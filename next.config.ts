@@ -5,7 +5,7 @@ import type { NextConfig } from "next";
 // serverless function bundle on Vercel and /api/repos returns stale data.
 const config: NextConfig = {
   outputFileTracingIncludes: {
-    "*": ["./data/rank.db"],
+    "/*": ["./data/rank.db"],
   },
 };
 
