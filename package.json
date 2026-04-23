@@ -1,0 +1,34 @@
+{
+  "name": "agent-friendly-code",
+  "version": "0.1.0",
+  "private": true,
+  "license": "MIT",
+  "author": "Himanshu Singh (https://github.com/hsnice16)",
+  "scripts": {
+    "dev": "bun --bun next dev -p 3000",
+    "build": "bun --bun next build",
+    "start": "bun --bun next start -p 3000",
+    "score": "bun run scripts/score.ts score",
+    "seed": "bun run scripts/seed.ts",
+    "init-db": "bun run scripts/init-db.ts",
+    "prepare-hooks": "lefthook install"
+  },
+  "dependencies": {
+    "@phosphor-icons/react": "2.1.10",
+    "next": "16.2.4",
+    "react": "19.2.5",
+    "react-dom": "19.2.5"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.4.12",
+    "@tailwindcss/postcss": "4.2.4",
+    "@types/bun": "1.3.12",
+    "@types/node": "25.6.0",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "lefthook": "2.1.6",
+    "postcss": "8.5.10",
+    "tailwindcss": "4.2.4",
+    "typescript": "6.0.3"
+  }
+}

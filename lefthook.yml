@@ -1,0 +1,15 @@
+# https://lefthook.dev/configuration/
+#
+# Activate locally: `bun run prepare-hooks` (alias for `lefthook install`).
+
+pre-commit:
+  parallel: true
+  jobs:
+    - name: biome
+      glob: "*.{js,ts,jsx,tsx,json,jsonc,css}"
+      run: bun x @biomejs/biome check --write --no-errors-on-unmatched {staged_files}
+      stage_fixed: true
+
+    - name: typecheck
+      glob: "*.{ts,tsx}"
+      run: bun x tsc --noEmit

@@ -1,0 +1,114 @@
+import type { Metadata, Viewport } from "next";
+import Link from "next/link";
+import "./globals.css";
+
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { MobileNav } from "@/components/MobileNav";
+import { VersionPill } from "@/components/VersionPill";
+import { APP_DESCRIPTION, APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
+
+const OG_IMAGE = {
+  width: 1200,
+  height: 630,
+  url: "/demo/light.png",
+  alt: `${APP_NAME} — public leaderboard`,
+};
+
+export const metadata: Metadata = {
+  applicationName: APP_NAME,
+  description: APP_DESCRIPTION,
+  metadataBase: new URL(APP_URL),
+  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  keywords: [
+    "AI coding agents",
+    "Claude Code",
+    "Cursor",
+    "Devin",
+    "GPT-5 Codex",
+    "AGENTS.md",
+    "agent readiness",
+    "open source",
+    "repo ranking",
+    "developer tools",
+  ],
+  creator: "Himanshu Singh",
+  authors: [{ name: "Himanshu Singh", url: REPO_URL }],
+  openGraph: {
+    url: "/",
+    locale: "en_US",
+    title: APP_NAME,
+    type: "website",
+    images: [OG_IMAGE],
+    siteName: APP_NAME,
+    description: APP_DESCRIPTION,
+  },
+  twitter: {
+    title: APP_NAME,
+    images: [OG_IMAGE.url],
+    card: "summary_large_image",
+    description: APP_DESCRIPTION,
+  },
+  alternates: { canonical: "/" },
+  robots: { index: true, follow: true },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+  colorScheme: "light dark",
+};
+
+const NAV_LINKS = [
+  { href: "/methodology", label: "Methodology" },
+  { href: "/roadmap", label: "Roadmap" },
+  { href: "/changelog", label: "Changelog" },
+];
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en">
+      <body>
+        <GoogleAnalytics />
+
+        <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
+          <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-3 py-3 sm:px-6">
+            <div className="flex items-center gap-2.5">
+              <div
+                aria-hidden="true"
+                className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-[13px] font-bold text-accent-ink"
+              >
+                A
+              </div>
+              <div className="text-[15px] font-semibold tracking-tight">
+                <Link href="/" className="text-ink hover:text-ink-soft">
+                  {APP_NAME}
+                </Link>
+              </div>
+            </div>
+
+            <nav aria-label="Primary" className="hidden items-center gap-4 text-[13.5px] md:flex">
+              {NAV_LINKS.map((l) => (
+                <Link key={l.href} href={l.href} className="text-ink-dim hover:text-ink-soft">
+                  {l.label}
+                </Link>
+              ))}
+              <VersionPill />
+            </nav>
+
+            <MobileNav links={NAV_LINKS} />
+          </div>
+        </header>
+
+        <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
+          <main id="main">{children}</main>
+          <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
+            Signals are static heuristics — no agent is actually run. Per-model weights are illustrative, not yet
+            empirically derived.
+          </footer>
+        </div>
+      </body>
+    </html>
+  );
+}

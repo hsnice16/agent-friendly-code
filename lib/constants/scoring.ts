@@ -1,0 +1,6 @@
+export const SCORE_THRESHOLD_MID = 60;
+export const SCORE_THRESHOLD_GOOD = 80;
+
+export const LEADERBOARD_PAGE_SIZE = 16;
+export const DEFAULT_SUGGESTION_LIMIT = 3;
+export const STRENGTHS_GAPS_VISIBLE_LIMIT = 5;
