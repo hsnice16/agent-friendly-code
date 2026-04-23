@@ -8,7 +8,7 @@ type Props = {
   placeholder?: string;
 };
 
-const DEBOUNCE_MS = 200;
+const DEBOUNCE_MS = 350;
 
 export function SearchBar({ placeholder = "Search repos by owner/name" }: Props) {
   const router = useRouter();
