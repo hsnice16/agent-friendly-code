@@ -9,3 +9,4 @@ tmp-clones/
 .DS_Store
 next-env.d.ts
 tsconfig.tsbuildinfo
+.claude/scheduled_tasks.lock

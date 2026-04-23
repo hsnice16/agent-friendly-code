@@ -27,6 +27,7 @@ const SEEDS: Seed[] = [
   { url: "https://github.com/oven-sh/bun", note: "Bun runtime (Zig)" },
   { url: "https://github.com/pallets/flask", note: "Python web framework" },
   { url: "https://github.com/django/django", note: "Django (Python)" },
+  { url: "https://github.com/antiwork/gumroad", note: "Gumroad (Ruby on Rails)" },
 
   // --- AI-native: coding agents ---
   {
