@@ -9,7 +9,7 @@ Read [AGENTS.md](./AGENTS.md) first — it's the source of truth for stack, conv
 ```bash
 bun install
 bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc)
-bun run seed            # optional: populate the DB with the curated set (~28 public repos)
+bun run seed            # optional: populate the DB with the curated set (~29 public repos)
 bun run dev             # http://localhost:3000
 ```
 
