@@ -9,7 +9,7 @@ Read [AGENTS.md](./AGENTS.md) first — it's the source of truth for stack, conv
 ```bash
 bun install
 bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc)
-bun run seed            # optional: populate the DB with the curated set (~27 public repos)
+bun run seed            # optional: populate the DB with the curated set (~28 public repos)
 bun run dev             # http://localhost:3000
 ```
 
@@ -53,7 +53,7 @@ Open against `main`. Keep the branch rebased; avoid merge commits from `main` in
 
 ### PR description — required sections
 
-Every PR description must include:
+New PRs auto-populate from [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_REQUEST_TEMPLATE.md). The template mirrors the sections below; keep the two in sync when either changes. Every PR description must include:
 
 ```markdown
 ## Summary

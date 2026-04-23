@@ -3,11 +3,11 @@
 [![Release](https://img.shields.io/badge/release-0.1.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
-[![Bun](https://img.shields.io/badge/runtime-Bun-%23000?style=flat-square)](https://bun.sh)
+[![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 
 **A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
 
-Next.js 16 + Bun + SQLite, styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.1.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.1.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -89,7 +89,7 @@ Auth and per-maintainer controls land with the opt-out / claim flow in v0.4.0.
 ```bash
 bun install
 bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc)
-bun run seed           # score the curated set (~27 repos) across GH / GL / BB
+bun run seed           # score the curated set (~28 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 ```
 
@@ -113,9 +113,9 @@ Optional: `GITHUB_TOKEN` / `GITLAB_TOKEN` in env to raise API rate limits.
 | Choice                                               | Why                                                                                                                                          | When we'd revisit                                                                                  |
 | ---------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | **Next.js 16 (App Router)**                          | Future features (filters, charts, auth, diff views) are React's territory. File-based routing + API routes replace hand-rolled HTTP cleanly. | Unlikely. The core scorer is stack-agnostic, only `app/` depends on this.                          |
-| **Bun runtime**                                      | Native TS, built-in SQLite, fast install + cold boot. Huge npm compat. Faster than Node; better Node-compat than Deno.                       | If a Bun-specific incompatibility surfaces that's not worth working around.                        |
+| **Node runtime (with `tsx` for CLI scripts)**        | Matches Vercel's serverless runtime — no Bun-only imports in prod. Bun still works locally as a fast package manager.                        | Unlikely — only if the deployment target changes.                                                  |
 | **Tailwind CSS 4**                                   | Zero-config via `@theme` tokens, no `tailwind.config.*` needed. Tight bundle output.                                                         | Would only leave for something with a stronger design-system story.                                |
-| **`bun:sqlite`**                                     | Zero deps, single file, inspectable. Avoids native-ABI drama (we tried `better-sqlite3` first and hit it).                                   | Postgres when concurrent writers / access control arrive (`tasks/1.0.0/01-postgres-migration.md`). |
+| **`better-sqlite3`**                                 | Single file, inspectable, zero ops overhead. Node-native so Vercel's serverless runtime can load it directly.                                | Postgres when concurrent writers / access control arrive (`tasks/1.0.0/01-postgres-migration.md`). |
 | **Server components + links, no client JS**          | Cheap, fast, SEO-friendly.                                                                                                                   | When a feature genuinely needs interactivity — e.g. live filter combinators.                       |
 | **Shallow git clones** (`--depth 1 --single-branch`) | Bandwidth + speed. Current signals don't need history.                                                                                       | History-aware signals → host APIs or `--filter=blob:none` partial clones.                          |
 | **Exact-pinned deps**                                | Deterministic scoring across environments.                                                                                                   | Never.                                                                                             |
@@ -147,14 +147,14 @@ lib/
   clients/    git clone, host API
   constants/  thresholds, host labels, sort keys
   utils/      format + score-tier helpers
-  db.ts       bun:sqlite schema + queries (all SQL lives here)
+  db.ts       better-sqlite3 schema + queries (all SQL lives here)
   version.ts  APP_NAME, APP_VERSION, APP_URL, APP_DESCRIPTION, REPO_URL
   changelog.ts / roadmap.ts
-scripts/      Bun-run CLI entries — score, seed, init-db
+scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db
 tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README + OG image
 .claude/      settings.json, hooks/ (Stop guard), skills/
-data/         SQLite database (gitignored)
+data/         rank.db (committed — shipped as a build artifact; rescoring runs locally)
 tmp-clones/   Shallow clones (gitignored)
 AGENTS.md     Agent instructions (source of truth)
 CONTRIBUTING.md  Human-contributor guide — PR workflow, review bar

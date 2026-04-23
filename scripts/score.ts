@@ -87,9 +87,12 @@ async function scoreCommand(target: string): Promise<void> {
 const [, , cmd, arg] = process.argv;
 
 if (cmd === "score" && arg) {
-  await scoreCommand(arg);
+  scoreCommand(arg).catch((err) => {
+    console.error(err);
+    process.exit(1);
+  });
 } else {
-  console.error("Usage: bun run scripts/score.ts score <github|gitlab|bitbucket url|local-path>");
+  console.error("Usage: bun run score <github|gitlab|bitbucket url|local-path>");
 
   process.exit(1);
 }

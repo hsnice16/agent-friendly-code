@@ -1,3 +1,5 @@
+import { relative } from "node:path";
+
 import { DEFAULT_SUGGESTION_LIMIT } from "../constants/scoring";
 import { runAllSignals, SIGNAL_BY_ID, type SignalResult } from "./signals";
 import { MODEL_BY_ID, MODELS, type ModelId, type ModelProfile } from "./weights";
@@ -47,8 +49,25 @@ function scoreOneModel(profile: ModelProfile, signals: SignalResult[]): ModelSco
   };
 }
 
+// Strip the absolute repo-root prefix so persisted/rendered paths never leak
+// the scanner's local filesystem layout. Signals are written individually —
+// some already return relative paths, some don't — normalising once here is
+// the reliable belt-and-braces.
+function toRelative(repoPath: string, p: string | undefined): string | undefined {
+  if (!p) {
+    return p;
+  }
+
+  const rel = relative(repoPath, p);
+  return rel.startsWith("..") ? p : rel || ".";
+}
+
 export function scoreRepo(repoPath: string): RepoScore {
-  const signals = runAllSignals(repoPath);
+  const rawSignals = runAllSignals(repoPath);
+  const signals = rawSignals.map((s) => ({
+    ...s,
+    matchedPath: toRelative(repoPath, s.matchedPath),
+  }));
   const modelScores = MODELS.map((m) => scoreOneModel(m, signals));
 
   const overall = Math.round((modelScores.reduce((a, b) => a + b.score, 0) / modelScores.length) * 10) / 10;
@@ -63,8 +82,6 @@ export type ImprovementSuggestion = {
   suggestion: string;
 };
 
-// For a given model, return the top N signal gaps ranked by how much score
-// the repo would gain by closing them (weight * (1 - current pass) / sumWeights * 100).
 export function topImprovements(
   modelId: ModelId,
   signals: SignalResult[],

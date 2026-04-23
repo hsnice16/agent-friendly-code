@@ -53,6 +53,14 @@ const SEEDS: Seed[] = [
     url: "https://github.com/farzaa/clicky",
     note: "Clicky — coding-agent side project",
   },
+  {
+    url: "https://github.com/openclaw/openclaw",
+    note: "OpenClaw — Captain Claw engine reimplementation (C++)",
+  },
+  {
+    url: "https://github.com/championswimmer/TwoFac",
+    note: "TwoFac — 2FA TOTP manager",
+  },
 
   // --- AI-native: models + infra ---
   {
@@ -86,7 +94,7 @@ let ok = 0,
 for (const s of SEEDS) {
   console.log(`\n━━━ seeding ${s.url}${s.note ? ` — ${s.note}` : ""} ━━━`);
 
-  const r = spawnSync("bun", ["run", "scripts/score.ts", "score", s.url], {
+  const r = spawnSync("bun", ["run", "score", s.url], {
     stdio: "inherit",
   });
 

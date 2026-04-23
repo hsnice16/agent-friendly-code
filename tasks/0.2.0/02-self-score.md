@@ -4,13 +4,12 @@
 
 ## Goal
 
-Seed this repo into the dashboard and confirm it hits ≥ 90 overall once tasks 01–06 land.
+Confirm this repo hits ≥ 90 overall on its own rubric once `tasks/0.2.0/01-tests.md` lands.
 
 ## Steps
 
-1. Add this repo to `scripts/seed.ts` once it's public.
-2. `bun run score <repo-url>` — confirm per-signal breakdown.
-3. If a signal fails in an unexpected way, treat it as a bug in the signal — fix the check, not the repo.
+1. `bun run score https://github.com/hsnice16/agent-friendly-code` — confirm per-signal breakdown (the repo is already in `scripts/seed.ts`).
+2. If a signal fails in an unexpected way, treat it as a bug in the signal — fix the check, not the repo.
 
 ## Acceptance
 

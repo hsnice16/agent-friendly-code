@@ -16,11 +16,11 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 
 - **Next.js 16** (App Router) — web UI + API routes.
 - **React 19** — server components by default; no client JS unless interactivity requires it.
-- **Bun** runtime — native TS for scripts; Next.js itself runs via `bun --bun next dev`.
+- **Node (≥20.9.0)** — runtime for Next.js and CLI scripts (via `tsx`). Matches Vercel's serverless runtime. Bun is supported as a faster local package manager (`bun install`) but not required.
 - **TypeScript** — strict mode.
 - **Tailwind CSS 4** — `@theme` tokens in `app/globals.css`; no `tailwind.config.*` file.
 - **Phosphor Icons** (`@phosphor-icons/react`) — the only icon library. The `code-review` skill blocks non-Phosphor icons.
-- **`bun:sqlite`** — built-in SQLite driver, single file at `data/rank.db`.
+- **`better-sqlite3`** — Node-native SQLite driver, single file at `data/rank.db`. Swapped back from `bun:sqlite` because Vercel's serverless functions run on Node.
 - **`git` CLI** — shallow clones (`--depth 1 --single-branch`) via `node:child_process`.
 
 ## Run anything
@@ -29,7 +29,7 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 bun install
 bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc on pre-commit)
 bun run init-db        # optional — auto-runs on first score
-bun run seed           # score the curated set (~27 repos) across GH / GL / BB
+bun run seed           # score the curated set (~28 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
 ```
@@ -69,7 +69,7 @@ lib/
     scorer.ts             # signals × weights, topImprovements
   clients/
     git.ts, github.ts
-  db.ts                   # bun:sqlite schema + queries
+  db.ts                   # better-sqlite3 schema + queries
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]

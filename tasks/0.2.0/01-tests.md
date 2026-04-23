@@ -13,10 +13,10 @@ Unit tests for the pure parts:
 
 ## Runner
 
-`bun test` (built-in). No extra deps.
+`node --test` (built-in, Node ≥20.9.0) — matches the prod runtime used on Vercel. Switch to `vitest` if we need watch mode + snapshots when the task actually lands.
 
 ## Acceptance
 
-- `bun test` passes.
+- `node --test` passes.
 - `/tests/` directory exists — flips the `tests` signal to pass=1 for our own repo.
 - Fixtures live under `tests/fixtures/`.

@@ -1,6 +1,6 @@
-import { Database } from "bun:sqlite";
 import { mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
+import Database from "better-sqlite3";
 
 import type { ModelScore } from "./scoring/scorer";
 import type { SignalResult } from "./scoring/signals";
@@ -115,9 +115,7 @@ export function saveScoredRepo(args: {
 export type LeaderboardRow = RepoRow & { score: number | null };
 
 export type LeaderboardOptions = {
-  /** Sort direction. */
   dir?: "asc" | "desc";
-  /** Column to sort by. */
   sort?: "score" | "stars";
   /** Restrict to a single host — "github" / "gitlab" / "bitbucket". */
   host?: string;
@@ -125,11 +123,7 @@ export type LeaderboardOptions = {
   model: string;
 };
 
-/**
- * Single entry point for the leaderboard — encapsulates model choice, host
- * filter, sort column, and direction. `sort` and `dir` are whitelisted so
- * they can be safely interpolated into SQL.
- */
+// `sort` and `dir` are whitelisted below so they can be safely interpolated into SQL.
 export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
   const sort = opts.sort === "stars" ? "stars" : "score";
   const dir = opts.dir === "asc" ? "ASC" : "DESC";
@@ -163,7 +157,6 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
     .all(opts.model, ...hostArgs) as LeaderboardRow[];
 }
 
-// Legacy shims — kept for any external callers (e.g. the API route).
 export function listLeaderboardOverall(): LeaderboardRow[] {
   return listLeaderboard({ model: "overall" });
 }

@@ -11,11 +11,8 @@ export type RoadmapVersion = {
   status: "planned" | "in_progress";
 };
 
-/**
- * What's next, version-by-version. Released versions live in lib/changelog.ts —
- * as an item ships, move it from here to there in the same PR. See
- * CONTRIBUTING.md for the workflow.
- */
+// As an item ships, move it from here to lib/changelog.ts in the same PR —
+// moved, not duplicated. See CONTRIBUTING.md for the workflow.
 export const ROADMAP: RoadmapVersion[] = [
   {
     version: "0.2.0",

@@ -1,7 +1,5 @@
 import { HOST_LABELS } from "../constants/hosts";
 
-// Intl.NumberFormat handles locale-aware compaction: 30090 → "30K", 1_400_000 → "1.4M".
-// We lowercase for aesthetics ("30k" reads a touch softer than "30K").
 const COMPACT_NUMBER = new Intl.NumberFormat("en", {
   notation: "compact",
   maximumFractionDigits: 1,
