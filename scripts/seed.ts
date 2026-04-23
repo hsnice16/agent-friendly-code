@@ -27,7 +27,10 @@ const SEEDS: Seed[] = [
   { url: "https://github.com/oven-sh/bun", note: "Bun runtime (Zig)" },
   { url: "https://github.com/pallets/flask", note: "Python web framework" },
   { url: "https://github.com/django/django", note: "Django (Python)" },
-  { url: "https://github.com/antiwork/gumroad", note: "Gumroad (Ruby on Rails)" },
+  {
+    note: "Gumroad (Ruby on Rails)",
+    url: "https://github.com/antiwork/gumroad",
+  },
 
   // --- AI-native: coding agents ---
   {
@@ -59,8 +62,12 @@ const SEEDS: Seed[] = [
     note: "OpenClaw — Captain Claw engine reimplementation (C++)",
   },
   {
-    url: "https://github.com/championswimmer/TwoFac",
     note: "TwoFac — 2FA TOTP manager",
+    url: "https://github.com/championswimmer/TwoFac",
+  },
+  {
+    note: "pretext — chenglou",
+    url: "https://github.com/chenglou/pretext",
   },
 
   // --- AI-native: models + infra ---
