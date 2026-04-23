@@ -29,7 +29,7 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 bun install
 bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc on pre-commit)
 bun run init-db        # optional — auto-runs on first score
-bun run seed           # score the curated set (~30 repos) across GH / GL / BB
+bun run seed           # score the curated set (~42 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
 ```

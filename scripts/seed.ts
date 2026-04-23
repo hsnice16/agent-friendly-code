@@ -16,6 +16,8 @@ const SEEDS: Seed[] = [
     url: "https://github.com/expressjs/express",
   },
   { url: "https://github.com/prettier/prettier", note: "Code formatter" },
+  { url: "https://github.com/n8n-io/n8n", note: "n8n — workflow automation" },
+  { url: "https://github.com/calcom/cal.diy", note: "Cal.com — cal.diy" },
 
   // --- GitHub, other languages ---
   { url: "https://github.com/astral-sh/ruff", note: "Python linter (Rust)" },
@@ -30,6 +32,34 @@ const SEEDS: Seed[] = [
   {
     note: "Gumroad (Ruby on Rails)",
     url: "https://github.com/antiwork/gumroad",
+  },
+  {
+    url: "https://github.com/PostHog/posthog",
+    note: "PostHog — product analytics (Python/Django)",
+  },
+  {
+    url: "https://github.com/apache/airflow",
+    note: "Airflow — workflow orchestration (Python)",
+  },
+  {
+    url: "https://github.com/apache/superset",
+    note: "Superset — data exploration + viz (Python)",
+  },
+  {
+    url: "https://github.com/microsoft/presidio",
+    note: "Presidio — PII detection / anonymization (Python)",
+  },
+  {
+    url: "https://github.com/google/osv-scanner",
+    note: "OSV-Scanner — vulnerability scanner (Go)",
+  },
+  {
+    note: "MuJoCo — physics simulator (C++)",
+    url: "https://github.com/google-deepmind/mujoco",
+  },
+  {
+    note: "Flutter sample apps (Dart)",
+    url: "https://github.com/flutter/samples",
   },
 
   // --- AI-native: coding agents ---
@@ -81,6 +111,18 @@ const SEEDS: Seed[] = [
     url: "https://github.com/vllm-project/vllm",
   },
   { url: "https://github.com/BerriAI/litellm", note: "Unified LLM proxy" },
+  {
+    note: "LangChain — LLM app framework",
+    url: "https://github.com/langchain-ai/langchain",
+  },
+  {
+    note: "OpenAI Cookbook — API examples / recipes",
+    url: "https://github.com/openai/openai-cookbook",
+  },
+  {
+    url: "https://github.com/karpathy/nanochat",
+    note: "nanochat — Karpathy's minimal LLM stack",
+  },
 
   // --- GitLab ---
   { url: "https://gitlab.com/gitlab-org/cli", note: "GitLab's own CLI (Go)" },
