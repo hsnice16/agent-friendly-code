@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { headers } from "next/headers";
 import Link from "next/link";
 import { HostPill } from "@/components/HostPill";
 import { HostSelect } from "@/components/HostSelect";
@@ -9,11 +10,11 @@ import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
 import { type Host, isHost } from "@/lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE } from "@/lib/constants/scoring";
+import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
-import { type LeaderboardRow, listLeaderboard } from "@/lib/db";
+import { getLeaderboardStats, type LeaderboardRow, listLeaderboard } from "@/lib/db";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
-import { compactStars } from "@/lib/utils/format";
+import { compactStars, relativeTime } from "@/lib/utils/format";
 
 type SearchParams = {
   q?: string;
@@ -70,21 +71,29 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   const dir: SortDir = isSortDir(sp.dir) ? sp.dir : DEFAULT_DIR;
   const sort: SortKey = isSortKey(sp.sort) ? sp.sort : DEFAULT_SORT;
 
+  // UA-based page size so mobile gets 16 rows and desktop gets 32 without the
+  // pagination math going inconsistent across viewports.
+  const ua = (await headers()).get("user-agent") ?? "";
+  const isMobile = /Mobi|Android|iPhone|iPod/i.test(ua);
+  const pageSize = isMobile ? LEADERBOARD_PAGE_SIZE_MOBILE : LEADERBOARD_PAGE_SIZE;
+
   const baseRows = listLeaderboard({
     dir,
     sort,
     model: selected,
     host: host === "all" ? undefined : host,
   });
+
   const filteredRows = q ? baseRows.filter((r) => matchesQuery(r, q)) : baseRows;
 
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / LEADERBOARD_PAGE_SIZE));
+  const stats = getLeaderboardStats();
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
 
   const parsedPage = Number(sp.page);
   const page = Number.isFinite(parsedPage) ? Math.min(totalPages, Math.max(1, Math.floor(parsedPage))) : 1;
 
-  const startIdx = (page - 1) * LEADERBOARD_PAGE_SIZE;
-  const rows = filteredRows.slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE);
+  const startIdx = (page - 1) * pageSize;
+  const rows = filteredRows.slice(startIdx, startIdx + pageSize);
 
   const activeLabel =
     selected === "overall"
@@ -116,21 +125,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         <strong className="text-ink-dim">{activeLabel}</strong> — {rationale}
       </div>
 
-      {/* Toolbar — search grows, filters + pagination beside it. Wraps on mobile. */}
+      {/* Toolbar — search grows, filters beside it. Wraps on mobile. */}
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
         <SearchBar />
 
         <div className="flex flex-wrap items-center gap-2">
           <HostSelect value={host} />
           <SortSelect sort={sort} dir={dir} />
-
-          <Pagination
-            page={page}
-            size="compact"
-            totalPages={totalPages}
-            label="Leaderboard pages"
-            hrefFor={(p) => buildHref({ model: selected, host, q, sort, dir, page: p })}
-          />
         </div>
       </div>
 
@@ -197,13 +198,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                 return (
                   <tr
                     key={r.id}
-                    className="[&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-[13px] [&>td]:text-[15px] hover:[&>td]:bg-surface-hover last:[&>td]:border-b-0 sm:[&>td]:px-[18px]"
+                    className="relative cursor-pointer [&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-[13px] [&>td]:text-[15px] hover:[&>td]:bg-surface-hover last:[&>td]:border-b-0 sm:[&>td]:px-[18px]"
                   >
                     <td className="tabular-nums text-muted">
                       <Medal rank={rank} />
                     </td>
                     <td>
-                      <Link href={`/repo/${r.id}`} className="font-medium text-ink hover:text-ink-soft">
+                      <Link
+                        href={`/repo/${r.id}`}
+                        aria-label={`View ${r.owner}/${r.name} details`}
+                        className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
+                      >
                         {r.owner}/{r.name}
                       </Link>
                       <HostPill host={r.host} />
@@ -218,7 +223,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                         rel="noopener"
                         target="_blank"
                         aria-label={`Open ${r.owner}/${r.name} on ${r.host} (new tab)`}
-                        className="inline-flex items-center gap-1 whitespace-nowrap text-ink-dim hover:text-ink-soft"
+                        className="relative inline-flex items-center gap-1 whitespace-nowrap text-ink-dim hover:text-ink-soft"
                       >
                         open <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
                       </a>
@@ -229,6 +234,29 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
             )}
           </tbody>
         </table>
+      </div>
+
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <p className="m-0 text-[12.5px] text-muted">
+          Tracking <strong className="font-medium text-ink-dim">{stats.count}</strong>{" "}
+          {stats.count === 1 ? "repo" : "repos"}
+          {stats.lastScoredAt != null && (
+            <>
+              {" · "}last updated{" "}
+              <time dateTime={new Date(stats.lastScoredAt * 1000).toISOString()}>
+                {relativeTime(stats.lastScoredAt)}
+              </time>
+            </>
+          )}
+        </p>
+
+        <Pagination
+          page={page}
+          size="compact"
+          totalPages={totalPages}
+          label="Leaderboard pages"
+          hrefFor={(p) => buildHref({ model: selected, host, q, sort, dir, page: p })}
+        />
       </div>
     </>
   );

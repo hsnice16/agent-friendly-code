@@ -5,9 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 export type SelectMenuOption = {
   value: string;
-  /** Full label shown in the open panel. */
   label: string;
-  /** Short label shown on the closed trigger. Defaults to `label` if absent. */
   shortLabel?: string;
 };
 
@@ -18,14 +16,6 @@ type Props = {
   onChange: (value: string) => void;
 };
 
-/**
- * Custom select that can show a short label on the trigger and a full label
- * in the popover. Native `<select>` can't do this — the closed state always
- * renders the option's text verbatim.
- *
- * Keyboard: Enter/Space opens, Escape closes, arrows move selection, Tab
- * escapes naturally. Click-outside closes.
- */
 export function SelectMenu({ label, options, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -75,7 +65,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         aria-expanded={open}
         aria-haspopup="listbox"
         onClick={() => setOpen((o) => !o)}
-        className="inline-flex items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[13px] text-ink-dim hover:text-ink-soft"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[13px] text-ink-dim hover:text-ink-soft"
       >
         <span className="whitespace-nowrap">{current.shortLabel ?? current.label}</span>
         <CaretDown size={11} weight="bold" aria-hidden="true" className="text-muted" />
@@ -94,7 +84,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
                 <button
                   type="button"
                   onClick={() => select(o.value)}
-                  className={`flex w-full items-center justify-between gap-3 px-3 py-2 text-left text-[13px] ${
+                  className={`flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-left text-[13px] ${
                     selected ? "text-ink" : "text-ink-dim"
                   } hover:bg-surface-hover hover:text-ink`}
                 >

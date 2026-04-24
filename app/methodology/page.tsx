@@ -35,6 +35,7 @@ export default function MethodologyPage() {
           enough to produce meaningfully different rankings and to show how the UX of per-model scoring feels, but it
           should not be read as a benchmark.
         </p>
+
         <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
           The plan to replace illustrative weights with measured ones is the v0.3.0 milestone on the{" "}
           <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
@@ -56,6 +57,7 @@ export default function MethodologyPage() {
 overall         = mean(per-model scores)
 improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100  points`}
           </pre>
+
           <p className="mt-3 text-sm text-muted">
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs">signal.pass</code>{" "}
             is a float in [0, 1] — partial credit is allowed (e.g. a thin README gets 0.3, a long one gets 1.0).
@@ -66,6 +68,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Signals ({SIGNALS.length})</PanelHeading>
+
           <ul className="m-0 list-none p-0">
             {SIGNALS.map((s) => (
               <li
@@ -91,11 +94,13 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Models & weight profiles ({MODELS.length})</PanelHeading>
+
           <ul className="m-0 list-none p-0">
             {MODELS.map((m) => (
               <li key={m.id} className="border-b border-line py-3 last:border-b-0">
                 <div className="text-[15px] font-medium">{m.label}</div>
                 <div className="mt-1 text-[13.5px] text-ink-dim">{m.rationale}</div>
+
                 <details className="mt-2 text-[13px] text-muted">
                   <summary className="cursor-pointer">Weights</summary>
                   <pre className="mt-2 overflow-x-auto rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs leading-relaxed">
@@ -116,7 +121,9 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             <li>Whether tests actually pass (we only detect their presence).</li>
             <li>Whether the linter actually runs cleanly.</li>
+
             <li>Whether the dev-env artifact (Makefile, Dockerfile) works end-to-end.</li>
+
             <li>
               Commit-history signals — churn, commit frequency, contributor count. We use
               <code className="mx-1 rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
@@ -129,6 +136,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
               </Link>
               .
             </li>
+
             <li>How agents actually perform on the repo — that&apos;s the v0.3.0 benchmark harness.</li>
           </ul>
         </Panel>

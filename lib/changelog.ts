@@ -20,6 +20,19 @@ export type ChangelogEntry = {
  */
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.2.0",
+    date: "2026-04-24",
+    title: "Complete the dogfood",
+    highlights: [
+      "This project scores ≥90 on its own rubric — overall 90.6, with each per-model score within 3 pts of the overall.",
+      "Leaderboard rows are fully clickable — click anywhere in a row to open the repo detail page (the external open link still goes to the host).",
+      "Curated set expanded ~5× — ~125 repos now ranked across JS/TS, Python, Rust, Go, JVM, C/C++, Swift, Ruby, Dart, language runtimes, AI-native models, and coding agents (up from ~25 at 0.1.0).",
+      "Desktop leaderboard shows 32 rows per page (mobile keeps 16), with pagination moved below the list so the toolbar stays clean.",
+      "Floating back-to-top button appears in the bottom-right when you're near the end of a long page.",
+      "Leaderboard footer shows the total number of tracked repos and when they were last scored.",
+    ],
+  },
+  {
     label: "0.1.0",
     date: "2026-04-22",
     title: "First public release",

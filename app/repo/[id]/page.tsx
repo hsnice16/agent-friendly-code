@@ -192,10 +192,12 @@ export default async function Page({
                 <dt className="inline">Stars: </dt>
                 <dd className="inline font-medium text-ink">{compactStars(repo.stars, false)}</dd>
               </div>
+
               <div>
                 <dt className="inline">Default branch: </dt>
                 <dd className="inline font-medium text-ink">{repo.default_branch ?? "—"}</dd>
               </div>
+
               <div>
                 <dt className="inline">Last scored: </dt>
                 <dd className="inline font-medium text-ink">
@@ -221,6 +223,7 @@ export default async function Page({
       {/* Strengths + Gaps — two separate cards, aligned */}
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <StrengthsCard items={strengths} empty={{ chip: "bad", text: "No fully-passing signals yet." }} />
+
         <GapsCard items={gaps} empty={{ chip: "ok", text: "No missing signals — nice." }} />
       </div>
 

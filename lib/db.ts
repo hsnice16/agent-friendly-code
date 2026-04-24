@@ -183,3 +183,19 @@ export function getSignalResults(repoId: number): SignalResult[] {
     )
     .all(repoId) as any as SignalResult[];
 }
+
+export type LeaderboardStats = {
+  count: number;
+  lastScoredAt: number | null;
+};
+
+export function getLeaderboardStats(): LeaderboardStats {
+  const row = db
+    .prepare(
+      `SELECT COUNT(*) AS count, MAX(last_scored_at) AS lastScoredAt
+       FROM repo WHERE overall_score IS NOT NULL`,
+    )
+    .get() as LeaderboardStats;
+
+  return { count: row.count ?? 0, lastScoredAt: row.lastScoredAt ?? null };
+}

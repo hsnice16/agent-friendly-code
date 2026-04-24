@@ -8,9 +8,10 @@ Read [AGENTS.md](./AGENTS.md) first — it's the source of truth for stack, conv
 
 ```bash
 bun install
-bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc)
-bun run seed            # optional: populate the DB with the curated set (~42 public repos)
+bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc + test)
+bun run seed            # optional: populate the DB with the curated set (124 public repos)
 bun run dev             # http://localhost:3000
+bun run test            # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
 
 ## Branch naming
@@ -40,10 +41,11 @@ Don't squash-amend published commits. Don't skip hooks (`--no-verify`); if a hoo
 
 ## Pre-commit hook
 
-`lefthook` runs two jobs on every commit:
+`lefthook` runs three jobs on every commit:
 
 1. **Biome** — `check --write` on staged JS/TS/JSON/CSS. Fixes and re-stages.
 2. **tsc** — `--noEmit` on `*.{ts,tsx}`. Blocks commits that don't typecheck.
+3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite (~1–2 s); blocks on regressions.
 
 Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/`) runs the same checks on PR for belt-and-braces.
 
@@ -62,8 +64,7 @@ New PRs auto-populate from [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_R
 
 ## Motivation
 
-<Why this change. Link to the roadmap item or `tasks/<file>.md`. If it's
-a roadmap item, quote the task's Goal line.>
+<Why this change. Link to the roadmap item or `tasks/<file>.md`. If it's a roadmap item, quote the task's Goal line.>
 
 ## Changes
 
@@ -71,8 +72,7 @@ a roadmap item, quote the task's Goal line.>
 
 ## Testing
 
-<How you verified this. Commands run (`bun run score <url>`, `bun x tsc --noEmit`,
-manual pass of specific pages). For UI changes: mobile + desktop, light + dark.>
+<How you verified this. Commands run (`bun run test`, `bun run score <url>`, `bun x tsc --noEmit`, manual pass of specific pages). For UI changes: mobile + desktop, light + dark.>
 
 ## Screenshots / screencasts
 

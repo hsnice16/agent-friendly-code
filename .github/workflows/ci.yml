@@ -12,7 +12,7 @@ concurrency:
 
 jobs:
   check:
-    name: Lint · Format · Typecheck
+    name: Lint · Format · Typecheck · Test
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -22,6 +22,11 @@ jobs:
         with:
           bun-version: 1.2.16
 
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
       - name: Install
         run: bun install --frozen-lockfile
 
@@ -30,3 +35,6 @@ jobs:
 
       - name: Typecheck
         run: bun x tsc --noEmit
+
+      - name: Test
+        run: bun run test

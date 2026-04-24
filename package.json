@@ -1,9 +1,12 @@
 {
   "name": "agent-friendly-code",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "private": true,
   "license": "MIT",
   "author": "Himanshu Singh (https://github.com/hsnice16)",
+  "engines": {
+    "node": ">=20.9.0"
+  },
   "scripts": {
     "dev": "next dev -p 3000",
     "build": "next build",
@@ -11,7 +14,8 @@
     "score": "tsx scripts/score.ts score",
     "seed": "tsx scripts/seed.ts",
     "init-db": "tsx scripts/init-db.ts",
-    "prepare-hooks": "lefthook install"
+    "prepare-hooks": "lefthook install",
+    "test": "node --import tsx --test 'tests/**/*.test.ts'"
   },
   "dependencies": {
     "@phosphor-icons/react": "2.1.10",

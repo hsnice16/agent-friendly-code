@@ -6,6 +6,10 @@ import { fetchRepoMeta, parseRepoUrl } from "../lib/clients/github";
 import { saveScoredRepo } from "../lib/db";
 import { scoreRepo } from "../lib/scoring/scorer";
 
+try {
+  process.loadEnvFile();
+} catch {}
+
 const CLONE_ROOT = join(process.cwd(), "tmp-clones");
 
 async function scoreCommand(target: string): Promise<void> {

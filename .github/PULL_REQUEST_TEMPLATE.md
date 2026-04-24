@@ -14,7 +14,7 @@ _Bulleted list of what this PR modifies. Keep it scoped to the summary._
 
 ## Testing
 
-_How you verified this. Commands run (`bun run score <url>`, `bun x tsc --noEmit`, manual pass of specific pages). For UI changes: mobile + desktop, light + dark._
+_How you verified this. Commands run (`bun run test`, `bun run score <url>`, `bun x tsc --noEmit`, manual pass of specific pages). For UI changes: mobile + desktop, light + dark._
 
 ## Screenshots / screencasts
 

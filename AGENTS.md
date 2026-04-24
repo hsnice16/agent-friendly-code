@@ -27,11 +27,12 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc on pre-commit)
+bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test on pre-commit)
 bun run init-db        # optional — auto-runs on first score
-bun run seed           # score the curated set (~42 repos) across GH / GL / BB
+bun run seed           # score the curated set (124 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
+bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
 
 ## Layout
@@ -54,7 +55,7 @@ components/               # Tailwind-styled React components
   HostPill.tsx, HostSelect.tsx, Medal.tsx, ModelPills.tsx,
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
-  GoogleAnalytics.tsx
+  BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
     scoring.ts            # score thresholds, visible limits
@@ -75,10 +76,16 @@ lib/
   roadmap.ts              # typed RoadmapVersion[]
 scripts/
   init-db.ts, score.ts, seed.ts
+tests/
+  _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
+  format.test.ts          # compactStars, relativeTime, hostLabel
+  parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
+  scorer.test.ts          # scoreRepo, topImprovements
+  signals/                # one *.test.ts per signal
 tasks/
   README.md
   0.1.0/                  # released — shipped record
-  0.2.0/                  # planned — complete the dogfood
+  0.2.0/                  # released — dogfood complete (tests, self-score, row-click)
   0.3.0/                  # planned — real per-model weights (benchmark harness)
   0.4.0/                  # planned — ecosystem integration (badge, PR diff, webhook, opt-out)
   0.5.0/                  # planned — discovery (alternative recommender)
@@ -184,6 +191,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 ## Useful pre-commit checks
 
 - `bun run score https://github.com/honojs/hono` — end-to-end smoke.
+- `bun run test` — unit tests (Node ≥20.9.0 required).
 - `curl -s localhost:3000/api/repos | head` — verify persistence + API.
 - `bun x tsc --noEmit` — typecheck.
 - Manual pass over `/`, `/repo/:id`, `/methodology`, `/roadmap`, `/changelog` after UI changes.

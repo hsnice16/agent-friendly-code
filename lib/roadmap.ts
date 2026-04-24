@@ -15,23 +15,6 @@ export type RoadmapVersion = {
 // moved, not duplicated. See CONTRIBUTING.md for the workflow.
 export const ROADMAP: RoadmapVersion[] = [
   {
-    version: "0.2.0",
-    status: "planned",
-    theme: "Complete the dogfood",
-    items: [
-      {
-        title: "Tests",
-        taskFile: "tasks/0.2.0/01-tests.md",
-        summary: "Unit tests for scorer, signals, URL parser.",
-      },
-      {
-        title: "Self-score",
-        taskFile: "tasks/0.2.0/02-self-score.md",
-        summary: "Make the repo hit ≥90 on its own rubric.",
-      },
-    ],
-  },
-  {
     version: "0.3.0",
     status: "planned",
     theme: "Real per-model weights",

@@ -1,13 +1,13 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.1.0-blue?style=flat-square)](./lib/changelog.ts)
+[![Release](https://img.shields.io/badge/release-0.2.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
 [![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 
 **A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
 
-Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.1.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.2.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -88,8 +88,8 @@ Auth and per-maintainer controls land with the opt-out / claim flow in v0.4.0.
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc)
-bun run seed           # score the curated set (~42 repos) across GH / GL / BB
+bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test)
+bun run seed           # score the curated set (124 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 ```
 
@@ -104,9 +104,11 @@ bun run score /path/to/local/checkout
 
 Optional: `GITHUB_TOKEN` / `GITLAB_TOKEN` in env to raise API rate limits.
 
+Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Node ≥20.9.0).
+
 ## Versioning
 
-`lib/version.ts` and `package.json` carry the current release number (currently **0.1.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
+`lib/version.ts` and `package.json` carry the current release number (currently **0.2.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
 
 ## Stack & rationale
 
@@ -148,9 +150,10 @@ lib/
   constants/  thresholds, host labels, sort keys
   utils/      format + score-tier helpers
   db.ts       better-sqlite3 schema + queries (all SQL lives here)
-  version.ts  APP_NAME, APP_VERSION, APP_URL, APP_DESCRIPTION, REPO_URL
+  version.ts  APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL
   changelog.ts / roadmap.ts
 scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db
+tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README + OG image
 .claude/      settings.json, hooks/ (Stop guard), skills/
@@ -166,7 +169,6 @@ LICENSE       MIT
 
 See `/roadmap` in the running app or the per-version `tasks/` folders for the full picture.
 
-- **0.2.0 — complete the dogfood**: tests for scorer / signals / URL parser + self-score ≥ 90 on this repo's own rubric.
 - **0.3.0 — real per-model weights**: benchmark harness actually runs agents on scoped tasks per repo; current illustrative weights get replaced with measured ones.
 - **0.4.0 — ecosystem integration**: badge endpoint for READMEs, GitHub Action that comments score delta on PRs, webhook-driven rescoring, OAuth-gated opt-out / claim flow for maintainers.
 - **0.5.0 — alternative recommender**: "repo Y does the same thing and ranks higher for your model."

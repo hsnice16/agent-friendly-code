@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import "./globals.css";
 
+import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MobileNav } from "@/components/MobileNav";
 import { VersionPill } from "@/components/VersionPill";
@@ -108,6 +109,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             empirically derived.
           </footer>
         </div>
+
+        <BackToTop />
       </body>
     </html>
   );
