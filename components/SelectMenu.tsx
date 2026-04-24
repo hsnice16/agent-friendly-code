@@ -20,7 +20,6 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
-
   const current = options.find((o) => o.value === value) ?? options[0];
 
   useEffect(() => {
@@ -71,31 +70,31 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         <CaretDown size={11} weight="bold" aria-hidden="true" className="text-muted" />
       </button>
 
-      {open && (
-        <div
-          role="listbox"
-          aria-label={label}
-          className="absolute right-0 top-full z-30 mt-1 min-w-[220px] overflow-hidden rounded-md border border-line bg-surface shadow-md"
-        >
-          {options.map((o) => {
-            const selected = o.value === value;
-            return (
-              <div key={o.value} role="option" tabIndex={-1} aria-selected={selected}>
-                <button
-                  type="button"
-                  onClick={() => select(o.value)}
-                  className={`flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-left text-[13px] ${
-                    selected ? "text-ink" : "text-ink-dim"
-                  } hover:bg-surface-hover hover:text-ink`}
-                >
-                  <span>{o.label}</span>
-                  {selected && <Check size={12} weight="bold" aria-hidden="true" />}
-                </button>
-              </div>
-            );
-          })}
-        </div>
-      )}
+      <div
+        role="listbox"
+        aria-label={label}
+        className={`absolute right-0 top-full z-30 mt-1 min-w-[220px] origin-top-right overflow-hidden rounded-md border border-line bg-surface shadow-md transition duration-150 ease-out ${
+          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
+        }`}
+      >
+        {options.map((o) => {
+          const selected = o.value === value;
+          return (
+            <div key={o.value} role="option" tabIndex={-1} aria-selected={selected}>
+              <button
+                type="button"
+                onClick={() => select(o.value)}
+                className={`flex w-full cursor-pointer items-center justify-between gap-3 px-3 py-2 text-left text-[13px] ${
+                  selected ? "text-ink" : "text-ink-dim"
+                } hover:bg-surface-hover hover:text-ink`}
+              >
+                <span>{o.label}</span>
+                {selected && <Check size={12} weight="bold" aria-hidden="true" />}
+              </button>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
