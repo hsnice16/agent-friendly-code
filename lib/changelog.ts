@@ -38,7 +38,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     title: "First public release",
     highlights: [
       "Public leaderboard ranking open-source repos by agent-friendliness across GitHub, GitLab, and Bitbucket.",
-      "Per-model scoring — separate ranking for Claude Code, Cursor, Devin, and Codex, each with its own signal weights.",
+      "Per-model scoring — separate ranking for Claude Code, Cursor, Devin, and GPT-5 Codex, each with its own signal weights.",
       "Repo detail page — score breakdown per signal and the top improvements ranked by score-gain for the selected model.",
       "Methodology page explaining what's measured today and what isn't.",
       "Leaderboard controls — live search, host filter (GitHub / GitLab / Bitbucket), rank + stars sort, paginated results.",

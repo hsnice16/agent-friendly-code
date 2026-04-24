@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for AI coding agents (Claude Code, Cursor, Codex, Devin, etc.) working on this repo.
+Instructions for AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, etc.) working on this repo.
 
 > `CLAUDE.md` is a one-line pointer to this file. AGENTS.md is the cross-agent standard; keeping one source of truth avoids drift.
 >
@@ -27,9 +27,9 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test on pre-commit)
+bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test + file-length on pre-commit)
 bun run init-db        # optional — auto-runs on first score
-bun run seed           # score the curated set (124 repos) across GH / GL / BB
+bun run seed           # score the curated set (155 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
 bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
@@ -55,6 +55,7 @@ components/               # Tailwind-styled React components
   HostPill.tsx, HostSelect.tsx, Medal.tsx, ModelPills.tsx,
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
+  RepoHero.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
@@ -75,7 +76,7 @@ lib/
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
 scripts/
-  init-db.ts, score.ts, seed.ts
+  init-db.ts, score.ts, seed.ts, seed-list.ts
 tests/
   _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
   format.test.ts          # compactStars, relativeTime, hostLabel
@@ -120,6 +121,7 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 - **Brand on UI**: "Agent Friendly Code" (no hyphen). Repo/package slug + GitHub `User-Agent` string: `agent-friendly-code`.
 - **Version**: `APP_VERSION` in `lib/version.ts` and `package.json`'s `version` carry the current release number. Bump both (and add a new bucket in `lib/changelog.ts`) only when cutting a release — never when merging intermediate work.
 - **Versioning + changelog**: bumps on `lib/version.ts` + `package.json` `version` happen only on a real release, coordinated with a new bucket in `lib/changelog.ts`. The changelog is a **user-facing capability log** — every bullet describes something a dashboard visitor or API caller can see, click, or call. Codebase hygiene (CI, linters, pre-commit, tests), pure internal refactors, dep bumps, and contributor-facing docs (CONTRIBUTING, PR templates) do **not** earn a changelog line — they stay in `tasks/` and the PR description. When a roadmap item ships, remove it from `lib/roadmap.ts` in the same PR — moved, not duplicated.
+- **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines — enforced by the `file-length` pre-commit job in `lefthook.yml`. Near the cap, split into subcomponents or extract helpers to `lib/utils/`. `scripts/` is exempt (seed data lists).
 
 ## Adding a signal
 

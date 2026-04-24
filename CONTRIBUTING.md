@@ -8,8 +8,8 @@ Read [AGENTS.md](./AGENTS.md) first — it's the source of truth for stack, conv
 
 ```bash
 bun install
-bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc + test)
-bun run seed            # optional: populate the DB with the curated set (124 public repos)
+bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc + test + file-length)
+bun run seed            # optional: populate the DB with the curated set (155 public repos)
 bun run dev             # http://localhost:3000
 bun run test            # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
@@ -41,11 +41,12 @@ Don't squash-amend published commits. Don't skip hooks (`--no-verify`); if a hoo
 
 ## Pre-commit hook
 
-`lefthook` runs three jobs on every commit:
+`lefthook` runs four jobs on every commit:
 
 1. **Biome** — `check --write` on staged JS/TS/JSON/CSS. Fixes and re-stages.
 2. **tsc** — `--noEmit` on `*.{ts,tsx}`. Blocks commits that don't typecheck.
 3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite (~1–2 s); blocks on regressions.
+4. **file-length** — blocks staged `.ts`/`.tsx` under `app/`, `components/`, `lib/` that exceed 300 lines. Split into subcomponents or pull helpers into `lib/utils/`. `scripts/` is exempt.
 
 Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/`) runs the same checks on PR for belt-and-braces.
 

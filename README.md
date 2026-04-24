@@ -88,8 +88,8 @@ Auth and per-maintainer controls land with the opt-out / claim flow in v0.4.0.
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test)
-bun run seed           # score the curated set (124 repos) across GH / GL / BB
+bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test + file-length)
+bun run seed           # score the curated set (155 repos) across GH / GL / BB
 bun run dev            # http://localhost:3000
 ```
 

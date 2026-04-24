@@ -17,3 +17,8 @@ pre-commit:
     - name: test
       glob: "*.{ts,tsx}"
       run: bun run test
+
+    - name: file-length
+      glob: "{app,components,lib}/**/*.{ts,tsx}"
+      run: |
+        wc -l {staged_files} | awk '$2 != "total" && $1 > 300 { printf "✗ %s: %d lines (cap: 300)\n", $2, $1; bad=1 } END { exit bad+0 }'
