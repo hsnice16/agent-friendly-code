@@ -1,12 +1,18 @@
-import { mkdirSync } from "node:fs";
+import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
 
 import type { ModelScore } from "./scoring/scorer";
 import type { SignalResult } from "./scoring/signals";
 
-const DB_PATH = join(process.cwd(), "data", "rank.db");
-mkdirSync(dirname(DB_PATH), { recursive: true });
+const BUNDLED_DB = join(process.cwd(), "data", "rank.db");
+const DB_PATH = process.env.VERCEL ? "/tmp/rank.db" : BUNDLED_DB;
+
+if (process.env.VERCEL) {
+  if (!existsSync(DB_PATH)) copyFileSync(BUNDLED_DB, DB_PATH);
+} else {
+  mkdirSync(dirname(DB_PATH), { recursive: true });
+}
 
 export const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL;");
