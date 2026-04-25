@@ -6,7 +6,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "printf '\\n📦 Agent Friendly Code — current release: 0.3.0\\n  • Read AGENTS.md for conventions, CONTRIBUTING.md for the PR workflow.\\n  • Roadmap: 0.4.0 (quick wins — history-aware signals + PR score-diff) → 0.5.0 (auto-refresh + smarter matching) → 0.6.0 (maintainer ownership + at-scale discovery) → 1.0.0 (production cut — Postgres + at-scale indexing + benchmark harness).\\n  • Changelog rule: user-facing capabilities only. Codebase hygiene (CI / linter / tests / CONTRIBUTING) does NOT go in lib/changelog.ts.\\n'"
+            "command": "printf '\\n📦 Agent Friendly Code — current release: 0.3.0\\n  • Read AGENTS.md for conventions, CONTRIBUTING.md for the PR workflow.\\n  • Roadmap: 0.4.0 (quick wins — history-aware signals + PR score-diff + Claude Code skill) → 0.5.0 (auto-refresh + smarter matching) → 0.6.0 (maintainer ownership + at-scale discovery) → 1.0.0 (production cut — Postgres + at-scale indexing + benchmark harness).\\n  • Changelog rule: user-facing capabilities only. Codebase hygiene (CI / linter / tests / CONTRIBUTING) does NOT go in lib/changelog.ts.\\n'"
           }
         ]
       }
