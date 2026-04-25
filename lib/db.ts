@@ -51,12 +51,6 @@ db.exec(`
   );
 `);
 
-// Additive migration for DBs created before `language` existed. `ALTER TABLE ... ADD COLUMN` is idempotent-by-error
-// in SQLite — swallow the "duplicate column" case on re-runs.
-try {
-  db.exec("ALTER TABLE repo ADD COLUMN language TEXT");
-} catch {}
-
 export type RepoRow = {
   id: number;
   url: string;
@@ -240,8 +234,6 @@ export type AlternativeRow = {
   stars: number | null;
 };
 
-// Same-host / same-language alternatives, ordered by the selected model's score when
-// `modelId` is provided, otherwise by overall_score.
 export function getAlternatives(repoId: number, modelId: string | null, limit: number): AlternativeRow[] {
   if (modelId) {
     return db
