@@ -8,7 +8,7 @@ Score signals that need git history or repo activity data, which the current `--
 
 ## Context
 
-Today's scorer reads file contents from the working tree at HEAD of the default branch. This is correct for the 12 static signals (presence of `AGENTS.md`, `tests/`, CI configs, etc.) but misses anything time-derived. Methodology's "What isn't measured yet" section acknowledges this; v0.7.0 closes the gap.
+Today's scorer reads file contents from the working tree at HEAD of the default branch. This is correct for the 12 static signals (presence of `AGENTS.md`, `tests/`, CI configs, etc.) but misses anything time-derived. Methodology's "What isn't measured yet" section acknowledges this; v0.4.0 closes the gap.
 
 ## Candidate signals (pick ≥ 3 to ship)
 

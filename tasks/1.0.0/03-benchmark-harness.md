@@ -1,4 +1,4 @@
-# 01 · Benchmark harness
+# 03 · Benchmark harness
 
 **Status**: planned
 

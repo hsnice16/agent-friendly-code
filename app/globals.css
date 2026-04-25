@@ -67,10 +67,10 @@ html {
 html,
 body {
   margin: 0;
-  background: var(--color-bg);
-  color: var(--color-ink);
-  font-family: var(--font-sans);
   line-height: 1.6;
+  color: var(--color-ink);
+  background: var(--color-bg);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -99,9 +99,9 @@ textarea,
 }
 
 *:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
   border-radius: 4px;
+  outline-offset: 2px;
+  outline: 2px solid var(--color-accent);
 }
 
 input:focus,
@@ -118,10 +118,11 @@ select:focus-visible {
   html {
     scroll-behavior: auto;
   }
+
   *,
   *::before,
   *::after {
-    transition: none !important;
     animation: none !important;
+    transition: none !important;
   }
 }

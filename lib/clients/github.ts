@@ -48,7 +48,11 @@ export function parseRepoUrl(input: string): ParsedRepo | null {
   return null;
 }
 
-export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{ defaultBranch?: string; stars?: number } | null> {
+export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{
+  stars?: number;
+  defaultBranch?: string;
+  language?: string | null;
+} | null> {
   try {
     if (parsed.host === "github") {
       const headers: Record<string, string> = {
@@ -67,7 +71,11 @@ export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{ defaultBranch
       }
 
       const j: any = await res.json();
-      return { defaultBranch: j.default_branch, stars: j.stargazers_count };
+      return {
+        stars: j.stargazers_count,
+        language: j.language ?? null,
+        defaultBranch: j.default_branch,
+      };
     }
 
     if (parsed.host === "gitlab") {
@@ -89,7 +97,12 @@ export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{ defaultBranch
       }
 
       const j: any = await res.json();
-      return { defaultBranch: j.default_branch, stars: j.star_count };
+      // GitLab's primary-language requires a separate /languages call; skip for v1.
+      return {
+        language: null,
+        stars: j.star_count,
+        defaultBranch: j.default_branch,
+      };
     }
 
     if (parsed.host === "bitbucket") {
@@ -102,7 +115,10 @@ export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{ defaultBranch
       }
 
       const j: any = await res.json();
-      return { defaultBranch: j.mainbranch?.name };
+      return {
+        language: j.language ?? null,
+        defaultBranch: j.mainbranch?.name,
+      };
     }
   } catch {}
   return null;

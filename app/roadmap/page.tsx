@@ -31,7 +31,9 @@ export default function RoadmapPage() {
               <span className="inline-block rounded-md border border-line bg-surface-2 px-2.5 py-[3px] font-mono text-[13px] font-semibold text-accent">
                 {v.version}
               </span>
+
               <span className="mr-auto text-lg font-semibold tracking-tight">{v.theme}</span>
+
               <span className="rounded-full border border-line bg-surface-2 px-2.5 py-0.5 text-xs uppercase tracking-wide text-muted">
                 {v.status.replace("_", " ")}
               </span>
@@ -51,7 +53,7 @@ export default function RoadmapPage() {
 
                   {it.taskFile && (
                     <a
-                      rel="noopener"
+                      rel="noopener noreferrer"
                       target="_blank"
                       href={`${REPO_URL}/blob/main/${it.taskFile}`}
                       aria-label={`Open ${it.taskFile} on GitHub (new tab)`}

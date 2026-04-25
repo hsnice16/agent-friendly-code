@@ -26,6 +26,10 @@ export const metadata: Metadata = {
     "Cursor",
     "Devin",
     "GPT-5 Codex",
+    "Gemini CLI",
+    "Aider",
+    "OpenHands",
+    "Pi",
     "AGENTS.md",
     "agent readiness",
     "open source",
@@ -53,6 +57,36 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${APP_URL}/#org`,
+      url: APP_URL,
+      name: APP_NAME,
+      sameAs: [REPO_URL],
+      logo: `${APP_URL}/icon.svg`,
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${APP_URL}/#site`,
+      url: APP_URL,
+      name: APP_NAME,
+      description: APP_DESCRIPTION,
+      publisher: { "@id": `${APP_URL}/#org` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${APP_URL}/?q={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
@@ -67,10 +101,25 @@ const NAV_LINKS = [
   { href: "/changelog", label: "Changelog" },
 ];
 
+const FOOTER_LINKS = [
+  { href: "/", label: "Home" },
+  { href: "/methodology", label: "Methodology" },
+  { href: "/roadmap", label: "Roadmap" },
+  { href: "/changelog", label: "Changelog" },
+  { href: "/package", label: "Packages" },
+];
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>
+        <script
+          type="application/ld+json"
+          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw script content; payload is server-controlled and `<` is escaped
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c"),
+          }}
+        />
         <GoogleAnalytics />
 
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
@@ -105,6 +154,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
           <main id="main">{children}</main>
           <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
+            <nav aria-label="Secondary" className="mb-2 flex flex-wrap gap-x-4 gap-y-1">
+              {FOOTER_LINKS.map((l) => (
+                <Link key={l.href} href={l.href} className="text-ink-dim hover:text-ink-soft">
+                  {l.label}
+                </Link>
+              ))}
+            </nav>
             Signals are static heuristics — no agent is actually run. Per-model weights are illustrative, not yet
             empirically derived.
           </footer>

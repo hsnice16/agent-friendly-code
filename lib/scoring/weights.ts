@@ -1,4 +1,4 @@
-export type ModelId = "claude-code" | "cursor" | "devin" | "gpt-5-codex";
+export type ModelId = "pi" | "aider" | "cursor" | "devin" | "openhands" | "gemini-cli" | "claude-code" | "gpt-5-codex";
 
 export type ModelProfile = {
   id: ModelId;
@@ -84,6 +84,86 @@ export const MODELS: ModelProfile[] = [
       pre_commit: 0.4,
       type_config: 0.7,
       contributing: 0.4,
+      deps_manifest: 0.7,
+    },
+  },
+  {
+    id: "gemini-cli",
+    label: "Gemini CLI",
+    rationale:
+      "Weights long-form README and strict type configs — Gemini's long context favors docs-heavy codebases that spell out contracts.",
+    weights: {
+      ci: 0.6,
+      size: 0.5,
+      tests: 0.9,
+      linter: 0.7,
+      readme: 0.9,
+      dev_env: 0.7,
+      license: 0.3,
+      agents_md: 0.7,
+      pre_commit: 0.4,
+      type_config: 0.9,
+      contributing: 0.4,
+      deps_manifest: 0.8,
+    },
+  },
+  {
+    id: "aider",
+    label: "Aider",
+    rationale:
+      "Weights tests and linter highest — Aider runs both per-edit as its feedback loop, so a green bar translates directly into successful commits.",
+    weights: {
+      ci: 0.3,
+      size: 0.4,
+      tests: 1.0,
+      linter: 1.0,
+      readme: 0.6,
+      dev_env: 0.5,
+      license: 0.2,
+      agents_md: 0.8,
+      pre_commit: 0.3,
+      type_config: 0.5,
+      contributing: 0.3,
+      deps_manifest: 0.7,
+    },
+  },
+  {
+    id: "openhands",
+    label: "OpenHands",
+    rationale:
+      "Weights reproducible dev-env and CI highest — OpenHands operates from a sandboxed container, so a working Dockerfile / Makefile is near-mandatory.",
+    weights: {
+      ci: 1.0,
+      size: 0.7,
+      tests: 0.9,
+      linter: 0.6,
+      readme: 0.7,
+      dev_env: 1.0,
+      license: 0.4,
+      agents_md: 0.5,
+      pre_commit: 0.6,
+      type_config: 0.5,
+      contributing: 0.7,
+      deps_manifest: 1.0,
+    },
+  },
+  {
+    id: "pi",
+    label: "Pi",
+    rationale:
+      "Weights AGENTS.md heavily and rewards a fast test/lint loop — Pi's minimal terminal harness reads AGENTS.md explicitly and defers sandboxing to user-installed extensions.",
+    weights: {
+      ci: 0.4,
+      size: 0.5,
+      tests: 0.9,
+      linter: 0.8,
+      readme: 0.7,
+      dev_env: 0.6,
+      license: 0.2,
+      agents_md: 1.0,
+      pre_commit: 0.4,
+      type_config: 0.6,
+      contributing: 0.3,
       deps_manifest: 0.7,
     },
   },

@@ -22,6 +22,7 @@ async function scoreCommand(target: string): Promise<void> {
   let repoPath: string;
   let stars: number | undefined;
   let defaultBranch: string | undefined;
+  let language: string | null | undefined;
 
   if (existsSync(target) && statSync(target).isDirectory()) {
     repoPath = target;
@@ -50,9 +51,11 @@ async function scoreCommand(target: string): Promise<void> {
     await shallowClone(parsed.cloneUrl, repoPath);
 
     const meta = await fetchRepoMeta(parsed);
+
     if (meta) {
       defaultBranch = meta.defaultBranch;
       stars = meta.stars;
+      language = meta.language;
     }
   }
 
@@ -67,6 +70,7 @@ async function scoreCommand(target: string): Promise<void> {
     stars: stars ?? null,
     overall: result.overall,
     signals: result.signals,
+    language: language ?? null,
     modelScores: result.modelScores,
     defaultBranch: defaultBranch ?? null,
   });

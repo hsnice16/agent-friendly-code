@@ -1,4 +1,4 @@
-# 04 · Opt-out / claim flow
+# 01 · Opt-out / claim flow
 
 **Status**: planned
 

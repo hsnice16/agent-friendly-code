@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { afterEach, describe, test } from "node:test";
+
 import { license } from "../../lib/scoring/signals/license";
 import { makeFixture, removeFixture } from "../_helpers";
 

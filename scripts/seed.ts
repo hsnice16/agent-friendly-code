@@ -1,5 +1,3 @@
-// Idempotent: re-running updates scores in place.
-
 import { spawnSync } from "node:child_process";
 import { SEEDS } from "./seed-list";
 

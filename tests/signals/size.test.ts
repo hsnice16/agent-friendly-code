@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { afterEach, describe, test } from "node:test";
+
 import { size } from "../../lib/scoring/signals/size";
 import { type FixtureFiles, makeFixture, removeFixture } from "../_helpers";
 

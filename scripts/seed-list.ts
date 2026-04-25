@@ -79,6 +79,15 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/supabase/supabase",
   },
   { url: "https://github.com/appwrite/appwrite", note: "Appwrite — BaaS" },
+  { url: "https://github.com/Shopify/cli", note: "Shopify CLI" },
+  {
+    note: "Kraken exchange CLI",
+    url: "https://github.com/krakenfx/kraken-cli",
+  },
+  {
+    note: "Sim — agent workflow builder",
+    url: "https://github.com/simstudioai/sim",
+  },
 
   // --- GitHub, Python ---
   {
@@ -293,6 +302,10 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/github/spec-kit",
     note: "GitHub Spec Kit — spec-driven development toolkit",
   },
+  {
+    url: "https://github.com/different-ai/openwork",
+    note: "Openwork — open-source Claude Cowork alternative (opencode-powered)",
+  },
 
   // --- AI-native: models + infra ---
   {
@@ -301,8 +314,8 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/ggml-org/llama.cpp", note: "Local LLM inference" },
   {
-    note: "LLaMA Factory — LLM fine-tuning framework",
     url: "https://github.com/hiyouga/LlamaFactory",
+    note: "LLaMA Factory — LLM fine-tuning framework",
   },
   {
     note: "High-throughput LLM serving",
@@ -377,6 +390,10 @@ export const SEEDS: Seed[] = [
   {
     note: "Supermemory — AI memory API",
     url: "https://github.com/supermemoryai/supermemory",
+  },
+  {
+    url: "https://github.com/h4ckf0r0day/obscura",
+    note: "Obscura — headless browser for AI agents / web scraping (Rust)",
   },
 
   // --- AI-native: application SDKs ---

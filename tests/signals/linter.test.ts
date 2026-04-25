@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { afterEach, describe, test } from "node:test";
+
 import { linter } from "../../lib/scoring/signals/linter";
 import { makeFixture, removeFixture } from "../_helpers";
 

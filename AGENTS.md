@@ -29,7 +29,7 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 bun install
 bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test + file-length on pre-commit)
 bun run init-db        # optional — auto-runs on first score
-bun run seed           # score the curated set (155 repos) across GH / GL / BB
+bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
 bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
@@ -49,6 +49,10 @@ app/
   sitemap.ts              # /sitemap.xml — static routes + every repo detail page
   api/repos/route.ts
   api/repo/[id]/route.ts
+  api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
+  api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
+  package/page.tsx                          # explainer + try-it examples
+  package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   globals.css             # Tailwind import + @theme tokens (no custom utilities)
 components/               # Tailwind-styled React components
   Panel.tsx, ScoreBar.tsx, ScoreNumber.tsx, ScoreCell.tsx,
@@ -70,7 +74,8 @@ lib/
     weights.ts            # per-model weight tables
     scorer.ts             # signals × weights, topImprovements
   clients/
-    git.ts, github.ts
+    git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
+  package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL
   changelog.ts            # typed ChangelogEntry[]
@@ -87,13 +92,11 @@ tasks/
   README.md
   0.1.0/                  # released — shipped record
   0.2.0/                  # released — dogfood complete (tests, self-score, row-click)
-  0.3.0/                  # planned — real per-model weights (benchmark harness)
-  0.4.0/                  # planned — ecosystem integration (badge, PR diff, webhook, opt-out)
-  0.5.0/                  # planned — discovery (alternative recommender)
-  0.6.0/                  # planned — discovery (package-registry overlay)
-  0.7.0/                  # planned — history-aware signals (closes the shallow-clone gap)
-  1.0.0/                  # planned — production stability (Postgres + stable API)
-  1.1.0/                  # planned — at-scale GitHub indexing (crawl + rank, not seed-only)
+  0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
+  0.4.0/                  # planned — quick wins (history-aware signals + PR score-diff action)
+  0.5.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
+  0.6.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
+  1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/
   settings.json           # SessionStart + Stop hooks (Stop → hooks/stop-guard.sh)
   hooks/
@@ -175,7 +178,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - SQL: all queries parameterised. No interpolation.
 - HTML: React auto-escapes; no `dangerouslyInnerHTML` anywhere.
 - Local-path mode reads files; never writes outside `data/` and `tmp-clones/`.
-- No auth yet (read-only dashboard). When auth lands (`tasks/0.4.0/04-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
+- No auth yet (read-only dashboard). When auth lands (`tasks/0.6.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
@@ -185,7 +188,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 ## Things to leave alone
 
-- Per-model weights are illustrative. Don't tune without `tasks/0.3.0/01-benchmark-harness.md`.
+- Per-model weights are illustrative. Don't tune without `tasks/1.0.0/03-benchmark-harness.md`.
 - SQLite schema is intentionally simple. Flag before restructuring.
 - The I/O boundary. Scoring stays pure; DB stays in `lib/db.ts`.
 - `APP_VERSION` — don't bump without a release.

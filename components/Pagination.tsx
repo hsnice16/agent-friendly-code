@@ -6,7 +6,6 @@ type Props = {
   label?: string;
   totalPages: number;
   hrefFor: (page: number) => string;
-  /** "default" — bottom of list; "compact" — inline toolbar. Both share the 13px chrome size. */
   size?: "default" | "compact";
 };
 

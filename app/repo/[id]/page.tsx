@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AlternativesStrip } from "@/components/AlternativesStrip";
+import { BadgeEmbed } from "@/components/BadgeEmbed";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
@@ -10,9 +12,10 @@ import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
 import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import { getModelScores, getRepo, getSignalResults } from "@/lib/db";
+import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
+import { APP_URL } from "@/lib/version";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id: idStr } = await params;
@@ -66,14 +69,42 @@ export default async function Page({
 
   const signals = getSignalResults(id);
   const modelScores = getModelScores(id);
+  const alternatives = getAlternatives(id, selected, 3);
 
   const suggestions = topImprovements(selected, signals, 3);
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
   const gaps = signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
+  const slug = `${repo.owner}/${repo.name}`;
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Leaderboard",
+        item: `${APP_URL}/`,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: slug,
+        item: `${APP_URL}/repo/${id}`,
+      },
+    ],
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw script content; payload is server-controlled and `<` is escaped
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <Link
         href="/"
         className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
@@ -101,12 +132,30 @@ export default async function Page({
       </div>
 
       <div className="mt-3.5">
+        <AlternativesStrip
+          language={repo.language}
+          alternatives={alternatives}
+          selectedModelLabel={MODEL_BY_ID[selected].label}
+        />
+      </div>
+
+      <div className="mt-3.5">
         <Panel>
           <PanelHeading>Signal breakdown</PanelHeading>
           {signals.map((s) => (
             <SignalRow key={s.id} signal={s} />
           ))}
         </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <BadgeEmbed
+          appUrl={APP_URL}
+          name={repo.name}
+          host={repo.host}
+          owner={repo.owner}
+          repoPagePath={`/repo/${id}`}
+        />
       </div>
     </>
   );

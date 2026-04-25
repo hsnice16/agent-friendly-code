@@ -1,9 +1,10 @@
-# 0.5.0 — discovery: alternatives
+# 0.5.0 — auto-refresh + smarter matching
 
 **Status**: planned
 
-When a visitor lands on a mid-ranked repo, the next useful question is: "is there a _better_ repo that does the same thing, for my agent?" This version answers that.
+Two moderate-effort items that need real infra (a webhook receiver + queue, an embedding model and a vector store) but don't yet need user accounts or registry crawls. Together they shift the product from a manual-seed snapshot to a self-updating dataset with smarter matching.
 
 ## Tasks
 
-- [01-alternative-recommender.md](./01-alternative-recommender.md) — "Repo Y does the same thing and ranks higher for your model."
+- [01-webhook-rescoring.md](./01-webhook-rescoring.md) — keep scores fresh on every push; detect regressions. Webhook receiver + signature verification + rescore queue.
+- [02-alternatives-v2-embeddings.md](./02-alternatives-v2-embeddings.md) — sentence-transformer embeddings on the README; cosine-similar neighbors = alternatives. Lifts the v1 same-language SQL heuristic so cross-language alternatives surface correctly (e.g. `axios` → `requests`).

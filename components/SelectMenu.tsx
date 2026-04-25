@@ -4,8 +4,8 @@ import { CaretDown, Check } from "@phosphor-icons/react";
 import { useEffect, useRef, useState } from "react";
 
 export type SelectMenuOption = {
-  value: string;
   label: string;
+  value: string;
   shortLabel?: string;
 };
 

@@ -71,8 +71,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   const dir: SortDir = isSortDir(sp.dir) ? sp.dir : DEFAULT_DIR;
   const sort: SortKey = isSortKey(sp.sort) ? sp.sort : DEFAULT_SORT;
 
-  // UA-based page size so mobile gets 16 rows and desktop gets 32 without the
-  // pagination math going inconsistent across viewports.
   const ua = (await headers()).get("user-agent") ?? "";
   const isMobile = /Mobi|Android|iPhone|iPod/i.test(ua);
   const pageSize = isMobile ? LEADERBOARD_PAGE_SIZE_MOBILE : LEADERBOARD_PAGE_SIZE;
@@ -114,6 +112,16 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
           Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
         </p>
+        <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
+          Looking up a dependency?{" "}
+          <Link
+            href="/package"
+            className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+          >
+            Check any npm / PyPI / Cargo package
+          </Link>{" "}
+          by name.
+        </p>
       </section>
 
       <ModelPills
@@ -125,7 +133,6 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         <strong className="text-ink-dim">{activeLabel}</strong> — {rationale}
       </div>
 
-      {/* Toolbar — search grows, filters beside it. Wraps on mobile. */}
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
         <SearchBar />
 
@@ -197,7 +204,8 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                 const rank = startIdx + i + 1;
                 return (
                   <tr
-                    key={r.id}
+                    // biome-ignore lint/suspicious/noArrayIndexKey: stable position keeps ScoreBar mounted so width transitions animate across re-renders
+                    key={i}
                     className="relative cursor-pointer [&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-[13px] [&>td]:text-[15px] hover:[&>td]:bg-surface-hover last:[&>td]:border-b-0 sm:[&>td]:px-[18px]"
                   >
                     <td className="tabular-nums text-muted">
@@ -220,7 +228,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                     <td>
                       <a
                         href={r.url}
-                        rel="noopener"
+                        rel="noopener noreferrer"
                         target="_blank"
                         aria-label={`Open ${r.owner}/${r.name} on ${r.host} (new tab)`}
                         className="relative inline-flex items-center gap-1 whitespace-nowrap text-ink-dim hover:text-ink-soft"

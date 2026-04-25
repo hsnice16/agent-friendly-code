@@ -6,19 +6,19 @@ export type ChangelogEntry = {
   highlights: string[];
 };
 
-/**
- * Changelog = what's new for *users of the dashboard*. Every bullet should
- * describe something a visitor can see, click, or programmatically call.
- *
- * What does NOT go here:
- * - Codebase hygiene (CI, linters, pre-commit hooks, test infra).
- * - Pure internal refactors, dep bumps, UI polish.
- * - Contributor / maintainer concerns (CONTRIBUTING, PR templates).
- *
- * Those are captured in `tasks/` and the PR description; they don't earn a
- * changelog line.
- */
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    label: "0.3.0",
+    date: "2026-04-25",
+    title: "Embeddable scores + broader coverage",
+    highlights: [
+      "Embeddable score badges — `/badge/<host>/<owner>/<name>.svg` returns an SVG you can drop into a README; per-model variants via `?model=<id>`. Repo detail pages show a copy-paste markdown snippet.",
+      "Package lookup — `/package` page (registry dropdown + name input) and `/api/package/<registry>/<name>` JSON resolve npm / PyPI / Cargo packages to their source repo's score; unscored ones get a pre-filled GitHub-issue link to request scoring.",
+      "Same-language alternatives — repo detail pages show up to 3 alternative repos (same host + same language) ranked for the selected model.",
+      "Broader agent coverage — Gemini CLI, Aider, OpenHands, and Pi added to the per-model leaderboard with illustrative weights, flagged as such on `/methodology`.",
+      "Smoother leaderboard navigation — `ScoreBar` fills animate between pages instead of popping in.",
+    ],
+  },
   {
     label: "0.2.0",
     date: "2026-04-24",

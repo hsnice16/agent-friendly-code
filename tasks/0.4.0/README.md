@@ -1,14 +1,10 @@
-# 0.4.0 — ecosystem integration
+# 0.4.0 — quick wins
 
 **Status**: planned
 
-Make the scores usable from outside the dashboard. Badges for READMEs, a PR action that comments the score delta, webhook-driven freshness, and a maintainer opt-out / claim flow.
-
-With 0.3.0's weights now grounded in measurement, these integrations surface the right numbers in the right places.
+The cheapest two items on the roadmap, paired so they can ship in one cut. History-aware signals extend the existing host-API clients with ~3 new signal files; the PR-diff GitHub Action is a thin wrapper that calls the badge / API endpoints we already ship. No new infra, no new deps of consequence — high-impact additions that don't need a heavy release.
 
 ## Tasks
 
-- [01-badge-endpoint.md](./01-badge-endpoint.md) — `/badge/:host/:owner/:name.svg` for READMEs.
-- [02-score-diff-on-pr.md](./02-score-diff-on-pr.md) — GitHub Action that comments score delta on every PR.
-- [03-webhook-rescoring.md](./03-webhook-rescoring.md) — keep scores fresh on every push; detect regressions.
-- [04-opt-out-claim-flow.md](./04-opt-out-claim-flow.md) — OAuth so maintainers control their listing.
+- [01-history-aware-signals.md](./01-history-aware-signals.md) — extend the scorer with maintenance recency, commit velocity, and contributor activity. Hybrid fetch (shallow clone for files, host API for history) — degrades gracefully without a token.
+- [02-score-diff-on-pr.md](./02-score-diff-on-pr.md) — GitHub Action that comments the score delta on every PR using the existing `/api/repo/:id` and `/badge/...svg` endpoints.

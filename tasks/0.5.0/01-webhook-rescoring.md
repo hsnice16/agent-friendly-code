@@ -1,4 +1,4 @@
-# 03 · Webhook-driven rescoring
+# 01 · Webhook-driven rescoring
 
 **Status**: planned
 

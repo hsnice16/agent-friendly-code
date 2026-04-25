@@ -19,6 +19,7 @@ export default function MethodologyPage() {
     <>
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Methodology</h1>
+
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
           How scores are computed today, what&apos;s being measured, and where the current approach stops short.
         </p>
@@ -28,6 +29,7 @@ export default function MethodologyPage() {
         <PanelHeading>
           <span className="text-warn">Status: static parameters</span>
         </PanelHeading>
+
         <p className="text-[14.5px] leading-relaxed text-ink-dim">
           Today every score is derived from <strong className="text-ink">static signals</strong> — file existence and
           content-length checks on the cloned tree. No agent is actually run. Per-model weights are{" "}
@@ -37,13 +39,13 @@ export default function MethodologyPage() {
         </p>
 
         <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
-          The plan to replace illustrative weights with measured ones is the v0.3.0 milestone on the{" "}
+          The plan to replace illustrative weights with measured ones is part of the v1.0.0 production cut on the{" "}
           <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
             roadmap
           </Link>{" "}
           (
           <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
-            tasks/0.3.0/01-benchmark-harness.md
+            tasks/1.0.0/03-benchmark-harness.md
           </code>
           ). Until then, treat the numbers as a directional signal, not a verdict.
         </p>
@@ -79,6 +81,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                   <div className="text-[14.5px] font-medium">{s.label}</div>
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
                 </div>
+
                 <div>
                   <div className="text-sm text-ink-dim">{s.description}</div>
                   <div className="mt-1.5 text-[13px] text-muted">
@@ -103,6 +106,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
                 <details className="mt-2 text-[13px] text-muted">
                   <summary className="cursor-pointer">Weights</summary>
+
                   <pre className="mt-2 overflow-x-auto rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs leading-relaxed">
                     {Object.entries(m.weights)
                       .map(([k, v]) => `${k.padEnd(16)} ${v.toFixed(2)}`)
@@ -130,14 +134,14 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                 --depth 1 --single-branch
               </code>
               which fetches the whole working tree at HEAD of the default branch, but no history. Closing this gap is
-              planned as v0.7.0 on the{" "}
+              planned as v0.4.0 on the{" "}
               <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
                 roadmap
               </Link>
               .
             </li>
 
-            <li>How agents actually perform on the repo — that&apos;s the v0.3.0 benchmark harness.</li>
+            <li>How agents actually perform on the repo — that&apos;s the v1.0.0 benchmark harness.</li>
           </ul>
         </Panel>
       </div>

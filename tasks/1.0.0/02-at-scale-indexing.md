@@ -1,4 +1,4 @@
-# 01 · At-scale GitHub indexing
+# 02 · At-scale GitHub indexing
 
 **Status**: planned
 
@@ -6,15 +6,15 @@
 
 Auto-discover and rank a large slice of public GitHub — not just the curated `scripts/seed.ts` list — so the leaderboard reflects the ecosystem rather than our hand-picked sample.
 
-## Why this is post-1.0
+## Why this rides with 1.0.0
 
-Crawling tens of thousands of repos needs pieces that only land at 1.0:
+Crawling tens of thousands of repos needs pieces that 1.0.0 also delivers:
 
-- **Postgres** for concurrent writers (v1.0.0) — SQLite bottlenecks quickly.
+- **Postgres** for concurrent writers (sibling task `01-postgres-migration.md`) — SQLite bottlenecks quickly.
 - **Rate-limit primitives** on the public API (flagged in AGENTS.md security section) — if the ingestion workers share infrastructure with the public read path, one pollutes the other.
 - **Tmp-clones disk cap** — the cloner runs continuously, not on-demand.
 
-Before 1.0, attempting this wastes effort; after 1.0, the foundation is ready.
+These two tasks ship together as "production at scale": Postgres unblocks the crawler, the crawler is what makes Postgres worth migrating to.
 
 ## Discovery sources (in order of simplicity)
 
@@ -34,7 +34,7 @@ Before 1.0, attempting this wastes effort; after 1.0, the foundation is ready.
 
 "All of GitHub" is aspirational. Ship a **target-N, tunable** crawler:
 
-- v1.1.0 delivery: **10k repos** across top-starred + trending + submitted.
+- v1.0.0 delivery: **10k repos** across top-starred + trending + submitted.
 - 100k and 1M are throughput questions, not design questions. Leave them to a separate v1.x when we hit them.
 
 ## Acceptance

@@ -12,7 +12,6 @@ export function BackToTop() {
       const scrollable = doc.scrollHeight > window.innerHeight + 200;
 
       const nearBottom = window.scrollY + window.innerHeight >= doc.scrollHeight - 300;
-
       setVisible(scrollable && nearBottom);
     };
 

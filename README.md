@@ -1,13 +1,15 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.2.0-blue?style=flat-square)](./lib/changelog.ts)
+[![Release](https://img.shields.io/badge/release-0.3.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
 [![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/hsnice16)
+[![Agent Friendly](https://www.agentfriendlycode.com/api/badge/github/hsnice16/agent-friendly-code.svg)](https://www.agentfriendlycode.com)
 
 **A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
 
-Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.2.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.3.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -58,9 +60,9 @@ Two audiences:
 
 Not pretending the idea is free of risk:
 
-- **Per-model scoring is the hardest part and the easiest to fake.** Today the weights are illustrative. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/0.3.0/01-benchmark-harness.md`.
+- **Per-model scoring is the hardest part and the easiest to fake.** Today the weights are illustrative. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
 - **Factory.ai is already in this space.** Differentiation has to stay sharp.
-- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.4.0/04-opt-out-claim-flow.md`.
+- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.6.0/01-opt-out-claim-flow.md`.
 - **Score gaming.** Once public, people add boilerplate `AGENTS.md` to pass the rubric without being useful. Dynamic (actually-run-an-agent) checks are the counter — see benchmark harness.
 - **Freshness.** Scores decay with every push. Webhook-driven rescoring is roadmap.
 
@@ -82,14 +84,14 @@ Short answer: **low risk**. The app:
 - Rate limiting the public API.
 - Sandbox the cloner in a container (future-proofing against hypothetical git CVEs).
 
-Auth and per-maintainer controls land with the opt-out / claim flow in v0.4.0.
+Auth and per-maintainer controls land with the opt-out / claim flow in v0.6.0.
 
 ## Quickstart
 
 ```bash
 bun install
 bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test + file-length)
-bun run seed           # score the curated set (155 repos) across GH / GL / BB
+bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
 ```
 
@@ -108,7 +110,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 
 ## Versioning
 
-`lib/version.ts` and `package.json` carry the current release number (currently **0.2.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
+`lib/version.ts` and `package.json` carry the current release number (currently **0.3.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
 
 ## Stack & rationale
 
@@ -169,13 +171,12 @@ LICENSE       MIT
 
 See `/roadmap` in the running app or the per-version `tasks/` folders for the full picture.
 
-- **0.3.0 — real per-model weights**: benchmark harness actually runs agents on scoped tasks per repo; current illustrative weights get replaced with measured ones.
-- **0.4.0 — ecosystem integration**: badge endpoint for READMEs, GitHub Action that comments score delta on PRs, webhook-driven rescoring, OAuth-gated opt-out / claim flow for maintainers.
-- **0.5.0 — alternative recommender**: "repo Y does the same thing and ranks higher for your model."
-- **0.6.0 — package-registry overlay**: rank npm / PyPI / Cargo packages by source-repo friendliness.
-- **0.7.0 — history-aware signals**: extend the scorer with maintenance recency, commit velocity, and contributor activity — closing the gap that the shallow clone leaves today.
-- **1.0.0 — production stability**: Postgres migration for concurrent writers; from here on, breaking API changes require a MAJOR bump.
-- **1.1.0 — at-scale GitHub indexing**: flip from a curated seed list to an auto-discovered crawl (GitHub search + trending + submissions). Target 10k repos on first delivery.
+Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
+
+- **0.4.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR. No new infra.
+- **0.5.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
+- **0.6.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
+- **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
 
 ## Defensibility
 
@@ -188,3 +189,7 @@ MIT — see [LICENSE](./LICENSE).
 ## Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for setup, branch/commit style, the PR description template, and the changelog discipline.
+
+## Sponsor
+
+If this project is useful to you, consider sponsoring its development: [github.com/sponsors/hsnice16](https://github.com/sponsors/hsnice16).

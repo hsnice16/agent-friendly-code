@@ -19,7 +19,7 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
           </h1>
 
           <a
-            rel="noopener"
+            rel="noopener noreferrer"
             target="_blank"
             href={repo.url}
             className="mt-1 block break-all text-sm text-muted"
