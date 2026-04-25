@@ -39,13 +39,13 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 ## Security
 
 - **SQL parameterisation**: every query uses `?` placeholders. No string concatenation.
-- **No `dangerouslySetInnerHTML`.**
-- **External URLs** in `<a target="_blank">` always include `rel="noopener"`.
+- **`dangerouslySetInnerHTML`** is allowed only for server-built JSON-LD (`app/layout.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) and must keep the `<` → `<` escape. Any other use must be rejected.
+- **External URLs** in `<a target="_blank">` always include `rel="noopener noreferrer"`.
 - **User input at every boundary** is validated: `parseRepoUrl` for repo URLs, `Number.isFinite` for numeric params, length caps on search strings.
 - **Clone safety**: `git clone --depth 1 --single-branch`; never execute code from a clone (no `bun install`, no `npm install`, no post-clone scripts).
 - **Secrets never in code**. `.env.example` documents required vars; `.env.local` is gitignored.
 - **Operational concerns** (flag for ops review, not code):
-  - Disk cap on `tmp-clones/`.
+  - Disk cap on the clone workspace.
   - Rate limit on the public API before launch.
   - Sandbox the cloner in a container for production.
 

@@ -102,7 +102,7 @@ When the PR qualifies, move the item atomically: append a one-line capability bu
 
 ### Size
 
-PRs under ~400 lines of diff review fastest. If your change is larger, split by feature or by layer (scoring → DB → UI) so each PR is independently reviewable.
+PRs under ~300 lines of diff review fastest — the same cap the `file-length` pre-commit job enforces per file. If your change is larger, split by feature or by layer (scoring → DB → UI) so each PR is independently reviewable.
 
 ## Review bar
 

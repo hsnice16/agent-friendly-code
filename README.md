@@ -26,7 +26,7 @@ Follows `prefers-color-scheme` automatically — same tokens, different values.
 
 ## The idea
 
-AI coding agents — Claude Code, Cursor, Devin, GPT-5 Codex — succeed dramatically more often on some repos than others. The difference is rarely the agent; it's the repo. A codebase with fast tests, a clear `AGENTS.md`, a Makefile, and CI is a massively different environment than one without.
+AI coding agents — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi — succeed dramatically more often on some repos than others. The difference is rarely the agent; it's the repo. A codebase with fast tests, a clear `AGENTS.md`, a Makefile, and CI is a massively different environment than one without.
 
 **Goal**: a public leaderboard where anyone can look up a repo and see:
 
@@ -75,12 +75,12 @@ Short answer: **low risk**. The app:
 - Only **reads** files after a shallow clone; never executes anything from the cloned tree (no `npm install`, no post-clone hooks).
 - Uses `--depth 1 --single-branch` and never clones submodules.
 - Runs all SQL via prepared statements.
-- Renders through React (auto-escaping); no `dangerouslySetInnerHTML`.
+- Renders through React (auto-escaping); the only `dangerouslySetInnerHTML` use is server-built JSON-LD with `<` escaped to `<`.
 - Has no auth and no writable API endpoints — read-only dashboard.
 
 **Operational concerns** for a public launch (not code-level security):
 
-- Disk quotas for `tmp-clones/`.
+- Disk quotas for the clone workspace.
 - Rate limiting the public API.
 - Sandbox the cloner in a container (future-proofing against hypothetical git CVEs).
 
@@ -120,7 +120,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 | **Node runtime (with `tsx` for CLI scripts)**        | Matches Vercel's serverless runtime — no Bun-only imports in prod. Bun still works locally as a fast package manager.                        | Unlikely — only if the deployment target changes.                                                  |
 | **Tailwind CSS 4**                                   | Zero-config via `@theme` tokens, no `tailwind.config.*` needed. Tight bundle output.                                                         | Would only leave for something with a stronger design-system story.                                |
 | **`better-sqlite3`**                                 | Single file, inspectable, zero ops overhead. Node-native so Vercel's serverless runtime can load it directly.                                | Postgres when concurrent writers / access control arrive (`tasks/1.0.0/01-postgres-migration.md`). |
-| **Server components + links, no client JS**          | Cheap, fast, SEO-friendly.                                                                                                                   | When a feature genuinely needs interactivity — e.g. live filter combinators.                       |
+| **Server-first; client islands where needed**        | Cheap, fast, SEO-friendly. Client components only where interactivity demands — mobile nav, search, selects, copy, back-to-top.              | When client islands grow past presentational interactivity → reach for client state mgmt.          |
 | **Shallow git clones** (`--depth 1 --single-branch`) | Bandwidth + speed. Current signals don't need history.                                                                                       | History-aware signals → host APIs or `--filter=blob:none` partial clones.                          |
 | **Exact-pinned deps**                                | Deterministic scoring across environments.                                                                                                   | Never.                                                                                             |
 | **One file per signal**                              | Each signal is a small, independent concern — keeps `git log` and code review focused.                                                       | When we bundle signals into dynamic checks (then the unit becomes the bundle).                     |
@@ -160,7 +160,6 @@ tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README + OG image
 .claude/      settings.json, hooks/ (Stop guard), skills/
 data/         rank.db (committed — shipped as a build artifact; rescoring runs locally)
-tmp-clones/   Shallow clones (gitignored)
 AGENTS.md     Agent instructions (source of truth)
 CONTRIBUTING.md  Human-contributor guide — PR workflow, review bar
 CLAUDE.md     Pointer → AGENTS.md

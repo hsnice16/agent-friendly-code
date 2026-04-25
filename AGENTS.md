@@ -142,7 +142,7 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 
 1. Extend `parseRepoUrl` in `lib/clients/github.ts`.
 2. Extend `fetchRepoMeta` with that host's API (use `process.env.<HOST>_TOKEN` if needed).
-3. Add a seed URL in `scripts/seed.ts`.
+3. Add a seed URL to the `SEEDS` list in `scripts/seed-list.ts`.
 4. Add the label to `lib/constants/hosts.ts`.
 
 ## Working from tasks/
@@ -165,7 +165,7 @@ The `Stop` guard exists because reminders alone weren't enough — agents would 
 `.claude/skills/` holds project skills that are auto-selected based on task relevance or invoked manually (`/skill-name`). Skills **do not auto-fire on file edits** — that's what the Stop guard is for. The guard enforces `post-change-check`, which orchestrates the other two.
 
 - **`code-review`** — writing-time conventions. Covers Tailwind-first (utilities > custom classes; `@theme` tokens > hex), **Phosphor Icons only** (blocks Lucide / Heroicons / React Icons / inline SVG / emoji-as-icon), the I/O boundary (`lib/scoring/` pure, all SQL in `lib/db.ts`), RSC preference, and when to extract into `components/` / `lib/constants/` / `lib/utils/`.
-- **`quality-check`** — review-time sweep. Four dimensions: accessibility (landmarks, aria, contrast, reduced motion, keyboard reachability), responsiveness (320 → 1080+ viewports, mobile nav, tables), performance (RSC default, `next/script` for third-party, bundle size), security (parameterised SQL, no innerHTML, `rel=noopener`, clone safety).
+- **`quality-check`** — review-time sweep. Four dimensions: accessibility (landmarks, aria, contrast, reduced motion, keyboard reachability), responsiveness (320 → 1080+ viewports, mobile nav, tables), performance (RSC default, `next/script` for third-party, bundle size), security (parameterised SQL, `dangerouslySetInnerHTML` only for the existing server-built JSON-LD scripts, `rel="noopener noreferrer"` on external links, clone safety).
 - **`post-change-check`** — end-of-turn orchestrator. Runs a four-phase report: diff collection, docs-sync audit (changelog / tasks / AGENTS / README / .env.example / skills), then delegates to `code-review` and `quality-check`. The Stop guard blocks turn-close until this has run when watched paths changed.
 
 Skill granularity rule of thumb: one skill per _phase_ of work (writing, reviewing, wrapping-up), not one skill per _rule_. Narrow skills fragment context; broad skills stay coherent.
@@ -176,13 +176,13 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes; no `dangerouslyInnerHTML` anywhere.
-- Local-path mode reads files; never writes outside `data/` and `tmp-clones/`.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.6.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
-- `tmp-clones/` can fill disk — add a cron/cap.
+- The clone workspace can fill disk — add a cron/cap.
 - Unauthenticated API → add rate limits before going public.
 - Sandbox the cloner in a container when running on remote infra, just in case of future git CVEs.
 

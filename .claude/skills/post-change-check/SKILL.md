@@ -82,7 +82,7 @@ Invoke the `quality-check` skill on the diff. Four dimensions:
 - **Accessibility**: landmarks, aria, contrast, reduced-motion, keyboard reachability.
 - **Responsiveness**: 320 → 1080+, mobile nav, table overflow, line-length caps.
 - **Performance**: RSC default, `next/script` for third-party, bundle weight, prepared statements.
-- **Security**: parameterised SQL, no `dangerouslySetInnerHTML`, `rel="noopener"` on external links, clone safety.
+- **Security**: parameterised SQL, `dangerouslySetInnerHTML` only for the existing server-built JSON-LD scripts (with `<` escape preserved), `rel="noopener noreferrer"` on external links, clone safety.
 
 Report Pass / Fail / Needs manual check per dimension.
 
