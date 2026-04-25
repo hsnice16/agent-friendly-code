@@ -42,6 +42,10 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/shadcn-ui/ui",
     note: "shadcn/ui component collection",
   },
+  {
+    url: "https://github.com/TheOrcDev/8bitcn-ui",
+    note: "8bitcn-ui — 8-bit shadcn-style component collection",
+  },
   { url: "https://github.com/TanStack/query", note: "TanStack Query" },
   { url: "https://github.com/TanStack/router", note: "TanStack Router" },
   {
