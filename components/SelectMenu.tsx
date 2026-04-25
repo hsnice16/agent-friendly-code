@@ -73,7 +73,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
       <div
         role="listbox"
         aria-label={label}
-        className={`absolute right-0 top-full z-30 mt-1 min-w-[220px] origin-top-right overflow-hidden rounded-md border border-line bg-surface shadow-md transition duration-150 ease-out ${
+        className={`absolute left-0 top-full z-30 mt-1 min-w-[220px] origin-top-left overflow-hidden rounded-md border border-line bg-surface shadow-md transition duration-150 ease-out sm:left-auto sm:right-0 sm:origin-top-right ${
           open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
         }`}
       >
