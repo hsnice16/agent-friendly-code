@@ -133,7 +133,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 
 ## Layout
 
-```txt
+```text
 app/          Next.js App Router — pages + API + SEO
   layout.tsx       root layout, root metadata (OG + Twitter cards)
   page.tsx         leaderboard

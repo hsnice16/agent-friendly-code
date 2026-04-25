@@ -28,6 +28,12 @@ export const ROADMAP: RoadmapVersion[] = [
         taskFile: "tasks/0.4.0/02-score-diff-on-pr.md",
         summary: "GitHub Action that comments score delta on every PR.",
       },
+      {
+        title: "Claude Code skill",
+        taskFile: "tasks/0.4.0/03-claude-code-skill.md",
+        summary:
+          "Skill (installable via npx skills add) that checks the active repo's score and recommends a Claude model. Ships with the /api/score lookup endpoint and a UI integration page with a SessionStart hook snippet.",
+      },
     ],
   },
   {

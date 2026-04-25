@@ -4,7 +4,7 @@ Per-version work breakdown, readable by any agent (Claude Code, Cursor, Codex, D
 
 ## Structure
 
-```txt
+```text
 tasks/
   README.md               <- this file
   <MAJOR.MINOR.PATCH>/    <- one folder per version, e.g. 0.1.0, 0.2.0
@@ -24,7 +24,7 @@ Each task file has a `**Status**: …` line:
 
 Starting a session, point the agent at a specific task:
 
-```txt
+```text
 Work on tasks/0.2.0/01-tests.md.
 ```
 

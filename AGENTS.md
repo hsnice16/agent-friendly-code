@@ -37,7 +37,7 @@ bun run test           # unit tests (node --test + tsx) — requires Node ≥20.
 
 ## Layout
 
-```txt
+```text
 app/
   layout.tsx              # root layout (nav + footer) — defines root metadata + OG / Twitter cards
   page.tsx                # leaderboard

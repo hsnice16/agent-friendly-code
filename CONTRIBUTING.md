@@ -30,7 +30,7 @@ Keep it short. `feat/postgres-migration` is better than `feat/add-postgres-migra
 
 One logical change per commit. Short imperative subject (≤72 chars), body only if the change needs explanation.
 
-```txt
+```text
 Add license signal — scores repos by SPDX ID presence
 
 Reads LICENSE, LICENSE.md, or COPYING at repo root. If `license:` is
