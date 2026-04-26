@@ -29,10 +29,10 @@ export const ROADMAP: RoadmapVersion[] = [
         summary: "GitHub Action that comments score delta on every PR.",
       },
       {
-        title: "Claude Code skill",
-        taskFile: "tasks/0.5.0/03-claude-code-skill.md",
+        title: "Agent skill",
+        taskFile: "tasks/0.5.0/03-agent-skill.md",
         summary:
-          "Skill (installable via npx skills add) that checks the active repo's score and recommends a Claude model. Ships with the /api/score lookup endpoint and a UI integration page with a SessionStart hook snippet.",
+          "Portable skill (installable via npx skills add into Claude Code, Codex, Cursor, Cline, Copilot, …) that checks the active repo's score and recommends a model. Ships with the /api/score lookup endpoint and a UI integration page with auto-check hook snippets for the agents that support them.",
       },
     ],
   },

@@ -97,7 +97,7 @@ tasks/
   0.2.0/                  # released — dogfood complete (tests, self-score, row-click)
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
-  0.5.0/                  # planned — quick wins (history-aware signals + PR score-diff action + Claude Code skill)
+  0.5.0/                  # planned — quick wins (history-aware signals + PR score-diff action + agent skill)
   0.6.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
   0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)

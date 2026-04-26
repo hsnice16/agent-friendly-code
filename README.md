@@ -172,7 +172,7 @@ See `/roadmap` in the running app or the per-version `tasks/` folders for the fu
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.5.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a Claude Code skill (with public `/api/score` lookup) that recommends a model for the active repo. No new infra.
+- **0.5.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a portable agent skill (Claude Code / Codex / Cursor / Cline / Copilot / 40+ others, with public `/api/score` lookup) that recommends a model for the active repo. No new infra.
 - **0.6.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
 - **0.7.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
 - **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
