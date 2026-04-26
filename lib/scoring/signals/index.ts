@@ -1,10 +1,14 @@
 import { agentsMd } from "./agents-md";
+import { aiderConf } from "./aider-conf";
 import { ci } from "./ci";
 import { contributing } from "./contributing";
+import { cursorRules } from "./cursor-rules";
 import { depsManifest } from "./deps-manifest";
 import { devEnv } from "./dev-env";
+import { geminiMd } from "./gemini-md";
 import { license } from "./license";
 import { linter } from "./linter";
+import { openhandsSetup } from "./openhands-setup";
 import { preCommit } from "./pre-commit";
 import { readme } from "./readme";
 import { size } from "./size";
@@ -16,6 +20,10 @@ export type { Signal, SignalResult };
 
 export const SIGNALS: Signal[] = [
   agentsMd,
+  cursorRules,
+  geminiMd,
+  openhandsSetup,
+  aiderConf,
   readme,
   tests,
   ci,

@@ -28,7 +28,7 @@ These two tasks ship together as "production at scale": Postgres unblocks the cr
 - **GitHub rate limit**: 5000 req/hr per token. Token pool + round-robin to scale. Respect `X-RateLimit-Remaining` + `Retry-After` headers.
 - **Clone bandwidth**: `--depth 1 --single-branch` per repo (unchanged). At 50 MB median, 20k repos/day ≈ 1 TB/day. Realistic only on a cloud host with bandwidth-included pricing (Hetzner, Fly, Vercel functions with a worker).
 - **Storage**: Postgres row count grows linearly with indexed repos × models × signals. Index-heavy schema; partition by host or by last-scored-at month after ~100k rows.
-- **Freshness**: webhook-driven rescoring (v0.4.0) handles pushes on already-indexed repos. The crawler fills in repos we haven't seen yet and re-checks long-dormant ones.
+- **Freshness**: webhook-driven rescoring (v0.6.0) handles pushes on already-indexed repos. The crawler fills in repos we haven't seen yet and re-checks long-dormant ones.
 
 ## Scope guard
 

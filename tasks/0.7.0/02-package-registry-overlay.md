@@ -4,7 +4,7 @@
 
 ## Goal
 
-The v0.3.0 lookup (`tasks/0.3.0/05-package-registry-overlay.md`) answers "is this specific package scored?" on demand. v0.6.0 turns that into a proactive dependency-choice signal: per-registry leaderboards and a browser-side overlay that renders our badge inline on npmjs.com / PyPI / crates.io.
+The v0.3.0 lookup (`tasks/0.3.0/05-package-registry-overlay.md`) answers "is this specific package scored?" on demand. v0.7.0 turns that into a proactive dependency-choice signal: per-registry leaderboards and a browser-side overlay that renders our badge inline on npmjs.com / PyPI / crates.io.
 
 ## Scope
 

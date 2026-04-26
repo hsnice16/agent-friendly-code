@@ -28,10 +28,10 @@ export function PackageLookupForm() {
           Registry
         </label>
         <select
-          id="package-registry"
           value={registry}
+          id="package-registry"
           onChange={(e) => setRegistry(e.target.value as Registry)}
-          className="h-9 w-full appearance-none rounded-md border border-line bg-surface-2 pl-3 pr-8 text-[13.5px] text-ink hover:bg-surface-hover sm:w-auto"
+          className="h-9 w-full appearance-none rounded-md border border-line bg-surface-2 pl-3 pr-8 text-[13.5px] text-ink cursor-pointer sm:w-auto"
         >
           {REGISTRIES.map((r) => (
             <option key={r} value={r}>
@@ -51,9 +51,9 @@ export function PackageLookupForm() {
         Package name
       </label>
       <input
-        id="package-name"
         type="text"
         value={name}
+        id="package-name"
         autoComplete="off"
         spellCheck={false}
         placeholder="package name"

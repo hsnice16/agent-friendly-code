@@ -43,14 +43,17 @@ app/
   page.tsx                # leaderboard
   repo/[id]/page.tsx      # repo detail with per-model suggestions (includes generateMetadata)
   methodology/page.tsx    # how the static scoring works
+  about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
-  robots.ts               # /robots.txt — allows "/", disallows "/api/"
-  sitemap.ts              # /sitemap.xml — static routes + every repo detail page
+  robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows
+  sitemap.ts              # /sitemap.xml — static routes + every repo detail page (priority scaled by score)
+  llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
+  repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   globals.css             # Tailwind import + @theme tokens (no custom utilities)
@@ -81,7 +84,7 @@ lib/
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
 scripts/
-  init-db.ts, score.ts, seed.ts, seed-list.ts
+  init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
 tests/
   _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
   format.test.ts          # compactStars, relativeTime, hostLabel
@@ -93,9 +96,10 @@ tasks/
   0.1.0/                  # released — shipped record
   0.2.0/                  # released — dogfood complete (tests, self-score, row-click)
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
-  0.4.0/                  # planned — quick wins (history-aware signals + PR score-diff action + Claude Code skill)
-  0.5.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
-  0.6.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
+  0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
+  0.5.0/                  # planned — quick wins (history-aware signals + PR score-diff action + Claude Code skill)
+  0.6.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
+  0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/
   settings.json           # SessionStart + Stop hooks (Stop → hooks/stop-guard.sh)
@@ -176,9 +180,9 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
-- No auth yet (read-only dashboard). When auth lands (`tasks/0.6.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
+- No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
@@ -188,7 +192,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 ## Things to leave alone
 
-- Per-model weights are illustrative. Don't tune without `tasks/1.0.0/03-benchmark-harness.md`.
+- Per-model rationales are derived from each agent's published documentation (see `MODELS[].sources` in `lib/scoring/weights.ts`); the weights themselves are still pre-benchmark. Do not tune individual values without re-running the docs audit (see `tasks/0.4.0/01-sourced-agent-rationales.md`) or shipping the v1.0.0 benchmark harness.
 - SQLite schema is intentionally simple. Flag before restructuring.
 - The I/O boundary. Scoring stays pure; DB stays in `lib/db.ts`.
 - `APP_VERSION` — don't bump without a release.

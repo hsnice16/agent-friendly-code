@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { PackageLookupForm } from "@/components/PackageLookupForm";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { getTopPackagesByRegistry } from "@/lib/db";
 
 export const metadata: Metadata = {
   title: "Packages",
@@ -20,7 +21,14 @@ const EXAMPLES = [
   { registry: "pypi", name: "requests" },
 ] as const;
 
+const TOP_REGISTRIES = ["npm", "pypi", "cargo"] as const;
+const TOP_LIMIT_PER_REGISTRY = 6;
+
 export default function PackageIndexPage() {
+  const topRows = TOP_REGISTRIES.flatMap((registry) =>
+    getTopPackagesByRegistry(registry, TOP_LIMIT_PER_REGISTRY).map((row) => ({ registry, ...row })),
+  ).sort((a, b) => b.score - a.score);
+
   return (
     <>
       <section className="my-3 mb-7">
@@ -50,7 +58,7 @@ export default function PackageIndexPage() {
               <li key={`${registry}/${name}`}>
                 <Link
                   href={`/package/${registry}/${name}`}
-                  className="block rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink hover:bg-surface-hover"
+                  className="block rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
                 >
                   <span className="font-mono text-[13px] text-muted">{registry}</span>
                   <span className="mx-1.5 text-muted">/</span>
@@ -73,6 +81,34 @@ export default function PackageIndexPage() {
           </p>
         </Panel>
       </div>
+
+      {topRows.length > 0 && (
+        <>
+          <hr className="my-9 border-0 border-t border-dotted border-line" />
+
+          <Panel>
+            <PanelHeading>Top scored packages by registry</PanelHeading>
+
+            <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
+              {topRows.map((row) => (
+                <li key={`${row.registry}/${row.name}`}>
+                  <Link
+                    href={`/package/${row.registry}/${row.name}`}
+                    className="flex items-center justify-between rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
+                  >
+                    <span className="truncate">
+                      <span className="font-mono text-[13px] text-muted">{row.registry}</span>
+                      <span className="mx-1.5 text-muted">/</span>
+                      <span className="font-medium">{row.name}</span>
+                    </span>
+                    <span className="ml-3 shrink-0 tabular-nums text-[13px] text-muted">{row.score.toFixed(1)}</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </Panel>
+        </>
+      )}
     </>
   );
 }

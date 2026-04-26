@@ -10,42 +10,48 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
-      url: `${APP_URL}/`,
       priority: 1,
+      url: `${APP_URL}/`,
       lastModified: lastScored,
       changeFrequency: "daily",
     },
     {
-      url: `${APP_URL}/package`,
       priority: 0.8,
+      url: `${APP_URL}/package`,
       lastModified: lastScored,
       changeFrequency: "weekly",
     },
     {
-      url: `${APP_URL}/methodology`,
       priority: 0.7,
       lastModified: now,
       changeFrequency: "monthly",
+      url: `${APP_URL}/methodology`,
     },
     {
+      priority: 0.5,
+      lastModified: now,
+      changeFrequency: "monthly",
+      url: `${APP_URL}/about`,
+    },
+    {
+      priority: 0.6,
+      lastModified: now,
+      changeFrequency: "weekly",
       url: `${APP_URL}/roadmap`,
-      priority: 0.6,
-      lastModified: now,
-      changeFrequency: "weekly",
     },
     {
-      url: `${APP_URL}/changelog`,
       priority: 0.6,
       lastModified: now,
       changeFrequency: "weekly",
+      url: `${APP_URL}/changelog`,
     },
   ];
 
   const repoRoutes: MetadataRoute.Sitemap = listLeaderboardOverall().map((r) => ({
-    url: `${APP_URL}/repo/${r.id}`,
-    priority: 0.6,
     changeFrequency: "weekly",
+    url: `${APP_URL}/repo/${r.id}`,
     lastModified: r.last_scored_at != null ? new Date(r.last_scored_at * 1000) : now,
+    priority: r.score != null ? Math.round((0.3 + (r.score / 100) * 0.6) * 10) / 10 : 0.4,
   }));
 
   return [...staticRoutes, ...repoRoutes];
