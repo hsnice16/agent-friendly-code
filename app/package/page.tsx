@@ -58,7 +58,7 @@ export default function PackageIndexPage() {
               <li key={`${registry}/${name}`}>
                 <Link
                   href={`/package/${registry}/${name}`}
-                  className="block rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink hover:bg-surface-hover"
+                  className="block rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
                 >
                   <span className="font-mono text-[13px] text-muted">{registry}</span>
                   <span className="mx-1.5 text-muted">/</span>
@@ -94,7 +94,7 @@ export default function PackageIndexPage() {
                 <li key={`${row.registry}/${row.name}`}>
                   <Link
                     href={`/package/${row.registry}/${row.name}`}
-                    className="flex items-center justify-between rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink hover:bg-surface-hover"
+                    className="flex items-center justify-between rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
                   >
                     <span className="truncate">
                       <span className="font-mono text-[13px] text-muted">{row.registry}</span>
