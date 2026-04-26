@@ -1,6 +1,6 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.3.0-blue?style=flat-square)](./lib/changelog.ts)
+[![Release](https://img.shields.io/badge/release-0.4.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
 [![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -9,7 +9,7 @@
 
 **A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
 
-Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.3.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.4.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -60,9 +60,9 @@ Two audiences:
 
 Not pretending the idea is free of risk:
 
-- **Per-model scoring is the hardest part and the easiest to fake.** Today the weights are illustrative. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
+- **Per-model scoring is the hardest part and the easiest to fake.** Per-model rationales are now sourced from each agent's published docs (see `MODELS[].sources` in `lib/scoring/weights.ts`), but the weight values themselves are still pre-benchmark. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
 - **Factory.ai is already in this space.** Differentiation has to stay sharp.
-- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.6.0/01-opt-out-claim-flow.md`.
+- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.7.0/01-opt-out-claim-flow.md`.
 - **Score gaming.** Once public, people add boilerplate `AGENTS.md` to pass the rubric without being useful. Dynamic (actually-run-an-agent) checks are the counter — see benchmark harness.
 - **Freshness.** Scores decay with every push. Webhook-driven rescoring is roadmap.
 
@@ -84,14 +84,14 @@ Short answer: **low risk**. The app:
 - Rate limiting the public API.
 - Sandbox the cloner in a container (future-proofing against hypothetical git CVEs).
 
-Auth and per-maintainer controls land with the opt-out / claim flow in v0.6.0.
+Auth and per-maintainer controls land with the opt-out / claim flow in v0.7.0.
 
 ## Quickstart
 
 ```bash
 bun install
 bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test + file-length)
-bun run seed           # score the curated set across GH / GL / BB
+bun run seed           # score the curated set across GH / GL / BB + cache popular package aliases
 bun run dev            # http://localhost:3000
 ```
 
@@ -110,7 +110,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 
 ## Versioning
 
-`lib/version.ts` and `package.json` carry the current release number (currently **0.3.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
+`lib/version.ts` and `package.json` carry the current release number (currently **0.4.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
 
 ## Stack & rationale
 
@@ -172,9 +172,9 @@ See `/roadmap` in the running app or the per-version `tasks/` folders for the fu
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.4.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a Claude Code skill (with public `/api/score` lookup) that recommends a model for the active repo. No new infra.
-- **0.5.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
-- **0.6.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
+- **0.5.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a Claude Code skill (with public `/api/score` lookup) that recommends a model for the active repo. No new infra.
+- **0.6.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
+- **0.7.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
 - **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
 
 ## Defensibility

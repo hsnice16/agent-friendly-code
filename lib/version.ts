@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.3.0";
+export const APP_VERSION = "0.4.0";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
@@ -6,7 +6,7 @@ export const REPO_URL = "https://github.com/hsnice16/agent-friendly-code";
 
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
 export const APP_DESCRIPTION =
-  "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex) — per model, across GitHub, GitLab, and Bitbucket.";
+  "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
 
 export const APP_KEYWORDS = [
   "ai",
@@ -27,8 +27,10 @@ export const APP_KEYWORDS = [
   "ai code agents",
   "ai coding agent",
   "ai coding agents",
+  "ai friendly code",
   "coding assistant",
   "agent friendly code",
+  "agent friendly repo",
   "ai pair programming",
   "ai software engineer",
   "pi",
@@ -47,4 +49,50 @@ export const APP_KEYWORDS = [
   "developer tools",
   "agent ready repo",
   "gemini code assist",
+  "v0",
+  "amp",
+  "cline",
+  "codeium",
+  "copilot",
+  "lovable",
+  "tabnine",
+  "bolt.new",
+  "roo code",
+  "windsurf",
+  "continue.dev",
+  "replit agent",
+  "copilot agent",
+  "github copilot",
+  "sourcegraph amp",
+  "copilot agent mode",
+  "MCP",
+  "spec kit",
+  "claude agent sdk",
+  "model context protocol",
+  "spec-driven development",
+  "agentic",
+  "agentic ai",
+  "agentic ide",
+  "agentic coding",
+  "ai code editor",
+  "ai code review",
+  "ai code generation",
+  "ai developer tools",
+  "ai pair programmer",
+  "swe agent",
+  "vibe coding",
+  "background agent",
+  "ai software development",
+  "autonomous coding agent",
+  "autonomous developer agent",
+  "agent eval",
+  "ai readiness",
+  "ai ready repo",
+  "agent benchmark",
+  "agent leaderboard",
+  "ai ready codebase",
+  "agent friendliness",
+  "ai agent benchmark",
+  "agent compatibility",
+  "ai agent leaderboard",
 ];

@@ -4,7 +4,7 @@
 
 ## Goal
 
-Ship a Claude Code skill that fetches the active repo's score and recommends a model, plus the public lookup endpoint it depends on and a UI page that explains the integration. Bundled because the endpoint has no other consumer in 0.4.0 and the three pieces only make sense together.
+Ship a Claude Code skill that fetches the active repo's score and recommends a model, plus the public lookup endpoint it depends on and a UI page that explains the integration. Bundled because the endpoint has no other consumer in 0.5.0 and the three pieces only make sense together.
 
 Installable via `npx skills add hsnice16/agent-friendly-code` (the [vercel-labs/skills](https://github.com/vercel-labs/skills) CLI auto-discovers a top-level `skills/` directory).
 

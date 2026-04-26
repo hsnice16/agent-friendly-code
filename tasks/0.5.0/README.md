@@ -1,10 +1,11 @@
-# 0.5.0 — auto-refresh + smarter matching
+# 0.5.0 — quick wins
 
 **Status**: planned
 
-Two moderate-effort items that need real infra (a webhook receiver + queue, an embedding model and a vector store) but don't yet need user accounts or registry crawls. Together they shift the product from a manual-seed snapshot to a self-updating dataset with smarter matching.
+The cheapest items on the roadmap, paired so they can ship in one cut. History-aware signals extend the existing host-API clients with ~3 new signal files; the PR-diff GitHub Action is a thin wrapper that calls the badge / API endpoints we already ship; the Claude Code skill bundles a small lookup endpoint, a `SKILL.md` shipped from this repo, and a UI integration page. No new infra, no new deps of consequence — high-impact additions that don't need a heavy release.
 
 ## Tasks
 
-- [01-webhook-rescoring.md](./01-webhook-rescoring.md) — keep scores fresh on every push; detect regressions. Webhook receiver + signature verification + rescore queue.
-- [02-alternatives-v2-embeddings.md](./02-alternatives-v2-embeddings.md) — sentence-transformer embeddings on the README; cosine-similar neighbors = alternatives. Lifts the v1 same-language SQL heuristic so cross-language alternatives surface correctly (e.g. `axios` → `requests`).
+- [01-history-aware-signals.md](./01-history-aware-signals.md) — extend the scorer with maintenance recency, commit velocity, and contributor activity. Hybrid fetch (shallow clone for files, host API for history) — degrades gracefully without a token.
+- [02-score-diff-on-pr.md](./02-score-diff-on-pr.md) — GitHub Action that comments the score delta on every PR using the existing `/api/repo/:id` and `/badge/...svg` endpoints.
+- [03-claude-code-skill.md](./03-claude-code-skill.md) — Claude Code skill (installable via `npx skills add`) that fetches the active repo's score and recommends a model, bundled with the public `/api/score` lookup endpoint it depends on and a UI integration page with the SessionStart hook snippet.

@@ -23,7 +23,7 @@
 - ✓ `/package`, `/package/npm/react`, `/package/npm/lodash`, `/package/npm/<gibberish>` all render the expected state.
 - ✓ Nav link visible; homepage callout visible.
 
-## Out of scope (stays in v0.6.0)
+## Out of scope (stays in v0.7.0)
 
 - Per-registry leaderboards ("top 100 npm packages by agent-friendliness").
 - Browser userscript for inline badges on registry pages.
@@ -34,7 +34,7 @@
 
 Developers pick dependencies in registry UIs (npmjs.com, PyPI, crates.io) — not on GitHub. This task adds the lookup half of the package-registry overlay: given a package name, resolve it to its source repo and surface the score (or invite scoring via a pre-filled GitHub issue).
 
-The at-scale side — per-registry leaderboards + browser userscript for inline badges — stays in v0.6.0 as a follow-up.
+The at-scale side — per-registry leaderboards + browser userscript for inline badges — stays in v0.7.0 as a follow-up.
 
 ## Public surface
 
@@ -65,7 +65,7 @@ The at-scale side — per-registry leaderboards + browser userscript for inline 
 - `lib/db.ts` — `package_alias(registry, name, repo_url, resolved_at)` cache table. Additive migration pattern matching `language`.
 - `lib/utils/contact.ts` — builds a `REPO_URL/issues/new?title=...&body=...` link with a pre-filled template naming the package + what we resolved.
 
-## Out of scope (v0.6.0 follow-up)
+## Out of scope (v0.7.0 follow-up)
 
 - Per-registry leaderboards ("top 100 npm packages").
 - Browser userscript for inline badges on registry pages.

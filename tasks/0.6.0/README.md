@@ -1,10 +1,10 @@
-# 0.6.0 — maintainer ownership + at-scale discovery
+# 0.6.0 — auto-refresh + smarter matching
 
 **Status**: planned
 
-Two heavier items that depend on real surface-area additions: an OAuth flow with per-user DB writes, and a registry-side discovery surface (per-registry leaderboards + a browser userscript). Bundled because both require new external touchpoints — auth provider sessions, browser extension distribution, registry-page DOM probes — that warrant a single release cut.
+Two moderate-effort items that need real infra (a webhook receiver + queue, an embedding model and a vector store) but don't yet need user accounts or registry crawls. Together they shift the product from a manual-seed snapshot to a self-updating dataset with smarter matching.
 
 ## Tasks
 
-- [01-opt-out-claim-flow.md](./01-opt-out-claim-flow.md) — OAuth so maintainers can claim or opt out of their listing. First touchpoint that writes to the DB on behalf of a user.
-- [02-package-registry-overlay.md](./02-package-registry-overlay.md) — at-scale package overlay: per-registry leaderboards on the dashboard + a browser userscript that renders the badge inline on npmjs.com / PyPI / crates.io. Builds on the v0.3.0 lookup endpoint.
+- [01-webhook-rescoring.md](./01-webhook-rescoring.md) — keep scores fresh on every push; detect regressions. Webhook receiver + signature verification + rescore queue.
+- [02-alternatives-v2-embeddings.md](./02-alternatives-v2-embeddings.md) — sentence-transformer embeddings on the README; cosine-similar neighbors = alternatives. Lifts the v1 same-language SQL heuristic so cross-language alternatives surface correctly (e.g. `axios` → `requests`).

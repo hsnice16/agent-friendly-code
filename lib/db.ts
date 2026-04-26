@@ -205,6 +205,27 @@ export function getPackageAlias(registry: string, name: string): string | null {
   return row?.repo_url ?? null;
 }
 
+export type TopPackageRow = {
+  name: string;
+  score: number;
+  owner: string;
+  repoName: string;
+};
+
+export function getTopPackagesByRegistry(registry: string, limit: number): TopPackageRow[] {
+  return db
+    .prepare(
+      `SELECT pa.name, r.overall_score AS score, r.owner, r.name AS repoName
+         FROM package_alias pa
+         JOIN repo r ON r.url = pa.repo_url
+        WHERE pa.registry = ?
+          AND r.overall_score IS NOT NULL
+        ORDER BY r.overall_score DESC
+        LIMIT ?`,
+    )
+    .all(registry, limit) as TopPackageRow[];
+}
+
 export function putPackageAlias(registry: string, name: string, repoUrl: string): void {
   db.prepare(
     `INSERT INTO package_alias (registry, name, repo_url, resolved_at)

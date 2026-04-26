@@ -34,7 +34,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const score = repo.overall_score != null ? repo.overall_score.toFixed(1) : "unranked";
 
   const title = `${slug} — ${score} / 100`;
-  const description = `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, and GPT-5 Codex — with the top improvements ranked by score-gain.`;
+  const description = `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi — with the top improvements ranked by score-gain.`;
 
   const repoKeywords = [
     slug,
@@ -117,7 +117,17 @@ export default async function Page({
         codeRepository: repo.url,
         url: `${APP_URL}/repo/${id}`,
         ...(repo.language ? { programmingLanguage: repo.language } : {}),
+        ...(repo.last_scored_at != null ? { dateModified: new Date(repo.last_scored_at * 1000).toISOString() } : {}),
+        keywords: [slug, repo.name, repo.owner, repo.language, "AGENTS.md", "AI coding agent"]
+          .filter(Boolean)
+          .join(", "),
         description: `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi.`,
+        additionalProperty: signals.map((s) => ({
+          "@type": "PropertyValue",
+          name: s.label,
+          value: s.pass,
+          ...(s.detail ? { description: s.detail } : {}),
+        })),
       },
     ],
   };

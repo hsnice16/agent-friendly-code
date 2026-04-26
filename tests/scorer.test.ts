@@ -1,5 +1,6 @@
 import { strict as assert } from "node:assert";
 import { afterEach, describe, test } from "node:test";
+
 import { scoreRepo, topImprovements } from "../lib/scoring/scorer";
 import { SIGNALS } from "../lib/scoring/signals";
 import type { SignalResult } from "../lib/scoring/signals/types";
@@ -19,11 +20,15 @@ function richFixtureFiles(): FixtureFiles {
     "CONTRIBUTING.md": "contrib",
     "AGENTS.md": "x".repeat(1500),
     "README.md": "y".repeat(1500),
+    "GEMINI.md": "g".repeat(1500),
     "docker-compose.yml": "services: {}",
     ".github/workflows/ci.yml": ciYaml(),
     "src/index.ts": "export const x = 1;",
     "tests/smoke.test.ts": "// placeholder",
+    ".aider.conf.yml": "test-cmd: bun run test",
     "lefthook.yml": "pre-commit:\n  commands: {}",
+    ".openhands/setup.sh": "#!/usr/bin/env bash\nbun install",
+    ".cursor/rules/style.mdc": "---\nname: style\n---\nUse Tailwind.",
     "package.json": JSON.stringify({
       name: "demo",
       scripts: { dev: "d", build: "b", test: "t" },

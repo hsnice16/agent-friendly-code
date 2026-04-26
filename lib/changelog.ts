@@ -8,6 +8,18 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.4.0",
+    date: "2026-04-27",
+    title: "Credible scores + better discoverability",
+    highlights: [
+      "Per-model rationales now cite each agent's official documentation — `/methodology` renders a Sources panel under every model, and the 'illustrative weights' framing is gone. Reweights: Devin CI 1.0 → 0.7, Codex AGENTS.md 0.7 → 0.9, Cursor AGENTS.md 0.6 → 0.8.",
+      "Four new agent-specific instruction-file signals — `.cursor/rules/*.mdc` (Cursor), `GEMINI.md` (Gemini CLI), `.openhands/setup.sh` (OpenHands), `.aider.conf.yml` (Aider). Each is a per-agent boost on the model that reads it.",
+      "`/about` page — independent project, no vendor affiliation, links from the footer; gives the methodology a human face for both readers and LLM crawlers.",
+      "`/llms.txt` markdown manifest — Perplexity / Claude / ChatGPT-search can ingest the site's pages and public API endpoints cleanly.",
+      "Per-repo Open Graph images — sharing a `/repo/:id` URL renders a 1200×630 preview with the repo + score instead of the default site card.",
+    ],
+  },
+  {
     label: "0.3.0",
     date: "2026-04-25",
     title: "Embeddable scores + broader coverage",

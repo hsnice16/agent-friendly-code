@@ -13,59 +13,59 @@ export type RoadmapVersion = {
 
 export const ROADMAP: RoadmapVersion[] = [
   {
-    version: "0.4.0",
+    version: "0.5.0",
     status: "planned",
     theme: "Quick wins",
     items: [
       {
         title: "History-aware signals",
-        taskFile: "tasks/0.4.0/01-history-aware-signals.md",
+        taskFile: "tasks/0.5.0/01-history-aware-signals.md",
         summary:
           "Score maintenance recency, commit velocity, and contributor activity — the gap left by the --depth 1 --single-branch clone. Served via host APIs, degrades gracefully without a token.",
       },
       {
         title: "Score diff on PR",
-        taskFile: "tasks/0.4.0/02-score-diff-on-pr.md",
+        taskFile: "tasks/0.5.0/02-score-diff-on-pr.md",
         summary: "GitHub Action that comments score delta on every PR.",
       },
       {
         title: "Claude Code skill",
-        taskFile: "tasks/0.4.0/03-claude-code-skill.md",
+        taskFile: "tasks/0.5.0/03-claude-code-skill.md",
         summary:
           "Skill (installable via npx skills add) that checks the active repo's score and recommends a Claude model. Ships with the /api/score lookup endpoint and a UI integration page with a SessionStart hook snippet.",
       },
     ],
   },
   {
-    version: "0.5.0",
+    version: "0.6.0",
     status: "planned",
     theme: "Auto-refresh + smarter matching",
     items: [
       {
         title: "Webhook-driven rescoring",
-        taskFile: "tasks/0.5.0/01-webhook-rescoring.md",
+        taskFile: "tasks/0.6.0/01-webhook-rescoring.md",
         summary: "Keep scores fresh on every push; detect regressions.",
       },
       {
         title: "Alternatives via README embeddings",
-        taskFile: "tasks/0.5.0/02-alternatives-v2-embeddings.md",
+        taskFile: "tasks/0.6.0/02-alternatives-v2-embeddings.md",
         summary: "Upgrade the v1 SQL heuristic with sentence-transformer embeddings for cross-language matches.",
       },
     ],
   },
   {
-    version: "0.6.0",
+    version: "0.7.0",
     status: "planned",
     theme: "Maintainer ownership + at-scale discovery",
     items: [
       {
         title: "Opt-out / claim flow",
-        taskFile: "tasks/0.6.0/01-opt-out-claim-flow.md",
+        taskFile: "tasks/0.7.0/01-opt-out-claim-flow.md",
         summary: "OAuth so maintainers control their listing.",
       },
       {
         title: "Package-registry overlay (at scale)",
-        taskFile: "tasks/0.6.0/02-package-registry-overlay.md",
+        taskFile: "tasks/0.7.0/02-package-registry-overlay.md",
         summary: "Per-registry leaderboards + browser userscript for inline badges on npmjs.com / PyPI / crates.io.",
       },
     ],

@@ -69,6 +69,19 @@ const JSON_LD = {
         "query-input": "required name=search_term_string",
       },
     },
+    {
+      "@type": "WebApplication",
+      "@id": `${APP_URL}/#app`,
+      url: APP_URL,
+      name: APP_NAME,
+      operatingSystem: "Any",
+      isAccessibleForFree: true,
+      description: APP_DESCRIPTION,
+      publisher: { "@id": `${APP_URL}/#org` },
+      applicationCategory: "DeveloperApplication",
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+      browserRequirements: "Requires JavaScript-enabled modern browser",
+    },
   ],
 };
 
@@ -88,10 +101,11 @@ const NAV_LINKS = [
 
 const FOOTER_LINKS = [
   { href: "/", label: "Home" },
-  { href: "/methodology", label: "Methodology" },
-  { href: "/roadmap", label: "Roadmap" },
+  { href: "/about", label: "About" },
   { href: "/changelog", label: "Changelog" },
+  { href: "/methodology", label: "Methodology" },
   { href: "/package", label: "Packages" },
+  { href: "/roadmap", label: "Roadmap" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -139,15 +153,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
           <main id="main">{children}</main>
           <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
-            <nav aria-label="Secondary" className="mb-2 flex flex-wrap gap-x-4 gap-y-1">
+            <nav aria-label="Secondary" className="mb-5 flex flex-wrap gap-x-4 gap-y-1">
               {FOOTER_LINKS.map((l) => (
-                <Link key={l.href} href={l.href} className="text-ink-dim hover:text-ink-soft">
+                <Link
+                  key={l.href}
+                  href={l.href}
+                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                >
                   {l.label}
                 </Link>
               ))}
             </nav>
-            Signals are static heuristics — no agent is actually run. Per-model weights are illustrative, not yet
-            empirically derived.
+            Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
+            values themselves are still pre-benchmark.
           </footer>
         </div>
 

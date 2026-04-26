@@ -1,6 +1,6 @@
 {
   "name": "agent-friendly-code",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "private": true,
   "license": "MIT",
   "author": "Himanshu Singh (https://github.com/hsnice16)",
@@ -13,6 +13,7 @@
     "start": "next start -p 3000",
     "score": "tsx scripts/score.ts score",
     "seed": "tsx scripts/seed.ts",
+    "seed-packages": "tsx scripts/seed-packages.ts",
     "init-db": "tsx scripts/init-db.ts",
     "prepare-hooks": "lefthook install",
     "test": "node --import tsx --test 'tests/**/*.test.ts'"
