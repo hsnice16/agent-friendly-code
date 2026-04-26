@@ -14,8 +14,8 @@ import { SignalRow } from "@/components/SignalRow";
 import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
-import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
-import { APP_URL } from "@/lib/version";
+import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
+import { APP_KEYWORDS, APP_URL } from "@/lib/version";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id: idStr } = await params;
@@ -36,9 +36,23 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const title = `${slug} — ${score} / 100`;
   const description = `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, and GPT-5 Codex — with the top improvements ranked by score-gain.`;
 
+  const repoKeywords = [
+    slug,
+    repo.name,
+    repo.owner,
+    repo.language,
+    `${repo.name} ai agent`,
+    `${repo.name} agents.md`,
+    `${repo.name} ai coding agent`,
+    ...MODELS.map((m) => `${repo.name} ${m.label.toLowerCase()}`),
+    ...MODELS.map((m) => m.label),
+    ...APP_KEYWORDS,
+  ].filter((k): k is string => Boolean(k));
+
   return {
     title,
     description,
+    keywords: repoKeywords,
     twitter: { title, description },
     alternates: { canonical: `/repo/${id}` },
     openGraph: { title, description, url: `/repo/${id}`, type: "article" },
@@ -79,19 +93,31 @@ export default async function Page({
   const slug = `${repo.owner}/${repo.name}`;
   const jsonLd = {
     "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
+    "@graph": [
       {
-        "@type": "ListItem",
-        position: 1,
-        name: "Leaderboard",
-        item: `${APP_URL}/`,
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          {
+            "@type": "ListItem",
+            position: 1,
+            item: `${APP_URL}/`,
+            name: "Leaderboard",
+          },
+          {
+            "@type": "ListItem",
+            name: slug,
+            position: 2,
+            item: `${APP_URL}/repo/${id}`,
+          },
+        ],
       },
       {
-        "@type": "ListItem",
-        position: 2,
+        "@type": "SoftwareSourceCode",
         name: slug,
-        item: `${APP_URL}/repo/${id}`,
+        codeRepository: repo.url,
+        url: `${APP_URL}/repo/${id}`,
+        ...(repo.language ? { programmingLanguage: repo.language } : {}),
+        description: `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi.`,
       },
     ],
   };

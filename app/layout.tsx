@@ -6,7 +6,7 @@ import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MobileNav } from "@/components/MobileNav";
 import { VersionPill } from "@/components/VersionPill";
-import { APP_DESCRIPTION, APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
+import { APP_DESCRIPTION, APP_KEYWORDS, APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
 
 const OG_IMAGE = {
   width: 1200,
@@ -16,28 +16,13 @@ const OG_IMAGE = {
 };
 
 export const metadata: Metadata = {
+  keywords: APP_KEYWORDS,
   applicationName: APP_NAME,
+  creator: "Himanshu Singh",
   description: APP_DESCRIPTION,
   metadataBase: new URL(APP_URL),
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
-  keywords: [
-    "AI coding agents",
-    "Claude Code",
-    "Cursor",
-    "Devin",
-    "GPT-5 Codex",
-    "Gemini CLI",
-    "Aider",
-    "OpenHands",
-    "Pi",
-    "AGENTS.md",
-    "agent readiness",
-    "open source",
-    "repo ranking",
-    "developer tools",
-  ],
-  creator: "Himanshu Singh",
   authors: [{ name: "Himanshu Singh", url: REPO_URL }],
+  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   openGraph: {
     url: "/",
     locale: "en_US",

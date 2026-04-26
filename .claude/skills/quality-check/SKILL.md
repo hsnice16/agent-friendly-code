@@ -39,7 +39,7 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 ## Security
 
 - **SQL parameterisation**: every query uses `?` placeholders. No string concatenation.
-- **`dangerouslySetInnerHTML`** is allowed only for server-built JSON-LD (`app/layout.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) and must keep the `<` → `<` escape. Any other use must be rejected.
+- **`dangerouslySetInnerHTML`** is allowed only for server-built JSON-LD (`app/layout.tsx`, `app/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) and must keep the `<` → `<` escape. Any other use must be rejected.
 - **External URLs** in `<a target="_blank">` always include `rel="noopener noreferrer"`.
 - **User input at every boundary** is validated: `parseRepoUrl` for repo URLs, `Number.isFinite` for numeric params, length caps on search strings.
 - **Clone safety**: `git clone --depth 1 --single-branch`; never execute code from a clone (no `bun install`, no `npm install`, no post-clone scripts).

@@ -1,4 +1,5 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
 import { HostPill } from "@/components/HostPill";
@@ -12,9 +13,23 @@ import { SortSelect } from "@/components/SortSelect";
 import { type Host, isHost } from "@/lib/constants/hosts";
 import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
-import { getLeaderboardStats, type LeaderboardRow, listLeaderboard } from "@/lib/db";
+import { getLeaderboardStats, type LeaderboardRow, listLeaderboard, listLeaderboardOverall } from "@/lib/db";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import { compactStars, relativeTime } from "@/lib/utils/format";
+import { APP_URL } from "@/lib/version";
+
+const HOME_TITLE =
+  "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Aider, OpenHands, Pi";
+const HOME_DESCRIPTION =
+  "Public leaderboard ranking GitHub, GitLab, and Bitbucket repos by how agent-friendly they are for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi — per model, with AGENTS.md / CLAUDE.md, CI, tests, and dev-env signals.";
+
+export const metadata: Metadata = {
+  title: HOME_TITLE,
+  description: HOME_DESCRIPTION,
+  alternates: { canonical: "/" },
+  twitter: { title: HOME_TITLE, description: HOME_DESCRIPTION },
+  openGraph: { title: HOME_TITLE, description: HOME_DESCRIPTION, url: "/" },
+};
 
 type SearchParams = {
   q?: string;
@@ -103,8 +118,29 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
       ? "Simple average of every per-model score."
       : (MODELS.find((m) => m.id === selected)?.rationale ?? "");
 
+  const allOverall = listLeaderboardOverall();
+  const itemListJsonLd = {
+    "@type": "ItemList",
+    "@context": "https://schema.org",
+    numberOfItems: allOverall.length,
+    name: "Agent-friendliness leaderboard",
+    itemListElement: allOverall.map((row, idx) => ({
+      "@type": "ListItem",
+      position: idx + 1,
+      name: `${row.owner}/${row.name}`,
+      url: `${APP_URL}/repo/${row.id}`,
+    })),
+  };
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c"),
+        }}
+      />
       <section className="mb-5">
         <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
           Which public repos are friendliest to an AI coding agent?

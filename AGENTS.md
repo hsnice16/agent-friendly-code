@@ -176,7 +176,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.6.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
