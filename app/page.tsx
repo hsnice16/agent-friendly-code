@@ -180,23 +180,52 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c"),
         }}
       />
-      <section className="mb-5">
-        <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
-          Which public repos are friendliest to an AI coding agent?
-        </h1>
-        <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
-        </p>
-        <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
-          Looking up a dependency?{" "}
-          <Link
-            href="/package"
-            className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+      <section className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
+        <div className="min-w-0 flex-1">
+          <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
+            Which public repos are friendliest to an AI coding agent?
+          </h1>
+          <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
+            Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
+          </p>
+
+          <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
+            Looking up a dependency?{" "}
+            <Link
+              href="/package"
+              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+            >
+              Check any npm / PyPI / Cargo package
+            </Link>{" "}
+            by name.
+          </p>
+        </div>
+
+        <a
+          target="_blank"
+          rel="noopener noreferrer"
+          href="https://peerlist.io/hsnice16/project/agent-friendly-code"
+          aria-label="Live on Peerlist Launchpad — open the Agent Friendly Code project page (new tab)"
+          className="group relative block w-full max-w-[340px] shrink-0 self-start overflow-hidden rounded-lg border border-line transition-colors hover:border-line-strong sm:w-[300px]"
+        >
+          <picture>
+            <source media="(prefers-color-scheme: dark)" srcSet="/launch/peerlist-dark.png" />
+            <img
+              height={630}
+              width={1200}
+              className="block h-auto w-full"
+              alt="Live on Peerlist Launchpad"
+              src="/launch/peerlist-light.png"
+            />
+          </picture>
+
+          <span
+            aria-hidden="true"
+            className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-bg/85 text-ink-dim ring-1 ring-line backdrop-blur-sm transition-colors group-hover:bg-bg group-hover:text-ink"
           >
-            Check any npm / PyPI / Cargo package
-          </Link>{" "}
-          by name.
-        </p>
+            <ArrowUpRight size={13} weight="bold" />
+          </span>
+        </a>
       </section>
 
       <ModelPills
