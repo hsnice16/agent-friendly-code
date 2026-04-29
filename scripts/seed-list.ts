@@ -163,6 +163,10 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/zed-industries/zed", note: "Zed editor" },
   { url: "https://github.com/warpdotdev/warp", note: "Warp — AI terminal" },
+  {
+    url: "https://github.com/ghostty-org/ghostty",
+    note: "Ghostty — fast native terminal emulator (Zig)",
+  },
   { url: "https://github.com/helix-editor/helix", note: "Helix modal editor" },
   { url: "https://github.com/nushell/nushell", note: "Nu shell" },
   { url: "https://github.com/starship/starship", note: "Starship prompt" },
