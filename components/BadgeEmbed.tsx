@@ -20,7 +20,7 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath }: Props) {
   return (
     <Panel>
       <PanelHeading>Embed this badge</PanelHeading>
-      <p className="m-0 mb-3 max-w-[60ch] text-[13px] text-muted">
+      <p className="m-0 mb-3 text-[13px] text-muted">
         Drop the snippet below into the top of this repo&apos;s README so visitors can see its agent-friendliness at a
         glance — clicks land back here.
       </p>

@@ -8,7 +8,7 @@ Score signals that need git history or repo activity data, which the current `--
 
 ## Context
 
-Today's scorer reads file contents from the working tree at HEAD of the default branch. This is correct for the 12 static signals (presence of `AGENTS.md`, `tests/`, CI configs, etc.) but misses anything time-derived. Methodology's "What isn't measured yet" section acknowledges this; v0.5.0 closes the gap.
+Today's scorer reads file contents from the working tree at HEAD of the default branch. This is correct for the sixteen static signals (twelve cross-agent — `AGENTS.md`, `tests/`, CI configs, etc. — plus four agent-specific instruction files added in 0.4.0) but misses anything time-derived. Methodology's "What isn't measured yet" section acknowledges this; v0.5.0 closes the gap.
 
 ## Candidate signals (pick ≥ 3 to ship)
 
@@ -32,3 +32,7 @@ Prefer (3). It keeps `lib/clients/git.ts` thin and lets us degrade gracefully to
 - Each new signal has a weight entry in every model in `lib/scoring/weights.ts`.
 - Hybrid fetch strategy documented in `AGENTS.md` under "I/O boundary".
 - Re-scoring a repo with and without a token yields the same static signals; history signals degrade to neutral when the token is absent.
+
+## Cross-reference (0.5.0/02)
+
+The PR-diff action vendors this scorer, so any history signals added here become available to the action automatically. Inside CI the action gets full git history "for free" via `actions/checkout` with `fetch-depth: 0`, and host-API calls work under the workflow's built-in `GITHUB_TOKEN` — no extra setup on the maintainer's side. Keep new signals tolerant of missing API access so the action's read-only path stays simple.

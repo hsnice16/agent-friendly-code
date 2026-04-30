@@ -2,7 +2,7 @@ import { relative } from "node:path";
 
 import { DEFAULT_SUGGESTION_LIMIT } from "../constants/scoring";
 import { runAllSignals, SIGNAL_BY_ID, type SignalResult } from "./signals";
-import { MODEL_BY_ID, MODELS, type ModelId, type ModelProfile } from "./weights";
+import { MODELS, type ModelId, type ModelProfile } from "./weights";
 
 export type ModelScore = {
   score: number;
@@ -62,15 +62,19 @@ function toRelative(repoPath: string, p: string | undefined): string | undefined
   return rel.startsWith("..") ? p : rel || ".";
 }
 
-export function scoreRepo(repoPath: string): RepoScore {
+export function scoreRepo(repoPath: string, models: ModelProfile[] = MODELS): RepoScore {
   const rawSignals = runAllSignals(repoPath);
   const signals = rawSignals.map((s) => ({
     ...s,
     matchedPath: toRelative(repoPath, s.matchedPath),
   }));
-  const modelScores = MODELS.map((m) => scoreOneModel(m, signals));
 
-  const overall = Math.round((modelScores.reduce((a, b) => a + b.score, 0) / modelScores.length) * 10) / 10;
+  const modelScores = models.map((m) => scoreOneModel(m, signals));
+
+  const overall =
+    modelScores.length === 0
+      ? 0
+      : Math.round((modelScores.reduce((a, b) => a + b.score, 0) / modelScores.length) * 10) / 10;
 
   return { signals, modelScores, overall };
 }
@@ -86,8 +90,9 @@ export function topImprovements(
   modelId: ModelId,
   signals: SignalResult[],
   limit = DEFAULT_SUGGESTION_LIMIT,
+  models: ModelProfile[] = MODELS,
 ): ImprovementSuggestion[] {
-  const profile = MODEL_BY_ID[modelId];
+  const profile = models.find((m) => m.id === modelId);
   if (!profile) {
     return [];
   }
@@ -105,8 +110,8 @@ export function topImprovements(
     .sort((a, b) => b.scoreGain - a.scoreGain)
     .slice(0, limit)
     .map(({ signalResult, scoreGain }) => ({
-      signalId: signalResult.id,
       label: signalResult.label,
+      signalId: signalResult.id,
       scoreGain: Math.round(scoreGain * 10) / 10,
       suggestion: SIGNAL_BY_ID[signalResult.id]?.improveSuggestion ?? "",
     }));

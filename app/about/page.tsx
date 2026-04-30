@@ -1,6 +1,6 @@
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
-
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, REPO_URL } from "@/lib/version";
 
@@ -30,9 +30,9 @@ export default function AboutPage() {
             target="_blank"
             rel="noopener noreferrer"
             href="https://github.com/hsnice16"
-            className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+            className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
           >
-            Himanshu Singh
+            Himanshu Singh <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
           </a>
           . Independent project — no affiliation with Anthropic, OpenAI, Google, Cognition, Anysphere, or any of the
           agent vendors ranked here.
@@ -83,9 +83,9 @@ export default function AboutPage() {
               href={REPO_URL}
               target="_blank"
               rel="noopener noreferrer"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
-              source repository
+              source repository <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
             </a>
             . If a repo&apos;s score looks wrong, file an issue with a link and the rubric to revisit; if a signal is
             missing, propose one.
@@ -103,9 +103,9 @@ export default function AboutPage() {
               target="_blank"
               rel="noopener noreferrer"
               href={`${REPO_URL}/issues`}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
-              GitHub
+              GitHub <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
             </a>
             .
           </p>

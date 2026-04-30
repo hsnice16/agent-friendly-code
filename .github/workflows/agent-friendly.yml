@@ -1,0 +1,20 @@
+name: Agent-friendly score diff
+
+on:
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  score-diff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: hsnice16/agent-friendly-action@v0
+        with:
+          agents-badge-token: ${{ secrets.AGENTS_BADGE_TOKEN }}

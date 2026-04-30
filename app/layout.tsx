@@ -102,6 +102,7 @@ const NAV_LINKS = [
 const FOOTER_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
+  { href: "/action", label: "Action" },
   { href: "/changelog", label: "Changelog" },
   { href: "/methodology", label: "Methodology" },
   { href: "/package", label: "Packages" },
@@ -164,8 +165,32 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </Link>
               ))}
             </nav>
-            Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
-            values themselves are still pre-benchmark.
+
+            <p className="m-0">
+              Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
+              values themselves are still pre-benchmark.
+            </p>
+
+            <p className="mt-3 text-[12px]">
+              © {new Date().getFullYear()}{" "}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href="https://github.com/hsnice16"
+                className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+              >
+                Himanshu Singh
+              </a>{" "}
+              ·{" "}
+              <a
+                target="_blank"
+                rel="noopener noreferrer"
+                href={`${REPO_URL}/blob/main/LICENSE`}
+                className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+              >
+                MIT
+              </a>
+            </p>
           </footer>
         </div>
 

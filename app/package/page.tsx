@@ -73,7 +73,7 @@ export default function PackageIndexPage() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>What happens when it&apos;s not scored?</PanelHeading>
-          <p className="m-0 max-w-[72ch] text-[14.5px] leading-relaxed text-ink-dim">
+          <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             If a package resolves to a source repo we don&apos;t track yet, the page shows you which repo it mapped to
             and links to a <strong className="text-ink mr-1">pre-filled GitHub issue</strong> you can submit to request
             scoring. If the registry manifest doesn&apos;t point at a parseable source URL at all, the issue template
