@@ -1,3 +1,4 @@
+import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 
@@ -81,10 +82,8 @@ export default function MethodologyPage() {
         </p>
       </section>
 
-      <Panel className="border-warn/40">
-        <PanelHeading>
-          <span className="text-warn">Status: documented rationales, pre-benchmark weights</span>
-        </PanelHeading>
+      <Panel tone="warn">
+        <PanelHeading tone="warn">Status: documented rationales, pre-benchmark weights</PanelHeading>
 
         <p className="text-[14.5px] leading-relaxed text-ink-dim">
           Today every score is derived from <strong className="text-ink">static signals</strong> — file existence and
@@ -117,9 +116,11 @@ overall         = mean(per-model scores)
 improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100  points`}
           </pre>
 
-          <p className="mt-3 text-sm text-muted">
-            <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs">signal.pass</code>{" "}
-            is a float in [0, 1] — partial credit is allowed (e.g. a thin README gets 0.3, a long one gets 1.0).
+          <p className="mt-3 text-[13.5px] leading-relaxed text-ink-dim">
+            <code className="font-mono text-[12.5px] text-ink">signal.pass</code> is a float in{" "}
+            <code className="font-mono text-[12.5px] text-ink">[0, 1]</code> — partial credit is allowed (e.g. a thin
+            README gets <code className="font-mono text-[12.5px] text-ink">0.3</code>, a long one gets{" "}
+            <code className="font-mono text-[12.5px] text-ink">1.0</code>).
           </p>
         </Panel>
       </div>
@@ -132,7 +133,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
             {SIGNALS.map((s) => (
               <li
                 key={s.id}
-                className="grid grid-cols-[160px_1fr] items-start gap-5 border-b border-line py-3 last:border-b-0"
+                className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0 sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
               >
                 <div>
                   <div className="text-[14.5px] font-medium">{s.label}</div>
@@ -178,9 +179,9 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                           title={url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
+                          className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
                         >
-                          {label}
+                          {label} <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
                         </a>
                       );
                     })}

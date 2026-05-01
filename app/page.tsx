@@ -193,7 +193,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
             Looking up a dependency?{" "}
             <Link
               href="/package"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+              className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
             >
               Check any npm / PyPI / Cargo package
             </Link>{" "}

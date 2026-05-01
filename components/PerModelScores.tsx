@@ -12,11 +12,10 @@ export function PerModelScores({ modelScores }: { modelScores: ModelScoreRow[] }
       <PanelHeading>Per-model scores</PanelHeading>
 
       <div className="grid grid-cols-1 gap-2.5">
-        {MODELS.map((m) => {
-          const ms = modelScores.find((x) => x.modelId === m.id);
-          const s = ms?.score ?? 0;
-
-          return (
+        {[...MODELS]
+          .map((m) => ({ model: m, score: modelScores.find((x) => x.modelId === m.id)?.score ?? 0 }))
+          .sort((a, b) => b.score - a.score)
+          .map(({ model: m, score: s }) => (
             <div
               key={m.id}
               className="grid grid-cols-[1fr_auto] items-center gap-3 border-b border-line py-3 last:border-b-0 sm:grid-cols-[150px_1fr_auto] sm:gap-4"
@@ -29,8 +28,7 @@ export function PerModelScores({ modelScores }: { modelScores: ModelScoreRow[] }
 
               <ScoreNumber score={s} />
             </div>
-          );
-        })}
+          ))}
       </div>
     </Panel>
   );

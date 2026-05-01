@@ -40,8 +40,8 @@ export default function AboutPage() {
       </Panel>
 
       <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>Why this exists</PanelHeading>
+        <Panel tone="warn">
+          <PanelHeading tone="warn">Why this exists</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             The gap between &ldquo;repo with a README&rdquo; and &ldquo;repo that actually helps an AI coding agent ship
             code&rdquo; keeps widening, and there&apos;s no public way to tell who&apos;s doing the work. {APP_NAME}{" "}
