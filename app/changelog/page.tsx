@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel } from "@/components/Panel";
 import { CHANGELOG } from "@/lib/changelog";
 
@@ -8,7 +9,7 @@ export const metadata: Metadata = {
   title: "Changelog",
   twitter: { title: "Changelog" },
   alternates: { canonical: "/changelog" },
-  openGraph: { title: "Changelog", url: "/changelog" },
+  openGraph: { title: "Changelog", url: "/changelog", type: "article" },
   description:
     "What's shipped in each release of Agent Friendly Code — user-facing capabilities, not internal churn. Every bullet corresponds to a roadmap item that landed.",
 };
@@ -16,6 +17,8 @@ export const metadata: Metadata = {
 export default function ChangelogPage() {
   return (
     <>
+      <BreadcrumbJsonLd current={{ name: "Changelog", path: "/changelog" }} />
+
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Changelog</h1>
 
@@ -41,10 +44,13 @@ export default function ChangelogPage() {
               <span className="tabular-nums text-sm text-muted">{entry.date}</span>
             </div>
 
-            <ul className="m-0 pl-5 text-[14.5px] text-ink-dim">
+            <ul className="m-0 list-none p-0 text-[14.5px] text-ink-dim">
               {entry.highlights.map((h) => (
-                <li key={h} className="my-1">
-                  {h}
+                <li key={h} className="my-1 flex gap-2">
+                  <span aria-hidden="true" className="select-none text-line">
+                    ·
+                  </span>
+                  <span>{h}</span>
                 </li>
               ))}
             </ul>

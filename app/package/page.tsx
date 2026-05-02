@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { PackageLookupForm } from "@/components/PackageLookupForm";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
@@ -31,6 +32,8 @@ export default function PackageIndexPage() {
 
   return (
     <>
+      <BreadcrumbJsonLd current={{ name: "Packages", path: "/package" }} />
+
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Packages</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">

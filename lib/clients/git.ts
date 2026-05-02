@@ -1,8 +1,8 @@
 // Why shallow (--depth 1 --single-branch)?
 //   - The static signal scorer only needs the current working tree, not history.
 //   - Skipping history keeps huge repos (gigabytes of log) manageable.
-//   - Tradeoff: no git log / blame — history-aware signals would need a host
-//     API or `--filter=blob:none` partial clones.
+//   - Tradeoff: no git log / blame — anything that needs commit history
+//     would need a host API or `--filter=blob:none` partial clones.
 
 import { spawn } from "node:child_process";
 import { existsSync, mkdirSync, rmSync } from "node:fs";

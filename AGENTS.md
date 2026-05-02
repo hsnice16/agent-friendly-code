@@ -105,7 +105,7 @@ tasks/
   0.2.0/                  # released — dogfood complete (tests, self-score, row-click)
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
-  0.5.0/                  # planned — quick wins (history-aware signals + PR score-diff action + agent skill)
+  0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
   0.6.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
   0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
@@ -212,7 +212,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Roadmap); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
