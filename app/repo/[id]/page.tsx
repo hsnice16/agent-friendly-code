@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { ActionEmbed } from "@/components/ActionEmbed";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { BadgeEmbed } from "@/components/BadgeEmbed";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
@@ -15,7 +16,7 @@ import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
-import { APP_KEYWORDS, APP_URL } from "@/lib/version";
+import { ACTION_USES, APP_KEYWORDS, APP_URL } from "@/lib/version";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id: idStr } = await params;
@@ -150,6 +151,22 @@ export default async function Page({
 
       <RepoHero repo={repo} />
 
+      <aside
+        aria-label="Tools you can add to this repo"
+        className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-line bg-surface px-4 py-2.5 text-[12.5px]"
+      >
+        <span className="text-muted">Use on your repo:</span>
+        <a href="#embed-badge" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+          Embed a badge ↓
+        </a>
+        <span aria-hidden="true" className="text-line">
+          ·
+        </span>
+        <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+          Add the PR-diff Action ↓
+        </a>
+      </aside>
+
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <SignalListCard
           items={strengths}
@@ -184,7 +201,7 @@ export default async function Page({
         </Panel>
       </div>
 
-      <div className="mt-3.5">
+      <div id="embed-badge" className="mt-3.5 scroll-mt-20">
         <BadgeEmbed
           appUrl={APP_URL}
           name={repo.name}
@@ -192,6 +209,10 @@ export default async function Page({
           owner={repo.owner}
           repoPagePath={`/repo/${id}`}
         />
+      </div>
+
+      <div id="pr-action" className="mt-3.5 scroll-mt-20">
+        <ActionEmbed actionUses={ACTION_USES} showSecretLink />
       </div>
     </>
   );

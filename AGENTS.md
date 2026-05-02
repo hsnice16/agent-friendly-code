@@ -51,11 +51,13 @@ app/
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
+  api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup (powers the action + agent skill)
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
+  action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
   globals.css             # Tailwind import + @theme tokens (no custom utilities)
 components/               # Tailwind-styled React components
   Panel.tsx, ScoreBar.tsx, ScoreNumber.tsx, ScoreCell.tsx,
@@ -63,6 +65,7 @@ components/               # Tailwind-styled React components
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
+  BadgeEmbed.tsx, ActionEmbed.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
@@ -80,7 +83,7 @@ lib/
     git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, ACTION_REPO_URL, ACTION_USES
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
 scripts/
@@ -130,17 +133,31 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 - **Versioning + changelog**: bumps on `lib/version.ts` + `package.json` `version` happen only on a real release, coordinated with a new bucket in `lib/changelog.ts`. The changelog is a **user-facing capability log** — every bullet describes something a dashboard visitor or API caller can see, click, or call. Codebase hygiene (CI, linters, pre-commit, tests), pure internal refactors, dep bumps, and contributor-facing docs (CONTRIBUTING, PR templates) do **not** earn a changelog line — they stay in `tasks/` and the PR description. When a roadmap item ships, remove it from `lib/roadmap.ts` in the same PR — moved, not duplicated.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines — enforced by the `file-length` pre-commit job in `lefthook.yml`. Near the cap, split into subcomponents or extract helpers to `lib/utils/`. `scripts/` is exempt (seed data lists).
 
+## Sibling repos
+
+The PR-diff GitHub Action lives in a sibling directory: `../agent-friendly-action/`. It **vendors** the scorer (`lib/scoring/` from this repo) into its own bundle so it can run inside maintainer CI with no network call to this app. Extracting `agent-friendly-scorer` as a standalone npm package is deferred to `tasks/1.0.0/03-benchmark-harness.md`, when a second sibling consumer (the benchmark harness) appears. Until then, the two copies of the scorer must stay in sync by hand.
+
+**Whenever you change `lib/scoring/`** — adding a signal, tweaking a weight, refactoring `scorer.ts`, anything — also:
+
+1. Re-vendor the changed file(s) into `../agent-friendly-action/src/scoring/` (mirror the directory layout).
+2. Append a line under "Unreleased" in `../agent-friendly-action/CHANGELOG.md` describing what changed, so action consumers can read what shipped in each tagged release.
+3. The action's CI verifies its `dist/` bundle is in sync with `src/` on every push, but it can't catch upstream-source drift — that's on the agent doing the change.
+
+If `../agent-friendly-action/` isn't present locally, flag it; never silently skip the propagation. Both repos are siblings under the same `personal/` workspace.
+
 ## Adding a signal
 
 1. New file at `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (including `improveSuggestion`).
 2. Import and add to the `SIGNALS` array in `lib/scoring/signals/index.ts`.
 3. Add a weight entry to **every** model in `lib/scoring/weights.ts` — missing weights default to 0, decide deliberately.
 4. Re-score: `bun run seed` is idempotent.
+5. **Mirror to the action** (per "Sibling repos" above): copy the new signal file into `../agent-friendly-action/src/scoring/signals/`, add the import + array entry to its `signals/index.ts`, copy the weights changes to its `weights.ts`, and log the addition in `../agent-friendly-action/CHANGELOG.md` under "Unreleased".
 
 ## Adding a model
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills and repo-page suggestions.
+3. **Mirror to the action**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` and log under "Unreleased" in its `CHANGELOG.md`.
 
 ## Adding a host
 
@@ -180,7 +197,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 

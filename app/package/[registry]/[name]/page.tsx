@@ -113,7 +113,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
           <Panel>
             <PanelHeading>Not scored yet</PanelHeading>
 
-            <p className="m-0 max-w-[72ch] text-[14.5px] leading-relaxed text-ink-dim">
+            <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
               This package maps to{" "}
               <strong className="break-all text-ink">
                 {result.repo.host}/{result.repo.owner}/{result.repo.name}
@@ -122,9 +122,9 @@ export default async function Page({ params }: { params: Promise<{ registry: str
             </p>
 
             <a
-              rel="noopener noreferrer"
               target="_blank"
               href={result.contact_url}
+              rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
             >
               Request scoring <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
@@ -138,15 +138,15 @@ export default async function Page({ params }: { params: Promise<{ registry: str
           <Panel>
             <PanelHeading>Couldn&apos;t find the source repo</PanelHeading>
 
-            <p className="m-0 max-w-[72ch] text-[14.5px] leading-relaxed text-ink-dim">
+            <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
               The <span className="mr-1">{registry}</span> registry either doesn&apos;t list a source repo for this
               package, or it lists one we can&apos;t parse (monorepo subdirectory, self-hosted host, etc.).
             </p>
 
             <a
-              rel="noopener noreferrer"
               target="_blank"
               href={result.contact_url}
+              rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
             >
               Tell us the correct URL <ArrowUpRight size={13} weight="bold" aria-hidden="true" />

@@ -66,3 +66,7 @@ The hook snippets on the UI page and the skill's first-invocation nudge must sta
 - On-demand scoring of unindexed repos.
 - Programmatic model switching. The skill recommends; the user runs `/model` (or their agent's equivalent) themselves.
 - Per-agent forks of the skill body. One `SKILL.md` for all agents; only the optional hook snippet differs by host.
+
+## Cross-reference (0.5.0/02)
+
+`/api/score` is a shared endpoint with the PR-diff action. Same response shape, same lookup. The action uses it as a fallback when a local base-ref fetch fails; this skill uses it as the primary read. Land the endpoint once, in whichever task ships first.

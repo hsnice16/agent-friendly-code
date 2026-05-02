@@ -141,12 +141,9 @@ export type LeaderboardOptions = {
   model: string;
 };
 
-// `sort` and `dir` are whitelisted below so they can be safely interpolated into SQL.
 export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
-  const sort = opts.sort === "stars" ? "stars" : "score";
   const dir = opts.dir === "asc" ? "ASC" : "DESC";
-
-  // Secondary sort is always the opposite axis, so equal rows stay stable.
+  const sort = opts.sort === "stars" ? "stars" : "score";
   const secondary = sort === "stars" ? "score DESC" : "stars DESC";
 
   const hostFilter = opts.host ? "AND r.host = ?" : "";

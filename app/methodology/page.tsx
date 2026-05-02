@@ -36,6 +36,10 @@ const FAQ = [
     a: "Add an AGENTS.md or CLAUDE.md file describing the project for agents, configure CI, ensure tests run, write a substantive README, add a linter and type config, include a license and CONTRIBUTING guide, and provide a reproducible dev environment (devcontainer or Dockerfile). The repo detail page lists the highest-impact gaps for each model.",
   },
   {
+    q: "How do I keep my score from regressing on PRs?",
+    a: "Install the agent-friendly-action GitHub Action (hsnice16/agent-friendly-action). It scores the PR head and base inside your CI and posts a single comment with the score delta and per-signal changes — opt-in via an AGENTS_BADGE_TOKEN secret, falls through silently when the secret is unset. Each repo detail page shows a copy-paste workflow snippet under 'Catch score regressions on every PR'.",
+  },
+  {
     q: "What is AGENTS.md or CLAUDE.md?",
     a: "A markdown file at the root of a repository that gives an AI coding agent a quick orientation: what the project is, how to build and test it, key conventions, and where to look. It is the highest-weighted signal for Pi, tied with the test suite as the top weight for Claude Code, and meaningfully helps every other agent.",
   },

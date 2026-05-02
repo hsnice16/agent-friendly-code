@@ -166,6 +166,10 @@ CLAUDE.md     Pointer → AGENTS.md
 LICENSE       MIT
 ```
 
+## Companion: PR-diff GitHub Action
+
+[`hsnice16/agent-friendly-action`](https://github.com/hsnice16/agent-friendly-action) runs the same scorer inside your CI and posts a per-PR score-delta comment — _"this PR drops your Claude Code score by 4.1 points because it removed CI config."_ Opt-in via an `AGENTS_BADGE_TOKEN` secret; falls through silently when unset. Each repo detail page on the dashboard ships a copy-paste workflow snippet under "Catch score regressions on every PR".
+
 ## Roadmap (high-level)
 
 See `/roadmap` in the running app or the per-version `tasks/` folders for the full picture.

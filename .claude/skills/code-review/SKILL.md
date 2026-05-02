@@ -54,7 +54,7 @@ Only `@phosphor-icons/react`. Block Lucide, Heroicons, React Icons, inline SVG, 
 ## Security
 
 - Parameterised SQL only.
-- `dangerouslySetInnerHTML` is allowed only for the existing server-built JSON-LD scripts (`app/layout.tsx`, `app/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) with the `<` → `<` escape preserved. Reject any new use.
+- `dangerouslySetInnerHTML` is allowed only for the existing server-built JSON-LD scripts (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) with the `<` → `<` escape preserved. Reject any new use.
 - External links include `rel="noopener noreferrer"`.
 - Never execute code from a cloned repo.
 

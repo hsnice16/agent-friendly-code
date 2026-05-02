@@ -21,7 +21,7 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
     <Panel>
       <PanelHeading>Alternatives</PanelHeading>
 
-      <p className="m-0 mb-3 max-w-[60ch] text-[13px] text-muted">
+      <p className="m-0 mb-3 text-[13px] text-muted">
         Same-language repos scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. Heuristic v1
         (same language + same host); cross-language matches are refined in v0.6.0.
       </p>

@@ -4,6 +4,9 @@ export const APP_NAME = "Agent Friendly Code";
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
 export const REPO_URL = "https://github.com/hsnice16/agent-friendly-code";
 
+export const ACTION_USES = "hsnice16/agent-friendly-action@v0";
+export const ACTION_REPO_URL = "https://github.com/hsnice16/agent-friendly-action";
+
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
 export const APP_DESCRIPTION =
   "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
@@ -95,4 +98,8 @@ export const APP_KEYWORDS = [
   "ai agent benchmark",
   "agent compatibility",
   "ai agent leaderboard",
+  "pr score check",
+  "agents.md ci check",
+  "agent friendly action",
+  "ai readiness github action",
 ];

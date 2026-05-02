@@ -4,7 +4,7 @@ import { afterEach, describe, test } from "node:test";
 import { scoreRepo, topImprovements } from "../lib/scoring/scorer";
 import { SIGNALS } from "../lib/scoring/signals";
 import type { SignalResult } from "../lib/scoring/signals/types";
-import { MODELS } from "../lib/scoring/weights";
+import { MODELS, type ModelProfile } from "../lib/scoring/weights";
 import { type FixtureFiles, makeFixture, removeFixture } from "./_helpers";
 
 function ciYaml(): string {
@@ -106,6 +106,25 @@ describe("scoreRepo", () => {
       }
     }
   });
+
+  test("an injected models array overrides the default MODELS", () => {
+    fixture = makeFixture(richFixtureFiles());
+    const onlyClaude: ModelProfile[] = MODELS.filter((m) => m.id === "claude-code");
+    const result = scoreRepo(fixture, onlyClaude);
+
+    assert.equal(result.modelScores.length, 1);
+    assert.equal(result.modelScores[0].modelId, "claude-code");
+    assert.equal(result.overall, result.modelScores[0].score);
+  });
+
+  test("an empty models array yields overall 0 and no model scores", () => {
+    fixture = makeFixture(sparseFixtureFiles());
+    const result = scoreRepo(fixture, []);
+
+    assert.equal(result.modelScores.length, 0);
+    assert.equal(result.overall, 0);
+    assert.equal(result.signals.length, SIGNALS.length);
+  });
 });
 
 describe("topImprovements", () => {
@@ -166,5 +185,23 @@ describe("topImprovements", () => {
     const half = topImprovements("claude-code", makeSignals({ agents_md: 0.5 }), 1)[0];
 
     assert.ok(zero.scoreGain > half.scoreGain);
+  });
+
+  test("respects an injected models array", () => {
+    const customWeights = { ...MODELS[0].weights, agents_md: 0, tests: 100 };
+    const customModels: ModelProfile[] = [{ ...MODELS[0], weights: customWeights }];
+
+    const signals = makeSignals({ agents_md: 0, tests: 0 });
+    const got = topImprovements("claude-code", signals, 5, customModels);
+
+    assert.ok(got.length > 0);
+    assert.equal(got[0].signalId, "tests");
+  });
+
+  test("returns empty when the model id is not in the injected models array", () => {
+    const onlyClaude = MODELS.filter((m) => m.id === "claude-code");
+    const signals = makeSignals({ agents_md: 0 });
+
+    assert.deepEqual(topImprovements("cursor", signals, 5, onlyClaude), []);
   });
 });
