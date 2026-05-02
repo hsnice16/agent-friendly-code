@@ -32,7 +32,7 @@ export const ROADMAP: RoadmapVersion[] = [
         title: "Agent skill",
         taskFile: "tasks/0.5.0/03-agent-skill.md",
         summary:
-          "Portable skill (installable via npx skills add into Claude Code, Codex, Cursor, Cline, Copilot, …) that checks the active repo's score and recommends a model. Ships with the /api/score lookup endpoint and a UI integration page with auto-check hook snippets for the agents that support them.",
+          "Portable skill (installable via npx skills add into Claude Code, Codex, Cursor, Cline, Copilot, …) that scores the user's current repo locally and recommends a model. Sibling repo vendors the scorer; no service dependency, works offline. Ships with a UI integration page and SessionStart hook snippets for agents that support them.",
       },
     ],
   },

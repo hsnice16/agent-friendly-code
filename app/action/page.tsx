@@ -119,33 +119,7 @@ export default function ActionPage() {
         </p>
       </section>
 
-      <Panel>
-        <PanelHeading>How it works</PanelHeading>
-        <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
-          <li>
-            <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
-              actions/checkout
-            </code>{" "}
-            with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the PR head and access to base
-            history.
-          </li>
-
-          <li>The action fetches the base ref locally and checks it out into a worktree — no network clone.</li>
-          <li>Scores both trees with the bundled scorer and computes the overall + per-signal + per-model delta.</li>
-
-          <li>
-            Posts (or edits) a single PR comment marked with{" "}
-            <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
-              {"<!-- agent-friendly-action -->"}
-            </code>
-            .
-          </li>
-        </ol>
-      </Panel>
-
-      <div className="mt-3.5">
-        <ActionEmbed actionUses={ACTION_USES} />
-      </div>
+      <ActionEmbed actionUses={ACTION_USES} highlight="warn" />
 
       <div id="set-secret" className="mt-3.5 scroll-mt-20">
         <Panel>
@@ -193,6 +167,32 @@ export default function ActionPage() {
             </a>
             .
           </p>
+        </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <Panel>
+          <PanelHeading>How it works</PanelHeading>
+          <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
+            <li>
+              <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
+                actions/checkout
+              </code>{" "}
+              with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the PR head and access to base
+              history.
+            </li>
+
+            <li>The action fetches the base ref locally and checks it out into a worktree — no network clone.</li>
+            <li>Scores both trees with the bundled scorer and computes the overall + per-signal + per-model delta.</li>
+
+            <li>
+              Posts (or edits) a single PR comment marked with{" "}
+              <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
+                {"<!-- agent-friendly-action -->"}
+              </code>
+              .
+            </li>
+          </ol>
         </Panel>
       </div>
 

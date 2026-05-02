@@ -5,7 +5,7 @@ const COMPACT_NUMBER = new Intl.NumberFormat("en", {
   maximumFractionDigits: 1,
 });
 
-export function compactNumber(n: number): string {
+function compactNumber(n: number): string {
   return COMPACT_NUMBER.format(n).toLowerCase();
 }
 

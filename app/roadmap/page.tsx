@@ -44,7 +44,7 @@ export default function RoadmapPage() {
               {v.items.map((it) => (
                 <li
                   key={it.title}
-                  className="grid grid-cols-[1fr_auto] items-start gap-4 border-b border-line py-3 last:border-b-0"
+                  className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0 sm:grid sm:grid-cols-[1fr_auto] sm:items-start sm:gap-4"
                 >
                   <div>
                     <div className="text-[15px] font-medium">{it.title}</div>

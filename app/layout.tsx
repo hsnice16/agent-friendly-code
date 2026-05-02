@@ -94,19 +94,23 @@ export const viewport: Viewport = {
 };
 
 const NAV_LINKS = [
+  { href: "/action", label: "GitHub Action" },
+  { href: "/skill", label: "Agent Skill" },
+  { href: "/methodology", label: "Methodology" },
+];
+
+const FOOTER_LINKS_PRIMARY = [
+  { href: "/", label: "Home" },
+  { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },
 ];
 
-const FOOTER_LINKS = [
-  { href: "/", label: "Home" },
-  { href: "/about", label: "About" },
-  { href: "/action", label: "Action" },
-  { href: "/changelog", label: "Changelog" },
-  { href: "/methodology", label: "Methodology" },
+const FOOTER_LINKS_TOOLS = [
+  { href: "/skill", label: "Agent Skill" },
+  { href: "/action", label: "GitHub Action" },
   { href: "/package", label: "Packages" },
-  { href: "/roadmap", label: "Roadmap" },
 ];
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -154,43 +158,59 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
           <main id="main">{children}</main>
           <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
-            <nav aria-label="Secondary" className="mb-5 flex flex-wrap gap-x-4 gap-y-1">
-              {FOOTER_LINKS.map((l) => (
-                <Link
-                  key={l.href}
-                  href={l.href}
-                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                >
-                  {l.label}
-                </Link>
-              ))}
-            </nav>
-
             <p className="m-0">
               Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
               values themselves are still pre-benchmark.
             </p>
 
-            <p className="mt-3 text-[12px]">
-              © {new Date().getFullYear()}{" "}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href="https://github.com/hsnice16"
-                className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-              >
-                Himanshu Singh
-              </a>{" "}
-              ·{" "}
-              <a
-                target="_blank"
-                rel="noopener noreferrer"
-                href={`${REPO_URL}/blob/main/LICENSE`}
-                className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-              >
-                MIT
-              </a>
-            </p>
+            <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+              <p className="m-0 order-2 text-[12px] sm:order-1">
+                © {new Date().getFullYear()}{" "}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href="https://github.com/hsnice16"
+                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                >
+                  Himanshu Singh
+                </a>{" "}
+                ·{" "}
+                <a
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`${REPO_URL}/blob/main/LICENSE`}
+                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                >
+                  MIT
+                </a>
+              </p>
+
+              <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">
+                <div className="flex flex-col items-start gap-1">
+                  {FOOTER_LINKS_PRIMARY.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+
+                <div className="flex flex-col items-start gap-1">
+                  {FOOTER_LINKS_TOOLS.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+                </div>
+              </nav>
+            </div>
           </footer>
         </div>
 

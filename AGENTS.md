@@ -51,13 +51,14 @@ app/
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
-  api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup (powers the action + agent skill)
+  api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup for external integrators (siblings vendor the scorer; they don't call this)
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
+  skill/page.tsx                            # agent-skill explainer + install snippet (SEO landing for the sibling skill repo)
   globals.css             # Tailwind import + @theme tokens (no custom utilities)
 components/               # Tailwind-styled React components
   Panel.tsx, ScoreBar.tsx, ScoreNumber.tsx, ScoreCell.tsx,
@@ -65,6 +66,7 @@ components/               # Tailwind-styled React components
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
+  AlternativesStrip.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx
 lib/
@@ -75,6 +77,8 @@ lib/
   utils/
     format.ts             # compactStars, relativeTime, hostLabel
     score.ts              # scoreTier + Tailwind class maps
+    badge.ts              # SVG badge renderer (used by /api/badge)
+    contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
   scoring/
     signals/              # one file per signal + helpers + types + index
     weights.ts            # per-model weight tables
@@ -83,9 +87,10 @@ lib/
     git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, ACTION_REPO_URL, ACTION_USES
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
+  skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page
 scripts/
   init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
 tests/
@@ -109,6 +114,7 @@ tasks/
   hooks/
     stop-guard.sh         # blocks turn end if source changed and /post-change-check hasn't run
   skills/                 # auto-selected workflows: code-review, quality-check, post-change-check
+                          # vendored: agent-friendly (installed via `npx skills add hsnice16/agent-friendly-skill#v0`)
 ```
 
 ## I/O boundary (architecturally important)
@@ -135,15 +141,22 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 
 ## Sibling repos
 
-The PR-diff GitHub Action lives in a sibling directory: `../agent-friendly-action/`. It **vendors** the scorer (`lib/scoring/` from this repo) into its own bundle so it can run inside maintainer CI with no network call to this app. Extracting `agent-friendly-scorer` as a standalone npm package is deferred to `tasks/1.0.0/03-benchmark-harness.md`, when a second sibling consumer (the benchmark harness) appears. Until then, the two copies of the scorer must stay in sync by hand.
+Two sibling repos live alongside this one (checked out as `../agent-friendly-action/` and `../agent-friendly-skill/` relative to this repo) and **vendor** the scorer (`lib/scoring/` from this repo) into their own bundles so they run with no network call to this app:
+
+- `../agent-friendly-action/` — PR-diff GitHub Action that runs in maintainer CI.
+- `../agent-friendly-skill/` — portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) that scores the user's local repo and recommends a model.
+
+Both vendor their own copy of `lib/scoring/` and ship it as a single `dist/` bundle via `@vercel/ncc`. Extracting `agent-friendly-scorer` as a standalone npm package is still deferred to `tasks/1.0.0/03-benchmark-harness.md`; the harness would be the third consumer that finally tips the balance. Until then, all three copies of the scorer must stay in sync by hand.
+
+Both siblings tag the same major in lockstep — `SIBLING_VERSION` in `lib/version.ts` is the single source of truth that drives `ACTION_USES`, `SKILL_INSTALL_CMD`, and the `#v0` ref in `skills-lock.json`. Bump it only when **both** siblings cut a new major together.
 
 **Whenever you change `lib/scoring/`** — adding a signal, tweaking a weight, refactoring `scorer.ts`, anything — also:
 
-1. Re-vendor the changed file(s) into `../agent-friendly-action/src/scoring/` (mirror the directory layout).
-2. Append a line under "Unreleased" in `../agent-friendly-action/CHANGELOG.md` describing what changed, so action consumers can read what shipped in each tagged release.
-3. The action's CI verifies its `dist/` bundle is in sync with `src/` on every push, but it can't catch upstream-source drift — that's on the agent doing the change.
+1. Re-vendor the changed file(s) into **both** sibling repos (`../agent-friendly-action/src/scoring/` and `../agent-friendly-skill/src/scoring/`) — mirror the directory layout.
+2. Append a line under "Unreleased" in **each** sibling's `CHANGELOG.md` describing what changed, so consumers can read what shipped in each tagged release.
+3. Each sibling's CI verifies its `dist/` bundle is in sync with `src/` on every push, but neither can catch upstream-source drift — that's on the agent doing the change.
 
-If `../agent-friendly-action/` isn't present locally, flag it; never silently skip the propagation. Both repos are siblings under the same `personal/` workspace.
+If either sibling isn't present locally, flag it; never silently skip the propagation.
 
 ## Adding a signal
 
@@ -151,13 +164,13 @@ If `../agent-friendly-action/` isn't present locally, flag it; never silently sk
 2. Import and add to the `SIGNALS` array in `lib/scoring/signals/index.ts`.
 3. Add a weight entry to **every** model in `lib/scoring/weights.ts` — missing weights default to 0, decide deliberately.
 4. Re-score: `bun run seed` is idempotent.
-5. **Mirror to the action** (per "Sibling repos" above): copy the new signal file into `../agent-friendly-action/src/scoring/signals/`, add the import + array entry to its `signals/index.ts`, copy the weights changes to its `weights.ts`, and log the addition in `../agent-friendly-action/CHANGELOG.md` under "Unreleased".
+5. **Mirror to both siblings** (per "Sibling repos" above): for each of `../agent-friendly-action/` and `../agent-friendly-skill/`, copy the new signal file into `src/scoring/signals/`, add the import + array entry to that repo's `signals/index.ts`, copy the weights changes to its `weights.ts`, and log the addition in its `CHANGELOG.md` under "Unreleased".
 
 ## Adding a model
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills and repo-page suggestions.
-3. **Mirror to the action**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` and log under "Unreleased" in its `CHANGELOG.md`.
+3. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
 ## Adding a host
 
@@ -191,13 +204,15 @@ The `Stop` guard exists because reminders alone weren't enough — agents would 
 
 Skill granularity rule of thumb: one skill per _phase_ of work (writing, reviewing, wrapping-up), not one skill per _rule_. Narrow skills fragment context; broad skills stay coherent.
 
+In addition to those project-authored workflow skills, `.claude/skills/agent-friendly/` is **vendored** — installed from the sibling `hsnice16/agent-friendly-skill` repo via `npx skills add hsnice16/agent-friendly-skill --agent claude-code -y` (pinned to `#v0`). It's a self-contained scorer bundle (SKILL.md + ncc-built `dist/index.js`), not a workflow skill, so the granularity rule above doesn't apply. Don't hand-edit the vendored files — re-run the install command to update. The install also writes `skills-lock.json` at the repo root (ref + content hash); commit it so `npx skills experimental_install` can restore the exact bundle reproducibly.
+
 Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 ## Security / threat surface (read before changing I/O)
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 

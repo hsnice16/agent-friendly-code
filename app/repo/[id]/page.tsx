@@ -153,9 +153,9 @@ export default async function Page({
 
       <aside
         aria-label="Tools you can add to this repo"
-        className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-line bg-surface px-4 py-2.5 text-[12.5px]"
+        className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-warn/40 bg-surface px-4 py-2.5 text-[12.5px]"
       >
-        <span className="text-muted">Use on your repo:</span>
+        <span className="text-warn">Use on your repo:</span>
         <a href="#embed-badge" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
           Embed a badge ↓
         </a>
@@ -165,6 +165,12 @@ export default async function Page({
         <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
           Add the PR-diff Action ↓
         </a>
+        <span aria-hidden="true" className="text-line">
+          ·
+        </span>
+        <Link href="/skill" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+          Install the agent skill →
+        </Link>
       </aside>
 
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
@@ -203,6 +209,7 @@ export default async function Page({
 
       <div id="embed-badge" className="mt-3.5 scroll-mt-20">
         <BadgeEmbed
+          highlight="tip"
           appUrl={APP_URL}
           name={repo.name}
           host={repo.host}
@@ -212,7 +219,7 @@ export default async function Page({
       </div>
 
       <div id="pr-action" className="mt-3.5 scroll-mt-20">
-        <ActionEmbed actionUses={ACTION_USES} showSecretLink />
+        <ActionEmbed actionUses={ACTION_USES} showSecretLink highlight="info" />
       </div>
     </>
   );

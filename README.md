@@ -148,12 +148,13 @@ app/          Next.js App Router — pages + API + SEO
 components/   React components (Tailwind-styled)
 lib/
   scoring/    signals, weights, scorer — pure, no I/O outside the cloned tree
-  clients/    git clone, host API
+  clients/    git clone, host API, npm/PyPI/Cargo registries
   constants/  thresholds, host labels, sort keys
-  utils/      format + score-tier helpers
+  utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder
   db.ts       better-sqlite3 schema + queries (all SQL lives here)
-  version.ts  APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL
-  changelog.ts / roadmap.ts
+  package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
+  version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
+  changelog.ts / roadmap.ts / skill-content.ts
 scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
@@ -170,13 +171,29 @@ LICENSE       MIT
 
 [`hsnice16/agent-friendly-action`](https://github.com/hsnice16/agent-friendly-action) runs the same scorer inside your CI and posts a per-PR score-delta comment — _"this PR drops your Claude Code score by 4.1 points because it removed CI config."_ Opt-in via an `AGENTS_BADGE_TOKEN` secret; falls through silently when unset. Each repo detail page on the dashboard ships a copy-paste workflow snippet under "Catch score regressions on every PR".
 
+## Companion: agent skill
+
+[`hsnice16/agent-friendly-skill`](https://github.com/hsnice16/agent-friendly-skill) is a portable agent skill installable in one command — `npx skills add hsnice16/agent-friendly-skill#v0` — that scores the user's current repo locally and recommends a model. Profiles the same 8 agents this dashboard does (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi); installs into any [`vercel-labs/skills`](https://github.com/vercel-labs/skills)-compatible host (Cline, Copilot, Continue, Roo Code, …) and produces identical output regardless of which host invokes it — scoring is score-driven, not host-driven. Same self-contained property as the action: vendored scorer, no service dependency, works offline. The dashboard's [`/skill`](https://www.agentfriendlycode.com/skill) page hosts the install command, the score → model mapping, and optional `SessionStart` hook snippets for Claude Code and Codex.
+
+## Public API
+
+Read-only JSON endpoints for external integrators (skills, hooks, browser overlays, third-party tools):
+
+- `GET /api/score?host=<host>&repo=<owner>/<name>` — look up an indexed repo by host + owner/name. Returns `{ repo, signals, modelScores }` on 200; `{ error: "not_indexed" }` with status 404 when the repo isn't in our DB. The natural lookup endpoint for any tool that has a repo URL but not our internal id.
+- `GET /api/repos` — full leaderboard (id, owner, name, host, stars, overall_score, per-model scores).
+- `GET /api/repo/<id>` — per-repo detail (signals, model scores, top improvements). Requires the internal id; use `/api/score` first if you only have host + owner/name.
+- `GET /api/badge/<host>/<owner>/<name>.svg` — embeddable SVG badge. `?model=<id>` for per-model variants.
+- `GET /api/package/<registry>/<name>` — resolve npm / PyPI / Cargo package → source-repo score (or `unresolved` when the registry doesn't expose a repo URL).
+
+Neither the action nor the agent skill calls these at runtime — both vendor the scorer and run locally. The endpoints exist so any third party can build on top of the dashboard without a network round-trip becoming a critical-path dependency.
+
 ## Roadmap (high-level)
 
 See `/roadmap` in the running app or the per-version `tasks/` folders for the full picture.
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.5.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a portable agent skill (Claude Code / Codex / Cursor / Cline / Copilot / 40+ others, with public `/api/score` lookup) that recommends a model for the active repo. No new infra.
+- **0.5.0 — quick wins**: history-aware signals (maintenance recency, commit velocity, contributor activity) + a GitHub Action that comments the score delta on every PR + a portable agent skill (profiles 8 agents — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi; installs into any vercel-labs/skills host) that scores the user's current repo locally and recommends a model. Skill ships as a sibling repo with the scorer vendored — same self-contained property as the action. No new infra.
 - **0.6.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
 - **0.7.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
 - **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.

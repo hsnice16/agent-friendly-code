@@ -50,4 +50,28 @@ describe("size signal", () => {
     const r = size.check(fixture);
     assert.match(r.detail, /^2 /);
   });
+
+  test("honours .gitignore patterns at the repo root", () => {
+    const noisy = seededFiles(8000, "tmp-clones/some-repo/f");
+    fixture = makeFixture({
+      ...seededFiles(20),
+      ...noisy,
+      ".gitignore": "tmp-clones/\n",
+    });
+
+    const r = size.check(fixture);
+    assert.equal(r.pass, 0.9);
+    assert.match(r.detail, /^20 /);
+  });
+
+  test("baseline ignore covers node_modules even without a .gitignore", () => {
+    fixture = makeFixture({
+      ...seededFiles(15),
+      ...seededFiles(8000, "node_modules/junk/f"),
+    });
+
+    const r = size.check(fixture);
+    assert.equal(r.pass, 0.9);
+    assert.match(r.detail, /^15 /);
+  });
 });

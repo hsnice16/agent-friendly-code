@@ -1,9 +1,10 @@
-import { readdirSync, type Stats, statSync } from "node:fs";
-import { join } from "node:path";
+import { readdirSync, readFileSync, type Stats, statSync } from "node:fs";
+import { join, relative, sep } from "node:path";
 
+import ignore from "ignore";
 import type { Signal } from "./types";
 
-const IGNORE = new Set(["node_modules", ".git", "vendor", "target", "dist", "build", ".next"]);
+const BASELINE_IGNORE = ["node_modules", ".git", "vendor", "target", "dist", "build", ".next"];
 const CAP = 10000;
 const MAX_DEPTH = 8;
 
@@ -14,6 +15,14 @@ export const size: Signal = {
   improveSuggestion:
     "If possible, split into smaller modules or carve out a focused entry path. Document where to start in AGENTS.md.",
   check: (repo) => {
+    const ig = ignore().add(BASELINE_IGNORE);
+
+    try {
+      ig.add(readFileSync(join(repo, ".gitignore"), "utf8"));
+    } catch {
+      // no .gitignore — baseline still applies
+    }
+
     let count = 0;
 
     const visit = (dir: string, depth: number) => {
@@ -29,15 +38,21 @@ export const size: Signal = {
       }
 
       for (const e of entries) {
-        if (IGNORE.has(e) || e.startsWith(".")) {
+        if (e.startsWith(".")) {
           continue;
         }
 
         const abs = join(dir, e);
         let st: Stats;
+
         try {
           st = statSync(abs);
         } catch {
+          continue;
+        }
+
+        const rel = relative(repo, abs).split(sep).join("/");
+        if (ig.ignores(st.isDirectory() ? `${rel}/` : rel)) {
           continue;
         }
 

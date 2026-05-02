@@ -1,4 +1,4 @@
-import { CopySnippet } from "./CopySnippet";
+import { CopySnippet, type SnippetTone } from "./CopySnippet";
 import { Panel, PanelHeading } from "./Panel";
 
 type Props = {
@@ -7,9 +7,10 @@ type Props = {
   owner: string;
   appUrl: string;
   repoPagePath: string;
+  highlight?: SnippetTone;
 };
 
-export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath }: Props) {
+export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, highlight = false }: Props) {
   const slug = `${host}/${owner}/${name}`;
   const previewSrc = `/api/badge/${slug}.svg`;
   const absoluteBadgeUrl = `${appUrl}/api/badge/${slug}.svg`;
@@ -17,9 +18,11 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath }: Props) {
   const repoPageUrl = `${appUrl}${repoPagePath}`;
   const markdown = `[![Agent Friendly](${absoluteBadgeUrl})](${repoPageUrl})`;
 
+  const tone = highlight || undefined;
+
   return (
-    <Panel>
-      <PanelHeading>Embed this badge</PanelHeading>
+    <Panel tone={tone}>
+      <PanelHeading tone={tone}>Embed this badge</PanelHeading>
       <p className="m-0 mb-3 text-[13px] text-muted">
         Drop the snippet below into the top of this repo&apos;s README so visitors can see its agent-friendliness at a
         glance — clicks land back here.
@@ -29,7 +32,7 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath }: Props) {
         <img height={20} src={previewSrc} alt={`Agent friendly score for ${slug}`} />
       </div>
 
-      <CopySnippet text={markdown} />
+      <CopySnippet text={markdown} highlight={highlight} />
     </Panel>
   );
 }

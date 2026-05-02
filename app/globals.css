@@ -21,8 +21,10 @@
   --color-accent-ink: #ffffff;
 
   --color-ok: #16a34a;
-  --color-warn: #ca8a04;
+  --color-warn: #b45309;
   --color-bad: #dc2626;
+  --color-info: #2563eb;
+  --color-tip: #0f766e;
 
   --font-sans:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI",
@@ -52,6 +54,8 @@
     --color-ok: #7ac796;
     --color-warn: #d9b864;
     --color-bad: #db7676;
+    --color-info: #b8cbed;
+    --color-tip: #ccfbf1;
   }
 }
 

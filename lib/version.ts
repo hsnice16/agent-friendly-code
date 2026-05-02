@@ -4,8 +4,13 @@ export const APP_NAME = "Agent Friendly Code";
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
 export const REPO_URL = "https://github.com/hsnice16/agent-friendly-code";
 
-export const ACTION_USES = "hsnice16/agent-friendly-action@v0";
+export const SIBLING_VERSION = "v0";
+
 export const ACTION_REPO_URL = "https://github.com/hsnice16/agent-friendly-action";
+export const ACTION_USES = `hsnice16/agent-friendly-action@${SIBLING_VERSION}`;
+
+export const SKILL_REPO_URL = "https://github.com/hsnice16/agent-friendly-skill";
+export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#${SIBLING_VERSION}`;
 
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
 export const APP_DESCRIPTION =
@@ -102,4 +107,10 @@ export const APP_KEYWORDS = [
   "agents.md ci check",
   "agent friendly action",
   "ai readiness github action",
+  "agent skill",
+  "codex skill",
+  "cursor skill",
+  "vercel skills",
+  "claude code skill",
+  "agent friendly skill",
 ];
