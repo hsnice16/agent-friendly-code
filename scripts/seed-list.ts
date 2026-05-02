@@ -206,6 +206,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/junegunn/fzf", note: "fzf — fuzzy finder" },
   { url: "https://github.com/privy-io/go-sdk", note: "Privy Go SDK" },
   { url: "https://github.com/pingcap/tidb", note: "TiDB — distributed SQL" },
+  {
+    url: "https://github.com/SigNoz/signoz",
+    note: "SigNoz — open-source observability (APM, logs, metrics, traces)",
+  },
 
   // --- GitHub, C / C++ / systems ---
   {
