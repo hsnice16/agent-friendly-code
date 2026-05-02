@@ -1,5 +1,6 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ROADMAP } from "@/lib/roadmap";
 import { REPO_URL } from "@/lib/version";
@@ -8,14 +9,16 @@ export const metadata: Metadata = {
   title: "Roadmap",
   twitter: { title: "Roadmap" },
   alternates: { canonical: "/roadmap" },
-  openGraph: { title: "Roadmap", url: "/roadmap" },
+  openGraph: { title: "Roadmap", url: "/roadmap", type: "article" },
   description:
-    "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, webhooks, opt-out), discovery surfaces, history-aware signals, production stability, and at-scale GitHub indexing.",
+    "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, webhooks, opt-out), discovery surfaces, production stability, and at-scale GitHub indexing.",
 };
 
 export default function RoadmapPage() {
   return (
     <>
+      <BreadcrumbJsonLd current={{ name: "Roadmap", path: "/roadmap" }} />
+
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Roadmap</h1>
         <p className="m-0 max-w-[70ch] text-[15.5px] text-ink-dim">

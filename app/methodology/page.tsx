@@ -2,6 +2,7 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
   title: "Methodology",
   twitter: { title: "Methodology" },
   alternates: { canonical: "/methodology" },
-  openGraph: { title: "Methodology", url: "/methodology" },
+  openGraph: { title: "Methodology", url: "/methodology", type: "article" },
   description:
     "How scores are computed today: the signals checked, the per-model weight profiles, the scoring formula, and what the static-heuristic approach deliberately doesn't measure yet.",
 };
@@ -67,6 +68,7 @@ const FAQ_JSON_LD = {
 export default function MethodologyPage() {
   return (
     <>
+      <BreadcrumbJsonLd current={{ name: "Methodology", path: "/methodology" }} />
       <script
         type="application/ld+json"
         // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
@@ -74,6 +76,7 @@ export default function MethodologyPage() {
           __html: JSON.stringify(FAQ_JSON_LD).replace(/</g, "\\u003c"),
         }}
       />
+
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Methodology</h1>
 
@@ -217,12 +220,8 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
               <code className="mx-1 rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
                 --depth 1 --single-branch
               </code>
-              which fetches the whole working tree at HEAD of the default branch, but no history. Closing this gap is
-              planned as v0.5.0 on the{" "}
-              <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-                roadmap
-              </Link>
-              .
+              which fetches the whole working tree at HEAD of the default branch, but no history. These describe repo
+              health more than agent behavior, so they sit outside the score for now.
             </li>
 
             <li>How agents actually perform on the repo — that&apos;s the v1.0.0 benchmark harness.</li>

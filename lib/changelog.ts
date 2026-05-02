@@ -8,6 +8,17 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.5.0",
+    date: "2026-05-02",
+    title: "Scorer ships outside the dashboard",
+    highlights: [
+      'PR score-diff GitHub Action — `hsnice16/agent-friendly-action` on the GitHub Marketplace. Scores base + head locally inside CI and posts a single PR comment with the overall delta + per-signal breakdown. Vendored scorer (works even if the dashboard is down); opt-in via `AGENTS_BADGE_TOKEN`. Repo detail pages now show a copy-paste workflow snippet under "Catch score regressions on every PR".',
+      "Portable agent skill — `npx skills add hsnice16/agent-friendly-skill#v0` installs into any vercel-labs/skills-compatible host (Claude Code, Codex, Cursor, Cline, Copilot, Continue, Roo Code, …). Scores the user's current repo locally with a vendored scorer and recommends a model — produces identical output regardless of which host invokes it.",
+      "Dedicated integration pages on the dashboard — `/action` (workflow snippet + Marketplace link + FAQ) and `/skill` (install command, score → model mapping, optional `SessionStart` hook snippets for Claude Code and Codex).",
+      'Public `GET /api/score?host=<host>&repo=<owner>/<name>` — natural lookup endpoint for any tool that has a repo URL but not the dashboard\'s internal id. Returns `{ repo, signals, modelScores }` on 200, `{ error: "not_indexed" }` on 404. Both the action and the skill consume this.',
+    ],
+  },
+  {
     label: "0.4.0",
     date: "2026-04-27",
     title: "Credible scores + better discoverability",

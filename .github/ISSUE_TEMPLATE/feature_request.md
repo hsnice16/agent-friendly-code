@@ -28,8 +28,8 @@ _Tick whichever applies:_
 
 _Tick whichever applies:_
 
-- [ ] **New signal** — see "Adding a signal" in [AGENTS.md](../../AGENTS.md). Mirrors to the sibling `agent-friendly-action` repo.
-- [ ] **New model** — see "Adding a model" in [AGENTS.md](../../AGENTS.md). Mirrors to the sibling repo.
+- [ ] **New signal** — see "Adding a signal" in [AGENTS.md](../../AGENTS.md). Mirrors to **both** sibling repos (`agent-friendly-action` and `agent-friendly-skill`).
+- [ ] **New model** — see "Adding a model" in [AGENTS.md](../../AGENTS.md). Mirrors to **both** sibling repos.
 - [ ] **New host** — see "Adding a host" in [AGENTS.md](../../AGENTS.md).
 - [ ] **New / changed API route** — `/api/...`. Note breaking-change implications for action + agent-skill consumers.
 - [ ] **New page or UI surface**.

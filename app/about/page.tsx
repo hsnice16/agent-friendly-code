@@ -1,20 +1,55 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, REPO_URL } from "@/lib/version";
+import { APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "About",
   alternates: { canonical: "/about" },
   twitter: { title: `About — ${APP_NAME}` },
-  openGraph: { title: `About — ${APP_NAME}`, url: "/about" },
+  openGraph: { title: `About — ${APP_NAME}`, url: "/about", type: "article" },
   description: `Who built ${APP_NAME}, why it exists, and what it isn't. Independent, MIT-licensed, no affiliation with any AI agent vendor.`,
+};
+
+const ABOUT_JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@id": `${APP_URL}/about#author`,
+      "@type": "Person",
+      name: "Himanshu Singh",
+      jobTitle: "Software Engineer",
+      url: "https://github.com/hsnice16",
+      worksFor: { "@id": `${APP_URL}/#org` },
+      sameAs: ["https://github.com/hsnice16", "https://github.com/sponsors/hsnice16"],
+    },
+    {
+      "@id": `${APP_URL}/about#page`,
+      "@type": "AboutPage",
+      url: `${APP_URL}/about`,
+      name: `About — ${APP_NAME}`,
+      author: { "@id": `${APP_URL}/about#author` },
+      isPartOf: { "@id": `${APP_URL}/#site` },
+      mainEntity: { "@id": `${APP_URL}/about#author` },
+    },
+  ],
 };
 
 export default function AboutPage() {
   return (
     <>
+      <BreadcrumbJsonLd current={{ name: "About", path: "/about" }} />
+
+      <script
+        type="application/ld+json"
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(ABOUT_JSON_LD).replace(/</g, "\\u003c"),
+        }}
+      />
+
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">About</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">

@@ -1,3 +1,5 @@
+import { REGISTRIES } from "@/lib/clients/registries";
+import { getTopPackagesByRegistry } from "@/lib/db";
 import { MODELS } from "@/lib/scoring/weights";
 import {
   ACTION_REPO_URL,
@@ -16,7 +18,22 @@ const HEADERS = {
   "Cache-Control": "public, max-age=3600, s-maxage=86400",
 };
 
+const LLMS_TOP_PACKAGES_PER_REGISTRY = 10;
+
 export function GET(): Response {
+  const topPackagesSection = REGISTRIES.map((registry) => {
+    const rows = getTopPackagesByRegistry(registry, LLMS_TOP_PACKAGES_PER_REGISTRY);
+    if (rows.length === 0) {
+      return "";
+    }
+    const lines = rows.map(
+      (p) => `- [${registry}/${p.name}](${APP_URL}/package/${registry}/${p.name}): ${p.score.toFixed(1)} / 100`,
+    );
+    return `### ${registry}\n\n${lines.join("\n")}`;
+  })
+    .filter(Boolean)
+    .join("\n\n");
+
   const body = `# ${APP_NAME}
 
 > ${APP_DESCRIPTION}
@@ -51,6 +68,10 @@ ${MODELS.map((m) => `- ${m.label} — ${m.rationale}`).join("\n")}
 
 - [Agent Friendly Action](${ACTION_REPO_URL}): GitHub Action that posts a per-PR score-delta comment — runs entirely inside the maintainer's CI, opt-in via \`AGENTS_BADGE_TOKEN\`, listed on the GitHub Marketplace
 - [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the user's current repo locally, no service dependency
+
+## Top scored packages
+
+${topPackagesSection || "_No packages indexed yet._"}
 
 ## Source
 

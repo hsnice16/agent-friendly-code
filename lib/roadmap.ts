@@ -13,30 +13,6 @@ export type RoadmapVersion = {
 
 export const ROADMAP: RoadmapVersion[] = [
   {
-    version: "0.5.0",
-    status: "planned",
-    theme: "Quick wins",
-    items: [
-      {
-        title: "History-aware signals",
-        taskFile: "tasks/0.5.0/01-history-aware-signals.md",
-        summary:
-          "Score maintenance recency, commit velocity, and contributor activity — the gap left by the --depth 1 --single-branch clone. Served via host APIs, degrades gracefully without a token.",
-      },
-      {
-        title: "Score diff on PR",
-        taskFile: "tasks/0.5.0/02-score-diff-on-pr.md",
-        summary: "GitHub Action that comments score delta on every PR.",
-      },
-      {
-        title: "Agent skill",
-        taskFile: "tasks/0.5.0/03-agent-skill.md",
-        summary:
-          "Portable skill (installable via npx skills add into Claude Code, Codex, Cursor, Cline, Copilot, …) that scores the user's current repo locally and recommends a model. Sibling repo vendors the scorer; no service dependency, works offline. Ships with a UI integration page and SessionStart hook snippets for agents that support them.",
-      },
-    ],
-  },
-  {
     version: "0.6.0",
     status: "planned",
     theme: "Auto-refresh + smarter matching",

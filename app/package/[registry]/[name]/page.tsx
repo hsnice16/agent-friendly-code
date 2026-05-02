@@ -2,12 +2,15 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { cache } from "react";
 import { HostPill } from "@/components/HostPill";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
-import { isRegistry } from "@/lib/clients/registries";
+import { isRegistry, type Registry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
 import { APP_URL } from "@/lib/version";
+
+const cachedLookup = cache((registry: Registry, name: string) => lookupPackage(registry, name));
 
 export async function generateMetadata({
   params,
@@ -16,13 +19,22 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { registry, name } = await params;
   const title = `${registry}/${name}`;
+  const description = `Agent-friendliness score for the ${registry} package "${name}" and its source repo.`;
+
+  if (!isRegistry(registry)) {
+    return { title, description, robots: { index: false, follow: true } };
+  }
+
+  const result = await cachedLookup(registry, name);
+  const isThin = result.status !== "scored";
 
   return {
     title,
-    twitter: { title },
+    description,
+    twitter: { title, description },
     alternates: { canonical: `/package/${registry}/${name}` },
-    openGraph: { title, url: `/package/${registry}/${name}`, type: "article" },
-    description: `Agent-friendliness score for the ${registry} package "${name}" and its source repo.`,
+    openGraph: { title, description, url: `/package/${registry}/${name}`, type: "article" },
+    ...(isThin ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -33,7 +45,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
     notFound();
   }
 
-  const result = await lookupPackage(registry, name);
+  const result = await cachedLookup(registry, name);
 
   const jsonLd = {
     "@context": "https://schema.org",

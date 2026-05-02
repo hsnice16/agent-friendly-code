@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 
-import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
+import { REGISTRIES } from "@/lib/clients/registries";
+import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall } from "@/lib/db";
 import { APP_URL } from "@/lib/version";
+
+const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -66,5 +69,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: r.score != null ? Math.round((0.3 + (r.score / 100) * 0.6) * 10) / 10 : 0.4,
   }));
 
-  return [...staticRoutes, ...repoRoutes];
+  const packageRoutes: MetadataRoute.Sitemap = REGISTRIES.flatMap((registry) =>
+    getTopPackagesByRegistry(registry, SITEMAP_PACKAGE_LIMIT_PER_REGISTRY).map((p) => ({
+      lastModified: lastScored,
+      changeFrequency: "weekly",
+      url: `${APP_URL}/package/${registry}/${p.name}`,
+      priority: Math.round((0.4 + (p.score / 100) * 0.4) * 10) / 10,
+    })),
+  );
+
+  return [...staticRoutes, ...repoRoutes, ...packageRoutes];
 }
