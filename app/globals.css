@@ -78,6 +78,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body {
+  overflow-x: hidden;
+}
+
 a,
 a:link,
 a:visited,
