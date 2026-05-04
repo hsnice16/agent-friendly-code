@@ -412,6 +412,10 @@ export const SEEDS: Seed[] = [
   // --- AI-native: application SDKs ---
   { url: "https://github.com/vercel/ai", note: "Vercel AI SDK" },
   {
+    url: "https://github.com/vercel-labs/deepsec",
+    note: "Vercel Labs DeepSec",
+  },
+  {
     note: "Microsoft AI (user-supplied)",
     url: "https://github.com/microsoft/AI",
   },
