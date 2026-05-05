@@ -4,8 +4,9 @@ import { join } from "node:path";
 import { walkFind } from "./helpers";
 import type { Signal } from "./types";
 
-const DIRS = ["tests", "test", "__tests__", "spec", "specs"];
-const FILE_RE = /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$)/;
+const DIRS = ["tests", "test", "__tests__", "spec", "specs", "Tests", "src/test"];
+const FILE_RE =
+  /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$|.*Test\.java$|.*Tests?\.kt$|.*_test\.exs$|.*_test\.dart$|.*Spec\.scala$|.*Test\.scala$)/;
 
 export const tests: Signal = {
   id: "tests",

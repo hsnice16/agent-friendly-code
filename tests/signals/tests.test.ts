@@ -47,4 +47,40 @@ describe("tests signal", () => {
     fixture = makeFixture({ "pkg/foo_test.go": "package foo" });
     assert.equal(testsSignal.check(fixture).pass, 0.7);
   });
+
+  test("pass=1 for src/test (JVM convention)", () => {
+    fixture = makeFixture({ "src/test/.keep": "" });
+    const r = testsSignal.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.equal(r.matchedPath, "src/test");
+  });
+
+  test("pass=1 for capital-T Tests/ (Swift convention)", () => {
+    fixture = makeFixture({ "Tests/.keep": "" });
+    const r = testsSignal.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /^tests$/i);
+  });
+
+  test("pass=0.7 for a Java *Test.java file", () => {
+    fixture = makeFixture({ "src/main/java/FooTest.java": "class FooTest {}" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for an Elixir *_test.exs file", () => {
+    fixture = makeFixture({ "lib/foo_test.exs": "defmodule FooTest do\nend" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for a Dart *_test.dart file", () => {
+    fixture = makeFixture({ "lib/foo_test.dart": "void main() {}" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for a Scala *Spec.scala file", () => {
+    fixture = makeFixture({ "src/main/scala/FooSpec.scala": "class FooSpec {}" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
 });

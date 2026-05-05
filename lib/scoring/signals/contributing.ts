@@ -1,7 +1,17 @@
 import { firstExisting } from "./helpers";
 import type { Signal } from "./types";
 
-const CANDIDATES = ["CONTRIBUTING.md", "CONTRIBUTING", ".github/CONTRIBUTING.md", "docs/CONTRIBUTING.md"];
+const CANDIDATES = [
+  "CONTRIBUTING.md",
+  "CONTRIBUTING.rst",
+  "CONTRIBUTING.adoc",
+  "CONTRIBUTING",
+  ".github/CONTRIBUTING.md",
+  ".github/CONTRIBUTING.rst",
+  "docs/CONTRIBUTING.md",
+  "docs/CONTRIBUTING.rst",
+  "docs/CONTRIBUTING.adoc",
+];
 
 export const contributing: Signal = {
   id: "contributing",

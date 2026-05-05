@@ -31,4 +31,17 @@ describe("contributing signal", () => {
     fixture = makeFixture({ ".github/CONTRIBUTING.md": "anything" });
     assert.equal(contributing.check(fixture).pass, 1);
   });
+
+  test("pass=1 for CONTRIBUTING.rst (Python/Sphinx convention)", () => {
+    fixture = makeFixture({ "CONTRIBUTING.rst": "How to contribute" });
+    const r = contributing.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /CONTRIBUTING\.rst$/);
+  });
+
+  test("pass=1 for CONTRIBUTING.adoc (AsciiDoc / JVM)", () => {
+    fixture = makeFixture({ "CONTRIBUTING.adoc": "= Contributing" });
+    assert.equal(contributing.check(fixture).pass, 1);
+  });
 });

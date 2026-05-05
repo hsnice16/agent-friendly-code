@@ -14,8 +14,14 @@ const ARTIFACTS = [
   "Dockerfile",
   "docker-compose.yml",
   "compose.yml",
+  "compose.yaml",
   "justfile",
   "Taskfile.yml",
+  "tox.ini",
+  "noxfile.py",
+  "mvnw",
+  "gradlew",
+  "bin/setup",
 ];
 
 export const devEnv: Signal = {

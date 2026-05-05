@@ -42,4 +42,36 @@ describe("devEnv signal", () => {
 
     assert.equal(devEnv.check(fixture).pass, 1);
   });
+
+  test("pass=0.7 for tox.ini alone (Python)", () => {
+    fixture = makeFixture({ "tox.ini": "[tox]\nenvlist = py310" });
+    const r = devEnv.check(fixture);
+
+    assert.equal(r.pass, 0.7);
+    assert.equal(r.matchedPath, "tox.ini");
+  });
+
+  test("pass=1 for tox.ini + Makefile (pytest-style)", () => {
+    fixture = makeFixture({
+      Makefile: "test:\n\tpytest",
+      "tox.ini": "[tox]\nenvlist = py310",
+    });
+
+    assert.equal(devEnv.check(fixture).pass, 1);
+  });
+
+  test("pass=0.7 for gradlew alone (JVM wrapper)", () => {
+    fixture = makeFixture({ gradlew: "#!/bin/sh" });
+    assert.equal(devEnv.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for bin/setup alone (Ruby convention)", () => {
+    fixture = makeFixture({ "bin/setup": "#!/usr/bin/env bash" });
+    assert.equal(devEnv.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for compose.yaml alone (modern Compose canonical name)", () => {
+    fixture = makeFixture({ "compose.yaml": "services: {}" });
+    assert.equal(devEnv.check(fixture).pass, 0.7);
+  });
 });
