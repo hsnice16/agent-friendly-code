@@ -47,7 +47,7 @@ const FAQ = [
   },
   {
     q: "How often is the data refreshed?",
-    a: "Manually for now — repositories are re-scored when the seed list changes or the rubric is updated. Automated periodic refresh is planned for v0.6.0.",
+    a: "Manually for now — repositories are re-scored when the seed list changes or the rubric is updated. Webhook-driven rescoring on every push is planned for v0.6.0.",
   },
   {
     q: "Which forges are supported?",

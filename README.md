@@ -137,13 +137,18 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 app/          Next.js App Router — pages + API + SEO
   layout.tsx       root layout, root metadata (OG + Twitter cards)
   page.tsx         leaderboard
-  repo/[id]/       repo detail (includes generateMetadata for shareable titles)
+  repo/[id]/       repo detail (generateMetadata + per-repo OG image)
   methodology/     how scoring works today
   roadmap/         upcoming versions (from lib/roadmap.ts)
   changelog/       what's shipped (from lib/changelog.ts)
-  api/             repos + repo/[id] JSON routes
+  about/           independent project, no vendor affiliation (footer-linked, E-E-A-T)
+  action/          PR-diff GitHub Action explainer + install snippet
+  skill/           agent-skill explainer + install command
+  package/         registry → repo lookup (form + per-package state pages)
+  api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
   robots.ts        /robots.txt — allows "/", blocks "/api/"
   sitemap.ts       /sitemap.xml — static routes + every repo
+  llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
 components/   React components (Tailwind-styled)
 lib/
