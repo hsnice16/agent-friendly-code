@@ -6,7 +6,7 @@ import type { Signal } from "./types";
 
 const DIRS = ["tests", "test", "__tests__", "spec", "specs", "Tests", "src/test"];
 const FILE_RE =
-  /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$|.*Test\.java$|.*Tests?\.kt$|.*_test\.exs$|.*_test\.dart$|.*Spec\.scala$|.*Test\.scala$)/;
+  /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$|.*Test\.java$|.*Tests?\.kt$|.*_test\.exs$|.*_test\.dart$|.*Spec\.scala$|.*Test\.scala$|.*Test\.php$|.*_test\.rb$|.*_spec\.rb$|.*Tests?\.cs$)/;
 
 export const tests: Signal = {
   id: "tests",

@@ -83,4 +83,24 @@ describe("tests signal", () => {
     fixture = makeFixture({ "src/main/scala/FooSpec.scala": "class FooSpec {}" });
     assert.equal(testsSignal.check(fixture).pass, 0.7);
   });
+
+  test("pass=0.7 for a PHP *Test.php file", () => {
+    fixture = makeFixture({ "src/FooTest.php": "<?php class FooTest {}" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for a Ruby *_test.rb file (Minitest)", () => {
+    fixture = makeFixture({ "lib/foo_test.rb": "require 'minitest'" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for a Ruby *_spec.rb file (RSpec)", () => {
+    fixture = makeFixture({ "lib/foo_spec.rb": "describe Foo do\nend" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
+
+  test("pass=0.7 for a C# *Tests.cs file", () => {
+    fixture = makeFixture({ "src/Foo/FooTests.cs": "class FooTests {}" });
+    assert.equal(testsSignal.check(fixture).pass, 0.7);
+  });
 });
