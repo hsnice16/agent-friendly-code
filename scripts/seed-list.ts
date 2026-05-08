@@ -92,6 +92,23 @@ export const SEEDS: Seed[] = [
     note: "Sim — agent workflow builder",
     url: "https://github.com/simstudioai/sim",
   },
+  {
+    note: "Excalidraw — virtual whiteboard",
+    url: "https://github.com/excalidraw/excalidraw",
+  },
+  {
+    url: "https://github.com/tldraw/tldraw",
+    note: "tldraw — collaborative whiteboard SDK",
+  },
+  {
+    url: "https://github.com/makeplane/plane",
+    note: "Plane — open-source project management (Jira alternative)",
+  },
+  {
+    url: "https://github.com/immich-app/immich",
+    note: "Immich — self-hosted photo + video backup",
+  },
+  { url: "https://github.com/11ty/eleventy", note: "Eleventy — static site generator" },
 
   // --- GitHub, Python ---
   {
@@ -184,6 +201,7 @@ export const SEEDS: Seed[] = [
     note: "Meilisearch — search engine",
     url: "https://github.com/meilisearch/meilisearch",
   },
+  { url: "https://github.com/bevyengine/bevy", note: "Bevy — Rust ECS game engine" },
 
   // --- GitHub, Go ---
   {
@@ -210,6 +228,11 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/SigNoz/signoz",
     note: "SigNoz — open-source observability (APM, logs, metrics, traces)",
   },
+  { url: "https://github.com/gohugoio/hugo", note: "Hugo — fast static site generator" },
+  {
+    url: "https://github.com/mattermost/mattermost",
+    note: "Mattermost — open-source team chat platform",
+  },
 
   // --- GitHub, C / C++ / systems ---
   {
@@ -233,6 +256,9 @@ export const SEEDS: Seed[] = [
     note: "ClickHouse — columnar OLAP database",
     url: "https://github.com/ClickHouse/ClickHouse",
   },
+  { url: "https://github.com/postgres/postgres", note: "PostgreSQL — relational database (mirror)" },
+  { url: "https://github.com/duckdb/duckdb", note: "DuckDB — in-process analytical database" },
+  { url: "https://github.com/ml-explore/mlx", note: "MLX — Apple's array framework for ML on Apple silicon" },
 
   // --- GitHub, JVM (Java / Kotlin) ---
   {
@@ -250,6 +276,7 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/google/guava",
     note: "Guava — Google core Java libraries",
   },
+  { url: "https://github.com/apache/spark", note: "Apache Spark — unified analytics engine" },
 
   // --- GitHub, Swift ---
   { url: "https://github.com/apple/swift", note: "Swift language" },
@@ -263,11 +290,64 @@ export const SEEDS: Seed[] = [
     note: "Gumroad (Ruby on Rails)",
     url: "https://github.com/antiwork/gumroad",
   },
+  { url: "https://github.com/rails/rails", note: "Ruby on Rails framework" },
+  { url: "https://github.com/jekyll/jekyll", note: "Jekyll — static site generator" },
+  { url: "https://github.com/mastodon/mastodon", note: "Mastodon — federated microblogging" },
+  { url: "https://github.com/discourse/discourse", note: "Discourse — community discussion platform" },
 
   // --- GitHub, Dart ---
   {
     note: "Flutter sample apps",
     url: "https://github.com/flutter/samples",
+  },
+  { url: "https://github.com/flutter/flutter", note: "Flutter SDK — cross-platform UI toolkit" },
+
+  // --- GitHub, .NET / C# ---
+  {
+    url: "https://github.com/dotnet/aspnetcore",
+    note: "ASP.NET Core — cross-platform .NET web framework",
+  },
+  { url: "https://github.com/dotnet/runtime", note: ".NET runtime + core libraries" },
+  {
+    url: "https://github.com/AvaloniaUI/Avalonia",
+    note: "Avalonia — cross-platform .NET UI framework",
+  },
+  {
+    url: "https://github.com/microsoft/semantic-kernel",
+    note: "Semantic Kernel — Microsoft's LLM SDK (C#/Python/Java)",
+  },
+
+  // --- GitHub, PHP ---
+  { url: "https://github.com/laravel/laravel", note: "Laravel — PHP web framework starter" },
+  { url: "https://github.com/symfony/symfony", note: "Symfony — PHP component framework" },
+  { url: "https://github.com/composer/composer", note: "Composer — PHP dependency manager" },
+  {
+    url: "https://github.com/filamentphp/filament",
+    note: "Filament — Laravel admin / TALL-stack UI framework",
+  },
+  {
+    url: "https://github.com/coollabsio/coolify",
+    note: "Coolify — self-hostable Heroku/Vercel alternative",
+  },
+
+  // --- GitHub, Elixir / Phoenix ---
+  {
+    note: "Phoenix — Elixir web framework",
+    url: "https://github.com/phoenixframework/phoenix",
+  },
+  { url: "https://github.com/elixir-lang/elixir", note: "Elixir language" },
+  { url: "https://github.com/elixir-ecto/ecto", note: "Ecto — Elixir database toolkit" },
+  {
+    note: "Livebook — interactive Elixir notebooks",
+    url: "https://github.com/livebook-dev/livebook",
+  },
+  {
+    url: "https://github.com/electric-sql/electric",
+    note: "ElectricSQL — Postgres sync engine (Elixir + TS)",
+  },
+  {
+    url: "https://github.com/plausible/analytics",
+    note: "Plausible — privacy-first web analytics (Elixir + Phoenix)",
   },
 
   // --- GitHub, language runtimes ---
@@ -318,6 +398,18 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/different-ai/openwork",
     note: "Openwork — open-source Claude Cowork alternative (opencode-powered)",
+  },
+  {
+    url: "https://github.com/mastra-ai/mastra",
+    note: "Mastra — TypeScript AI agent framework",
+  },
+  {
+    url: "https://github.com/inngest/inngest",
+    note: "Inngest — durable event-driven workflows for AI / background jobs",
+  },
+  {
+    url: "https://github.com/modelcontextprotocol/servers",
+    note: "Model Context Protocol — official reference servers",
   },
 
   // --- AI-native: models + infra ---
