@@ -40,6 +40,7 @@ export const metadata: Metadata = {
   },
   alternates: { canonical: "/" },
   robots: { index: true, follow: true },
+  other: { "google-adsense-account": "ca-pub-8901860576820221" },
 };
 
 const JSON_LD = {
