@@ -1,6 +1,7 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+
 import { CopySnippet } from "@/components/CopySnippet";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { CLAUDE_HOOK_SNIPPET, CODEX_HOOK_SNIPPET, SCORE_BANDS, SKILL_FAQ } from "@/lib/skill-content";
 import { ACTION_REPO_URL, APP_KEYWORDS, APP_NAME, APP_URL, SKILL_INSTALL_CMD, SKILL_REPO_URL } from "@/lib/version";
@@ -91,17 +92,13 @@ export default function SkillPage() {
         <PanelHeading tone="warn">Install</PanelHeading>
         <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
           One command, any supported agent — the{" "}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/vercel-labs/skills"
-            className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft"
-          >
-            vercel-labs/skills <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-          </a>{" "}
+          <ExternalLink href="https://github.com/vercel-labs/skills" tone="ink">
+            vercel-labs/skills
+          </ExternalLink>{" "}
           CLI autodetects which agents you have configured locally and writes{" "}
           <code className="text-ink-dim">SKILL.md</code> plus the bundled scorer to each one&apos;s skill directory.
         </p>
+
         <CopySnippet text={SKILL_INSTALL_CMD} highlight="warn" />
 
         <p className="mt-3 text-[12.5px] text-muted">
@@ -243,24 +240,11 @@ export default function SkillPage() {
           <PanelHeading>Source</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            <a
-              target="_blank"
-              href={SKILL_REPO_URL}
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              {SKILL_REPO_URL.replace(/^https:\/\//, "")} <ArrowUpRight size={12} weight="bold" aria-hidden="true" />
-            </a>{" "}
+            <ExternalLink href={SKILL_REPO_URL} iconSize={12}>
+              {SKILL_REPO_URL.replace(/^https:\/\//, "")}
+            </ExternalLink>{" "}
             — MIT-licensed, semver-tagged. Sibling repo to{" "}
-            <a
-              target="_blank"
-              href={ACTION_REPO_URL}
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              agent-friendly-action <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-            </a>{" "}
-            — both vendor the same scorer.
+            <ExternalLink href={ACTION_REPO_URL}>agent-friendly-action</ExternalLink> — both vendor the same scorer.
           </p>
         </Panel>
       </div>

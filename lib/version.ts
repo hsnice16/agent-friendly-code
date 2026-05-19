@@ -3,6 +3,7 @@ export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
 export const REPO_URL = "https://github.com/hsnice16/agent-friendly-code";
+export const CONTACT_EMAIL = "hsnice16@gmail.com";
 
 export const SIBLING_VERSION = "v0";
 

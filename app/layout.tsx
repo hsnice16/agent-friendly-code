@@ -114,6 +114,11 @@ const FOOTER_LINKS_TOOLS = [
   { href: "/package", label: "Packages" },
 ];
 
+const FOOTER_LINKS_LEGAL = [
+  { href: "/privacy", label: "Privacy" },
+  { href: "/terms", label: "Terms" },
+];
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -165,17 +170,20 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </p>
 
             <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
-              <p className="m-0 order-2 text-[12px] sm:order-1">
-                © {new Date().getFullYear()}{" "}
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href="https://github.com/hsnice16"
-                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                >
-                  Himanshu Singh
-                </a>{" "}
-                ·{" "}
+              <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] sm:order-1">
+                <span>
+                  © {new Date().getFullYear()}{" "}
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://github.com/hsnice16"
+                    className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                  >
+                    Himanshu Singh
+                  </a>
+                </span>
+
+                <span aria-hidden="true">·</span>
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
@@ -184,6 +192,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 >
                   MIT
                 </a>
+
+                {FOOTER_LINKS_LEGAL.map((l) => (
+                  <span key={l.href} className="contents">
+                    <span aria-hidden="true">·</span>
+                    <Link
+                      href={l.href}
+                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                    >
+                      {l.label}
+                    </Link>
+                  </span>
+                ))}
               </p>
 
               <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">

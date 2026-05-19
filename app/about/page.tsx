@@ -1,7 +1,8 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
+
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
 
@@ -60,17 +61,9 @@ export default function AboutPage() {
       <Panel>
         <PanelHeading>Who</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          Built and maintained by{" "}
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="https://github.com/hsnice16"
-            className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-          >
-            Himanshu Singh <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-          </a>
-          . Independent project — no affiliation with Anthropic, OpenAI, Google, Cognition, Anysphere, or any of the
-          agent vendors ranked here.
+          Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>.
+          Independent project — no affiliation with Anthropic, OpenAI, Google, Cognition, Anysphere, or any of the agent
+          vendors ranked here.
         </p>
       </Panel>
 
@@ -113,17 +106,8 @@ export default function AboutPage() {
           <PanelHeading>Open source</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             MIT-licensed. The signal definitions, weight profiles, scoring code, seed list, and every score in the
-            database are all in the{" "}
-            <a
-              href={REPO_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              source repository <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-            </a>
-            . If a repo&apos;s score looks wrong, file an issue with a link and the rubric to revisit; if a signal is
-            missing, propose one.
+            database are all in the <ExternalLink href={REPO_URL}>source repository</ExternalLink>. If a repo&apos;s
+            score looks wrong, file an issue with a link and the rubric to revisit; if a signal is missing, propose one.
           </p>
         </Panel>
       </div>
@@ -133,16 +117,7 @@ export default function AboutPage() {
           <PanelHeading>Contact</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            Best signal: open an issue or discussion on{" "}
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href={`${REPO_URL}/issues`}
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              GitHub <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-            </a>
-            .
+            Best signal: open an issue or discussion on <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>.
           </p>
         </Panel>
       </div>

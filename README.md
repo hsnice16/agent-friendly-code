@@ -142,6 +142,8 @@ app/          Next.js App Router — pages + API + SEO
   roadmap/         upcoming versions (from lib/roadmap.ts)
   changelog/       what's shipped (from lib/changelog.ts)
   about/           independent project, no vendor affiliation (footer-linked, E-E-A-T)
+  privacy/         privacy policy (footer-linked, AdSense/GDPR/CCPA)
+  terms/           terms of use (footer-linked)
   action/          PR-diff GitHub Action explainer + install snippet
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)

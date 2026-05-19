@@ -1,8 +1,8 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
@@ -176,16 +176,9 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                       const label = lastSeg ? `${host}/${lastSeg}` : host;
 
                       return (
-                        <a
-                          key={url}
-                          href={url}
-                          title={url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                        >
-                          {label} <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-                        </a>
+                        <ExternalLink key={url} href={url} title={url}>
+                          {label}
+                        </ExternalLink>
                       );
                     })}
                   </div>

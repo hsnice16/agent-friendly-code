@@ -46,6 +46,8 @@ app/
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
+  privacy/page.tsx        # privacy policy (footer-linked, AdSense/GDPR/CCPA)
+  terms/page.tsx          # terms of use (footer-linked)
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows
   sitemap.ts              # /sitemap.xml — static routes + every repo detail page (priority scaled by score)
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
@@ -66,7 +68,7 @@ components/               # Tailwind-styled React components
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
-  AlternativesStrip.tsx, BreadcrumbJsonLd.tsx,
+  AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, ExternalLink.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx
 lib/
@@ -212,7 +214,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Roadmap); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 

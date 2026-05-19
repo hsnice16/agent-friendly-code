@@ -1,6 +1,7 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
+
 import { ActionEmbed } from "@/components/ActionEmbed";
+import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ACTION_REPO_URL, ACTION_USES, APP_KEYWORDS, APP_NAME, APP_URL } from "@/lib/version";
 
@@ -157,14 +158,9 @@ export default function ActionPage() {
 
           <p className="mt-3 text-[13px] text-muted">
             Authoritative reference:{" "}
-            <a
-              target="_blank"
-              rel="noopener noreferrer"
-              href="https://docs.github.com/en/actions/security-guides/encrypted-secrets"
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              docs.github.com — encrypted secrets <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
-            </a>
+            <ExternalLink href="https://docs.github.com/en/actions/security-guides/encrypted-secrets">
+              docs.github.com — encrypted secrets
+            </ExternalLink>
             .
           </p>
         </Panel>
@@ -240,14 +236,9 @@ export default function ActionPage() {
           <PanelHeading>Source</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            <a
-              target="_blank"
-              href={ACTION_REPO_URL}
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
-              {ACTION_REPO_URL.replace(/^https:\/\//, "")} <ArrowUpRight size={12} weight="bold" aria-hidden="true" />
-            </a>{" "}
+            <ExternalLink href={ACTION_REPO_URL} iconSize={12}>
+              {ACTION_REPO_URL.replace(/^https:\/\//, "")}
+            </ExternalLink>{" "}
             — MIT-licensed, semver-tagged. Listed on the GitHub Marketplace under Code Quality / Continuous Integration.
           </p>
         </Panel>
