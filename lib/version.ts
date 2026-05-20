@@ -17,6 +17,9 @@ export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendl
 export const APP_DESCRIPTION =
   "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
 
+export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
+export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;
+
 export const APP_KEYWORDS = [
   "ai",
   "code",

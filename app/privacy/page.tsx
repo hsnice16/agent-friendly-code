@@ -4,15 +4,15 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
+import { APP_NAME, CONTACT_EMAIL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const LAST_UPDATED = "May 19, 2026";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   alternates: { canonical: "/privacy" },
-  twitter: { title: `Privacy Policy — ${APP_NAME}` },
-  openGraph: { title: `Privacy Policy — ${APP_NAME}`, url: "/privacy", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: `Privacy Policy — ${APP_NAME}` },
+  openGraph: { ...OG_DEFAULTS, title: `Privacy Policy — ${APP_NAME}`, url: "/privacy", type: "article" },
   description: `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`,
 };
 

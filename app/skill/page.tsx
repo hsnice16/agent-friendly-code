@@ -4,7 +4,16 @@ import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { CLAUDE_HOOK_SNIPPET, CODEX_HOOK_SNIPPET, SCORE_BANDS, SKILL_FAQ } from "@/lib/skill-content";
-import { ACTION_REPO_URL, APP_KEYWORDS, APP_NAME, APP_URL, SKILL_INSTALL_CMD, SKILL_REPO_URL } from "@/lib/version";
+import {
+  ACTION_REPO_URL,
+  APP_KEYWORDS,
+  APP_NAME,
+  APP_URL,
+  OG_DEFAULTS,
+  SKILL_INSTALL_CMD,
+  SKILL_REPO_URL,
+  TWITTER_DEFAULTS,
+} from "@/lib/version";
 
 const PAGE_TITLE = "Agent Friendly Skill — score your repo locally and pick the right model";
 const PAGE_DESCRIPTION =
@@ -17,8 +26,8 @@ export const metadata: Metadata = {
   keywords: PAGE_KEYWORDS,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/skill" },
-  twitter: { title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-  openGraph: { title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/skill", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  openGraph: { ...OG_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/skill", type: "article" },
 };
 
 const FAQ_JSON_LD = {

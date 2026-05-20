@@ -57,7 +57,9 @@ app/
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
+  twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
+  repo/[id]/twitter-image.tsx               # next/og convention — per-repo twitter:image, re-exports (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
@@ -92,7 +94,7 @@ lib/
     db.ts                 # shared row-shape types for lib/db.ts (RepoRow, LeaderboardRow, …)
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page

@@ -6,14 +6,15 @@ import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MobileNav } from "@/components/MobileNav";
 import { VersionPill } from "@/components/VersionPill";
-import { APP_DESCRIPTION, APP_KEYWORDS, APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
-
-const OG_IMAGE = {
-  width: 2312,
-  height: 924,
-  url: "/demo/light.png",
-  alt: `${APP_NAME} — public leaderboard`,
-};
+import {
+  APP_DESCRIPTION,
+  APP_KEYWORDS,
+  APP_NAME,
+  APP_URL,
+  OG_DEFAULTS,
+  REPO_URL,
+  TWITTER_DEFAULTS,
+} from "@/lib/version";
 
 export const metadata: Metadata = {
   keywords: APP_KEYWORDS,
@@ -24,18 +25,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Himanshu Singh", url: REPO_URL }],
   title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
   openGraph: {
+    ...OG_DEFAULTS,
     url: "/",
-    locale: "en_US",
     title: APP_NAME,
     type: "website",
-    images: [OG_IMAGE],
-    siteName: APP_NAME,
     description: APP_DESCRIPTION,
   },
   twitter: {
+    ...TWITTER_DEFAULTS,
     title: APP_NAME,
-    images: [OG_IMAGE.url],
-    card: "summary_large_image",
     description: APP_DESCRIPTION,
   },
   alternates: { canonical: "/" },

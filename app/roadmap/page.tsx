@@ -3,13 +3,13 @@ import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ROADMAP } from "@/lib/roadmap";
-import { REPO_URL } from "@/lib/version";
+import { OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "Roadmap",
-  twitter: { title: "Roadmap" },
+  twitter: { ...TWITTER_DEFAULTS, title: "Roadmap" },
   alternates: { canonical: "/roadmap" },
-  openGraph: { title: "Roadmap", url: "/roadmap", type: "article" },
+  openGraph: { ...OG_DEFAULTS, title: "Roadmap", url: "/roadmap", type: "article" },
   description:
     "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, scheduled rescoring, opt-out), discovery surfaces, production stability, and at-scale GitHub indexing.",
 };

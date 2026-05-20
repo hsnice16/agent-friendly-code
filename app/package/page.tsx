@@ -5,12 +5,13 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { PackageLookupForm } from "@/components/PackageLookupForm";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "Packages",
-  twitter: { title: "Packages" },
+  twitter: { ...TWITTER_DEFAULTS, title: "Packages" },
   alternates: { canonical: "/package" },
-  openGraph: { title: "Packages", url: "/package" },
+  openGraph: { ...OG_DEFAULTS, title: "Packages", url: "/package", type: "website" },
   description:
     "Look up any npm, PyPI, or Cargo package to see how agent-friendly its source repo is — the score, per-model breakdown, and an embeddable badge.",
 };

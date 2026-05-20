@@ -16,7 +16,7 @@ import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
-import { ACTION_USES, APP_KEYWORDS, APP_URL } from "@/lib/version";
+import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id: idStr } = await params;
@@ -54,9 +54,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title,
     description,
     keywords: repoKeywords,
-    twitter: { title, description },
     alternates: { canonical: `/repo/${id}` },
-    openGraph: { title, description, url: `/repo/${id}`, type: "article" },
+    twitter: { ...TWITTER_DEFAULTS, title, description },
+    openGraph: { ...OG_DEFAULTS, title, description, url: `/repo/${id}`, type: "article" },
   };
 }
 

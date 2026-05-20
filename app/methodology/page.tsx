@@ -6,12 +6,13 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "Methodology",
-  twitter: { title: "Methodology" },
   alternates: { canonical: "/methodology" },
-  openGraph: { title: "Methodology", url: "/methodology", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: "Methodology" },
+  openGraph: { ...OG_DEFAULTS, title: "Methodology", url: "/methodology", type: "article" },
   description:
     "How scores are computed today: the signals checked, the per-model weight profiles, the scoring formula, and what the static-heuristic approach deliberately doesn't measure yet.",
 };
