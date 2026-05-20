@@ -2,11 +2,13 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { HomeJsonLd } from "@/components/HomeJsonLd";
 import { HostPill } from "@/components/HostPill";
 import { HostSelect } from "@/components/HostSelect";
 import { Medal } from "@/components/Medal";
 import { ModelPills } from "@/components/ModelPills";
 import { Pagination } from "@/components/Pagination";
+import { PeerlistCard } from "@/components/PeerlistCard";
 import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
@@ -17,7 +19,7 @@ import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
-import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE =
   "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Aider, OpenHands, Pi";
@@ -120,67 +122,10 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
       : (MODELS.find((m) => m.id === selected)?.rationale ?? "");
 
   const allOverall = listLeaderboardOverall();
-  const lastModified =
-    stats.lastScoredAt != null ? new Date(stats.lastScoredAt * 1000).toISOString() : new Date().toISOString();
-
-  const itemListJsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "ItemList",
-        "@id": `${APP_URL}/#leaderboard`,
-        numberOfItems: allOverall.length,
-        name: "Agent-friendliness leaderboard",
-        itemListElement: allOverall.map((row, idx) => ({
-          "@type": "ListItem",
-          position: idx + 1,
-          name: `${row.owner}/${row.name}`,
-          url: `${APP_URL}/repo/${row.id}`,
-        })),
-      },
-      {
-        "@type": "Dataset",
-        "@id": `${APP_URL}/#dataset`,
-        name: "Agent Friendly Code — public repository scoring dataset",
-        description:
-          "Per-model agent-friendliness scores for public repositories on GitHub, GitLab, and Bitbucket, evaluated against sixteen static signals — twelve cross-agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing, dev env, pre-commit, deps manifest, size) plus four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml) — for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi.",
-        url: APP_URL,
-        isAccessibleForFree: true,
-        dateModified: lastModified,
-        creator: { "@id": `${APP_URL}/#org` },
-        license: "https://opensource.org/licenses/MIT",
-        mainEntity: { "@id": `${APP_URL}/#leaderboard` },
-        variableMeasured: [
-          "License",
-          "Test suite",
-          "Codebase size",
-          "README quality",
-          "CI configuration",
-          "Contributing guide",
-          "Type configuration",
-          "Dependency manifest",
-          "Pre-commit / git hooks",
-          "Linter / formatter config",
-          "Reproducible dev environment",
-          "AGENTS.md / CLAUDE.md presence",
-          "Aider config (.aider.conf.yml)",
-          "Cursor rules (.cursor/rules/*.mdc)",
-          "Gemini CLI instructions (GEMINI.md)",
-          "OpenHands setup script (.openhands/setup.sh)",
-        ],
-      },
-    ],
-  };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(itemListJsonLd).replace(/</g, "\\u003c"),
-        }}
-      />
+      <HomeJsonLd allOverall={allOverall} lastScoredAt={stats.lastScoredAt} />
       <section className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
         <div className="min-w-0 flex-1">
           <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
@@ -202,31 +147,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           </p>
         </div>
 
-        <a
-          target="_blank"
-          rel="noopener noreferrer"
-          href="https://peerlist.io/hsnice16/project/agent-friendly-code"
-          aria-label="Live on Peerlist Launchpad — open the Agent Friendly Code project page (new tab)"
-          className="group relative block w-full max-w-[340px] shrink-0 self-start overflow-hidden rounded-lg border border-line transition-colors hover:border-line-strong sm:w-[300px]"
-        >
-          <picture>
-            <source media="(prefers-color-scheme: dark)" srcSet="/launch/peerlist-dark.png" />
-            <img
-              height={630}
-              width={1200}
-              className="block h-auto w-full"
-              alt="Live on Peerlist Launchpad"
-              src="/launch/peerlist-light.png"
-            />
-          </picture>
-
-          <span
-            aria-hidden="true"
-            className="absolute right-2 top-2 inline-flex h-6 w-6 items-center justify-center rounded-full bg-bg/85 text-ink-dim ring-1 ring-line backdrop-blur-sm transition-colors group-hover:bg-bg group-hover:text-ink"
-          >
-            <ArrowUpRight size={13} weight="bold" />
-          </span>
-        </a>
+        <PeerlistCard />
       </section>
 
       <ModelPills

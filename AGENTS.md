@@ -71,8 +71,8 @@ components/               # Tailwind-styled React components
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
-  AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, ExternalLink.tsx,
-  BadgeEmbed.tsx, ActionEmbed.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
+  AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
+  BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
