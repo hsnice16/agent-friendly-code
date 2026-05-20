@@ -1,0 +1,54 @@
+name: Scheduled rescore
+
+on:
+  schedule:
+    - cron: "0 */6 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: scheduled-rescore
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  rescore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Snapshot pre-rescore overall scores
+        run: sqlite3 data/rank.db "SELECT url, overall_score FROM repo ORDER BY url;" > /tmp/scores-before.txt
+
+      - name: Rescore curated seeds
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run seed
+
+      - name: Commit and push if any overall score changed
+        run: |
+          sqlite3 data/rank.db "SELECT url, overall_score FROM repo ORDER BY url;" > /tmp/scores-after.txt
+          if diff -q /tmp/scores-before.txt /tmp/scores-after.txt > /dev/null; then
+            echo "No overall-score changes — skipping commit (last_scored_at churn ignored)."
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/rank.db
+          git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push

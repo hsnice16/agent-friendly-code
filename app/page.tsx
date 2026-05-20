@@ -13,10 +13,11 @@ import { SortSelect } from "@/components/SortSelect";
 import { type Host, isHost } from "@/lib/constants/hosts";
 import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
-import { getLeaderboardStats, type LeaderboardRow, listLeaderboard, listLeaderboardOverall } from "@/lib/db";
+import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/lib/db";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
+import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
-import { APP_URL } from "@/lib/version";
+import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE =
   "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Aider, OpenHands, Pi";
@@ -27,8 +28,8 @@ export const metadata: Metadata = {
   title: HOME_TITLE,
   description: HOME_DESCRIPTION,
   alternates: { canonical: "/" },
-  twitter: { title: HOME_TITLE, description: HOME_DESCRIPTION },
-  openGraph: { title: HOME_TITLE, description: HOME_DESCRIPTION, url: "/" },
+  twitter: { ...TWITTER_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION },
+  openGraph: { ...OG_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION, url: "/", type: "website" },
 };
 
 type SearchParams = {

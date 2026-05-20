@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.5.0";
+export const APP_VERSION = "0.6.0";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
@@ -16,6 +16,9 @@ export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#$
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
 export const APP_DESCRIPTION =
   "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
+
+export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
+export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;
 
 export const APP_KEYWORDS = [
   "ai",
@@ -114,4 +117,28 @@ export const APP_KEYWORDS = [
   "vercel skills",
   "claude code skill",
   "agent friendly skill",
+  "GEMINI.md",
+  ".cursor/rules",
+  ".aider.conf.yml",
+  ".openhands/setup.sh",
+  "ai ide",
+  "OpenAI",
+  "Anthropic",
+  "Anysphere",
+  "Cognition",
+  "agentic ide",
+  "code agent ranking",
+  "context engineering",
+  "ai coding leaderboard",
+  "ai friendly repository",
+  "claude code leaderboard",
+  "agent compatibility score",
+  "devin leaderboard",
+  "codex leaderboard",
+  "agent ready check",
+  "ai readiness check",
+  "cursor leaderboard",
+  "make repo ai friendly",
+  "ai code agent comparison",
+  "ai pair programmer leaderboard",
 ];

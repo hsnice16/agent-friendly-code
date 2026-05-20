@@ -56,7 +56,10 @@ app/
   api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup for external integrators (siblings vendor the scorer; they don't call this)
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
+  opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
+  twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
+  repo/[id]/twitter-image.tsx               # next/og convention — per-repo twitter:image, re-exports (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
@@ -87,9 +90,11 @@ lib/
     scorer.ts             # signals × weights, topImprovements
   clients/
     git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
+  types/
+    db.ts                 # shared row-shape types for lib/db.ts (RepoRow, LeaderboardRow, …)
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page
@@ -108,7 +113,7 @@ tasks/
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
   0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
-  0.6.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
+  0.6.0/                  # released — auto-refresh (scheduled rescoring)
   0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/

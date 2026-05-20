@@ -3,7 +3,15 @@ import type { Metadata } from "next";
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { ACTION_REPO_URL, ACTION_USES, APP_KEYWORDS, APP_NAME, APP_URL } from "@/lib/version";
+import {
+  ACTION_REPO_URL,
+  ACTION_USES,
+  APP_KEYWORDS,
+  APP_NAME,
+  APP_URL,
+  OG_DEFAULTS,
+  TWITTER_DEFAULTS,
+} from "@/lib/version";
 
 const PAGE_TITLE = "Agent Friendly Action — PR-diff GitHub Action for AI agent-friendliness";
 const PAGE_DESCRIPTION =
@@ -27,8 +35,8 @@ export const metadata: Metadata = {
   keywords: PAGE_KEYWORDS,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/action" },
-  twitter: { title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-  openGraph: { title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/action", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  openGraph: { ...OG_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/action", type: "article" },
 };
 
 const FAQ = [

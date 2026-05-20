@@ -4,15 +4,15 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
+import { APP_NAME, CONTACT_EMAIL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
 const LAST_UPDATED = "May 19, 2026";
 
 export const metadata: Metadata = {
   title: "Terms of Use",
   alternates: { canonical: "/terms" },
-  twitter: { title: `Terms of Use — ${APP_NAME}` },
-  openGraph: { title: `Terms of Use — ${APP_NAME}`, url: "/terms", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: `Terms of Use — ${APP_NAME}` },
+  openGraph: { ...OG_DEFAULTS, title: `Terms of Use — ${APP_NAME}`, url: "/terms", type: "article" },
   description: `Terms of Use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`,
 };
 
@@ -32,8 +32,8 @@ export default function TermsPage() {
       <Panel>
         <PanelHeading>Acceptance</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          By accessing or using {APP_NAME} (the &ldquo;Service&rdquo;), you agree to these Terms of Use. If you do not
-          agree, please do not use the Service.
+          By accessing or using <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;), you agree to
+          these Terms of Use. If you do not agree, please do not use the Service.
         </p>
       </Panel>
 

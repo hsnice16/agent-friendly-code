@@ -8,7 +8,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { isRegistry, type Registry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
-import { APP_URL } from "@/lib/version";
+import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const cachedLookup = cache((registry: Registry, name: string) => lookupPackage(registry, name));
 
@@ -31,9 +31,9 @@ export async function generateMetadata({
   return {
     title,
     description,
-    twitter: { title, description },
+    twitter: { ...TWITTER_DEFAULTS, title, description },
     alternates: { canonical: `/package/${registry}/${name}` },
-    openGraph: { title, description, url: `/package/${registry}/${name}`, type: "article" },
+    openGraph: { ...OG_DEFAULTS, title, description, url: `/package/${registry}/${name}`, type: "article" },
     ...(isThin ? { robots: { index: false, follow: true } } : {}),
   };
 }

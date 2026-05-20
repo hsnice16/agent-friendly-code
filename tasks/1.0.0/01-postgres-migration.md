@@ -6,7 +6,7 @@
 
 When any of these become true:
 
-- Concurrent writers from webhooks/Actions saturate SQLite's single-writer limit.
+- Concurrent writers (today's scheduled-rescore Action plus any future webhook receiver) saturate SQLite's single-writer limit.
 - Need per-row access control for claimed/private repos.
 - Multi-region read replicas required.
 

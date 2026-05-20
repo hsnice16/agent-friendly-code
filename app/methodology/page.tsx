@@ -6,12 +6,13 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "Methodology",
-  twitter: { title: "Methodology" },
   alternates: { canonical: "/methodology" },
-  openGraph: { title: "Methodology", url: "/methodology", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: "Methodology" },
+  openGraph: { ...OG_DEFAULTS, title: "Methodology", url: "/methodology", type: "article" },
   description:
     "How scores are computed today: the signals checked, the per-model weight profiles, the scoring formula, and what the static-heuristic approach deliberately doesn't measure yet.",
 };
@@ -47,7 +48,7 @@ const FAQ = [
   },
   {
     q: "How often is the data refreshed?",
-    a: "Manually for now — repositories are re-scored when the seed list changes or the rubric is updated. Webhook-driven rescoring on every push is planned for v0.6.0.",
+    a: "Every six hours — a GitHub Actions cron runs the full scorer over the curated seed list and commits the refreshed database to the repo, which auto-deploys. Repositories are also re-scored whenever the seed list changes or the rubric is updated.",
   },
   {
     q: "Which forges are supported?",

@@ -1,4 +1,4 @@
-import type { RepoRow } from "@/lib/db";
+import type { RepoRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
 import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
 
@@ -8,6 +8,10 @@ import { Panel } from "./Panel";
 export function RepoHero({ repo }: { repo: RepoRow }) {
   const overall = repo.overall_score ?? 0;
   const overallTier = scoreTier(overall);
+
+  const prev = repo.previous_overall_score;
+  const scoreDiff =
+    prev != null && repo.overall_score != null ? Math.round((repo.overall_score - prev) * 10) / 10 : null;
 
   return (
     <Panel padding={false}>
@@ -19,9 +23,9 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
           </h1>
 
           <a
-            rel="noopener noreferrer"
             target="_blank"
             href={repo.url}
+            rel="noopener noreferrer"
             className="mt-1 block break-all text-sm text-muted"
             aria-label={`${repo.owner}/${repo.name} on ${repo.host} (new tab)`}
           >
@@ -43,6 +47,16 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
               <dt className="inline">Last scored: </dt>
               <dd className="inline font-medium text-ink">
                 {repo.last_scored_at ? relativeTime(repo.last_scored_at) : "—"}
+                {scoreDiff != null && prev != null && scoreDiff !== 0 && (
+                  <span
+                    role="img"
+                    className={`ml-2 ${scoreDiff < 0 ? "text-bad" : "text-ok"}`}
+                    aria-label={`${scoreDiff > 0 ? "Up" : "Down"} ${Math.abs(scoreDiff).toFixed(1)} points from previous overall ${prev.toFixed(1)} out of 100`}
+                  >
+                    {scoreDiff > 0 ? "+" : ""}
+                    {scoreDiff.toFixed(1)} pts
+                  </span>
+                )}
               </dd>
             </div>
           </dl>

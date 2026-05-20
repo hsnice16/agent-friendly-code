@@ -1,6 +1,7 @@
 import { parseRepoUrl } from "./clients/github";
 import { type Registry, resolvePackageToRepo } from "./clients/registries";
-import { getModelScores, getPackageAlias, getRepoByUrl, putPackageAlias, type RepoRow } from "./db";
+import { getModelScores, getPackageAlias, getRepoByUrl, putPackageAlias } from "./db";
+import type { RepoRow } from "./types/db";
 import { packageRequestIssueUrl } from "./utils/contact";
 
 export type PackageLookup =

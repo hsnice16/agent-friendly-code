@@ -5,6 +5,7 @@ import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall }
 import { APP_URL } from "@/lib/version";
 
 const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
+const LEGAL_LAST_UPDATED = new Date("2026-05-19");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
@@ -45,20 +46,20 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       priority: 0.5,
       lastModified: now,
-      changeFrequency: "monthly",
       url: `${APP_URL}/about`,
+      changeFrequency: "monthly",
     },
     {
       priority: 0.3,
-      lastModified: now,
       changeFrequency: "yearly",
       url: `${APP_URL}/privacy`,
+      lastModified: LEGAL_LAST_UPDATED,
     },
     {
       priority: 0.3,
-      lastModified: now,
       url: `${APP_URL}/terms`,
       changeFrequency: "yearly",
+      lastModified: LEGAL_LAST_UPDATED,
     },
     {
       priority: 0.6,
@@ -71,6 +72,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: now,
       changeFrequency: "weekly",
       url: `${APP_URL}/changelog`,
+    },
+    {
+      priority: 0.4,
+      lastModified: lastScored,
+      changeFrequency: "weekly",
+      url: `${APP_URL}/llms.txt`,
     },
   ];
 

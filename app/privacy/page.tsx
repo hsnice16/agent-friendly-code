@@ -4,15 +4,15 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
+import { APP_NAME, CONTACT_EMAIL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const LAST_UPDATED = "May 19, 2026";
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
   alternates: { canonical: "/privacy" },
-  twitter: { title: `Privacy Policy — ${APP_NAME}` },
-  openGraph: { title: `Privacy Policy — ${APP_NAME}`, url: "/privacy", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: `Privacy Policy — ${APP_NAME}` },
+  openGraph: { ...OG_DEFAULTS, title: `Privacy Policy — ${APP_NAME}`, url: "/privacy", type: "article" },
   description: `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`,
 };
 
@@ -33,10 +33,10 @@ export default function PrivacyPage() {
       <Panel>
         <PanelHeading>Overview</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          {APP_NAME} (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an independent, MIT-licensed project.
-          There are no user accounts. The Service is a public, read-only dashboard that ranks publicly accessible source
-          repositories. This policy explains the limited information that is collected when you visit and how it is
-          used.
+          <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an
+          independent, MIT-licensed project. There are no user accounts. The Service is a public, read-only dashboard
+          that ranks publicly accessible source repositories. This policy explains the limited information that is
+          collected when you visit and how it is used.
         </p>
       </Panel>
 

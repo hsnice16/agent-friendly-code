@@ -4,12 +4,13 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel } from "@/components/Panel";
 import { CHANGELOG } from "@/lib/changelog";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "Changelog",
-  twitter: { title: "Changelog" },
   alternates: { canonical: "/changelog" },
-  openGraph: { title: "Changelog", url: "/changelog", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, title: "Changelog" },
+  openGraph: { ...OG_DEFAULTS, title: "Changelog", url: "/changelog", type: "article" },
   description:
     "What's shipped in each release of Agent Friendly Code — user-facing capabilities, not internal churn. Every bullet corresponds to a roadmap item that landed.",
 };

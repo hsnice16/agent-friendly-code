@@ -19,6 +19,7 @@ Each task file has a `**Status**: …` line:
 - `done` — shipped; file is a record of what happened.
 - `in_progress` — being worked on now.
 - `planned` — scheduled for this version, not yet started.
+- `deferred` — considered for this version's release but postponed before shipping. The file stays as a future reference with the rationale; may or may not return in a later version.
 
 ## How to use in a session
 

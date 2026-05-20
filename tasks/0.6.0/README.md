@@ -1,10 +1,13 @@
-# 0.6.0 — auto-refresh + smarter matching
+# 0.6.0 — auto-refresh
 
-**Status**: planned
+**Status**: released
 
-Two moderate-effort items that need real infra (a webhook receiver + queue, an embedding model and a vector store) but don't yet need user accounts or registry crawls. Together they shift the product from a manual-seed snapshot to a self-updating dataset with smarter matching.
+Keeps the dataset fresh: a 6-hourly GitHub Actions cron re-runs the seed, commits the refreshed `data/rank.db`, and the repo page shows the score delta since the previous rescore. Picks the simplest implementation that delivers the user-facing value rather than the full webhook + queue design originally sketched — see task 01 for the rationale and what was deferred to 0.7.0.
 
 ## Tasks
 
-- [01-webhook-rescoring.md](./01-webhook-rescoring.md) — keep scores fresh on every push; detect regressions. Webhook receiver + signature verification + rescore queue.
-- [02-alternatives-v2-embeddings.md](./02-alternatives-v2-embeddings.md) — sentence-transformer embeddings on the README; cosine-similar neighbors = alternatives. Lifts the v1 same-language SQL heuristic so cross-language alternatives surface correctly (e.g. `axios` → `requests`).
+- [01-scheduled-rescoring.md](./01-scheduled-rescoring.md) — keep scores fresh on a 6-hourly GH Actions cron; show overall-score regressions on the repo page. No new infra, no new deps.
+
+## Deferred from this version
+
+- [02-alternatives-v2-embeddings.md](./02-alternatives-v2-embeddings.md) — sentence-transformer embeddings on the README; cosine-similar neighbors as alternatives. Considered for 0.6.0, deferred to backlog on 2026-05-20 — see the task file for the rationale and lighter-weight alternatives.

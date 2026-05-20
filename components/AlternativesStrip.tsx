@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { AlternativeRow } from "@/lib/db";
+import type { AlternativeRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
 
 import { Panel, PanelHeading } from "./Panel";
@@ -23,7 +23,7 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
 
       <p className="m-0 mb-3 text-[13px] text-muted">
         Same-language repos scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. Heuristic v1
-        (same language + same host); cross-language matches are refined in v0.6.0.
+        (same language + same host).
       </p>
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-3">
