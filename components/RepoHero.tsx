@@ -4,14 +4,14 @@ import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
 
 import { HostPill } from "./HostPill";
 import { Panel } from "./Panel";
+import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
 
 export function RepoHero({ repo }: { repo: RepoRow }) {
   const overall = repo.overall_score ?? 0;
   const overallTier = scoreTier(overall);
 
   const prev = repo.previous_overall_score;
-  const scoreDiff =
-    prev != null && repo.overall_score != null ? Math.round((repo.overall_score - prev) * 10) / 10 : null;
+  const hasDelta = prev != null && repo.overall_score != null && repo.overall_score !== prev;
 
   return (
     <Panel padding={false}>
@@ -47,16 +47,6 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
               <dt className="inline">Last scored: </dt>
               <dd className="inline font-medium text-ink">
                 {repo.last_scored_at ? relativeTime(repo.last_scored_at) : "—"}
-                {scoreDiff != null && prev != null && scoreDiff !== 0 && (
-                  <span
-                    role="img"
-                    className={`ml-2 ${scoreDiff < 0 ? "text-bad" : "text-ok"}`}
-                    aria-label={`${scoreDiff > 0 ? "Up" : "Down"} ${Math.abs(scoreDiff).toFixed(1)} points from previous overall ${prev.toFixed(1)} out of 100`}
-                  >
-                    {scoreDiff > 0 ? "+" : ""}
-                    {scoreDiff.toFixed(1)} pts
-                  </span>
-                )}
               </dd>
             </div>
           </dl>
@@ -70,6 +60,9 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
           >
             {overall.toFixed(1)}
           </div>
+          {hasDelta && prev != null && repo.overall_score != null && (
+            <ScoreDeltaPopover current={repo.overall_score} previous={prev} lastScoredAt={repo.last_scored_at} />
+          )}
           <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Overall</div>
         </div>
       </div>

@@ -70,7 +70,7 @@ components/               # Tailwind-styled React components
   HostPill.tsx, HostSelect.tsx, Medal.tsx, ModelPills.tsx,
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
-  RepoHero.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
+  RepoHero.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, ExternalLink.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
   BackToTop.tsx, GoogleAnalytics.tsx

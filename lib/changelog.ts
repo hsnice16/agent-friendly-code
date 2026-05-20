@@ -13,7 +13,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     title: "Auto-refresh — scores stay fresh on their own",
     highlights: [
       "Scheduled rescoring — a 6-hourly GitHub Actions cron re-runs `bun run seed` over every tracked repo, commits the refreshed `data/rank.db` to `main`, and Vercel redeploys. Scores stay current without anyone re-running the seed by hand. The job skips the commit when no `overall_score` actually changed.",
-      'Score-delta on the repo page — `/repo/:id` inlines a `+N.N pts` / `-N.N pts` diff (green/red) next to "Last scored" so a regression since the last rescore is visible at a glance. Hidden on a repo\'s first scoring.',
+      "Score-delta on the repo page — `/repo/:id` shows a `+N.N` / `-N.N` diff (green/red) under the overall score so a regression since the last rescore is visible at a glance. Hover or focus reveals a score-history popover with the previous value, the change, and the absolute scored-at date. Hidden on a repo's first scoring.",
       "16 new seed repos in the curated set so the cron has more material to refresh on each cycle.",
     ],
   },
