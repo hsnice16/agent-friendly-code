@@ -33,10 +33,10 @@ export default function PrivacyPage() {
       <Panel>
         <PanelHeading>Overview</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          {APP_NAME} (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an independent, MIT-licensed project.
-          There are no user accounts. The Service is a public, read-only dashboard that ranks publicly accessible source
-          repositories. This policy explains the limited information that is collected when you visit and how it is
-          used.
+          <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an
+          independent, MIT-licensed project. There are no user accounts. The Service is a public, read-only dashboard
+          that ranks publicly accessible source repositories. This policy explains the limited information that is
+          collected when you visit and how it is used.
         </p>
       </Panel>
 

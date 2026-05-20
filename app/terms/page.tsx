@@ -32,8 +32,8 @@ export default function TermsPage() {
       <Panel>
         <PanelHeading>Acceptance</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          By accessing or using {APP_NAME} (the &ldquo;Service&rdquo;), you agree to these Terms of Use. If you do not
-          agree, please do not use the Service.
+          By accessing or using <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;), you agree to
+          these Terms of Use. If you do not agree, please do not use the Service.
         </p>
       </Panel>
 

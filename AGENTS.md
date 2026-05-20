@@ -56,6 +56,7 @@ app/
   api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup for external integrators (siblings vendor the scorer; they don't call this)
   api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
+  opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
@@ -110,7 +111,7 @@ tasks/
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
   0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
-  0.6.0/                  # in progress — auto-refresh + smarter matching (scheduled rescoring + alternatives v2)
+  0.6.0/                  # released — auto-refresh (scheduled rescoring)
   0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/

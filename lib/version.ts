@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.5.0";
+export const APP_VERSION = "0.6.0";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
@@ -114,4 +114,28 @@ export const APP_KEYWORDS = [
   "vercel skills",
   "claude code skill",
   "agent friendly skill",
+  "GEMINI.md",
+  ".cursor/rules",
+  ".aider.conf.yml",
+  ".openhands/setup.sh",
+  "ai ide",
+  "OpenAI",
+  "Anthropic",
+  "Anysphere",
+  "Cognition",
+  "agentic ide",
+  "code agent ranking",
+  "context engineering",
+  "ai coding leaderboard",
+  "ai friendly repository",
+  "claude code leaderboard",
+  "agent compatibility score",
+  "devin leaderboard",
+  "codex leaderboard",
+  "agent ready check",
+  "ai readiness check",
+  "cursor leaderboard",
+  "make repo ai friendly",
+  "ai code agent comparison",
+  "ai pair programmer leaderboard",
 ];

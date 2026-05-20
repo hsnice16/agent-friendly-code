@@ -13,24 +13,6 @@ export type RoadmapVersion = {
 
 export const ROADMAP: RoadmapVersion[] = [
   {
-    version: "0.6.0",
-    status: "in_progress",
-    theme: "Auto-refresh + smarter matching",
-    items: [
-      {
-        title: "Scheduled rescoring",
-        taskFile: "tasks/0.6.0/01-scheduled-rescoring.md",
-        summary:
-          "6-hourly GitHub Actions cron keeps scores fresh; the repo page shows the overall-score delta from the previous rescore.",
-      },
-      {
-        title: "Alternatives via README embeddings",
-        taskFile: "tasks/0.6.0/02-alternatives-v2-embeddings.md",
-        summary: "Upgrade the v1 SQL heuristic with sentence-transformer embeddings for cross-language matches.",
-      },
-    ],
-  },
-  {
     version: "0.7.0",
     status: "planned",
     theme: "Maintainer ownership + at-scale discovery",

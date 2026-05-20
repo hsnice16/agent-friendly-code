@@ -8,6 +8,16 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.6.0",
+    date: "2026-05-20",
+    title: "Auto-refresh — scores stay fresh on their own",
+    highlights: [
+      "Scheduled rescoring — a 6-hourly GitHub Actions cron re-runs `bun run seed` over every tracked repo, commits the refreshed `data/rank.db` to `main`, and Vercel redeploys. Scores stay current without anyone re-running the seed by hand. The job skips the commit when no `overall_score` actually changed.",
+      'Score-delta on the repo page — `/repo/:id` inlines a `+N.N pts` / `-N.N pts` diff (green/red) next to "Last scored" so a regression since the last rescore is visible at a glance. Hidden on a repo\'s first scoring.',
+      "16 new seed repos in the curated set so the cron has more material to refresh on each cycle.",
+    ],
+  },
+  {
     label: "0.5.0",
     date: "2026-05-02",
     title: "Scorer ships outside the dashboard",

@@ -12,7 +12,7 @@ On the repo detail page, show a short "alternatives" strip: _"Repos that look si
 - `lib/clients/github.ts` — `fetchRepoMeta` now returns `language` alongside `defaultBranch` and `stars`. GitHub + Bitbucket expose it directly; GitLab needs a separate endpoint, so it stays `null` there for v1.
 - `scripts/score.ts` — pipes the language through to `saveScoredRepo`; `saveScoredRepo` uses `COALESCE` on conflict so a rescore without language (e.g. offline) doesn't blow away an existing value.
 - `lib/db.ts` — new `getAlternatives(repoId, modelId | null, limit)` query. Filters: same host + same language + `id != self`. Orders by the selected model's `model_score` when a model is given, else `overall_score`.
-- `components/AlternativesStrip.tsx` — up to 3 cards in a grid (single column on mobile, 3-col at `sm:`), each linking to the candidate's repo page. Panel is suppressed entirely when the query returns zero rows. UI flags itself as "heuristic v1" and points at v0.6.0 for refinement.
+- `components/AlternativesStrip.tsx` — up to 3 cards in a grid (single column on mobile, 3-col at `sm:`), each linking to the candidate's repo page. Panel is suppressed entirely when the query returns zero rows. UI flags itself as "heuristic v1".
 - `app/repo/[id]/page.tsx` — renders the strip between `PerModelScores` and `Signal breakdown`.
 
 ## Acceptance
@@ -22,9 +22,9 @@ On the repo detail page, show a short "alternatives" strip: _"Repos that look si
 - ✓ Query stays in `lib/db.ts`; no SQL leaks into `app/` or `components/`.
 - ~ One test in `tests/db.test.ts` — not added in this pass; follow-up.
 
-## Known limitations (improve in v2 — `tasks/0.6.0/`)
+## Known limitations
 
-- **Cross-language alternatives get missed** — `axios` (JS) vs `requests` (Python) are semantic alternatives but different languages. v1 will never surface these; v2 in 0.6.0 lifts this with README-embedding similarity.
+- **Cross-language alternatives get missed** — `axios` (JS) vs `requests` (Python) are semantic alternatives but different languages. v1 will never surface these. A v2 upgrade (sentence-transformer embeddings on the README) was considered for 0.6.0 and [deferred to the backlog](../0.6.0/02-alternatives-v2-embeddings.md) — lighter-weight options (curated cluster YAML, topics-overlap Jaccard) listed there.
 - **Language alone is coarse** — a Rust CLI tool and a Rust ORM share a language but aren't alternatives. The UI flags itself as "heuristic v1" so users know the confidence level.
 - **No topic clustering** — `react` and `nextjs` appear as "alternatives" because both are top-scoring JS repos, even though they're complementary. Acceptable noise for v1.
 - **Back-fill**: repos scored before this change have `language = NULL` until rescored. The heuristic excludes `NULL`-language rows, so the strip renders only on rescored repos until the next full re-seed.

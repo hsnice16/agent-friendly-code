@@ -1,6 +1,6 @@
 # 01 · Scheduled rescoring
 
-**Status**: in progress
+**Status**: done
 
 ## Goal
 

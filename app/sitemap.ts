@@ -73,6 +73,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "weekly",
       url: `${APP_URL}/changelog`,
     },
+    {
+      priority: 0.4,
+      lastModified: lastScored,
+      changeFrequency: "weekly",
+      url: `${APP_URL}/llms.txt`,
+    },
   ];
 
   const repoRoutes: MetadataRoute.Sitemap = listLeaderboardOverall().map((r) => ({
