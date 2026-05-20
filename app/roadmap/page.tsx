@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/roadmap" },
   openGraph: { title: "Roadmap", url: "/roadmap", type: "article" },
   description:
-    "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, webhooks, opt-out), discovery surfaces, production stability, and at-scale GitHub indexing.",
+    "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, scheduled rescoring, opt-out), discovery surfaces, production stability, and at-scale GitHub indexing.",
 };
 
 export default function RoadmapPage() {

@@ -87,6 +87,8 @@ lib/
     scorer.ts             # signals × weights, topImprovements
   clients/
     git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
+  types/
+    db.ts                 # shared row-shape types for lib/db.ts (RepoRow, LeaderboardRow, …)
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   db.ts                   # better-sqlite3 schema + queries
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD
@@ -108,7 +110,7 @@ tasks/
   0.3.0/                  # released — embeddable scores + broader coverage (badge, more agents, alternatives, package lookup)
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
   0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
-  0.6.0/                  # planned — auto-refresh + smarter matching (webhook rescoring + alternatives v2)
+  0.6.0/                  # in progress — auto-refresh + smarter matching (scheduled rescoring + alternatives v2)
   0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/

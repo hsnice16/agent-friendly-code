@@ -22,7 +22,7 @@ No clone over the network for either side — everything happens on what `action
 Two products, one pipeline:
 
 - **This task (0.5.0/02)** → action is **read-only**. It scores, comments, exits. No DB write.
-- **0.6.0/01 webhook rescoring** → server-side GitHub App listens for `push` / `pull_request.merged` and refreshes our DB.
+- **0.6.0/01 scheduled rescoring** → a GitHub Actions cron in our repo runs `bun run seed` every 6h and commits the refreshed `data/rank.db` to `main`. (Originally sketched as a webhook receiver; downscoped to the simplest design that delivers the freshness benefit — see that task file for the rationale.)
 
 Reasons for the split: webhooks fire only on merge-to-default-branch (the right rescore trigger); the action runs on every PR commit (too noisy for DB writes); maintainers don't have to ship credentials for our API to install the action.
 
@@ -118,6 +118,6 @@ Lets us ship the action inside starter-repo templates without it firing for fork
 ## Out of scope (deferred)
 
 - Runtime weights refresh (tiers 1 + 2). Lands when 1.0.0/03 publishes its first weight set.
-- Action POSTing to our DB / webhook. Lives in 0.6.0/01 as a server-side GitHub App.
+- Action POSTing to our DB. DB freshness is handled by the 0.6.0/01 scheduled-rescore cron in this repo; a webhook receiver would only become useful alongside the 0.7.0 claim flow.
 - Per-language or per-agent comment customisation.
 - On-demand scoring of unindexed repos via the action.

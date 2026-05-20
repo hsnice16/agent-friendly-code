@@ -4,6 +4,14 @@ import Database from "better-sqlite3";
 
 import type { ModelScore } from "./scoring/scorer";
 import type { SignalResult } from "./scoring/signals";
+import type {
+  AlternativeRow,
+  LeaderboardOptions,
+  LeaderboardRow,
+  LeaderboardStats,
+  RepoRow,
+  TopPackageRow,
+} from "./types/db";
 
 const BUNDLED_DB = join(process.cwd(), "data", "rank.db");
 const DB_PATH = process.env.VERCEL ? "/tmp/rank.db" : BUNDLED_DB;
@@ -20,16 +28,17 @@ db.exec("PRAGMA foreign_keys = ON;");
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS repo (
-    id              INTEGER PRIMARY KEY AUTOINCREMENT,
-    host            TEXT    NOT NULL,
-    owner           TEXT    NOT NULL,
-    name            TEXT    NOT NULL,
-    url             TEXT    NOT NULL UNIQUE,
-    default_branch  TEXT,
-    stars           INTEGER,
-    last_scored_at  INTEGER,
-    overall_score   REAL,
-    language        TEXT,
+    id                     INTEGER PRIMARY KEY AUTOINCREMENT,
+    host                   TEXT    NOT NULL,
+    owner                  TEXT    NOT NULL,
+    name                   TEXT    NOT NULL,
+    url                    TEXT    NOT NULL UNIQUE,
+    default_branch         TEXT,
+    stars                  INTEGER,
+    last_scored_at         INTEGER,
+    overall_score          REAL,
+    previous_overall_score REAL,
+    language               TEXT,
     UNIQUE(host, owner, name)
   );
   CREATE TABLE IF NOT EXISTS model_score (
@@ -57,19 +66,6 @@ db.exec(`
   );
 `);
 
-export type RepoRow = {
-  id: number;
-  url: string;
-  host: string;
-  name: string;
-  owner: string;
-  stars: number | null;
-  language: string | null;
-  overall_score: number | null;
-  default_branch: string | null;
-  last_scored_at: number | null;
-};
-
 export function saveScoredRepo(args: {
   url: string;
   host: string;
@@ -87,11 +83,12 @@ export function saveScoredRepo(args: {
       `INSERT INTO repo (host, owner, name, url, default_branch, stars, last_scored_at, overall_score, language)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(url) DO UPDATE SET
-         default_branch = excluded.default_branch,
-         stars          = excluded.stars,
-         last_scored_at = excluded.last_scored_at,
-         overall_score  = excluded.overall_score,
-         language       = COALESCE(excluded.language, repo.language)`,
+         default_branch         = excluded.default_branch,
+         stars                  = excluded.stars,
+         last_scored_at         = excluded.last_scored_at,
+         previous_overall_score = repo.overall_score,
+         overall_score          = excluded.overall_score,
+         language               = COALESCE(excluded.language, repo.language)`,
     ).run(
       args.host,
       args.owner,
@@ -129,17 +126,6 @@ export function saveScoredRepo(args: {
 
   return tx() as number;
 }
-
-export type LeaderboardRow = RepoRow & { score: number | null };
-
-export type LeaderboardOptions = {
-  dir?: "asc" | "desc";
-  sort?: "score" | "stars";
-  /** Restrict to a single host — "github" / "gitlab" / "bitbucket". */
-  host?: string;
-  /** "overall" or a specific model id — determines which score column is returned. */
-  model: string;
-};
 
 export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
   const dir = opts.dir === "asc" ? "ASC" : "DESC";
@@ -202,13 +188,6 @@ export function getPackageAlias(registry: string, name: string): string | null {
   return row?.repo_url ?? null;
 }
 
-export type TopPackageRow = {
-  name: string;
-  score: number;
-  owner: string;
-  repoName: string;
-};
-
 export function getTopPackagesByRegistry(registry: string, limit: number): TopPackageRow[] {
   return db
     .prepare(
@@ -249,15 +228,6 @@ export function getSignalResults(repoId: number): SignalResult[] {
     .all(repoId) as any as SignalResult[];
 }
 
-export type AlternativeRow = {
-  id: number;
-  host: string;
-  name: string;
-  owner: string;
-  score: number | null;
-  stars: number | null;
-};
-
 export function getAlternatives(repoId: number, modelId: string | null, limit: number): AlternativeRow[] {
   if (modelId) {
     return db
@@ -288,11 +258,6 @@ export function getAlternatives(repoId: number, modelId: string | null, limit: n
     )
     .all(repoId, repoId, repoId, limit) as AlternativeRow[];
 }
-
-export type LeaderboardStats = {
-  count: number;
-  lastScoredAt: number | null;
-};
 
 export function getLeaderboardStats(): LeaderboardStats {
   const row = db

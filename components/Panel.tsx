@@ -35,5 +35,5 @@ export function Panel({
 export function PanelHeading({ children, tone }: { children: React.ReactNode; tone?: PanelTone }) {
   const toneClass = tone ? TONE_HEADING[tone] : "text-muted";
 
-  return <h3 className={`mb-3.5 text-xs font-semibold uppercase tracking-[0.08em] ${toneClass}`}>{children}</h3>;
+  return <h2 className={`mb-3.5 text-xs font-semibold uppercase tracking-[0.08em] ${toneClass}`}>{children}</h2>;
 }

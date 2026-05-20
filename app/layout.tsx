@@ -9,8 +9,8 @@ import { VersionPill } from "@/components/VersionPill";
 import { APP_DESCRIPTION, APP_KEYWORDS, APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
 
 const OG_IMAGE = {
-  width: 1200,
-  height: 630,
+  width: 2312,
+  height: 924,
   url: "/demo/light.png",
   alt: `${APP_NAME} — public leaderboard`,
 };
@@ -39,7 +39,17 @@ export const metadata: Metadata = {
     description: APP_DESCRIPTION,
   },
   alternates: { canonical: "/" },
-  robots: { index: true, follow: true },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-snippet": -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+    },
+  },
   other: { "google-adsense-account": "ca-pub-8901860576820221" },
 };
 

@@ -14,6 +14,8 @@ bun run dev             # http://localhost:3000
 bun run test            # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
 
+> **About `data/rank.db`** — a GitHub Actions cron (`.github/workflows/scheduled-rescore.yml`) re-runs `bun run seed` every six hours and commits the refreshed database to `main`. If your branch touches `scripts/seed-list.ts` and you also commit a re-seeded `rank.db`, you may hit a merge conflict against a cron commit. Easiest resolution: rebase, `git checkout --theirs -- data/rank.db`, and re-run `bun run seed` before pushing.
+
 ## Branch naming
 
 Lowercase, kebab-case, prefixed by intent:
@@ -121,7 +123,7 @@ A PR is ready to merge when:
 
 ## Security
 
-See the "Security / threat surface" section of [AGENTS.md](./AGENTS.md). For vulnerability reports that shouldn't be public, email hsnice16@gmail.com rather than opening an issue.
+See the "Security / threat surface" section of [AGENTS.md](./AGENTS.md). For vulnerability reports that shouldn't be public, email <hsnice16@gmail.com> rather than opening an issue.
 
 ## Code of conduct
 

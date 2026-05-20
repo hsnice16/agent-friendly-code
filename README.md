@@ -64,7 +64,7 @@ Not pretending the idea is free of risk:
 - **Factory.ai is already in this space.** Differentiation has to stay sharp.
 - **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.7.0/01-opt-out-claim-flow.md`.
 - **Score gaming.** Once public, people add boilerplate `AGENTS.md` to pass the rubric without being useful. Dynamic (actually-run-an-agent) checks are the counter — see benchmark harness.
-- **Freshness.** Scores decay with every push. Webhook-driven rescoring is roadmap.
+- **Freshness.** Scores decay with every push. A 6-hourly GitHub Actions cron rescores the curated set; webhook-driven sub-minute refresh is deferred until the claim flow lands in 0.7.0.
 
 See `/methodology` in the running app for a candid walkthrough of what's measured today and what isn't.
 
@@ -200,7 +200,7 @@ See `/roadmap` in the running app or the per-version `tasks/` folders for the fu
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.6.0 — auto-refresh + smarter matching**: webhook-driven rescoring (keep scores fresh on every push) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
+- **0.6.0 — auto-refresh + smarter matching**: scheduled rescoring (6-hourly GitHub Actions cron + previous-score diff on the repo page) + alternatives via README embeddings (cross-language matches the v0.3.0 SQL heuristic misses).
 - **0.7.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
 - **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
 

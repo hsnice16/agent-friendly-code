@@ -109,6 +109,16 @@ export const SEEDS: Seed[] = [
     note: "Immich — self-hosted photo + video backup",
   },
   { url: "https://github.com/11ty/eleventy", note: "Eleventy — static site generator" },
+  { url: "https://github.com/lit/lit", note: "Lit — fast, lightweight web components" },
+  {
+    url: "https://github.com/refinedev/refine",
+    note: "Refine — React-based admin / internal-tools framework",
+  },
+  {
+    note: "Payload — TypeScript headless CMS",
+    url: "https://github.com/payloadcms/payload",
+  },
+  { url: "https://github.com/strapi/strapi", note: "Strapi — Node.js headless CMS" },
 
   // --- GitHub, Python ---
   {
@@ -161,6 +171,12 @@ export const SEEDS: Seed[] = [
     note: "LlamaIndex — data framework for LLMs",
     url: "https://github.com/run-llama/llama_index",
   },
+  { url: "https://github.com/wagtail/wagtail", note: "Wagtail — Django-based CMS" },
+  { url: "https://github.com/encode/uvicorn", note: "Uvicorn — lightning-fast ASGI server" },
+  {
+    url: "https://github.com/sqlfluff/sqlfluff",
+    note: "SQLFluff — multi-dialect SQL linter / formatter",
+  },
 
   // --- GitHub, Rust ---
   {
@@ -202,6 +218,14 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/meilisearch/meilisearch",
   },
   { url: "https://github.com/bevyengine/bevy", note: "Bevy — Rust ECS game engine" },
+  {
+    url: "https://github.com/oxc-project/oxc",
+    note: "Oxc — JavaScript / TypeScript toolchain written in Rust",
+  },
+  {
+    note: "reqwest — ergonomic Rust HTTP client",
+    url: "https://github.com/seanmonstar/reqwest",
+  },
 
   // --- GitHub, Go ---
   {
@@ -232,6 +256,18 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/mattermost/mattermost",
     note: "Mattermost — open-source team chat platform",
+  },
+  {
+    url: "https://github.com/dagger/dagger",
+    note: "Dagger — programmable CI/CD engine running pipelines in containers",
+  },
+  {
+    url: "https://github.com/pocketbase/pocketbase",
+    note: "PocketBase — open-source backend in a single Go file",
+  },
+  {
+    url: "https://github.com/charmbracelet/bubbletea",
+    note: "Bubble Tea — Go TUI framework based on The Elm Architecture",
   },
 
   // --- GitHub, C / C++ / systems ---
@@ -277,6 +313,10 @@ export const SEEDS: Seed[] = [
     note: "Guava — Google core Java libraries",
   },
   { url: "https://github.com/apache/spark", note: "Apache Spark — unified analytics engine" },
+  {
+    url: "https://github.com/Anuken/Mindustry",
+    note: "Mindustry — open-source factory / tower-defense game (Java + libGDX)",
+  },
 
   // --- GitHub, Swift ---
   { url: "https://github.com/apple/swift", note: "Swift language" },
@@ -294,6 +334,14 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/jekyll/jekyll", note: "Jekyll — static site generator" },
   { url: "https://github.com/mastodon/mastodon", note: "Mastodon — federated microblogging" },
   { url: "https://github.com/discourse/discourse", note: "Discourse — community discussion platform" },
+  {
+    url: "https://github.com/getlago/lago",
+    note: "Lago — open-source usage-based billing (Ruby on Rails)",
+  },
+  {
+    url: "https://github.com/forem/forem",
+    note: "Forem — community platform that powers DEV.to (Ruby on Rails)",
+  },
 
   // --- GitHub, Dart ---
   {
@@ -315,6 +363,10 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/microsoft/semantic-kernel",
     note: "Semantic Kernel — Microsoft's LLM SDK (C#/Python/Java)",
+  },
+  {
+    url: "https://github.com/jellyfin/jellyfin",
+    note: "Jellyfin — open-source media server (.NET)",
   },
 
   // --- GitHub, PHP ---

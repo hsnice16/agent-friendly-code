@@ -14,13 +14,14 @@ export type RoadmapVersion = {
 export const ROADMAP: RoadmapVersion[] = [
   {
     version: "0.6.0",
-    status: "planned",
+    status: "in_progress",
     theme: "Auto-refresh + smarter matching",
     items: [
       {
-        title: "Webhook-driven rescoring",
-        taskFile: "tasks/0.6.0/01-webhook-rescoring.md",
-        summary: "Keep scores fresh on every push; detect regressions.",
+        title: "Scheduled rescoring",
+        taskFile: "tasks/0.6.0/01-scheduled-rescoring.md",
+        summary:
+          "6-hourly GitHub Actions cron keeps scores fresh; the repo page shows the overall-score delta from the previous rescore.",
       },
       {
         title: "Alternatives via README embeddings",

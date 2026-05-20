@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import type { AlternativeRow } from "@/lib/db";
+import type { AlternativeRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
 
 import { Panel, PanelHeading } from "./Panel";
