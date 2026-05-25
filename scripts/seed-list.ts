@@ -463,6 +463,10 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/modelcontextprotocol/servers",
     note: "Model Context Protocol — official reference servers",
   },
+  {
+    url: "https://github.com/earendil-works/pi",
+    note: "Pi — self-extensible coding agent CLI + unified multi-provider LLM API (TypeScript)",
+  },
 
   // --- AI-native: models + infra ---
   {
