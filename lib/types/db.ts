@@ -7,6 +7,7 @@ export type RepoRow = {
   stars: number | null;
   language: string | null;
   overall_score: number | null;
+  badge_embedded: number | null;
   default_branch: string | null;
   last_scored_at: number | null;
   previous_overall_score: number | null;

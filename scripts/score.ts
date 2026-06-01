@@ -1,6 +1,7 @@
 import { existsSync, mkdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { detectBadgeEmbed } from "../lib/badge-adoption";
 import { shallowClone } from "../lib/clients/git";
 import { fetchRepoMeta, parseRepoUrl } from "../lib/clients/github";
 import { saveScoredRepo } from "../lib/db";
@@ -61,12 +62,14 @@ async function scoreCommand(target: string): Promise<void> {
 
   console.log(`[score] scanning ${repoPath}`);
   const result = scoreRepo(repoPath);
+  const badgeEmbedded = detectBadgeEmbed(repoPath, `${host}/${owner}/${name}`);
 
   saveScoredRepo({
     url,
     host,
     name,
     owner,
+    badgeEmbedded,
     stars: stars ?? null,
     overall: result.overall,
     signals: result.signals,
