@@ -2,6 +2,7 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import { headers } from "next/headers";
 import Link from "next/link";
+import { BadgeAdoptedTag } from "@/components/BadgeAdoptedTag";
 import { HomeJsonLd } from "@/components/HomeJsonLd";
 import { HostPill } from "@/components/HostPill";
 import { HostSelect } from "@/components/HostSelect";
@@ -246,6 +247,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
                         {r.owner}/{r.name}
                       </Link>
                       <HostPill host={r.host} />
+                      {r.badge_embedded ? <BadgeAdoptedTag /> : null}
                     </td>
                     <td className="text-right tabular-nums text-ink-dim">{compactStars(r.stars)}</td>
                     <td className="text-right">

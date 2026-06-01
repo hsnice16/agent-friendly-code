@@ -73,7 +73,7 @@ components/               # Tailwind-styled React components
   RepoHero.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
-  BackToTop.tsx, GoogleAnalytics.tsx
+  BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
     scoring.ts            # score thresholds, visible limits
@@ -93,6 +93,7 @@ lib/
   types/
     db.ts                 # shared row-shape types for lib/db.ts (RepoRow, LeaderboardRow, …)
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
+  badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 schema + queries
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
@@ -105,6 +106,7 @@ tests/
   format.test.ts          # compactStars, relativeTime, hostLabel
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
+  badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
   signals/                # one *.test.ts per signal
 tasks/
   README.md

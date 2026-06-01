@@ -2,6 +2,7 @@ import type { RepoRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
 import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
 
+import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
 import { Panel } from "./Panel";
 import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
@@ -20,6 +21,7 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
           <h1 className="m-0 break-words text-[20px] font-semibold tracking-tight sm:text-[22px]">
             {repo.owner}/{repo.name}
             <HostPill host={repo.host} />
+            {repo.badge_embedded ? <BadgeAdoptedTag /> : null}
           </h1>
 
           <a

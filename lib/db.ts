@@ -39,6 +39,7 @@ db.exec(`
     overall_score          REAL,
     previous_overall_score REAL,
     language               TEXT,
+    badge_embedded         INTEGER,
     UNIQUE(host, owner, name)
   );
   CREATE TABLE IF NOT EXISTS model_score (
@@ -73,6 +74,7 @@ export function saveScoredRepo(args: {
   owner: string;
   overall: number;
   stars?: number | null;
+  badgeEmbedded?: boolean;
   signals: SignalResult[];
   language?: string | null;
   modelScores: ModelScore[];
@@ -80,15 +82,16 @@ export function saveScoredRepo(args: {
 }): number {
   const tx = db.transaction(() => {
     db.prepare(
-      `INSERT INTO repo (host, owner, name, url, default_branch, stars, last_scored_at, overall_score, language)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO repo (host, owner, name, url, default_branch, stars, last_scored_at, overall_score, language, badge_embedded)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(url) DO UPDATE SET
          default_branch         = excluded.default_branch,
          stars                  = excluded.stars,
          last_scored_at         = excluded.last_scored_at,
          previous_overall_score = repo.overall_score,
          overall_score          = excluded.overall_score,
-         language               = COALESCE(excluded.language, repo.language)`,
+         language               = COALESCE(excluded.language, repo.language),
+         badge_embedded         = excluded.badge_embedded`,
     ).run(
       args.host,
       args.owner,
@@ -99,6 +102,7 @@ export function saveScoredRepo(args: {
       Math.floor(Date.now() / 1000),
       args.overall,
       args.language ?? null,
+      args.badgeEmbedded ? 1 : 0,
     );
 
     const row = db.prepare("SELECT id FROM repo WHERE url = ?").get(args.url) as { id: number };
