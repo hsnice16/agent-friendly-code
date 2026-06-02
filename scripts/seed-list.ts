@@ -17,6 +17,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/calcom/cal.diy", note: "Cal.com — cal.diy" },
   { url: "https://github.com/cloudflare/vinext", note: "Cloudflare Vinext" },
   {
+    note: "react-doctor — React diagnostics tool",
+    url: "https://github.com/millionco/react-doctor",
+  },
+  {
     note: "TypeScript language",
     url: "https://github.com/microsoft/TypeScript",
   },
