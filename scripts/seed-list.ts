@@ -658,6 +658,65 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/laravel/ai", note: "Laravel AI (user-supplied)" },
   { url: "https://github.com/flutter/ai", note: "Flutter AI (user-supplied)" },
 
+  // --- GitHub, streaming / distributed data infrastructure ---
+  {
+    url: "https://github.com/AutoMQ/automq",
+    note: "AutoMQ — cloud-native Kafka on object storage (Java)",
+  },
+  { url: "https://github.com/apache/pulsar", note: "Apache Pulsar — cloud-native distributed messaging + streaming" },
+  { url: "https://github.com/apache/rocketmq", note: "Apache RocketMQ — distributed messaging + streaming platform" },
+  {
+    url: "https://github.com/nats-io/nats-server",
+    note: "NATS — high-performance cloud-native messaging system (Go)",
+  },
+  {
+    url: "https://github.com/redpanda-data/redpanda",
+    note: "Redpanda — Kafka-compatible streaming data platform (C++)",
+  },
+  { url: "https://github.com/apache/flink", note: "Apache Flink — stream + batch processing engine" },
+  { url: "https://github.com/apache/beam", note: "Apache Beam — unified batch + streaming data processing" },
+  { url: "https://github.com/apache/pinot", note: "Apache Pinot — real-time distributed OLAP datastore" },
+  { url: "https://github.com/apache/druid", note: "Apache Druid — real-time analytics database" },
+  {
+    url: "https://github.com/apache/doris",
+    note: "Apache Doris — MPP real-time analytical database",
+  },
+  { url: "https://github.com/StarRocks/starrocks", note: "StarRocks — high-performance analytical database" },
+  { url: "https://github.com/apache/iceberg", note: "Apache Iceberg — open table format for huge analytic datasets" },
+  { url: "https://github.com/apache/hudi", note: "Apache Hudi — transactional data lake platform" },
+  { url: "https://github.com/apache/paimon", note: "Apache Paimon — streaming lakehouse table format" },
+  { url: "https://github.com/delta-io/delta", note: "Delta Lake — ACID storage layer for lakehouses" },
+  { url: "https://github.com/apache/arrow", note: "Apache Arrow — columnar in-memory data format" },
+  {
+    note: "RisingWave — streaming database (Rust)",
+    url: "https://github.com/risingwavelabs/risingwave",
+  },
+  {
+    url: "https://github.com/MaterializeInc/materialize",
+    note: "Materialize — streaming SQL materialized-view database (Rust)",
+  },
+  { url: "https://github.com/timescale/timescaledb", note: "TimescaleDB — time-series database on Postgres" },
+  { url: "https://github.com/questdb/questdb", note: "QuestDB — high-performance time-series database" },
+  { url: "https://github.com/influxdata/influxdb", note: "InfluxDB — time-series database" },
+  {
+    url: "https://github.com/GreptimeTeam/greptimedb",
+    note: "GreptimeDB — cloud-native time-series database (Rust)",
+  },
+  { url: "https://github.com/apache/cassandra", note: "Apache Cassandra — distributed wide-column database" },
+  {
+    url: "https://github.com/scylladb/scylladb",
+    note: "ScyllaDB — high-performance Cassandra-compatible database (C++)",
+  },
+  { url: "https://github.com/cockroachdb/cockroach", note: "CockroachDB — distributed SQL database (Go)" },
+  { url: "https://github.com/vitessio/vitess", note: "Vitess — horizontal scaling for MySQL (Go)" },
+  { url: "https://github.com/yugabyte/yugabyte-db", note: "YugabyteDB — distributed SQL database" },
+  { url: "https://github.com/trinodb/trino", note: "Trino — distributed SQL query engine" },
+  { url: "https://github.com/debezium/debezium", note: "Debezium — change data capture (CDC) platform" },
+  { url: "https://github.com/apache/seatunnel", note: "Apache SeaTunnel — distributed data integration platform" },
+  { url: "https://github.com/milvus-io/milvus", note: "Milvus — cloud-native vector database" },
+  { url: "https://github.com/qdrant/qdrant", note: "Qdrant — vector search engine (Rust)" },
+  { url: "https://github.com/weaviate/weaviate", note: "Weaviate — open-source vector database (Go)" },
+
   // --- GitLab ---
   { url: "https://gitlab.com/gitlab-org/cli", note: "GitLab's own CLI (Go)" },
   {
