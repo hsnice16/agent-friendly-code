@@ -657,6 +657,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/symfony/ai", note: "Symfony AI (user-supplied)" },
   { url: "https://github.com/laravel/ai", note: "Laravel AI (user-supplied)" },
   { url: "https://github.com/flutter/ai", note: "Flutter AI (user-supplied)" },
+  {
+    url: "https://github.com/getnao/nao",
+    note: "nao — AI-native data engineering IDE (user-supplied)",
+  },
 
   // --- GitHub, streaming / distributed data infrastructure ---
   {
