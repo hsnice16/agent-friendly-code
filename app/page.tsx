@@ -9,7 +9,7 @@ import { HostSelect } from "@/components/HostSelect";
 import { Medal } from "@/components/Medal";
 import { ModelPills } from "@/components/ModelPills";
 import { Pagination } from "@/components/Pagination";
-import { PeerlistCard } from "@/components/PeerlistCard";
+// import { PeerlistCard } from "@/components/PeerlistCard";
 import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
@@ -148,7 +148,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           </p>
         </div>
 
-        <PeerlistCard />
+        {/* <PeerlistCard /> */}
       </section>
 
       <ModelPills
