@@ -5,6 +5,7 @@ import "./globals.css";
 import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MobileNav } from "@/components/MobileNav";
+import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { VersionPill } from "@/components/VersionPill";
 import {
   APP_DESCRIPTION,
@@ -176,6 +177,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
               values themselves are still pre-benchmark.
             </p>
+
+            <ProductHuntBadge className="mt-5 inline-block" />
 
             <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
               <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] sm:order-1">

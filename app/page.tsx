@@ -10,6 +10,7 @@ import { Medal } from "@/components/Medal";
 import { ModelPills } from "@/components/ModelPills";
 import { Pagination } from "@/components/Pagination";
 // import { PeerlistCard } from "@/components/PeerlistCard";
+import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
@@ -149,6 +150,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         </div>
 
         {/* <PeerlistCard /> */}
+        <ProductHuntBadge className="shrink-0 self-start" />
       </section>
 
       <ModelPills
