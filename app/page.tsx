@@ -9,8 +9,6 @@ import { HostSelect } from "@/components/HostSelect";
 import { Medal } from "@/components/Medal";
 import { ModelPills } from "@/components/ModelPills";
 import { Pagination } from "@/components/Pagination";
-// import { PeerlistCard } from "@/components/PeerlistCard";
-import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
@@ -128,29 +126,24 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   return (
     <>
       <HomeJsonLd allOverall={allOverall} lastScoredAt={stats.lastScoredAt} />
-      <section className="mb-5 flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between sm:gap-6">
-        <div className="min-w-0 flex-1">
-          <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
-            Which public repos are friendliest to an AI coding agent?
-          </h1>
-          <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-            Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
-          </p>
+      <section className="mb-5">
+        <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
+          Which public repos are friendliest to an AI coding agent?
+        </h1>
+        <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
+          Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
+        </p>
 
-          <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
-            Looking up a dependency?{" "}
-            <Link
-              href="/package"
-              className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
-            >
-              Check any npm / PyPI / Cargo package
-            </Link>{" "}
-            by name.
-          </p>
-        </div>
-
-        {/* <PeerlistCard /> */}
-        <ProductHuntBadge className="shrink-0 self-start" />
+        <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
+          Looking up a dependency?{" "}
+          <Link
+            href="/package"
+            className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
+          >
+            Check any npm / PyPI / Cargo package
+          </Link>{" "}
+          by name.
+        </p>
       </section>
 
       <ModelPills

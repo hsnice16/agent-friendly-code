@@ -5,6 +5,7 @@ import "./globals.css";
 import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { MobileNav } from "@/components/MobileNav";
+import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { VersionPill } from "@/components/VersionPill";
 import {
@@ -178,7 +179,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               values themselves are still pre-benchmark.
             </p>
 
-            <ProductHuntBadge className="mt-5 inline-block" />
+            <div className="mt-5 flex flex-wrap items-start gap-4">
+              <PeerlistBadge />
+              <ProductHuntBadge />
+            </div>
 
             <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
               <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] sm:order-1">
