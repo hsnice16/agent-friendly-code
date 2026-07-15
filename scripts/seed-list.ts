@@ -143,6 +143,16 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/novuhq/novu",
     note: "Novu — open-source notification infrastructure",
   },
+  { url: "https://github.com/jestjs/jest", note: "Jest — JavaScript testing framework" },
+  { url: "https://github.com/webpack/webpack", note: "webpack — module bundler" },
+  { url: "https://github.com/rollup/rollup", note: "Rollup — ES module bundler" },
+  {
+    url: "https://github.com/expo/expo",
+    note: "Expo — framework + platform for universal React Native apps",
+  },
+  { url: "https://github.com/colinhacks/zod", note: "Zod — TypeScript-first schema validation" },
+  { url: "https://github.com/statelyai/xstate", note: "XState — state machines / statecharts" },
+  { url: "https://github.com/date-fns/date-fns", note: "date-fns — modern JS date utility library" },
 
   // --- GitHub, Python ---
   {
@@ -210,6 +220,15 @@ export const SEEDS: Seed[] = [
     note: "Poetry — Python packaging & dependency manager",
   },
   { url: "https://github.com/mkdocs/mkdocs", note: "MkDocs — Markdown project documentation" },
+  { url: "https://github.com/psf/black", note: "Black — the uncompromising Python code formatter" },
+  {
+    note: "SQLAlchemy — Python SQL toolkit + ORM",
+    url: "https://github.com/sqlalchemy/sqlalchemy",
+  },
+  { url: "https://github.com/Textualize/rich", note: "Rich — rich text + formatting in the terminal" },
+  { url: "https://github.com/Textualize/textual", note: "Textual — Python TUI framework" },
+  { url: "https://github.com/aio-libs/aiohttp", note: "aiohttp — async HTTP client / server" },
+  { url: "https://github.com/tqdm/tqdm", note: "tqdm — fast, extensible progress bar" },
 
   // --- GitHub, Rust ---
   {
@@ -272,6 +291,8 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/rustdesk/rustdesk",
     note: "RustDesk — open-source remote desktop",
   },
+  { url: "https://github.com/rust-lang/cargo", note: "Cargo — the Rust package manager" },
+  { url: "https://github.com/rayon-rs/rayon", note: "Rayon — data-parallelism library for Rust" },
 
   // --- GitHub, Go ---
   {
@@ -325,6 +346,9 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/minio/minio", note: "MinIO — high-performance object storage" },
   { url: "https://github.com/go-gorm/gorm", note: "GORM — Go ORM library" },
+  { url: "https://github.com/go-chi/chi", note: "chi — lightweight, idiomatic Go HTTP router" },
+  { url: "https://github.com/uber-go/zap", note: "zap — blazing-fast structured logging for Go" },
+  { url: "https://github.com/stretchr/testify", note: "testify — Go assertions + mocks toolkit" },
 
   // --- GitHub, C / C++ / systems ---
   {
@@ -354,6 +378,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/fmtlib/fmt", note: "fmt — modern C++ formatting library" },
   { url: "https://github.com/nlohmann/json", note: "JSON for Modern C++" },
   { url: "https://github.com/opencv/opencv", note: "OpenCV — computer vision library" },
+  {
+    url: "https://github.com/protocolbuffers/protobuf",
+    note: "Protocol Buffers — language-neutral data serialization",
+  },
 
   // --- GitHub, JVM (Java / Kotlin) ---
   {
@@ -381,6 +409,8 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/netty/netty",
     note: "Netty — async event-driven network framework",
   },
+  { url: "https://github.com/ReactiveX/RxJava", note: "RxJava — reactive extensions for the JVM" },
+  { url: "https://github.com/square/retrofit", note: "Retrofit — type-safe HTTP client for Java / Android" },
 
   // --- GitHub, Swift ---
   { url: "https://github.com/apple/swift", note: "Swift language" },
@@ -407,6 +437,8 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/forem/forem",
     note: "Forem — community platform that powers DEV.to (Ruby on Rails)",
   },
+  { url: "https://github.com/sidekiq/sidekiq", note: "Sidekiq — background job processing for Ruby" },
+  { url: "https://github.com/fastlane/fastlane", note: "fastlane — mobile build + release automation (Ruby)" },
 
   // --- GitHub, Dart ---
   {
@@ -437,6 +469,10 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/PowerShell/PowerShell",
     note: "PowerShell — cross-platform shell + scripting (.NET)",
   },
+  {
+    url: "https://github.com/dotnet/maui",
+    note: ".NET MAUI — cross-platform native app framework",
+  },
 
   // --- GitHub, PHP ---
   { url: "https://github.com/laravel/laravel", note: "Laravel — PHP web framework starter" },
@@ -450,6 +486,7 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/coollabsio/coolify",
     note: "Coolify — self-hostable Heroku/Vercel alternative",
   },
+  { url: "https://github.com/guzzle/guzzle", note: "Guzzle — PHP HTTP client" },
 
   // --- GitHub, Elixir / Phoenix ---
   {
@@ -636,6 +673,12 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/h4ckf0r0day/obscura",
     note: "Obscura — headless browser for AI agents / web scraping (Rust)",
+  },
+  { url: "https://github.com/ollama/ollama", note: "Ollama — run local LLMs" },
+  { url: "https://github.com/chroma-core/chroma", note: "Chroma — open-source embedding database" },
+  {
+    url: "https://github.com/crewAIInc/crewAI",
+    note: "CrewAI — framework for orchestrating role-playing AI agents",
   },
 
   // --- AI-native: application SDKs ---
