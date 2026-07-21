@@ -349,6 +349,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/go-chi/chi", note: "chi — lightweight, idiomatic Go HTTP router" },
   { url: "https://github.com/uber-go/zap", note: "zap — blazing-fast structured logging for Go" },
   { url: "https://github.com/stretchr/testify", note: "testify — Go assertions + mocks toolkit" },
+  { url: "https://github.com/moby/moby", note: "Moby — the upstream container engine behind Docker" },
 
   // --- GitHub, C / C++ / systems ---
   {
@@ -382,6 +383,9 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/protocolbuffers/protobuf",
     note: "Protocol Buffers — language-neutral data serialization",
   },
+  { url: "https://github.com/llvm/llvm-project", note: "LLVM — compiler infrastructure + Clang" },
+  { url: "https://github.com/openssl/openssl", note: "OpenSSL — TLS / cryptography library" },
+  { url: "https://github.com/git/git", note: "Git — the version control system itself" },
 
   // --- GitHub, JVM (Java / Kotlin) ---
   {
@@ -511,6 +515,12 @@ export const SEEDS: Seed[] = [
   // --- GitHub, language runtimes ---
   { url: "https://github.com/denoland/deno", note: "Deno runtime (Rust)" },
   { url: "https://github.com/oven-sh/bun", note: "Bun runtime (Zig)" },
+  { url: "https://github.com/golang/go", note: "Go language + toolchain" },
+  { url: "https://github.com/rust-lang/rust", note: "Rust language + compiler" },
+  { url: "https://github.com/python/cpython", note: "CPython — the reference Python implementation" },
+  { url: "https://github.com/nodejs/node", note: "Node.js runtime" },
+  { url: "https://github.com/ruby/ruby", note: "Ruby language" },
+  { url: "https://github.com/ziglang/zig", note: "Zig language + compiler" },
 
   // --- AI-native: coding agents ---
   {
@@ -584,6 +594,22 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/continuedev/continue",
     note: "Continue — open-source AI code assistant for IDEs",
+  },
+  {
+    url: "https://github.com/MoonshotAI/kimi-code",
+    note: "Kimi Code CLI — Moonshot AI's terminal coding agent (the Kimi CLI profile this dashboard scores)",
+  },
+  {
+    url: "https://github.com/Aider-AI/aider",
+    note: "Aider — AI pair programming in your terminal",
+  },
+  {
+    url: "https://github.com/charmbracelet/crush",
+    note: "Crush — Charm's terminal-based AI coding agent (Go)",
+  },
+  {
+    url: "https://github.com/QwenLM/qwen-code",
+    note: "Qwen Code — Alibaba's command-line coding agent",
   },
 
   // --- AI-native: models + infra ---
@@ -680,6 +706,9 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/crewAIInc/crewAI",
     note: "CrewAI — framework for orchestrating role-playing AI agents",
   },
+  { url: "https://github.com/pytorch/pytorch", note: "PyTorch — deep learning framework" },
+  { url: "https://github.com/sgl-project/sglang", note: "SGLang — fast LLM serving runtime" },
+  { url: "https://github.com/Comfy-Org/ComfyUI", note: "ComfyUI — node-based diffusion workflow engine" },
 
   // --- AI-native: application SDKs ---
   { url: "https://github.com/vercel/ai", note: "Vercel AI SDK" },
@@ -770,6 +799,9 @@ export const SEEDS: Seed[] = [
     note: "GitLab Runner (Go)",
     url: "https://gitlab.com/gitlab-org/gitlab-runner",
   },
+  { url: "https://gitlab.com/gitlab-org/gitlab", note: "GitLab itself — the platform monorepo (Ruby)" },
+  { url: "https://gitlab.com/inkscape/inkscape", note: "Inkscape — vector graphics editor (C++)" },
+  { url: "https://gitlab.com/wireshark/wireshark", note: "Wireshark — network protocol analyzer (C)" },
 
   // --- Bitbucket ---
   {
