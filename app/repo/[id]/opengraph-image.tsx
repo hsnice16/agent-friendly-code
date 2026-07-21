@@ -101,7 +101,7 @@ export default async function Image({ params }: { params: Promise<{ id: string }
           borderTop: "1px solid #e5e5e5",
         }}
       >
-        Claude Code · Cursor · Devin · Codex · Gemini · Aider · OpenHands · Pi
+        Claude Code · Cursor · Devin · Codex · Gemini · Kimi · Aider · OpenHands · Pi
       </div>
     </div>,
     { ...size },

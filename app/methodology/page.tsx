@@ -28,7 +28,7 @@ const FAQ = [
   },
   {
     q: "Which AI coding agents are evaluated?",
-    a: "Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi. Each has its own weight profile encoded in lib/scoring/weights.ts.",
+    a: "Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each has its own weight profile encoded in lib/scoring/weights.ts.",
   },
   {
     q: "Is this a benchmark of agent performance?",

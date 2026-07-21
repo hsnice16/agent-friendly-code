@@ -76,7 +76,7 @@ export default function Image() {
         </div>
         <div style={{ display: "flex", color: "#525252", fontSize: "28px", marginTop: "24px", maxWidth: "1000px" }}>
           Per-model leaderboard across GitHub, GitLab, and Bitbucket — ranked for Claude Code, Cursor, Devin, Codex,
-          Gemini, Aider, OpenHands, and Pi.
+          Gemini, Kimi, Aider, OpenHands, and Pi.
         </div>
       </div>
 

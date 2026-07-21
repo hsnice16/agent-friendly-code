@@ -72,7 +72,8 @@ components/               # Tailwind-styled React components
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
-  BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, CopySnippet.tsx, PackageLookupForm.tsx,
+  BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
+  CopySnippet.tsx, PackageLookupForm.tsx,
   BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx
 lib/
   constants/
@@ -178,8 +179,10 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 ## Adding a model
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
-2. Appears automatically in the leaderboard model pills and repo-page suggestions.
-3. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
+2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
+3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/repo/[id]/opengraph-image.tsx`, the `generateMetadata` description + JSON-LD description in `app/repo/[id]/page.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count word (e.g. `eight`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
+4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getAlternatives` (the repo page's alternatives strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
+5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
 ## Adding a host
 

@@ -90,8 +90,8 @@ export default function TermsPage() {
             The source code of the Service is released under the MIT License (see{" "}
             <ExternalLink href={`${REPO_URL}/blob/main/LICENSE`}>LICENSE</ExternalLink>). The textual content and visual
             design of this Service are © Himanshu Singh and provided for personal, non-commercial reading. All
-            third-party trademarks (Claude Code, Cursor, Devin, Codex, Gemini, Aider, OpenHands, Pi, GitHub, GitLab,
-            Bitbucket, and others) belong to their respective owners.
+            third-party trademarks (Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi, GitHub,
+            GitLab, Bitbucket, and others) belong to their respective owners.
           </p>
         </Panel>
       </div>

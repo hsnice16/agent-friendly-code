@@ -15,7 +15,7 @@ export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#$
 
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
 export const APP_DESCRIPTION =
-  "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
+  "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
 
 export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
 export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;
@@ -55,6 +55,9 @@ export const APP_KEYWORDS = [
   "CLAUDE.md",
   "openhands",
   "gemini cli",
+  "kimi",
+  "kimi cli",
+  "kimi code",
   "open source",
   "repo ranking",
   "agent readiness",

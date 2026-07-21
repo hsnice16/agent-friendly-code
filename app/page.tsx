@@ -22,9 +22,9 @@ import { compactStars, relativeTime } from "@/lib/utils/format";
 import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE =
-  "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Aider, OpenHands, Pi";
+  "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi";
 const HOME_DESCRIPTION =
-  "Public leaderboard ranking GitHub, GitLab, and Bitbucket repos by how agent-friendly they are for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi — per model, with AGENTS.md / CLAUDE.md, CI, tests, and dev-env signals.";
+  "Public leaderboard ranking GitHub, GitLab, and Bitbucket repos by how agent-friendly they are for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi — per model, with AGENTS.md / CLAUDE.md, CI, tests, and dev-env signals.";
 
 export const metadata: Metadata = {
   title: HOME_TITLE,

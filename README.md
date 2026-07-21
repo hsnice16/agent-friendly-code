@@ -26,7 +26,7 @@ Follows `prefers-color-scheme` automatically — same tokens, different values.
 
 ## The idea
 
-AI coding agents — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi — succeed dramatically more often on some repos than others. The difference is rarely the agent; it's the repo. A codebase with fast tests, a clear `AGENTS.md`, a Makefile, and CI is a massively different environment than one without.
+AI coding agents — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi — succeed dramatically more often on some repos than others. The difference is rarely the agent; it's the repo. A codebase with fast tests, a clear `AGENTS.md`, a Makefile, and CI is a massively different environment than one without.
 
 **Goal**: a public leaderboard where anyone can look up a repo and see:
 
@@ -180,7 +180,7 @@ LICENSE       MIT
 
 ## Companion: agent skill
 
-[`hsnice16/agent-friendly-skill`](https://github.com/hsnice16/agent-friendly-skill) is a portable agent skill installable in one command — `npx skills add hsnice16/agent-friendly-skill#v0` — that scores the user's current repo locally and recommends a model. Profiles the same 8 agents this dashboard does (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi); installs into any [`vercel-labs/skills`](https://github.com/vercel-labs/skills)-compatible host (Cline, Copilot, Continue, Roo Code, …) and produces identical output regardless of which host invokes it — scoring is score-driven, not host-driven. Same self-contained property as the action: vendored scorer, no service dependency, works offline. The dashboard's [`/skill`](https://www.agentfriendlycode.com/skill) page hosts the install command, the score → model mapping, and optional `SessionStart` hook snippets for Claude Code and Codex.
+[`hsnice16/agent-friendly-skill`](https://github.com/hsnice16/agent-friendly-skill) is a portable agent skill installable in one command — `npx skills add hsnice16/agent-friendly-skill#v0` — that scores the user's current repo locally and recommends a model. Profiles the same 9 agents this dashboard does (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi); installs into any [`vercel-labs/skills`](https://github.com/vercel-labs/skills)-compatible host (Cline, Copilot, Continue, Roo Code, …) and produces identical output regardless of which host invokes it — scoring is score-driven, not host-driven. Same self-contained property as the action: vendored scorer, no service dependency, works offline. The dashboard's [`/skill`](https://www.agentfriendlycode.com/skill) page hosts the install command, the score → model mapping, and optional `SessionStart` hook snippets for Claude Code and Codex.
 
 ## Public API
 

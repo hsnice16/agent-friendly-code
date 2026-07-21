@@ -17,7 +17,7 @@ import {
 
 const PAGE_TITLE = "Agent Friendly Skill — score your repo locally and pick the right model";
 const PAGE_DESCRIPTION =
-  "Portable agent skill that scores the current repo's agent-friendliness on disk and recommends a model. Profiles 8 agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi); installs into any vercel-labs/skills-compatible agent. Self-contained: vendored scorer, no service dependency, works offline.";
+  "Portable agent skill that scores the current repo's agent-friendliness on disk and recommends a model. Profiles 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi); installs into any vercel-labs/skills-compatible agent. Self-contained: vendored scorer, no service dependency, works offline.";
 
 const PAGE_KEYWORDS = [...APP_KEYWORDS, "model recommendation", "agent-friendliness score"];
 
@@ -113,10 +113,10 @@ export default function SkillPage() {
         <p className="mt-3 text-[12.5px] text-muted">
           After install, run <code className="text-ink-dim">/agent-friendly</code> (or however your agent invokes
           skills) inside any local repo — the skill resolves the repo root, runs the bundled scorer, and prints the
-          score plus a model recommendation. The scorer profiles 8 agents (Claude Code, Cursor, Devin, GPT-5 Codex,
-          Gemini CLI, Aider, OpenHands, Pi) and always returns scores for all 8 — the best-fit pick is score-driven, not
-          driven by which agent invoked the skill, so the output is identical whether Claude Code, Cline, Copilot,
-          Continue, or anything else vercel-labs/skills installs into is calling it.
+          score plus a model recommendation. The scorer profiles 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex,
+          Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) and always returns scores for all 9 — the best-fit pick is
+          score-driven, not driven by which agent invoked the skill, so the output is identical whether Claude Code,
+          Cline, Copilot, Continue, or anything else vercel-labs/skills installs into is calling it.
         </p>
       </Panel>
 

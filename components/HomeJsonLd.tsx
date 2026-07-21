@@ -29,7 +29,7 @@ export function HomeJsonLd({ allOverall, lastScoredAt }: HomeJsonLdProps) {
         "@id": `${APP_URL}/#dataset`,
         name: "Agent Friendly Code — public repository scoring dataset",
         description:
-          "Per-model agent-friendliness scores for public repositories on GitHub, GitLab, and Bitbucket, evaluated against sixteen static signals — twelve cross-agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing, dev env, pre-commit, deps manifest, size) plus four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml) — for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi.",
+          "Per-model agent-friendliness scores for public repositories on GitHub, GitLab, and Bitbucket, evaluated against sixteen static signals — twelve cross-agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing, dev env, pre-commit, deps manifest, size) plus four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml) — for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi.",
         url: APP_URL,
         isAccessibleForFree: true,
         dateModified: lastModified,

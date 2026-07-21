@@ -1,4 +1,13 @@
-export type ModelId = "pi" | "aider" | "cursor" | "devin" | "openhands" | "gemini-cli" | "claude-code" | "gpt-5-codex";
+export type ModelId =
+  | "pi"
+  | "aider"
+  | "cursor"
+  | "devin"
+  | "kimi-cli"
+  | "openhands"
+  | "gemini-cli"
+  | "claude-code"
+  | "gpt-5-codex";
 
 export type ModelProfile = {
   id: ModelId;
@@ -88,8 +97,8 @@ export const MODELS: ModelProfile[] = [
     id: "gpt-5-codex",
     label: "GPT-5 Codex",
     rationale:
-      "Reads AGENTS.md before doing any work per OpenAI's Codex docs — the strictest AGENTS.md adherent of any agent here. Hierarchical (per-directory) AGENTS.md and AGENTS.override.md are first-class.",
-    sources: ["https://developers.openai.com/codex/guides/agents-md"],
+      "Reads AGENTS.md before doing any work per OpenAI's Codex docs. Hierarchical (per-directory) AGENTS.md and AGENTS.override.md are first-class.",
+    sources: ["https://learn.chatgpt.com/docs/agent-configuration/agents-md"],
     weights: {
       ci: 0.7,
       size: 0.5,
@@ -104,6 +113,34 @@ export const MODELS: ModelProfile[] = [
       cursor_rules: 0,
       pre_commit: 0.4,
       type_config: 0.7,
+      contributing: 0.4,
+      deps_manifest: 0.7,
+      openhands_setup: 0,
+    },
+  },
+  {
+    id: "kimi-cli",
+    label: "Kimi CLI",
+    rationale:
+      "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one — the strictest AGENTS.md-only adherent here, with no CLAUDE.md fallback. Runs shell commands step-by-step under an approval gate rather than a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
+    sources: [
+      "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md",
+      "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md",
+    ],
+    weights: {
+      ci: 0.4,
+      size: 0.4,
+      tests: 0.9,
+      readme: 0.7,
+      linter: 0.6,
+      dev_env: 0.7,
+      license: 0.3,
+      gemini_md: 0,
+      aider_conf: 0,
+      agents_md: 1.0,
+      cursor_rules: 0,
+      pre_commit: 0.4,
+      type_config: 0.6,
       contributing: 0.4,
       deps_manifest: 0.7,
       openhands_setup: 0,
@@ -138,8 +175,8 @@ export const MODELS: ModelProfile[] = [
     id: "aider",
     label: "Aider",
     rationale:
-      "Auto-lints on every edit by default; runs the configured test command after edits when `--test-cmd` is set (per Aider's lint/test docs). A green linter and a declared test command translate directly into successful commits.",
-    sources: ["https://aider.chat/docs/usage/lint-test.html"],
+      "Auto-lints on every edit by default; runs the configured test command after edits when `--test-cmd` is set (per Aider's lint/test docs). It doesn't natively read AGENTS.md or CONVENTIONS.md — those load only when wired via `.aider.conf.yml`'s `read:` — so the config file, a green linter, and a declared test command are what translate into successful commits.",
+    sources: ["https://aider.chat/docs/usage/lint-test.html", "https://aider.chat/docs/config/aider_conf.html"],
     weights: {
       ci: 0.3,
       size: 0.4,
@@ -149,8 +186,8 @@ export const MODELS: ModelProfile[] = [
       dev_env: 0.5,
       license: 0.2,
       gemini_md: 0,
-      agents_md: 0.8,
-      aider_conf: 0.8,
+      agents_md: 0.3,
+      aider_conf: 1.0,
       cursor_rules: 0,
       pre_commit: 0.3,
       type_config: 0.5,
@@ -163,7 +200,7 @@ export const MODELS: ModelProfile[] = [
     id: "openhands",
     label: "OpenHands",
     rationale:
-      "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. Root AGENTS.md is now the preferred always-on instruction surface (microagents are deprecated in favor of it).",
+      "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is now the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
     sources: [
       "https://docs.openhands.dev/usage/prompting/repository",
       "https://docs.openhands.dev/usage/prompting/microagents-overview",

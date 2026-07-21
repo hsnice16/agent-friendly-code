@@ -13,8 +13,8 @@ export function PerModelScores({ modelScores }: { modelScores: ModelScoreRow[] }
 
       <div className="grid grid-cols-1 gap-2.5">
         {[...MODELS]
-          .map((m) => ({ model: m, score: modelScores.find((x) => x.modelId === m.id)?.score ?? 0 }))
-          .sort((a, b) => b.score - a.score)
+          .map((m) => ({ model: m, score: modelScores.find((x) => x.modelId === m.id)?.score ?? null }))
+          .sort((a, b) => (b.score ?? -1) - (a.score ?? -1))
           .map(({ model: m, score: s }) => (
             <div
               key={m.id}
@@ -22,11 +22,22 @@ export function PerModelScores({ modelScores }: { modelScores: ModelScoreRow[] }
             >
               <div className="text-[15px] font-medium">{m.label}</div>
               <div className="col-span-2 order-3 sm:col-span-1 sm:order-none">
-                <ScoreBar score={s} width={100} />
+                {s === null ? (
+                  <div className="h-[7px] w-[100px] rounded-sm bg-line" aria-hidden />
+                ) : (
+                  <ScoreBar score={s} width={100} />
+                )}
                 <div className="mt-1 text-sm text-muted">{m.rationale}</div>
               </div>
 
-              <ScoreNumber score={s} />
+              {s === null ? (
+                <span className="text-[15px] font-semibold tabular-nums text-muted">
+                  <span aria-hidden="true">—</span>
+                  <span className="sr-only">Not scored yet</span>
+                </span>
+              ) : (
+                <ScoreNumber score={s} />
+              )}
             </div>
           ))}
       </div>

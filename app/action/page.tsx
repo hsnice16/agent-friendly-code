@@ -15,7 +15,7 @@ import {
 
 const PAGE_TITLE = "Agent Friendly Action — PR-diff GitHub Action for AI agent-friendliness";
 const PAGE_DESCRIPTION =
-  "GitHub Action that scores your PR's head and base in CI and posts a single comment with the agent-friendliness delta — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi. Opt-in, Marketplace-listed, runs entirely inside your CI.";
+  "GitHub Action that scores your PR's head and base in CI and posts a single comment with the agent-friendliness delta — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi. Opt-in, Marketplace-listed, runs entirely inside your CI.";
 
 const PAGE_KEYWORDS = [
   ...APP_KEYWORDS,

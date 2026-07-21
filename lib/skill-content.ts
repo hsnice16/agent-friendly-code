@@ -31,7 +31,7 @@ export const SKILL_FAQ = [
   },
   {
     q: "Which agents does it score against?",
-    a: "Eight: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, Pi — the same set this dashboard profiles. Scoring is the same regardless of which agent invokes the skill; you always get all 8 per-agent scores. The skill installs into any vercel-labs/skills-compatible agent (Cline, Copilot, Continue, Roo Code, Windsurf, Amp, etc.) via the same one-line install.",
+    a: "Nine: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi — the same set this dashboard profiles. Scoring is the same regardless of which agent invokes the skill; you always get all 9 per-agent scores. The skill installs into any vercel-labs/skills-compatible agent (Cline, Copilot, Continue, Roo Code, Windsurf, Amp, etc.) via the same one-line install.",
   },
   {
     q: "How does the model recommendation work?",
