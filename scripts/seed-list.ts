@@ -423,6 +423,11 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/vapor/vapor",
   },
   { url: "https://github.com/Alamofire/Alamofire", note: "Alamofire — Swift HTTP networking" },
+  {
+    note: "Composable Architecture — Swift app framework",
+    url: "https://github.com/pointfreeco/swift-composable-architecture",
+  },
+  { url: "https://github.com/apple/swift-nio", note: "SwiftNIO — async event-driven network framework" },
 
   // --- GitHub, Ruby ---
   {
@@ -450,6 +455,7 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/flutter/samples",
   },
   { url: "https://github.com/flutter/flutter", note: "Flutter SDK — cross-platform UI toolkit" },
+  { url: "https://github.com/serverpod/serverpod", note: "Serverpod — Dart backend framework" },
 
   // --- GitHub, .NET / C# ---
   {
@@ -491,6 +497,7 @@ export const SEEDS: Seed[] = [
     note: "Coolify — self-hostable Heroku/Vercel alternative",
   },
   { url: "https://github.com/guzzle/guzzle", note: "Guzzle — PHP HTTP client" },
+  { url: "https://github.com/nikic/PHP-Parser", note: "PHP-Parser — PHP parser written in PHP" },
 
   // --- GitHub, Elixir / Phoenix ---
   {
@@ -511,6 +518,7 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/plausible/analytics",
     note: "Plausible — privacy-first web analytics (Elixir + Phoenix)",
   },
+  { url: "https://github.com/oban-bg/oban", note: "Oban — background job processing for Elixir" },
 
   // --- GitHub, language runtimes ---
   { url: "https://github.com/denoland/deno", note: "Deno runtime (Rust)" },
@@ -521,6 +529,18 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/nodejs/node", note: "Node.js runtime" },
   { url: "https://github.com/ruby/ruby", note: "Ruby language" },
   { url: "https://github.com/ziglang/zig", note: "Zig language + compiler" },
+
+  // --- GitHub, functional + niche languages ---
+  { url: "https://github.com/jgm/pandoc", note: "Pandoc — universal document converter (Haskell)" },
+  { url: "https://github.com/haskell/cabal", note: "Cabal — Haskell build system + package manager" },
+  { url: "https://github.com/ocaml/ocaml", note: "OCaml — the OCaml compiler and runtime" },
+  { url: "https://github.com/ocaml/dune", note: "Dune — OCaml build system" },
+  { url: "https://github.com/metabase/metabase", note: "Metabase — business intelligence tool (Clojure)" },
+  { url: "https://github.com/babashka/babashka", note: "Babashka — fast-starting Clojure scripting runtime" },
+  { url: "https://github.com/crystal-lang/crystal", note: "Crystal — Ruby-like compiled language" },
+  { url: "https://github.com/erlang/otp", note: "Erlang/OTP — the Erlang runtime and libraries" },
+  { url: "https://github.com/nim-lang/Nim", note: "Nim — statically typed compiled systems language" },
+  { url: "https://github.com/JuliaLang/julia", note: "Julia — scientific computing language" },
 
   // --- AI-native: coding agents ---
   {
@@ -802,10 +822,16 @@ export const SEEDS: Seed[] = [
   { url: "https://gitlab.com/gitlab-org/gitlab", note: "GitLab itself — the platform monorepo (Ruby)" },
   { url: "https://gitlab.com/inkscape/inkscape", note: "Inkscape — vector graphics editor (C++)" },
   { url: "https://gitlab.com/wireshark/wireshark", note: "Wireshark — network protocol analyzer (C)" },
+  { url: "https://gitlab.com/gitlab-org/gitaly", note: "Gitaly — Git RPC service for GitLab (Go)" },
+  { url: "https://gitlab.com/veloren/veloren", note: "Veloren — multiplayer voxel RPG (Rust)" },
+  { url: "https://gitlab.com/fdroid/fdroidclient", note: "F-Droid client — FOSS Android app store (Java)" },
+  { url: "https://gitlab.com/graphviz/graphviz", note: "Graphviz — graph visualization software (C)" },
+  { url: "https://gitlab.com/libeigen/eigen", note: "Eigen — C++ template library for linear algebra" },
 
   // --- Bitbucket ---
   {
     note: "Historic Bitbucket OSS (Java)",
     url: "https://bitbucket.org/snakeyaml/snakeyaml",
   },
+  { url: "https://bitbucket.org/multicoreware/x265_git", note: "x265 — HEVC/H.265 video encoder (C++)" },
 ];
