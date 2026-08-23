@@ -165,9 +165,6 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
 export function listLeaderboardOverall(): LeaderboardRow[] {
   return listLeaderboard({ model: "overall" });
 }
-export function listLeaderboardForModel(modelId: string): LeaderboardRow[] {
-  return listLeaderboard({ model: modelId });
-}
 
 export function getRepo(id: number): RepoRow | null {
   return (db.prepare("SELECT * FROM repo WHERE id = ?").get(id) as RepoRow) ?? null;
