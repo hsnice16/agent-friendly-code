@@ -50,7 +50,7 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
            /* ... */
          ]
        }
-       // 7 more models...
+       // 8 more models...
      ],
      "topImprovements": [
        { "label": "Contributing guide", "signalId": "contributing", "scoreGain": 2.1, "suggestion": "..." }
@@ -63,7 +63,7 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
 
 ## How to render the result
 
-The scorer profiles **8 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Aider, OpenHands, and Pi.
+The scorer profiles **9 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, GPT-5 Codex, Kimi CLI, Gemini CLI, Aider, OpenHands, and Pi.
 
 **The recommendation is score-driven.** Don't try to detect which agent is invoking this skill — the answer is the same either way: find the highest-scoring entry in `modelScores`, that's the agent this repo is most tuned for. Show the user; let them decide whether to switch. Never programmatically switch the agent or model.
 
