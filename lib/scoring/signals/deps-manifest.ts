@@ -36,7 +36,7 @@ const CANDIDATES = [
   "vcpkg.json",
 ];
 
-const GLOB_MANIFESTS: RegExp[] = [/\.(csproj|fsproj|vbproj|sln)$/, /\.cabal$/, /\.nimble$/];
+const GLOB_MANIFESTS: RegExp[] = [/\.(csproj|fsproj|vbproj|sln)$/i, /\.cabal$/i, /\.nimble$/i];
 
 function findGlobManifest(repo: string): string | null {
   try {

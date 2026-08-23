@@ -1,28 +1,9 @@
-import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { readSafe } from "./helpers";
+import { readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "GEMINI.md";
-
-function findGeminiMd(repo: string): string | null {
-  let entries: string[] = [];
-
-  try {
-    entries = readdirSync(repo);
-  } catch {
-    return null;
-  }
-
-  for (const e of entries) {
-    if (e.toLowerCase() === "gemini.md") {
-      return join(repo, e);
-    }
-  }
-
-  return null;
-}
 
 export const geminiMd: Signal = {
   label: LABEL,
@@ -31,7 +12,7 @@ export const geminiMd: Signal = {
   improveSuggestion:
     "Add a GEMINI.md at the repo root covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
   check: (repo) => {
-    const matched = findGeminiMd(repo);
+    const matched = resolveRelative(repo, "GEMINI.md");
 
     if (!matched) {
       return {
@@ -42,7 +23,7 @@ export const geminiMd: Signal = {
       };
     }
 
-    const len = readSafe(matched).trim().length;
+    const len = readSafe(join(repo, matched)).trim().length;
     if (len === 0) {
       return {
         pass: 0.2,

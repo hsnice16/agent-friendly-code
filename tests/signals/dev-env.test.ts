@@ -74,4 +74,9 @@ describe("devEnv signal", () => {
     fixture = makeFixture({ "compose.yaml": "services: {}" });
     assert.equal(devEnv.check(fixture).pass, 0.7);
   });
+
+  test("pass=0.7 for a lone Makefile — one file is never two hits", () => {
+    fixture = makeFixture({ Makefile: "test:\n\tpytest" });
+    assert.equal(devEnv.check(fixture).pass, 0.7);
+  });
 });

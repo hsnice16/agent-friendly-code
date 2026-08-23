@@ -1,6 +1,7 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
+import { resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "Cursor rules (.cursor/rules)";
@@ -12,19 +13,21 @@ export const cursorRules: Signal = {
   improveSuggestion:
     "Add `.cursor/rules/*.mdc` files describing how Cursor should work in this repo (architecture, conventions, naming). The legacy `.cursorrules` file is still read but is deprecated.",
   check: (repo) => {
-    const dir = join(repo, ".cursor", "rules");
+    const dir = resolveRelative(repo, ".cursor/rules");
 
-    if (existsSync(dir)) {
+    if (dir) {
+      const abs = join(repo, dir);
+
       try {
-        if (statSync(dir).isDirectory()) {
-          const mdc = readdirSync(dir).filter((f) => f.endsWith(".mdc"));
+        if (statSync(abs).isDirectory()) {
+          const mdc = readdirSync(abs).filter((f) => f.toLowerCase().endsWith(".mdc"));
 
           if (mdc.length > 0) {
             return {
               pass: 1,
               label: LABEL,
               id: "cursor_rules",
-              matchedPath: `.cursor/rules/${mdc[0]}`,
+              matchedPath: `${dir}/${mdc[0]}`,
               detail: `${mdc.length} .mdc file${mdc.length === 1 ? "" : "s"} in .cursor/rules/`,
             };
           }
@@ -32,13 +35,13 @@ export const cursorRules: Signal = {
       } catch {}
     }
 
-    const legacy = join(repo, ".cursorrules");
-    if (existsSync(legacy)) {
+    const legacy = resolveRelative(repo, ".cursorrules");
+    if (legacy) {
       return {
         pass: 0.5,
         label: LABEL,
         id: "cursor_rules",
-        matchedPath: ".cursorrules",
+        matchedPath: legacy,
         detail: "Legacy .cursorrules — Cursor still reads it, but `.cursor/rules/*.mdc` is preferred",
       };
     }

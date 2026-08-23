@@ -1,7 +1,6 @@
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { firstExisting, readSafe } from "./helpers";
+import { firstExisting, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = [
@@ -74,12 +73,12 @@ export const linter: Signal = {
       };
     }
 
-    const pyproject = join(repo, "pyproject.toml");
-    if (existsSync(pyproject) && PYPROJECT_RE.test(readSafe(pyproject))) {
+    const pyproject = resolveRelative(repo, "pyproject.toml");
+    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject)))) {
       return {
         pass: 1,
         id: "linter",
-        matchedPath: "pyproject.toml",
+        matchedPath: pyproject,
         label: "Linter / formatter config",
         detail: "Configured in pyproject.toml",
       };

@@ -1,12 +1,10 @@
-import { existsSync } from "node:fs";
 import { join } from "node:path";
 
-import { readSafe } from "./helpers";
+import { readSafe, resolveAllRelative, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const ARTIFACTS = [
   "Makefile",
-  "makefile",
   ".devcontainer/devcontainer.json",
   ".devcontainer.json",
   "flake.nix",
@@ -30,7 +28,7 @@ export const devEnv: Signal = {
   description: "One-command setup the agent can run (Makefile / devcontainer / Nix / Docker).",
   improveSuggestion: "Add a Makefile or devcontainer or Dockerfile so the agent can set up the project in one command.",
   check: (repo) => {
-    const matches = ARTIFACTS.filter((c) => existsSync(join(repo, c)));
+    const matches = resolveAllRelative(repo, ARTIFACTS);
 
     if (matches.length >= 2) {
       return {
@@ -52,16 +50,16 @@ export const devEnv: Signal = {
       };
     }
 
-    const pkg = join(repo, "package.json");
-    if (existsSync(pkg)) {
+    const pkg = resolveRelative(repo, "package.json");
+    if (pkg) {
       try {
-        const j = JSON.parse(readSafe(pkg));
+        const j = JSON.parse(readSafe(join(repo, pkg)));
 
         if (j.scripts && Object.keys(j.scripts).length >= 3) {
           return {
             pass: 0.6,
             id: "dev_env",
-            matchedPath: "package.json",
+            matchedPath: pkg,
             label: "Reproducible dev env",
             detail: `package.json has ${Object.keys(j.scripts).length} scripts`,
           };

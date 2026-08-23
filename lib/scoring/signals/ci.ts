@@ -1,7 +1,7 @@
-import { existsSync, readdirSync, statSync } from "node:fs";
+import { readdirSync, statSync } from "node:fs";
 import { join } from "node:path";
 
-import { firstExisting } from "./helpers";
+import { firstExisting, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const OTHER_CI = [
@@ -20,20 +20,26 @@ export const ci: Signal = {
   improveSuggestion:
     "Add a CI workflow (e.g. .github/workflows/ci.yml or .gitlab-ci.yml) that runs tests + linter on every PR.",
   check: (repo) => {
-    const ghWf = join(repo, ".github", "workflows");
+    const ghWf = resolveRelative(repo, ".github/workflows");
 
-    if (existsSync(ghWf) && statSync(ghWf).isDirectory()) {
-      const files = readdirSync(ghWf).filter((f) => /\.ya?ml$/.test(f));
+    if (ghWf) {
+      const abs = join(repo, ghWf);
 
-      if (files.length > 0) {
-        return {
-          pass: 1,
-          id: "ci",
-          label: "CI configuration",
-          matchedPath: ".github/workflows",
-          detail: `${files.length} GitHub Actions workflow(s)`,
-        };
-      }
+      try {
+        if (statSync(abs).isDirectory()) {
+          const files = readdirSync(abs).filter((f) => /\.ya?ml$/i.test(f));
+
+          if (files.length > 0) {
+            return {
+              pass: 1,
+              id: "ci",
+              matchedPath: ghWf,
+              label: "CI configuration",
+              detail: `${files.length} GitHub Actions workflow(s)`,
+            };
+          }
+        }
+      } catch {}
     }
 
     const m = firstExisting(repo, OTHER_CI);

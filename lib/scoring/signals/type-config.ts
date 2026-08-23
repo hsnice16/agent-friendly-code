@@ -1,7 +1,7 @@
-import { existsSync, readdirSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { firstExisting, readSafe } from "./helpers";
+import { firstExisting, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = ["tsconfig.json", "jsconfig.json", "mypy.ini", ".mypy.ini", "pyrightconfig.json"];
@@ -22,13 +22,13 @@ const TYPED_LANG_FILES: { file: string; lang: string }[] = [
 ];
 
 const GLOB_TYPED: { re: RegExp; lang: string }[] = [
-  { re: /\.(csproj|fsproj|vbproj|sln)$/, lang: "C#" },
-  { re: /\.cabal$/, lang: "Haskell" },
+  { re: /\.(csproj|fsproj|vbproj|sln)$/i, lang: "C#" },
+  { re: /\.cabal$/i, lang: "Haskell" },
 ];
 
 function detectTypedLang(repo: string): string | null {
   for (const { file, lang } of TYPED_LANG_FILES) {
-    if (existsSync(join(repo, file))) {
+    if (resolveRelative(repo, file)) {
       return lang;
     }
   }
@@ -64,13 +64,13 @@ export const typeConfig: Signal = {
       };
     }
 
-    const pyproject = join(repo, "pyproject.toml");
-    if (existsSync(pyproject) && PYPROJECT_RE.test(readSafe(pyproject))) {
+    const pyproject = resolveRelative(repo, "pyproject.toml");
+    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject)))) {
       return {
         pass: 1,
         id: "type_config",
         label: "Type configuration",
-        matchedPath: "pyproject.toml",
+        matchedPath: pyproject,
         detail: "Configured in pyproject.toml",
       };
     }
