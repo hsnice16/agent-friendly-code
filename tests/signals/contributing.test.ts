@@ -44,4 +44,9 @@ describe("contributing signal", () => {
     fixture = makeFixture({ "CONTRIBUTING.adoc": "= Contributing" });
     assert.equal(contributing.check(fixture).pass, 1);
   });
+
+  test("matches a lowercased contributing file", () => {
+    fixture = makeFixture({ "contributing.md": "x".repeat(400) });
+    assert.equal(contributing.check(fixture).pass, 1);
+  });
 });

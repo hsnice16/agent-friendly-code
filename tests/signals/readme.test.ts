@@ -41,4 +41,12 @@ describe("readme signal", () => {
     fixture = makeFixture({ "README.rst": "x".repeat(400) });
     assert.equal(readme.check(fixture).pass, 0.7);
   });
+
+  test("matches a differently-cased README and reports its real name", () => {
+    fixture = makeFixture({ "Readme.md": "x".repeat(1500) });
+    const r = readme.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /\/Readme\.md$/);
+  });
 });

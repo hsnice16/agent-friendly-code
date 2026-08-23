@@ -108,6 +108,7 @@ tests/
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
+  path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
   signals/                # one *.test.ts per signal
 tasks/
   README.md
@@ -142,6 +143,7 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 - **Server components** unless interactivity requires client. Prefer `<Link>` + query params over client state.
 - **All SQL** lives in `lib/db.ts`. Don't scatter `db.prepare(...)` elsewhere.
 - **Signal IDs** are stable strings (`agents_md`, `tests`, etc.). Changing one = migration.
+- **Repo path lookups** in `lib/scoring/signals/` go through `firstExisting` / `resolveRelative` / `resolveAllRelative` in `helpers.ts` — never a raw `existsSync(join(repo, …))`. They match case-insensitively because README / LICENSE / CONTRIBUTING casing varies in the wild (`readme.md`, `Readme.md`, `README.MD`); an exact-match lookup scores those files as missing on case-sensitive filesystems, so Linux CI and a macOS dev box disagree on the same commit. `resolveAllRelative` dedupes by resolved path — a candidate list carrying two spellings of one file must not count as two hits.
 - **Tailwind first**, then `@theme` tokens. Avoid inline styles; avoid custom classes unless the pattern is truly repeatable.
 - **No comments** explaining _what_ the code does. Only comment _why_ — the shallow-clone rationale in `lib/clients/git.ts` is the model.
 - **Brand on UI**: "Agent Friendly Code" (no hyphen). Repo/package slug + GitHub `User-Agent` string: `agent-friendly-code`.
@@ -170,7 +172,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 
 ## Adding a signal
 
-1. New file at `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (including `improveSuggestion`).
+1. New file at `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (including `improveSuggestion`). Use the `helpers.ts` resolvers for every path lookup (see Conventions).
 2. Import and add to the `SIGNALS` array in `lib/scoring/signals/index.ts`.
 3. Add a weight entry to **every** model in `lib/scoring/weights.ts` — missing weights default to 0, decide deliberately.
 4. Re-score: `bun run seed` is idempotent.

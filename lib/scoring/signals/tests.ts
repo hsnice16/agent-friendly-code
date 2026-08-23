@@ -1,10 +1,10 @@
-import { existsSync, statSync } from "node:fs";
+import { statSync } from "node:fs";
 import { join } from "node:path";
 
-import { walkFind } from "./helpers";
+import { resolveRelative, walkFind } from "./helpers";
 import type { Signal } from "./types";
 
-const DIRS = ["tests", "test", "__tests__", "spec", "specs", "Tests", "src/test"];
+const DIRS = ["tests", "test", "__tests__", "spec", "specs", "src/test"];
 const FILE_RE =
   /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$|.*Test\.java$|.*Tests?\.kt$|.*_test\.exs$|.*_test\.dart$|.*Spec\.scala$|.*Test\.scala$|.*Test\.php$|.*_test\.rb$|.*_spec\.rb$|.*Tests?\.cs$)/;
 
@@ -16,17 +16,23 @@ export const tests: Signal = {
     "Add a tests/ (or test/, __tests__/, spec/) directory with runnable tests. Document how to run them in AGENTS.md.",
   check: (repo) => {
     for (const d of DIRS) {
-      const p = join(repo, d);
+      const rel = resolveRelative(repo, d);
 
-      if (existsSync(p) && statSync(p).isDirectory()) {
-        return {
-          pass: 1,
-          id: "tests",
-          matchedPath: d,
-          label: "Test suite",
-          detail: `Found /${d}`,
-        };
+      if (!rel) {
+        continue;
       }
+
+      try {
+        if (statSync(join(repo, rel)).isDirectory()) {
+          return {
+            pass: 1,
+            id: "tests",
+            matchedPath: rel,
+            label: "Test suite",
+            detail: `Found /${rel}`,
+          };
+        }
+      } catch {}
     }
 
     const hits = walkFind(repo, (rel) => FILE_RE.test(rel), 3, 1);

@@ -28,4 +28,12 @@ describe("license signal", () => {
     fixture = makeFixture({ COPYING: "GPL..." });
     assert.equal(license.check(fixture).pass, 1);
   });
+
+  test("matches a lowercased license file", () => {
+    fixture = makeFixture({ "license.md": "MIT" });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /\/license\.md$/);
+  });
 });

@@ -20,7 +20,7 @@ export const metadata: Metadata = {
 const FAQ = [
   {
     q: "How is the agent-friendliness score computed?",
-    a: "Each repository is shallow-cloned and evaluated against sixteen static signals — twelve cross-agent (AGENTS.md / CLAUDE.md, CI, tests, README, linter, type config, license, contributing guide, reproducible dev environment, pre-commit hooks, dependency manifest, codebase size) plus four agent-specific instruction files (`.cursor/rules/*.mdc`, `GEMINI.md`, `.openhands/setup.sh`, `.aider.conf.yml`). Per-model score = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100. Overall score = mean of per-model scores.",
+    a: "Each repository is shallow-cloned and evaluated against sixteen static signals — twelve cross-agent (AGENTS.md / CLAUDE.md, CI, tests, README, linter, type config, license, contributing guide, reproducible dev environment, pre-commit hooks, dependency manifest, codebase size) plus four agent-specific instruction files (`.cursor/rules/*.mdc`, `GEMINI.md`, `.openhands/setup.sh`, `.aider.conf.yml`). File names are matched case-insensitively, so `readme.md` and `README.MD` count exactly like `README.md`. Per-model score = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100. Overall score = mean of per-model scores.",
   },
   {
     q: "Why score per model instead of giving one overall number?",
@@ -132,6 +132,12 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Signals ({SIGNALS.length})</PanelHeading>
+
+          <p className="mt-2 mb-1 text-[13.5px] leading-relaxed text-ink-dim">
+            File names are matched case-insensitively —{" "}
+            <code className="font-mono text-[12.5px] text-ink">readme.md</code> and{" "}
+            <code className="font-mono text-[12.5px] text-ink">README.MD</code> both count as a README.
+          </p>
 
           <ul className="m-0 list-none p-0">
             {SIGNALS.map((s) => (
