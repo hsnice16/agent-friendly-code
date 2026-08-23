@@ -32,6 +32,7 @@ bun run init-db        # optional — auto-runs on first score
 bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
+bun run audit-seeds    # check every seed is public, original, and still there
 bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
 
@@ -102,6 +103,8 @@ lib/
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page
 scripts/
   init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
+  audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone.
+                        # Needs a valid GITHUB_TOKEN — unauthenticated it covers ~60 repos/hr.
 tests/
   _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
   format.test.ts          # compactStars, relativeTime, hostLabel

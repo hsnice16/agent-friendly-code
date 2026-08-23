@@ -14,6 +14,7 @@
     "score": "tsx scripts/score.ts score",
     "seed": "tsx scripts/seed.ts",
     "seed-packages": "tsx scripts/seed-packages.ts",
+    "audit-seeds": "tsx scripts/audit-seeds.ts",
     "init-db": "tsx scripts/init-db.ts",
     "prepare-hooks": "lefthook install",
     "test": "node --import tsx --test 'tests/**/*.test.ts'"
