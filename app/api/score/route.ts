@@ -5,6 +5,8 @@ import { getModelScores, getRepoByHostOwnerName, getSignalResults } from "@/lib/
 
 export const dynamic = "force-dynamic";
 
+const HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600" };
+
 export async function GET(req: Request) {
   const url = new URL(req.url);
   const repoParam = url.searchParams.get("repo");
@@ -29,9 +31,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "not_indexed" }, { status: 404 });
   }
 
-  return NextResponse.json({
-    repo,
-    signals: getSignalResults(repo.id),
-    modelScores: getModelScores(repo.id),
-  });
+  return NextResponse.json(
+    {
+      repo,
+      signals: getSignalResults(repo.id),
+      modelScores: getModelScores(repo.id),
+    },
+    { headers: HEADERS },
+  );
 }
