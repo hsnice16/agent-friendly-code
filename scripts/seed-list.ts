@@ -70,10 +70,6 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/microsoft/vscode", note: "VS Code editor" },
   { url: "https://github.com/Uniswap/interface", note: "Uniswap web app" },
   {
-    note: "DefiLlama dashboard",
-    url: "https://github.com/DefiLlama/defillama-app",
-  },
-  {
     note: "Wormhole Connect — cross-chain widget",
     url: "https://github.com/wormhole-foundation/wormhole-connect",
   },
@@ -153,6 +149,9 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/colinhacks/zod", note: "Zod — TypeScript-first schema validation" },
   { url: "https://github.com/statelyai/xstate", note: "XState — state machines / statecharts" },
   { url: "https://github.com/date-fns/date-fns", note: "date-fns — modern JS date utility library" },
+  { url: "https://github.com/pnpm/pnpm", note: "pnpm — disk-efficient package manager" },
+  { url: "https://github.com/immerjs/immer", note: "Immer — immutable state updates" },
+  { url: "https://github.com/mermaid-js/mermaid", note: "Mermaid — diagrams from text" },
 
   // --- GitHub, Python ---
   {
@@ -229,6 +228,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/Textualize/textual", note: "Textual — Python TUI framework" },
   { url: "https://github.com/aio-libs/aiohttp", note: "aiohttp — async HTTP client / server" },
   { url: "https://github.com/tqdm/tqdm", note: "tqdm — fast, extensible progress bar" },
+  { url: "https://github.com/astral-sh/uv", note: "uv — Python package + project manager" },
 
   // --- GitHub, Rust ---
   {
@@ -350,6 +350,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/uber-go/zap", note: "zap — blazing-fast structured logging for Go" },
   { url: "https://github.com/stretchr/testify", note: "testify — Go assertions + mocks toolkit" },
   { url: "https://github.com/moby/moby", note: "Moby — the upstream container engine behind Docker" },
+  { url: "https://github.com/go-gitea/gitea", note: "Gitea — self-hosted Git service" },
 
   // --- GitHub, C / C++ / systems ---
   {
@@ -386,6 +387,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/llvm/llvm-project", note: "LLVM — compiler infrastructure + Clang" },
   { url: "https://github.com/openssl/openssl", note: "OpenSSL — TLS / cryptography library" },
   { url: "https://github.com/git/git", note: "Git — the version control system itself" },
+  { url: "https://github.com/ocornut/imgui", note: "Dear ImGui — immediate-mode GUI" },
 
   // --- GitHub, JVM (Java / Kotlin) ---
   {
@@ -415,6 +417,7 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/ReactiveX/RxJava", note: "RxJava — reactive extensions for the JVM" },
   { url: "https://github.com/square/retrofit", note: "Retrofit — type-safe HTTP client for Java / Android" },
+  { url: "https://github.com/quarkusio/quarkus", note: "Quarkus — Kubernetes-native Java" },
 
   // --- GitHub, Swift ---
   { url: "https://github.com/apple/swift", note: "Swift language" },
@@ -428,6 +431,8 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/pointfreeco/swift-composable-architecture",
   },
   { url: "https://github.com/apple/swift-nio", note: "SwiftNIO — async event-driven network framework" },
+  { url: "https://github.com/ReactiveX/RxSwift", note: "RxSwift — reactive extensions" },
+  { url: "https://github.com/apple/swift-argument-parser", note: "swift-argument-parser — CLI parsing" },
 
   // --- GitHub, Ruby ---
   {
@@ -456,6 +461,8 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/flutter/flutter", note: "Flutter SDK — cross-platform UI toolkit" },
   { url: "https://github.com/serverpod/serverpod", note: "Serverpod — Dart backend framework" },
+  { url: "https://github.com/localsend/localsend", note: "LocalSend — cross-platform file sharing" },
+  { url: "https://github.com/rrousselGit/riverpod", note: "Riverpod — Flutter state management" },
 
   // --- GitHub, .NET / C# ---
   {
@@ -498,6 +505,8 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/guzzle/guzzle", note: "Guzzle — PHP HTTP client" },
   { url: "https://github.com/nikic/PHP-Parser", note: "PHP-Parser — PHP parser written in PHP" },
+  { url: "https://github.com/api-platform/core", note: "API Platform — PHP API framework" },
+  { url: "https://github.com/phpstan/phpstan", note: "PHPStan — static analysis" },
 
   // --- GitHub, Elixir / Phoenix ---
   {
@@ -519,6 +528,7 @@ export const SEEDS: Seed[] = [
     note: "Plausible — privacy-first web analytics (Elixir + Phoenix)",
   },
   { url: "https://github.com/oban-bg/oban", note: "Oban — background job processing for Elixir" },
+  { url: "https://github.com/ash-project/ash", note: "Ash — declarative Elixir framework" },
 
   // --- GitHub, language runtimes ---
   { url: "https://github.com/denoland/deno", note: "Deno runtime (Rust)" },
@@ -529,6 +539,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/nodejs/node", note: "Node.js runtime" },
   { url: "https://github.com/ruby/ruby", note: "Ruby language" },
   { url: "https://github.com/ziglang/zig", note: "Zig language + compiler" },
+  { url: "https://github.com/dart-lang/sdk", note: "Dart SDK" },
 
   // --- GitHub, functional + niche languages ---
   { url: "https://github.com/jgm/pandoc", note: "Pandoc — universal document converter (Haskell)" },
@@ -541,6 +552,7 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/erlang/otp", note: "Erlang/OTP — the Erlang runtime and libraries" },
   { url: "https://github.com/nim-lang/Nim", note: "Nim — statically typed compiled systems language" },
   { url: "https://github.com/JuliaLang/julia", note: "Julia — scientific computing language" },
+  { url: "https://github.com/gleam-lang/gleam", note: "Gleam — typed language on the BEAM" },
 
   // --- AI-native: coding agents ---
   {
@@ -827,6 +839,8 @@ export const SEEDS: Seed[] = [
   { url: "https://gitlab.com/fdroid/fdroidclient", note: "F-Droid client — FOSS Android app store (Java)" },
   { url: "https://gitlab.com/graphviz/graphviz", note: "Graphviz — graph visualization software (C)" },
   { url: "https://gitlab.com/libeigen/eigen", note: "Eigen — C++ template library for linear algebra" },
+  { url: "https://gitlab.com/gnachman/iterm2", note: "iTerm2 — macOS terminal" },
+  { url: "https://gitlab.com/kicad/code/kicad", note: "KiCad — EDA suite (subgroup path)" },
 
   // --- Bitbucket ---
   {
