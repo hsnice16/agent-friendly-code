@@ -20,6 +20,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       changeFrequency: "daily",
     },
     {
+      priority: 0.9,
+      url: `${APP_URL}/score`,
+      lastModified: lastScored,
+      changeFrequency: "weekly",
+    },
+    {
       priority: 0.8,
       url: `${APP_URL}/package`,
       lastModified: lastScored,

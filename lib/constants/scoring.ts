@@ -5,4 +5,5 @@ export const LEADERBOARD_PAGE_SIZE = 32;
 export const LEADERBOARD_PAGE_SIZE_MOBILE = 16;
 
 export const DEFAULT_SUGGESTION_LIMIT = 3;
+export const ALTERNATIVES_LIMIT = 3;
 export const STRENGTHS_GAPS_VISIBLE_LIMIT = 5;

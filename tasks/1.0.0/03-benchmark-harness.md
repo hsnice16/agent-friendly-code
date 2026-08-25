@@ -13,6 +13,10 @@ Actually run agents on scoped tasks derived from each repo's own git history, so
 - Regress signal presence × agent-success to derive weights.
 - Publish the harness open-source; publish the derived weights.
 
+## Execution environment
+
+This is the one task in the roadmap that has to actually *run* repos — install dependencies, execute tests, invoke an agent — rather than read them. [Vercel Sandbox](https://vercel.com/docs/sandbox) fits that shape: Firecracker microVMs with root, real `git`, 45-minute sessions, 32 GB disk, and a Hobby allowance of 5 CPU-hours / 5,000 creations / month with repo downloads unbilled. Evaluated and rejected for the 0.7.0 live scorer (see `tasks/0.7.0/01-tree-materializer.md`) because that path needs no execution, so VM-boot latency and a 10-sandbox concurrency cap bought nothing there. Both constraints are irrelevant to a batch harness.
+
 ## Risks
 
 - Cost at scale — sample small first.

@@ -33,6 +33,7 @@ bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
 bun run audit-seeds    # check every seed is public, original, and still there
+bun run parity-check   # clone-vs-live-path scores must match (add --pr for the PR subset)
 bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
 ```
 
@@ -61,6 +62,11 @@ app/
   twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
   repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
   repo/[id]/twitter-image.tsx               # next/og convention — per-repo twitter:image, re-exports (auto-wired)
+  score/page.tsx                            # Live Score entry — URL form, past scores, FAQ
+  score/opengraph-image.tsx                 # next/og convention — Live Score OG image (auto-wired)
+  score/twitter-image.tsx                   # next/og convention — /score twitter:image, re-exports (auto-wired)
+  score/[host]/[owner]/[name]/page.tsx      # live score; result cached 1h per repo (unstable_cache); redirects to /repo/:id when indexed
+  score/[host]/[owner]/[name]/error.tsx     # retry boundary — page.tsx throws transient failures here so they aren't cached
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
   action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
@@ -75,7 +81,8 @@ components/               # Tailwind-styled React components
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
   CopySnippet.tsx, PackageLookupForm.tsx,
-  BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx
+  BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx,
+  LiveScoreForm.tsx, RecentScores.tsx, RecordScore.tsx, ReleaseAnnouncement.tsx
 lib/
   constants/
     scoring.ts            # score thresholds, visible limits
@@ -94,6 +101,13 @@ lib/
     git.ts, github.ts, registries.ts  # registries.ts: npm/PyPI/Cargo package → source-repo URL
   types/
     db.ts                 # shared row-shape types for lib/db.ts (RepoRow, LeaderboardRow, …)
+  live-score/             # on-the-fly scoring: host tree API → materialized dir → scoreRepo
+    hosts.ts              # per-host tree listing / raw / blob URLs + MAX_ENTRIES guard
+    materialize.ts        # build a scoreable dir; symlinks reproduced, never repaired
+    content-files.ts      # the ~14 paths whose *bytes* a signal reads
+    supported.ts          # SUPPORTED_HOSTS — client-importable (no node:fs)
+    recents.ts            # localStorage read/write for the visitor's own scores
+    score.ts              # liveScore(): commit resolve + metadata + materialize + scoreRepo
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 schema + queries
@@ -101,8 +115,10 @@ lib/
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page
+  release-notice.ts       # localStorage "seen" marker for the home-page release announcement
 scripts/
   init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
+  parity-check.ts       # asserts the live-score path equals `bun run score`. CI gate: .github/workflows/parity.yml
   audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone.
                         # Needs a valid GITHUB_TOKEN — unauthenticated it covers ~60 repos/hr.
 tests/
@@ -112,6 +128,7 @@ tests/
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
   path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
+  live-score.test.ts      # content-candidate coverage vs the signals, path traversal, host URLs
   signals/                # one *.test.ts per signal
 tasks/
   README.md
@@ -121,7 +138,8 @@ tasks/
   0.4.0/                  # released — credible scores + discoverability (docs-cited rationales + agent-specific signals + About/llms.txt/OG)
   0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
   0.6.0/                  # released — auto-refresh (scheduled rescoring)
-  0.7.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
+  0.7.0/                  # released — Live Score (tree materializer + parity harness + live score pages + release notice)
+  0.8.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/
   settings.json           # SessionStart + Stop hooks (Stop → hooks/stop-guard.sh)
@@ -147,6 +165,7 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 - **All SQL** lives in `lib/db.ts`. Don't scatter `db.prepare(...)` elsewhere.
 - **Signal IDs** are stable strings (`agents_md`, `tests`, etc.). Changing one = migration.
 - **Repo path lookups** in `lib/scoring/signals/` go through `firstExisting` / `resolveRelative` / `resolveAllRelative` in `helpers.ts` — never a raw `existsSync(join(repo, …))`. They match case-insensitively because README / LICENSE / CONTRIBUTING casing varies in the wild (`readme.md`, `Readme.md`, `README.MD`); an exact-match lookup scores those files as missing on case-sensitive filesystems, so Linux CI and a macOS dev box disagree on the same commit. `resolveAllRelative` dedupes by resolved path — a candidate list carrying two spellings of one file must not count as two hits.
+- **Client-side persistence**: components stay presentational, except that a `"use client"` component may read/write `localStorage` in an effect — there are no accounts, so per-visitor state has nowhere else to live. The storage access goes in `lib/` (`live-score/recents.ts`, `release-notice.ts`), wrapped in try/catch because private mode throws, and the read happens after mount so the server HTML still matches.
 - **Tailwind first**, then `@theme` tokens. Avoid inline styles; avoid custom classes unless the pattern is truly repeatable.
 - **No comments** explaining _what_ the code does. Only comment _why_ — the shallow-clone rationale in `lib/clients/git.ts` is the model.
 - **Brand on UI**: "Agent Friendly Code" (no hyphen). Repo/package slug + GitHub `User-Agent` string: `agent-friendly-code`.
@@ -194,7 +213,8 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 1. Extend `parseRepoUrl` in `lib/clients/github.ts`.
 2. Extend `fetchRepoMeta` with that host's API (use `process.env.<HOST>_TOKEN` if needed).
 3. Add a seed URL to the `SEEDS` list in `scripts/seed-list.ts`.
-4. Add the label to `lib/constants/hosts.ts`.
+4. Add the label and domain to `lib/constants/hosts.ts`.
+5. For the live-score path: add tree listing / raw / blob URL builders in `lib/live-score/hosts.ts`, a fixture to `FIXTURES` in `scripts/parity-check.ts`, and only then the host id to `SUPPORTED_HOSTS` in `lib/live-score/supported.ts`. Parity has to be green **before** the host ships — a host that lists a tree but scores differently is worse than one that says "coming". Note that `/score/[host]/[owner]/[name]` is a single path segment per field, so a host with nested namespaces (GitLab subgroups) needs a route change too.
 
 ## Working from tasks/
 
@@ -228,15 +248,16 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 ## Security / threat surface (read before changing I/O)
 
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
+- `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
-- No auth yet (read-only dashboard). When auth lands (`tasks/0.7.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
+- No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
-- The clone workspace can fill disk — add a cron/cap.
-- Unauthenticated API → add rate limits before going public.
+- The clone workspace lives in the OS temp dir and each clone is removed after it is scored (`scripts/score.ts`); a crashed run can still leave one behind.
+- Unauthenticated API → add rate limits before going public. `/score/*` is the expensive one: an uncached slug costs a tree listing plus a burst of raw fetches against the shared `GITHUB_TOKEN` quota. ISR absorbs repeats, not breadth.
 - Sandbox the cloner in a container when running on remote infra, just in case of future git CVEs.
 
 ## Things to leave alone

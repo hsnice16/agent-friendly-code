@@ -22,7 +22,7 @@ Instead: a GitHub Actions cron in this repo runs `bun run seed` every 6 hours, c
 ## What this gives up vs the original spec
 
 - **Sub-minute freshness on push** → up to 6h stale. For signals like README / AGENTS.md / CI files, that's well inside the noise floor.
-- **Per-repo subscription** → no such concept. Webhook subscription only becomes meaningful once `tasks/0.7.0/01-opt-out-claim-flow.md` introduces repo ownership.
+- **Per-repo subscription** → no such concept. Webhook subscription only becomes meaningful once `tasks/0.8.0/01-opt-out-claim-flow.md` introduces repo ownership.
 
 ## Cost / footprint
 
@@ -33,7 +33,7 @@ Instead: a GitHub Actions cron in this repo runs `bun run seed` every 6 hours, c
 
 ## Future webhook layer (if we ever want it)
 
-Add a webhook receiver as `app/api/webhook/github/route.ts` that verifies HMAC-SHA256 against a secret and triggers the same workflow via `workflow_dispatch` (or enqueues into a queue we'll have by then). The cron stays as the floor; webhooks become a latency optimization. Best landed alongside the claim flow in 0.7.0.
+Add a webhook receiver as `app/api/webhook/github/route.ts` that verifies HMAC-SHA256 against a secret and triggers the same workflow via `workflow_dispatch` (or enqueues into a queue we'll have by then). The cron stays as the floor; webhooks become a latency optimization. Best landed alongside the claim flow in 0.8.0.
 
 ## Acceptance
 

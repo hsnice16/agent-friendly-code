@@ -12,7 +12,7 @@ import { RepoHero } from "@/components/RepoHero";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
-import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
+import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
@@ -84,9 +84,9 @@ export default async function Page({
 
   const signals = getSignalResults(id);
   const modelScores = getModelScores(id);
-  const alternatives = getAlternatives(id, selected, 3);
+  const alternatives = getAlternatives(id, selected, ALTERNATIVES_LIMIT);
 
-  const suggestions = topImprovements(selected, signals, 3);
+  const suggestions = topImprovements(selected, signals);
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
   const gaps = signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
@@ -183,7 +183,7 @@ export default async function Page({
       </div>
 
       <div className="mt-3.5">
-        <ModelSuggestions repoId={id} selected={selected} suggestions={suggestions} />
+        <ModelSuggestions basePath={`/repo/${id}`} selected={selected} suggestions={suggestions} />
       </div>
 
       <div className="mt-3.5">

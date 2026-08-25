@@ -118,6 +118,6 @@ Lets us ship the action inside starter-repo templates without it firing for fork
 ## Out of scope (deferred)
 
 - Runtime weights refresh (tiers 1 + 2). Lands when 1.0.0/03 publishes its first weight set.
-- Action POSTing to our DB. DB freshness is handled by the 0.6.0/01 scheduled-rescore cron in this repo; a webhook receiver would only become useful alongside the 0.7.0 claim flow.
+- Action POSTing to our DB. DB freshness is handled by the 0.6.0/01 scheduled-rescore cron in this repo; a webhook receiver would only become useful alongside the 0.8.0 claim flow.
 - Per-language or per-agent comment customisation.
 - On-demand scoring of unindexed repos via the action.

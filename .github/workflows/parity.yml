@@ -1,0 +1,58 @@
+name: Score parity
+
+# The live-score path and `bun run score` must produce identical numbers. A
+# signal that reads a new file would otherwise score as empty on the live path
+# only — no error, just a wrong number on a public page.
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "lib/scoring/**"
+      - "lib/live-score/**"
+      - "lib/badge-adoption.ts"
+      - "lib/clients/git.ts"
+      - "scripts/parity-check.ts"
+  schedule:
+    # 03:00 UTC. Runs the curated fixture set in scripts/parity-check.ts — the
+    # failure classes, not the seed list: parity is a property of the two code
+    # paths, so more repos of the same shape buy no coverage and cost clone time.
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: parity-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  parity:
+    name: Clone vs live path
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      - name: Parity (PR subset)
+        if: github.event_name == 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run parity-check --pr
+
+      - name: Parity (full fixtures)
+        if: github.event_name != 'pull_request'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run parity-check

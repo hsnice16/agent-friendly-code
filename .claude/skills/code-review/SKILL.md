@@ -38,7 +38,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 ## Components
 
 - If you're writing the same markup 2–3 times, extract a component into `components/`.
-- Components are presentational — no data fetching, no side effects.
+- Components are presentational — no data fetching, no side effects. One carve-out: a client component may read/write `localStorage` in an effect (`RecentScores`, `RecordScore`, `ReleaseAnnouncement`), because per-visitor state has nowhere else to live in a site with no accounts. The storage access itself must be extracted to `lib/` (`live-score/recents.ts`, `release-notice.ts`) and wrapped in try/catch — private mode throws — and the read must happen after mount, never during render, or the server HTML will not match.
 - Props are typed explicitly; avoid `any`.
 
 ## Icons
@@ -54,7 +54,7 @@ Only `@phosphor-icons/react`. Block Lucide, Heroicons, React Icons, inline SVG, 
 ## Security
 
 - Parameterised SQL only.
-- `dangerouslySetInnerHTML` is allowed only for the existing server-built JSON-LD scripts (`app/layout.tsx`, `app/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`) with the `<` → `<` escape preserved. Reject any new use.
+- `dangerouslySetInnerHTML` is allowed only for the existing server-built JSON-LD scripts (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[id]/page.tsx`, `app/package/[registry]/[name]/page.tsx`, plus the `BreadcrumbJsonLd` component) with the `<` → `<` escape preserved. Keep this list in step with the one in `AGENTS.md`. Reject any new use.
 - External links include `rel="noopener noreferrer"`.
 - Never execute code from a cloned repo.
 

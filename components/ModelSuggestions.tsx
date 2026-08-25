@@ -6,12 +6,13 @@ import { Panel, PanelHeading } from "./Panel";
 import { SuggestionItem } from "./SuggestionItem";
 
 type Props = {
-  repoId: number;
+  /** Page the model pills link back to — `/repo/:id` or `/score/:host/:owner/:name`. */
+  basePath: string;
   selected: ModelId;
   suggestions: ImprovementSuggestion[];
 };
 
-export function ModelSuggestions({ repoId, selected, suggestions }: Props) {
+export function ModelSuggestions({ basePath, selected, suggestions }: Props) {
   return (
     <Panel>
       <PanelHeading>Suggestions to improve for a specific model</PanelHeading>
@@ -19,7 +20,7 @@ export function ModelSuggestions({ repoId, selected, suggestions }: Props) {
       <ModelPills
         scroll={false}
         selected={selected}
-        hrefFor={(m) => `/repo/${repoId}?model=${m}`}
+        hrefFor={(m) => `${basePath}?model=${m}`}
         label="Select a model for per-model suggestions"
       />
 

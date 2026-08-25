@@ -3,6 +3,8 @@ import { getModelScores, getRepo, getSignalResults } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
+const HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600" };
+
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id: idStr } = await ctx.params;
   const id = Number(idStr);
@@ -16,9 +18,12 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
     return NextResponse.json({ error: "not found" }, { status: 404 });
   }
 
-  return NextResponse.json({
-    repo,
-    signals: getSignalResults(id),
-    modelScores: getModelScores(id),
-  });
+  return NextResponse.json(
+    {
+      repo,
+      signals: getSignalResults(id),
+      modelScores: getModelScores(id),
+    },
+    { headers: HEADERS },
+  );
 }
