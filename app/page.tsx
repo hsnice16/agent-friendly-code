@@ -9,9 +9,11 @@ import { HostSelect } from "@/components/HostSelect";
 import { Medal } from "@/components/Medal";
 import { ModelPills } from "@/components/ModelPills";
 import { Pagination } from "@/components/Pagination";
+import { ReleaseAnnouncement } from "@/components/ReleaseAnnouncement";
 import { ScoreCell } from "@/components/ScoreCell";
 import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
+import { CHANGELOG } from "@/lib/changelog";
 import { type Host, isHost } from "@/lib/constants/hosts";
 import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
@@ -19,7 +21,7 @@ import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
-import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE =
   "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi";
@@ -126,6 +128,13 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   return (
     <>
       <HomeJsonLd allOverall={allOverall} lastScoredAt={stats.lastScoredAt} />
+
+      {/* Announced only once the release it describes is the one deployed —
+          otherwise a version bump ahead of the changelog entry (or behind it)
+          would advertise the wrong thing. */}
+      {CHANGELOG[0]?.label === APP_VERSION && (
+        <ReleaseAnnouncement anchorHref="/score" version={APP_VERSION} title={CHANGELOG[0].title} />
+      )}
       <section className="mb-5">
         <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
           Which public repos are friendliest to an AI coding agent?
@@ -143,6 +152,17 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
             Check any npm / PyPI / Cargo package
           </Link>{" "}
           by name.
+        </p>
+
+        <p className="mt-1.5 max-w-[68ch] text-[13px] text-muted">
+          Repo not on the board?{" "}
+          <Link
+            href="/score"
+            className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
+          >
+            Score any public GitHub repo live
+          </Link>{" "}
+          from its current commit.
         </p>
       </section>
 
