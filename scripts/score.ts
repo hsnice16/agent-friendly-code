@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, statSync } from "node:fs";
+import { existsSync, mkdirSync, rmSync, statSync } from "node:fs";
+import { tmpdir } from "node:os";
 import { join } from "node:path";
 
 import { detectBadgeEmbed } from "../lib/badge-adoption";
@@ -11,10 +12,17 @@ try {
   process.loadEnvFile();
 } catch {}
 
-const CLONE_ROOT = join(process.cwd(), "tmp-clones");
+// Outside the project on purpose. A clone inside it is part of the Next.js
+// module graph: one repo with a symlink loop (stripe/ai has one) fails
+// `next build` with a Turbopack panic that names none of this.
+const CLONE_ROOT = join(tmpdir(), "afc-clones");
 
 async function scoreCommand(target: string): Promise<void> {
   const startedAt = Date.now();
+
+  // Set only for a clone we made. A local-path target is the caller's own
+  // directory and must never be swept.
+  let cloned: string | null = null;
 
   let url = "";
   let name = "";
@@ -50,6 +58,7 @@ async function scoreCommand(target: string): Promise<void> {
 
     console.log(`[clone] ${parsed.cloneUrl} → ${repoPath}`);
     await shallowClone(parsed.cloneUrl, repoPath);
+    cloned = repoPath;
 
     const meta = await fetchRepoMeta(parsed);
 
@@ -61,8 +70,19 @@ async function scoreCommand(target: string): Promise<void> {
   }
 
   console.log(`[score] scanning ${repoPath}`);
-  const result = scoreRepo(repoPath);
-  const badgeEmbedded = detectBadgeEmbed(repoPath, `${host}/${owner}/${name}`);
+
+  let result: ReturnType<typeof scoreRepo>;
+  let badgeEmbedded: boolean;
+
+  try {
+    result = scoreRepo(repoPath);
+    badgeEmbedded = detectBadgeEmbed(repoPath, `${host}/${owner}/${name}`);
+  } finally {
+    // `bun run seed` scores 350+ repos in one pass; keeping every tree would
+    // put tens of gigabytes under CLONE_ROOT and eventually fill the disk.
+    // Nothing downstream reads the tree again — the score is already in memory.
+    if (cloned) rmSync(cloned, { recursive: true, force: true });
+  }
 
   saveScoredRepo({
     url,
