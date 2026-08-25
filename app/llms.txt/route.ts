@@ -52,6 +52,7 @@ ${MODELS.map((m) => `- ${m.label} — ${m.rationale}`).join("\n")}
 - [Changelog](${APP_URL}/changelog): What shipped per release
 - [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
+- [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, including repos the leaderboard has not indexed
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
 - [Skill](${APP_URL}/skill): Portable agent skill — install snippet, score → model mapping, optional SessionStart hooks for Claude Code / Codex
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL

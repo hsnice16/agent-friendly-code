@@ -2,7 +2,7 @@
 
 **Status**: released
 
-Keeps the dataset fresh: a 6-hourly GitHub Actions cron re-runs the seed, commits the refreshed `data/rank.db`, and the repo page shows the score delta since the previous rescore. Picks the simplest implementation that delivers the user-facing value rather than the full webhook + queue design originally sketched — see task 01 for the rationale and what was deferred to 0.7.0.
+Keeps the dataset fresh: a 6-hourly GitHub Actions cron re-runs the seed, commits the refreshed `data/rank.db`, and the repo page shows the score delta since the previous rescore. Picks the simplest implementation that delivers the user-facing value rather than the full webhook + queue design originally sketched — see task 01 for the rationale and what was deferred to 0.8.0.
 
 ## Tasks
 

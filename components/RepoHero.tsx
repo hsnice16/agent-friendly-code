@@ -7,7 +7,9 @@ import { HostPill } from "./HostPill";
 import { Panel } from "./Panel";
 import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
 
-export function RepoHero({ repo }: { repo: RepoRow }) {
+// `commitSha` is the live-score path: there is no "last scored" when the page
+// render *is* the scoring, so the commit is the only honest freshness fact.
+export function RepoHero({ repo, commitSha }: { repo: RepoRow; commitSha?: string }) {
   const overall = repo.overall_score ?? 0;
   const overallTier = scoreTier(overall);
 
@@ -46,10 +48,19 @@ export function RepoHero({ repo }: { repo: RepoRow }) {
             </div>
 
             <div>
-              <dt className="inline">Last scored: </dt>
-              <dd className="inline font-medium text-ink">
-                {repo.last_scored_at ? relativeTime(repo.last_scored_at) : "—"}
-              </dd>
+              {commitSha ? (
+                <>
+                  <dt className="inline">Commit: </dt>
+                  <dd className="inline font-medium font-mono text-ink">{commitSha.slice(0, 7)}</dd>
+                </>
+              ) : (
+                <>
+                  <dt className="inline">Last scored: </dt>
+                  <dd className="inline font-medium text-ink">
+                    {repo.last_scored_at ? relativeTime(repo.last_scored_at) : "—"}
+                  </dd>
+                </>
+              )}
             </div>
           </dl>
         </div>

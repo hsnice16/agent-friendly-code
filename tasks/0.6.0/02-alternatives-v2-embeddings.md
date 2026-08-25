@@ -15,7 +15,7 @@ Postponed from 0.6.0 to backlog. Three concrete reasons:
 - Hand-curated `alternatives.yml` for the well-known clusters (`axios ↔ requests ↔ got`, `react ↔ vue ↔ svelte`, `vite ↔ webpack ↔ parcel`). High precision, zero deps, an afternoon to seed at this scale.
 - GitHub topics overlap (Jaccard on the `topics` array we already fetch). Captures most cross-language cases for free.
 
-Revisit alongside `tasks/0.7.0/02-package-registry-overlay.md` or `tasks/1.0.0/02-at-scale-indexing.md` when repo volume + user feedback justify the dep.
+Revisit alongside `tasks/0.8.0/02-package-registry-overlay.md` or `tasks/1.0.0/02-at-scale-indexing.md` when repo volume + user feedback justify the dep.
 
 ## Goal
 

@@ -229,35 +229,49 @@ export function getSignalResults(repoId: number): SignalResult[] {
     .all(repoId) as any as SignalResult[];
 }
 
-export function getAlternatives(repoId: number, modelId: string | null, limit: number): AlternativeRow[] {
+// Keyed by language + host rather than a repo id, because a live-scored repo has
+// no row of its own to derive them from. `excludeId` keeps an indexed repo out of
+// its own alternatives list.
+export function getAlternativesFor(
+  host: string,
+  language: string | null,
+  modelId: string | null,
+  limit: number,
+  excludeId?: number,
+): AlternativeRow[] {
+  if (!language) return [];
+
+  const skip = excludeId == null ? "" : "AND r.id != ?";
+  const args = excludeId == null ? [language, host, limit] : [language, host, excludeId, limit];
+
   if (modelId) {
     return db
       .prepare(
         `SELECT r.id, r.host, r.owner, r.name, r.stars, m.score
            FROM repo r
            JOIN model_score m ON m.repo_id = r.id AND m.model_id = ?
-          WHERE r.id != ?
-            AND r.language IS NOT NULL
-            AND r.language = (SELECT language FROM repo WHERE id = ?)
-            AND r.host     = (SELECT host     FROM repo WHERE id = ?)
+          WHERE r.language = ? AND r.host = ? ${skip}
           ORDER BY m.score DESC
           LIMIT ?`,
       )
-      .all(modelId, repoId, repoId, repoId, limit) as AlternativeRow[];
+      .all(modelId, ...args) as AlternativeRow[];
   }
 
   return db
     .prepare(
-      `SELECT id, host, owner, name, stars, overall_score AS score
-         FROM repo
-        WHERE id != ?
-          AND language IS NOT NULL
-          AND language = (SELECT language FROM repo WHERE id = ?)
-          AND host     = (SELECT host     FROM repo WHERE id = ?)
-        ORDER BY overall_score DESC
+      `SELECT r.id, r.host, r.owner, r.name, r.stars, r.overall_score AS score
+         FROM repo r
+        WHERE r.language = ? AND r.host = ? ${skip}
+        ORDER BY r.overall_score DESC
         LIMIT ?`,
     )
-    .all(repoId, repoId, repoId, limit) as AlternativeRow[];
+    .all(...args) as AlternativeRow[];
+}
+
+export function getAlternatives(repoId: number, modelId: string | null, limit: number): AlternativeRow[] {
+  const repo = getRepo(repoId);
+  if (!repo) return [];
+  return getAlternativesFor(repo.host, repo.language, modelId, limit, repoId);
 }
 
 export function getLeaderboardStats(): LeaderboardStats {

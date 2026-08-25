@@ -22,12 +22,16 @@ const AI_CRAWLERS = [
   "Meta-ExternalAgent",
 ];
 
+// /score/* is unbounded — one URL per repo that exists anywhere. Canonical
+// repo pages live at /repo/:id and are the only ones in the sitemap.
+const DISALLOW = ["/api/", "/score/"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     sitemap: `${APP_URL}/sitemap.xml`,
     rules: [
-      { userAgent: "*", allow: "/", disallow: "/api/" },
-      { userAgent: AI_CRAWLERS, allow: "/", disallow: "/api/" },
+      { userAgent: "*", allow: "/", disallow: DISALLOW },
+      { userAgent: AI_CRAWLERS, allow: "/", disallow: DISALLOW },
     ],
   };
 }

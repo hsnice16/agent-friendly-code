@@ -50,7 +50,9 @@ Don't squash-amend published commits. Don't skip hooks (`--no-verify`); if a hoo
 3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite (~1–2 s); blocks on regressions.
 4. **file-length** — blocks staged `.ts`/`.tsx` under `app/`, `components/`, `lib/` that exceed 300 lines. Split into subcomponents or pull helpers into `lib/utils/`. `scripts/` is exempt.
 
-Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/`) runs the same checks on PR for belt-and-braces.
+Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/ci.yml`) runs the same checks on PR for belt-and-braces.
+
+One extra workflow fires only when it has to: `.github/workflows/parity.yml` runs `bun run parity-check --pr` when a PR touches `lib/scoring/`, `lib/live-score/`, `lib/clients/git.ts` or `lib/badge-adoption.ts`. It clones a handful of real repos and asserts the live-score path produces the same numbers as `bun run score`, so it takes minutes rather than seconds — the full fixture set runs nightly. If it reports a diff, the score shown on `/score/…` and the score on the leaderboard have drifted apart; fix that before merging rather than re-running.
 
 ## PR workflow
 

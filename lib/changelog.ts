@@ -8,6 +8,18 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.7.0",
+    date: "2026-08-25",
+    title: "Score any repo on the fly",
+    highlights: [
+      "On-demand scoring at `/score` — paste any public GitHub repository URL and get its full score in about a second, even if the leaderboard has never indexed it. Same signals, same per-model breakdown, same suggestions as an indexed repo page. Already-indexed repos redirect to their canonical `/repo/:id` page.",
+      "Scored without cloning — the repo is reconstructed from GitHub's tree API rather than `git clone`, so a score costs one API call and a handful of small file fetches. Results are cached for an hour, and nothing about a scored repo is stored.",
+      "Recent scores on `/score` — the repos you have scored are kept in your own browser and listed for one-click return. They are never sent anywhere.",
+      "Every live score carries the commit it was computed from, so a cached result says exactly what it reflects.",
+      "The home page now tells you once, on your first visit after a release, what that release shipped — then stays quiet until the next one.",
+    ],
+  },
+  {
     label: "0.6.0",
     date: "2026-05-20",
     title: "Auto-refresh — scores stay fresh on their own",

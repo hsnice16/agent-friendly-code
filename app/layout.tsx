@@ -104,9 +104,11 @@ export const viewport: Viewport = {
   colorScheme: "light dark",
 };
 
+// Alphabetical by label — a new entry has exactly one place to go.
 const NAV_LINKS = [
-  { href: "/action", label: "GitHub Action" },
   { href: "/skill", label: "Agent Skill" },
+  { href: "/action", label: "GitHub Action" },
+  { href: "/score", label: "Live Score" },
   { href: "/methodology", label: "Methodology" },
 ];
 
@@ -121,6 +123,7 @@ const FOOTER_LINKS_PRIMARY = [
 const FOOTER_LINKS_TOOLS = [
   { href: "/skill", label: "Agent Skill" },
   { href: "/action", label: "GitHub Action" },
+  { href: "/score", label: "Live Score" },
   { href: "/package", label: "Packages" },
 ];
 
@@ -172,7 +175,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
-          <main id="main">{children}</main>
+          <main id="main" className="min-h-[60vh]">
+            {children}
+          </main>
           <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
             <p className="m-0">
               Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight

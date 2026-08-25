@@ -1,6 +1,6 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.6.0-blue?style=flat-square)](./lib/changelog.ts)
+[![Release](https://img.shields.io/badge/release-0.7.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
 [![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
@@ -9,7 +9,7 @@
 
 **A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
 
-Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.6.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.7.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -62,9 +62,9 @@ Not pretending the idea is free of risk:
 
 - **Per-model scoring is the hardest part and the easiest to fake.** Per-model rationales are now sourced from each agent's published docs (see `MODELS[].sources` in `lib/scoring/weights.ts`), but the weight values themselves are still pre-benchmark. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
 - **Factory.ai is already in this space.** Differentiation has to stay sharp.
-- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.7.0/01-opt-out-claim-flow.md`.
+- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.8.0/01-opt-out-claim-flow.md`.
 - **Score gaming.** Once public, people add boilerplate `AGENTS.md` to pass the rubric without being useful. Dynamic (actually-run-an-agent) checks are the counter — see benchmark harness.
-- **Freshness.** Scores decay with every push. A 6-hourly GitHub Actions cron rescores the curated set; webhook-driven sub-minute refresh is deferred until the claim flow lands in 0.7.0.
+- **Freshness.** Scores decay with every push. A 6-hourly GitHub Actions cron rescores the curated set; webhook-driven sub-minute refresh is deferred until the claim flow lands in 0.8.0.
 
 See `/methodology` in the running app for a candid walkthrough of what's measured today and what isn't.
 
@@ -84,7 +84,7 @@ Short answer: **low risk**. The app:
 - Rate limiting the public API.
 - Sandbox the cloner in a container (future-proofing against hypothetical git CVEs).
 
-Auth and per-maintainer controls land with the opt-out / claim flow in v0.7.0.
+Auth and per-maintainer controls land with the opt-out / claim flow in v0.8.0.
 
 ## Quickstart
 
@@ -110,7 +110,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 
 ## Versioning
 
-`lib/version.ts` and `package.json` carry the current release number (currently **0.6.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
+`lib/version.ts` and `package.json` carry the current release number (currently **0.7.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
 
 ## Stack & rationale
 
@@ -125,11 +125,14 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 | **Exact-pinned deps**                                | Deterministic scoring across environments.                                                                                                   | Never.                                                                                             |
 | **One file per signal**                              | Each signal is a small, independent concern — keeps `git log` and code review focused.                                                       | When we bundle signals into dynamic checks (then the unit becomes the bundle).                     |
 
-## Why do we clone at all (instead of host APIs)?
+## Why clone for the batch path, but not for live scoring?
 
-- Static signals need to read **file contents** (AGENTS.md length, `pyproject.toml [tool.X]` sections, package.json scripts count) — not just existence.
-- One clone is faster than N API calls for content-heavy scoring, and respects rate limits.
-- Any real version of this dashboard needs dynamic signals (run tests, run an agent). Those absolutely need code on disk.
+Both paths run the **same** `scoreRepo()` against a real directory — they differ only in how that directory is produced.
+
+- **Batch (`bun run score`, the 6-hourly rescore)** clones. One `git clone --depth 1` is a single uniform substrate across GitHub, GitLab and Bitbucket, needs no token, and puts code on disk for the dynamic signals a benchmark harness will eventually need.
+- **Live (`/score/…`)** can't clone — a Vercel function has no `git` binary — so it materializes the tree from the host API instead: every path present, real bytes fetched only for the ~14 files a signal actually reads. `scripts/parity-check.ts` asserts the two produce identical scores.
+
+Note what it deliberately does **not** use: the host tarball endpoints. Those run `git archive`, which honors `export-ignore` in `.gitattributes`, so an archive reflects a release rather than the repository — measured at 7.4% of repos scoring differently. See `tasks/0.7.0/01-tree-materializer.md`.
 
 ## Layout
 
@@ -138,6 +141,7 @@ app/          Next.js App Router — pages + API + SEO
   layout.tsx       root layout, root metadata (OG + Twitter cards)
   page.tsx         leaderboard
   repo/[id]/       repo detail (generateMetadata + per-repo OG image)
+  score/           Live Score — entry form + /score/[host]/[owner]/[name] result page (cached 1h per repo)
   methodology/     how scoring works today
   roadmap/         upcoming versions (from lib/roadmap.ts)
   changelog/       what's shipped (from lib/changelog.ts)
@@ -148,7 +152,7 @@ app/          Next.js App Router — pages + API + SEO
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
-  robots.ts        /robots.txt — allows "/", blocks "/api/"
+  robots.ts        /robots.txt — allows "/", blocks "/api/" and "/score/" (unbounded URL space)
   sitemap.ts       /sitemap.xml — static routes + every repo
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
@@ -162,7 +166,7 @@ lib/
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
   version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
   changelog.ts / roadmap.ts / skill-content.ts
-scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db
+scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README + OG image
@@ -173,6 +177,12 @@ CONTRIBUTING.md  Human-contributor guide — PR workflow, review bar
 CLAUDE.md     Pointer → AGENTS.md
 LICENSE       MIT
 ```
+
+## Live Score
+
+[`/score`](https://www.agentfriendlycode.com/score) takes any public GitHub repository URL and returns its full score — signals, per-model breakdown, and the gaps worth fixing first — for repos the leaderboard has never indexed. Results are computed from the repository's current commit, and cached for an hour per repo; nothing about a scored repo is stored. Repos already on the board redirect to their canonical `/repo/:id` page.
+
+GitLab and Bitbucket are implemented and score identically to a clone, but ship behind a "support coming" state: GitLab paginates its tree at 100 entries (a large project needs hundreds of sequential calls) and Bitbucket allows 60 unauthenticated API requests an hour.
 
 ## Companion: PR-diff GitHub Action
 
@@ -200,7 +210,7 @@ See `/roadmap` in the running app or the per-version `tasks/` folders for the fu
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.7.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
+- **0.8.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
 - **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
 
 ## Defensibility
