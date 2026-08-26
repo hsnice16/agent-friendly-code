@@ -164,7 +164,7 @@ export default function ScoreIndexPage() {
             {FAQ.map((entry) => (
               <div key={entry.q} className="border-b border-line py-3.5 last:border-b-0 last:pb-0">
                 <dt className="m-0 text-[14.5px] font-semibold text-ink">{entry.q}</dt>
-                <dd className="m-0 mt-1.5 max-w-[72ch] text-[14px] leading-relaxed text-ink-dim">
+                <dd className="m-0 mt-1.5 text-[14px] leading-relaxed text-ink-dim">
                   <Answer entry={entry} />
                 </dd>
               </div>
