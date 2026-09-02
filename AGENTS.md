@@ -43,6 +43,7 @@ bun run test           # unit tests (node --test + tsx) — requires Node ≥20.
 app/
   layout.tsx              # root layout (nav + footer) — defines root metadata + OG / Twitter cards
   page.tsx                # leaderboard
+  not-found.tsx           # 404 — every unmatched path and every notFound() from the repo / score / package routes
   repo/[id]/page.tsx      # repo detail with per-model suggestions (includes generateMetadata)
   methodology/page.tsx    # how the static scoring works
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
