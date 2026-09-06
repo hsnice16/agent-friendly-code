@@ -32,19 +32,22 @@ jobs:
       - name: Install
         run: bun install --frozen-lockfile
 
-      - name: Snapshot pre-rescore overall scores
-        run: sqlite3 data/rank.db "SELECT url, overall_score FROM repo ORDER BY url;" > /tmp/scores-before.txt
+      # badge_embedded is here despite not being a score: adoption leaves every
+      # overall_score identical, so a scores-only diff reads the run as a no-op
+      # and discards the flag with the runner, every run, forever.
+      - name: Snapshot pre-rescore state
+        run: sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-before.txt
 
       - name: Rescore curated seeds
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run seed
 
-      - name: Commit and push if any overall score changed
+      - name: Commit and push if any score or badge adoption changed
         run: |
-          sqlite3 data/rank.db "SELECT url, overall_score FROM repo ORDER BY url;" > /tmp/scores-after.txt
-          if diff -q /tmp/scores-before.txt /tmp/scores-after.txt > /dev/null; then
-            echo "No overall-score changes — skipping commit (last_scored_at churn ignored)."
+          sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-after.txt
+          if diff -q /tmp/state-before.txt /tmp/state-after.txt > /dev/null; then
+            echo "No score or badge-adoption changes — skipping commit (last_scored_at churn ignored)."
             exit 0
           fi
           git config user.name "github-actions[bot]"
