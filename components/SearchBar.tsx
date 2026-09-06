@@ -3,6 +3,7 @@
 import { MagnifyingGlass } from "@phosphor-icons/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 
 type Props = {
   placeholder?: string;
@@ -13,7 +14,10 @@ const DEBOUNCE_MS = 350;
 export function SearchBar({ placeholder = "Search repos by owner/name" }: Props) {
   const router = useRouter();
   const params = useSearchParams();
-  const currentQ = params.get("q") ?? "";
+  // Capped like the server reads it (app/page.tsx): a hand-typed long `q`
+  // would otherwise sit in the box while the board filtered on the slice.
+  // The push below then rewrites the URL down to it.
+  const currentQ = (params.get("q") ?? "").slice(0, MAX_SEARCH_LENGTH);
 
   const [value, setValue] = useState(currentQ);
 
@@ -66,6 +70,7 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
         id="repo-search"
         autoComplete="off"
         spellCheck={false}
+        maxLength={MAX_SEARCH_LENGTH}
         placeholder={placeholder}
         onChange={(e) => setValue(e.target.value)}
         className="block w-full rounded-md border border-line bg-surface py-1.5 pl-8 pr-3 text-[13px] text-ink placeholder:text-muted outline-none"

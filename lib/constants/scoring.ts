@@ -1,6 +1,10 @@
 export const SCORE_THRESHOLD_MID = 60;
 export const SCORE_THRESHOLD_GOOD = 80;
 
+// The board matches on `owner/name`; nothing longer can match, and `q` arrives
+// from the URL, so the input's own maxLength is not the boundary.
+export const MAX_SEARCH_LENGTH = 120;
+
 export const LEADERBOARD_PAGE_SIZE = 32;
 export const LEADERBOARD_PAGE_SIZE_MOBILE = 16;
 

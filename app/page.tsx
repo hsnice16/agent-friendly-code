@@ -11,7 +11,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
 import { CHANGELOG } from "@/lib/changelog";
 import { type Host, isHost } from "@/lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE } from "@/lib/constants/scoring";
+import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
 import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/lib/db";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
@@ -82,7 +82,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   const sp = await searchParams;
   const selected: ModelId | "overall" = sp.model && sp.model in MODEL_BY_ID ? (sp.model as ModelId) : "overall";
 
-  const q = sp.q ?? "";
+  const q = (sp.q ?? "").slice(0, MAX_SEARCH_LENGTH);
   const host: Host | "all" = isHost(sp.host) ? sp.host : "all";
   const dir: SortDir = isSortDir(sp.dir) ? sp.dir : DEFAULT_DIR;
   const sort: SortKey = isSortKey(sp.sort) ? sp.sort : DEFAULT_SORT;
