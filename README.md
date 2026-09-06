@@ -140,6 +140,7 @@ Note what it deliberately does **not** use: the host tarball endpoints. Those ru
 app/          Next.js App Router — pages + API + SEO
   layout.tsx       root layout, root metadata (OG + Twitter cards)
   page.tsx         leaderboard
+  not-found.tsx    404 — unmatched paths and every notFound() from repo / score / package
   repo/[id]/       repo detail (generateMetadata + per-repo OG image)
   score/           Live Score — entry form + /score/[host]/[owner]/[name] result page (cached 1h per repo)
   methodology/     how scoring works today
@@ -159,12 +160,16 @@ app/          Next.js App Router — pages + API + SEO
 components/   React components (Tailwind-styled)
 lib/
   scoring/    signals, weights, scorer — pure, no I/O outside the cloned tree
+  live-score/ host tree API → materialized dir → scoreRepo (the /score/… path)
   clients/    git clone, host API, npm/PyPI/Cargo registries
   constants/  thresholds, host labels, sort keys
+  types/      shared row-shape types for db.ts
   utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder
   db.ts       better-sqlite3 schema + queries (all SQL lives here)
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
   version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
+  badge-adoption.ts  detectBadgeEmbed — dashboard metadata, not a scored signal
+  release-notice.ts  localStorage "seen" marker for the home-page release announcement
   changelog.ts / roadmap.ts / skill-content.ts
 scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters

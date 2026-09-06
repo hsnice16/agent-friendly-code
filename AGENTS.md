@@ -83,7 +83,8 @@ components/               # Tailwind-styled React components
   BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
   CopySnippet.tsx, PackageLookupForm.tsx,
   BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx,
-  LiveScoreForm.tsx, RecentScores.tsx, RecordScore.tsx, ReleaseAnnouncement.tsx
+  LiveScoreForm.tsx, RecentScores.tsx, RecordScore.tsx, ReleaseAnnouncement.tsx,
+  LeaderboardTable.tsx
 lib/
   constants/
     scoring.ts            # score thresholds, visible limits
@@ -251,7 +252,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `<` (`app/layout.tsx`, `app/page.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
