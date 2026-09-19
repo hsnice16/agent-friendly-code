@@ -53,7 +53,8 @@ app/
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
   privacy/page.tsx        # privacy policy (footer-linked, AdSense/GDPR/CCPA)
   terms/page.tsx          # terms of use (footer-linked)
-  robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows; blocks the leaderboard facet params, leaves ?page= crawlable
+  robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
+                          # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive
   sitemap.ts              # /sitemap.xml — static routes + every repo detail page (priority scaled by score)
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
@@ -63,8 +64,8 @@ app/
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
   twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
-  og/repo/[...slug]/route.tsx               # per-repo OG image — a plain route, since Next forbids the next/og file
-                                            # convention inside a catch-all; generateMetadata points og/twitter at it
+  og/repo/[...slug]/route.tsx               # per-repo OG image — a plain route, because the next/og file
+                                            # convention would sit at a path the catch-all page route also claims
   score/page.tsx                            # Live Score entry — URL form, past scores, FAQ
   score/opengraph-image.tsx                 # next/og convention — Live Score OG image (auto-wired)
   score/twitter-image.tsx                   # next/og convention — /score twitter:image, re-exports (auto-wired)
@@ -116,7 +117,7 @@ lib/
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 schema + queries
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS, OG_IMAGE_SIZE, DEFAULT_OG_IMAGE (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page

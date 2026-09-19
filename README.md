@@ -155,7 +155,7 @@ app/          Next.js App Router — pages + API + SEO
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
-  robots.ts        /robots.txt — allows "/", blocks "/api/", "/score/" (unbounded URL space) and the leaderboard facet params
+  robots.ts        /robots.txt — allows "/", blocks "/api/" and "/score/" (unbounded URL space)
   sitemap.ts       /sitemap.xml — static routes + every repo
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens

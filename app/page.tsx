@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cache } from "react";
 import { HomeJsonLd } from "@/components/HomeJsonLd";
 import { HostSelect } from "@/components/HostSelect";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
@@ -84,7 +85,9 @@ type View = {
   filteredRows: LeaderboardRow[];
 };
 
-async function resolveView(sp: SearchParams): Promise<View> {
+// Shared by generateMetadata and the page body, which run in one request
+// scope — without this the whole board is queried and filtered twice.
+const resolveView = cache(async (sp: SearchParams): Promise<View> => {
   const selected: ModelId | "overall" = sp.model && sp.model in MODEL_BY_ID ? (sp.model as ModelId) : "overall";
 
   const q = (sp.q ?? "").slice(0, MAX_SEARCH_LENGTH);
@@ -108,7 +111,7 @@ async function resolveView(sp: SearchParams): Promise<View> {
   const page = Number.isFinite(parsedPage) ? Math.min(totalPages, Math.max(1, Math.floor(parsedPage))) : 1;
 
   return { q, page, totalPages, dir, sort, host, selected, filteredRows };
-}
+});
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
   const { q, page, dir, sort, host, selected } = await resolveView(await searchParams);

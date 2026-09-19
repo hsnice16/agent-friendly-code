@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { ImageResponse } from "next/og";
 
 import { getRepoByHostOwnerName } from "@/lib/db";
@@ -9,9 +10,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   const identity = repoIdentity((await params).slug);
 
   const repo = identity ? getRepoByHostOwnerName(identity.host, identity.owner, identity.name) : null;
-  const slug = repo ? `${repo.owner}/${repo.name}` : "Unknown repo";
-  const score = repo?.overall_score != null ? repo.overall_score.toFixed(1) : "—";
-  const host = repo ? hostLabel(repo.host) : "";
+  if (!repo) {
+    notFound();
+  }
+
+  const slug = `${repo.owner}/${repo.name}`;
+  const score = repo.overall_score != null ? repo.overall_score.toFixed(1) : "—";
+  const host = hostLabel(repo.host);
 
   return new ImageResponse(
     <div

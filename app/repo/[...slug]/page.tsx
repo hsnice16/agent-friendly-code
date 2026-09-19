@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
@@ -85,6 +85,12 @@ export default async function Page({
 
   const id = repo.id;
   const path = repoPath(repo);
+
+  // The lookup ignores case, so one repo answers to several spellings. Serve
+  // the stored one and redirect the rest, rather than duplicating the page.
+  if (identity.host !== repo.host || identity.owner !== repo.owner || identity.name !== repo.name) {
+    permanentRedirect(path);
+  }
 
   const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
 

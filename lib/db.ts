@@ -170,10 +170,15 @@ export function getRepo(id: number): RepoRow | null {
   return (db.prepare("SELECT * FROM repo WHERE id = ?").get(id) as RepoRow) ?? null;
 }
 
+// NOCASE because the hosts are: github.com/HonoJS/hono and github.com/honojs/hono
+// are one repo, and the display casing is what ends up in a pasted link.
 export function getRepoByHostOwnerName(host: string, owner: string, name: string): RepoRow | null {
   return (
-    (db.prepare("SELECT * FROM repo WHERE host = ? AND owner = ? AND name = ?").get(host, owner, name) as RepoRow) ??
-    null
+    (db
+      .prepare(
+        "SELECT * FROM repo WHERE host = ? COLLATE NOCASE AND owner = ? COLLATE NOCASE AND name = ? COLLATE NOCASE",
+      )
+      .get(host, owner, name) as RepoRow) ?? null
   );
 }
 
