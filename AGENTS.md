@@ -44,14 +44,16 @@ app/
   layout.tsx              # root layout (nav + footer) — defines root metadata + OG / Twitter cards
   page.tsx                # leaderboard
   not-found.tsx           # 404 — every unmatched path and every notFound() from the repo / score / package routes
-  repo/[id]/page.tsx      # repo detail with per-model suggestions (includes generateMetadata)
+  repo/[...slug]/page.tsx # repo detail with per-model suggestions (includes generateMetadata). Catch-all because a
+                          # GitLab owner can be a nested group: host first, repo name last, owner is the rest
+  repo-redirect/[id]/page.tsx          # 308 to the slug — serves the pre-slug /repo/:id URLs, rewritten here by next.config.ts
   methodology/page.tsx    # how the static scoring works
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
   privacy/page.tsx        # privacy policy (footer-linked, AdSense/GDPR/CCPA)
   terms/page.tsx          # terms of use (footer-linked)
-  robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows
+  robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows; blocks the leaderboard facet params, leaves ?page= crawlable
   sitemap.ts              # /sitemap.xml — static routes + every repo detail page (priority scaled by score)
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
@@ -61,12 +63,12 @@ app/
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
   twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
-  repo/[id]/opengraph-image.tsx             # next/og convention — per-repo OG image (auto-wired)
-  repo/[id]/twitter-image.tsx               # next/og convention — per-repo twitter:image, re-exports (auto-wired)
+  og/repo/[...slug]/route.tsx               # per-repo OG image — a plain route, since Next forbids the next/og file
+                                            # convention inside a catch-all; generateMetadata points og/twitter at it
   score/page.tsx                            # Live Score entry — URL form, past scores, FAQ
   score/opengraph-image.tsx                 # next/og convention — Live Score OG image (auto-wired)
   score/twitter-image.tsx                   # next/og convention — /score twitter:image, re-exports (auto-wired)
-  score/[host]/[owner]/[name]/page.tsx      # live score; result cached 1h per repo (unstable_cache); redirects to /repo/:id when indexed
+  score/[host]/[owner]/[name]/page.tsx      # live score; result cached 1h per repo (unstable_cache); redirects to the repo page when indexed
   score/[host]/[owner]/[name]/error.tsx     # retry boundary — page.tsx throws transient failures here so they aren't cached
   package/page.tsx                          # explainer + try-it examples
   package/[registry]/[name]/page.tsx        # scored | not_scored | unresolved states
@@ -95,6 +97,7 @@ lib/
     score.ts              # scoreTier + Tailwind class maps
     badge.ts              # SVG badge renderer (used by /api/badge)
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
+    repo-path.ts          # repoPath / repoIdentity — the one place a repo URL is built or parsed
   scoring/
     signals/              # one file per signal + helpers + types + index
     weights.ts            # per-model weight tables
@@ -206,7 +209,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
-3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/repo/[id]/opengraph-image.tsx`, the `generateMetadata` description + JSON-LD description in `app/repo/[id]/page.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count word (e.g. `eight`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
+3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the `generateMetadata` description + JSON-LD description in `app/repo/[...slug]/page.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count word (e.g. `eight`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
 4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getAlternatives` (the repo page's alternatives strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
 5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
@@ -216,7 +219,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 2. Extend `fetchRepoMeta` with that host's API (use `process.env.<HOST>_TOKEN` if needed).
 3. Add a seed URL to the `SEEDS` list in `scripts/seed-list.ts`.
 4. Add the label and domain to `lib/constants/hosts.ts`.
-5. For the live-score path: add tree listing / raw / blob URL builders in `lib/live-score/hosts.ts`, a fixture to `FIXTURES` in `scripts/parity-check.ts`, and only then the host id to `SUPPORTED_HOSTS` in `lib/live-score/supported.ts`. Parity has to be green **before** the host ships — a host that lists a tree but scores differently is worse than one that says "coming". Note that `/score/[host]/[owner]/[name]` is a single path segment per field, so a host with nested namespaces (GitLab subgroups) needs a route change too.
+5. For the live-score path: add tree listing / raw / blob URL builders in `lib/live-score/hosts.ts`, a fixture to `FIXTURES` in `scripts/parity-check.ts`, and only then the host id to `SUPPORTED_HOSTS` in `lib/live-score/supported.ts`. Parity has to be green **before** the host ships — a host that lists a tree but scores differently is worse than one that says "coming". Note that `/score/[host]/[owner]/[name]` is a single path segment per field, so a host with nested namespaces (GitLab subgroups) needs a route change too — `/repo/[...slug]` already handles them.
 
 ## Working from tasks/
 
@@ -252,7 +255,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[id]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
@@ -275,4 +278,4 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - `bun run test` — unit tests (Node ≥20.9.0 required).
 - `curl -s localhost:3000/api/repos | head` — verify persistence + API.
 - `bun x tsc --noEmit` — typecheck.
-- Manual pass over `/`, `/repo/:id`, `/methodology`, `/roadmap`, `/changelog` after UI changes.
+- Manual pass over `/`, `/repo/<host>/<owner>/<name>`, `/methodology`, `/roadmap`, `/changelog` after UI changes.

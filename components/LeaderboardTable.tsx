@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Host } from "@/lib/constants/hosts";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
+import { repoPath } from "@/lib/utils/repo-path";
 import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
 import { Medal } from "./Medal";
@@ -84,7 +85,7 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                   </td>
                   <td>
                     <Link
-                      href={`/repo/${r.id}`}
+                      href={repoPath(r)}
                       aria-label={`View ${r.owner}/${r.name} details`}
                       className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
                     >

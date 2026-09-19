@@ -15,6 +15,28 @@ const config: NextConfig = {
   outputFileTracingExcludes: {
     "/*": ["./tasks/**", "./tests/**", "./public/**", "./.claude/**", "./.next/cache/**"],
   },
+
+  // Every deployment answers on its *.vercel.app alias as well as the custom
+  // domain, serving the same pages. The canonical tag already points home, but
+  // a crawler has to fetch the copy to read it; this keeps it out of the index
+  // without costing that fetch. The value is an anchored regex over the
+  // lowercased hostname, so the custom domain cannot match it.
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        has: [{ type: "host", value: ".*\\.vercel\\.app" }],
+        headers: [{ key: "X-Robots-Tag", value: "noindex" }],
+      },
+    ];
+  },
+
+  // `/repo/:id` was the original repo URL. Turning an id back into its slug
+  // needs a database read, which a static redirect rule can't do, so the
+  // request is handed to a route that looks it up and answers 308.
+  async rewrites() {
+    return [{ source: "/repo/:id(\\d+)", destination: "/repo-redirect/:id" }];
+  },
 };
 
 export default config;

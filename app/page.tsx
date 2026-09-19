@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { headers } from "next/headers";
 import Link from "next/link";
 import { HomeJsonLd } from "@/components/HomeJsonLd";
 import { HostSelect } from "@/components/HostSelect";
@@ -11,7 +10,7 @@ import { SearchBar } from "@/components/SearchBar";
 import { SortSelect } from "@/components/SortSelect";
 import { CHANGELOG } from "@/lib/changelog";
 import { type Host, isHost } from "@/lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE, LEADERBOARD_PAGE_SIZE_MOBILE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
+import { LEADERBOARD_PAGE_SIZE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
 import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/lib/db";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
@@ -23,14 +22,6 @@ const HOME_TITLE =
   "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi";
 const HOME_DESCRIPTION =
   "Public leaderboard ranking GitHub, GitLab, and Bitbucket repos by how agent-friendly they are for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi — per model, with AGENTS.md / CLAUDE.md, CI, tests, and dev-env signals.";
-
-export const metadata: Metadata = {
-  title: HOME_TITLE,
-  description: HOME_DESCRIPTION,
-  alternates: { canonical: "/" },
-  twitter: { ...TWITTER_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION },
-  openGraph: { ...OG_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION, url: "/", type: "website" },
-};
 
 type SearchParams = {
   q?: string;
@@ -52,8 +43,12 @@ type HrefParts = {
 
 function buildHref(parts: HrefParts): string {
   const p = new URLSearchParams();
-  p.set("model", parts.model);
 
+  // Defaults stay out of the URL so the unfiltered board has one address —
+  // `/`, never a second copy of it at `/?model=overall`.
+  if (parts.model !== "overall") {
+    p.set("model", parts.model);
+  }
   if (parts.host !== "all") {
     p.set("host", parts.host);
   }
@@ -78,18 +73,24 @@ function matchesQuery(row: LeaderboardRow, q: string): boolean {
   return `${row.owner}/${row.name}`.toLowerCase().includes(q.trim().toLowerCase());
 }
 
-export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
-  const sp = await searchParams;
+type View = {
+  q: string;
+  page: number;
+  totalPages: number;
+  dir: SortDir;
+  sort: SortKey;
+  host: Host | "all";
+  selected: ModelId | "overall";
+  filteredRows: LeaderboardRow[];
+};
+
+async function resolveView(sp: SearchParams): Promise<View> {
   const selected: ModelId | "overall" = sp.model && sp.model in MODEL_BY_ID ? (sp.model as ModelId) : "overall";
 
   const q = (sp.q ?? "").slice(0, MAX_SEARCH_LENGTH);
   const host: Host | "all" = isHost(sp.host) ? sp.host : "all";
   const dir: SortDir = isSortDir(sp.dir) ? sp.dir : DEFAULT_DIR;
   const sort: SortKey = isSortKey(sp.sort) ? sp.sort : DEFAULT_SORT;
-
-  const ua = (await headers()).get("user-agent") ?? "";
-  const isMobile = /Mobi|Android|iPhone|iPod/i.test(ua);
-  const pageSize = isMobile ? LEADERBOARD_PAGE_SIZE_MOBILE : LEADERBOARD_PAGE_SIZE;
 
   const baseRows = listLeaderboard({
     dir,
@@ -99,15 +100,43 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
   });
 
   const filteredRows = q ? baseRows.filter((r) => matchesQuery(r, q)) : baseRows;
+  const totalPages = Math.max(1, Math.ceil(filteredRows.length / LEADERBOARD_PAGE_SIZE));
 
-  const stats = getLeaderboardStats();
-  const totalPages = Math.max(1, Math.ceil(filteredRows.length / pageSize));
-
+  // Out-of-range clamps rather than 404s, so a stale or hand-typed page number
+  // still lands on rows; the canonical below folds it onto the page it shows.
   const parsedPage = Number(sp.page);
   const page = Number.isFinite(parsedPage) ? Math.min(totalPages, Math.max(1, Math.floor(parsedPage))) : 1;
 
-  const startIdx = (page - 1) * pageSize;
-  const rows = filteredRows.slice(startIdx, startIdx + pageSize);
+  return { q, page, totalPages, dir, sort, host, selected, filteredRows };
+}
+
+export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
+  const { q, page, dir, sort, host, selected } = await resolveView(await searchParams);
+  const canonical = buildHref({ model: selected, host, q, sort, dir, page });
+
+  // Every view points at itself. Canonicalising page 2+ back to `/` declared
+  // the deeper pages duplicates, which drained the repos only linked from them.
+  // A filtered view is a re-cut of rows that already have a home, so it takes
+  // `noindex, follow`: crawlable and link-passing, just not indexed. A Disallow
+  // would instead hide that directive from the crawler that has to read it.
+  const filtered = selected !== "overall" || host !== "all" || q !== "" || sort !== DEFAULT_SORT || dir !== DEFAULT_DIR;
+
+  return {
+    title: HOME_TITLE,
+    description: HOME_DESCRIPTION,
+    alternates: { canonical },
+    ...(filtered ? { robots: { index: false, follow: true } } : {}),
+    twitter: { ...TWITTER_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION },
+    openGraph: { ...OG_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION, url: canonical, type: "website" },
+  };
+}
+
+export default async function Page({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const { q, page, totalPages, dir, sort, host, selected, filteredRows } = await resolveView(await searchParams);
+
+  const stats = getLeaderboardStats();
+  const startIdx = (page - 1) * LEADERBOARD_PAGE_SIZE;
+  const rows = filteredRows.slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE);
 
   const activeLabel =
     selected === "overall"

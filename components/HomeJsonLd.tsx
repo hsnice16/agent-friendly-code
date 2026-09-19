@@ -1,4 +1,5 @@
 import type { LeaderboardRow } from "@/lib/types/db";
+import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
 type HomeJsonLdProps = {
@@ -21,7 +22,7 @@ export function HomeJsonLd({ allOverall, lastScoredAt }: HomeJsonLdProps) {
           "@type": "ListItem",
           position: idx + 1,
           name: `${row.owner}/${row.name}`,
-          url: `${APP_URL}/repo/${row.id}`,
+          url: `${APP_URL}${repoPath(row)}`,
         })),
       },
       {

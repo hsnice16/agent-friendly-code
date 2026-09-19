@@ -9,6 +9,7 @@ import {
   APP_KEYWORDS,
   APP_NAME,
   APP_URL,
+  DEFAULT_OG_IMAGE,
   OG_DEFAULTS,
   TWITTER_DEFAULTS,
 } from "@/lib/version";
@@ -35,8 +36,15 @@ export const metadata: Metadata = {
   keywords: PAGE_KEYWORDS,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/action" },
-  twitter: { ...TWITTER_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-  openGraph: { ...OG_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/action", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: "/action",
+    type: "article",
+  },
 };
 
 const FAQ = [

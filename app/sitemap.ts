@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall } from "@/lib/db";
+import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
 const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
@@ -15,7 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       priority: 1,
-      url: `${APP_URL}/`,
+      url: APP_URL,
       lastModified: lastScored,
       changeFrequency: "daily",
     },
@@ -89,7 +90,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const repoRoutes: MetadataRoute.Sitemap = listLeaderboardOverall().map((r) => ({
     changeFrequency: "weekly",
-    url: `${APP_URL}/repo/${r.id}`,
+    url: `${APP_URL}${repoPath(r)}`,
     lastModified: r.last_scored_at != null ? new Date(r.last_scored_at * 1000) : now,
     priority: r.score != null ? Math.round((0.3 + (r.score / 100) * 0.6) * 10) / 10 : 0.4,
   }));

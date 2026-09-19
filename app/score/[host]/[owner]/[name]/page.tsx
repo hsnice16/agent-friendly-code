@@ -21,6 +21,7 @@ import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { hostLabel } from "@/lib/utils/format";
+import { repoPath } from "@/lib/utils/repo-path";
 import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
@@ -57,7 +58,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     description: `On-demand agent-friendliness score for ${owner}/${name}, computed from its current commit.`,
     twitter: { ...TWITTER_DEFAULTS, title },
     alternates: { canonical: `/score/${host}/${owner}/${name}` },
-    // Unbounded URL space; robots.ts disallows /score/* and the sitemap stays on /repo/:id.
+    // Unbounded URL space; robots.ts disallows /score/* and the sitemap stays on the repo pages.
     robots: { index: false, follow: true },
     openGraph: { ...OG_DEFAULTS, title, url: `/score/${host}/${owner}/${name}`, type: "website" },
   };
@@ -109,7 +110,7 @@ export default async function LiveScorePage({
   // Indexed repos get the canonical page: better SEO, and it absorbs the popular
   // repos that are also the most expensive to score cold.
   const indexed = getRepoByHostOwnerName(host, owner, name);
-  if (indexed) redirect(`/repo/${indexed.id}`);
+  if (indexed) redirect(repoPath(indexed));
 
   if (!SUPPORTED_HOSTS.includes(parsed.host)) return <Unsupported host={host} />;
 

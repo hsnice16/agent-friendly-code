@@ -9,6 +9,7 @@ import {
   APP_KEYWORDS,
   APP_NAME,
   APP_URL,
+  DEFAULT_OG_IMAGE,
   OG_DEFAULTS,
   SKILL_INSTALL_CMD,
   SKILL_REPO_URL,
@@ -26,8 +27,15 @@ export const metadata: Metadata = {
   keywords: PAGE_KEYWORDS,
   description: PAGE_DESCRIPTION,
   alternates: { canonical: "/skill" },
-  twitter: { ...TWITTER_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-  openGraph: { ...OG_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/skill", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: PAGE_TITLE, description: PAGE_DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: PAGE_TITLE,
+    description: PAGE_DESCRIPTION,
+    url: "/skill",
+    type: "article",
+  },
 };
 
 const FAQ_JSON_LD = {

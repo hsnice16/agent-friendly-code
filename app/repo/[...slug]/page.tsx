@@ -13,25 +13,29 @@ import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import { getAlternatives, getModelScores, getRepo, getSignalResults } from "@/lib/db";
+import { getAlternatives, getModelScores, getRepoByHostOwnerName, getSignalResults } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
-import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
+import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
-export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
-  const { id: idStr } = await params;
-  const id = Number(idStr);
+type Params = { slug: string[] };
 
-  if (!Number.isFinite(id)) {
+export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
+  const identity = repoIdentity((await params).slug);
+  if (!identity) {
     return {};
   }
 
-  const repo = getRepo(id);
+  const repo = getRepoByHostOwnerName(identity.host, identity.owner, identity.name);
   if (!repo) {
     return {};
   }
 
+  const path = repoPath(repo);
   const slug = `${repo.owner}/${repo.name}`;
+  const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${slug} — agent-friendliness score` };
+
   const score = repo.overall_score != null ? repo.overall_score.toFixed(1) : "unranked";
 
   const title = `${slug} — ${score} / 100`;
@@ -54,9 +58,9 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     title,
     description,
     keywords: repoKeywords,
-    alternates: { canonical: `/repo/${id}` },
-    twitter: { ...TWITTER_DEFAULTS, title, description },
-    openGraph: { ...OG_DEFAULTS, title, description, url: `/repo/${id}`, type: "article" },
+    alternates: { canonical: path },
+    twitter: { ...TWITTER_DEFAULTS, title, description, images: [image] },
+    openGraph: { ...OG_DEFAULTS, title, description, url: path, type: "article", images: [image] },
   };
 }
 
@@ -64,21 +68,23 @@ export default async function Page({
   params,
   searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  params: Promise<Params>;
   searchParams: Promise<{ model?: string }>;
 }) {
-  const { id: idStr } = await params;
+  const identity = repoIdentity((await params).slug);
   const { model } = await searchParams;
-  const id = Number(idStr);
 
-  if (!Number.isFinite(id)) {
+  if (!identity) {
     notFound();
   }
 
-  const repo = getRepo(id);
+  const repo = getRepoByHostOwnerName(identity.host, identity.owner, identity.name);
   if (!repo) {
     notFound();
   }
+
+  const id = repo.id;
+  const path = repoPath(repo);
 
   const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
 
@@ -108,7 +114,7 @@ export default async function Page({
             "@type": "ListItem",
             name: slug,
             position: 2,
-            item: `${APP_URL}/repo/${id}`,
+            item: `${APP_URL}${path}`,
           },
         ],
       },
@@ -116,7 +122,7 @@ export default async function Page({
         "@type": "SoftwareSourceCode",
         name: slug,
         codeRepository: repo.url,
-        url: `${APP_URL}/repo/${id}`,
+        url: `${APP_URL}${path}`,
         ...(repo.language ? { programmingLanguage: repo.language } : {}),
         ...(repo.last_scored_at != null ? { dateModified: new Date(repo.last_scored_at * 1000).toISOString() } : {}),
         keywords: [slug, repo.name, repo.owner, repo.language, "AGENTS.md", "AI coding agent"]
@@ -183,7 +189,7 @@ export default async function Page({
       </div>
 
       <div className="mt-3.5">
-        <ModelSuggestions basePath={`/repo/${id}`} selected={selected} suggestions={suggestions} />
+        <ModelSuggestions basePath={path} selected={selected} suggestions={suggestions} />
       </div>
 
       <div className="mt-3.5">
@@ -214,7 +220,7 @@ export default async function Page({
           name={repo.name}
           host={repo.host}
           owner={repo.owner}
-          repoPagePath={`/repo/${id}`}
+          repoPagePath={path}
         />
       </div>
 

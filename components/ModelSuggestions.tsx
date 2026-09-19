@@ -6,7 +6,7 @@ import { Panel, PanelHeading } from "./Panel";
 import { SuggestionItem } from "./SuggestionItem";
 
 type Props = {
-  /** Page the model pills link back to — `/repo/:id` or `/score/:host/:owner/:name`. */
+  /** Page the model pills link back to — the repo page or `/score/:host/:owner/:name`. */
   basePath: string;
   selected: ModelId;
   suggestions: ImprovementSuggestion[];

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { type RecentScore, readRecents } from "@/lib/live-score/recents";
+import { repoPath } from "@/lib/utils/repo-path";
 
 import { HostPill } from "./HostPill";
 import { Panel, PanelHeading } from "./Panel";
@@ -17,10 +18,10 @@ type Props = {
   past: Row[];
 };
 
-// An indexed repo's /score/… URL only redirects to /repo/:id, at the cost of a
-// cold server render first.
+// An indexed repo's /score/… URL only redirects to its repo page, at the cost
+// of a cold server render first.
 function hrefFor(row: Row): string {
-  return row.id == null ? `/score/${row.host}/${row.owner}/${row.name}` : `/repo/${row.id}`;
+  return row.id == null ? `/score/${row.host}/${row.owner}/${row.name}` : repoPath(row);
 }
 
 function ScoreList({ rows }: { rows: Row[] }) {

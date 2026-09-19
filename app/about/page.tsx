@@ -4,13 +4,19 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
   title: "About",
   alternates: { canonical: "/about" },
-  twitter: { ...TWITTER_DEFAULTS, title: `About — ${APP_NAME}` },
-  openGraph: { ...OG_DEFAULTS, title: `About — ${APP_NAME}`, url: "/about", type: "article" },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: `About — ${APP_NAME}` },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: `About — ${APP_NAME}`,
+    url: "/about",
+    type: "article",
+  },
   description: `Who built ${APP_NAME}, why it exists, and what it isn't. Independent, MIT-licensed, no affiliation with any AI agent vendor.`,
 };
 

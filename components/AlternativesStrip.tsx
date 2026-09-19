@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { AlternativeRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
+import { repoPath } from "@/lib/utils/repo-path";
 
 import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
@@ -31,7 +32,7 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
           <li key={a.id} className="relative rounded-lg border border-line bg-surface-2 px-3.5 py-3">
             <div className="flex items-start justify-between gap-2">
               <Link
-                href={`/repo/${a.id}`}
+                href={repoPath(a)}
                 aria-label={`View ${a.owner}/${a.name} details`}
                 className="min-w-0 font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
               >

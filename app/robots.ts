@@ -22,8 +22,10 @@ const AI_CRAWLERS = [
   "Meta-ExternalAgent",
 ];
 
-// /score/* is unbounded — one URL per repo that exists anywhere. Canonical
-// repo pages live at /repo/:id and are the only ones in the sitemap.
+// /score/* is unbounded — one URL per repo that exists anywhere. Filtered
+// leaderboard views are deduped with `noindex, follow` instead of a Disallow:
+// every repo page links out under `?model=`, and a blocked URL is one whose
+// canonical and noindex a crawler is never allowed to read.
 const DISALLOW = ["/api/", "/score/"];
 
 export default function robots(): MetadataRoute.Robots {

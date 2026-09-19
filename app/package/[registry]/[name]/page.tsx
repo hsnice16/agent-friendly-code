@@ -8,6 +8,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { isRegistry, type Registry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
+import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const cachedLookup = cache((registry: Registry, name: string) => lookupPackage(registry, name));
@@ -107,7 +108,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
                 </div>
 
                 <Link
-                  href={`/repo/${result.repo.id}`}
+                  href={repoPath(result.repo)}
                   className="mt-2 inline-flex items-center gap-1 text-sm text-ink-dim hover:text-ink-soft"
                 >
                   Full score breakdown <ArrowUpRight size={14} weight="bold" aria-hidden="true" />

@@ -141,7 +141,9 @@ app/          Next.js App Router — pages + API + SEO
   layout.tsx       root layout, root metadata (OG + Twitter cards)
   page.tsx         leaderboard
   not-found.tsx    404 — unmatched paths and every notFound() from repo / score / package
-  repo/[id]/       repo detail (generateMetadata + per-repo OG image)
+  repo/[...slug]/  repo detail — /repo/<host>/<owner>/<name> (owner may be a nested GitLab group)
+  repo-redirect/[id]/  308 to the slug, for the pre-slug /repo/:id URLs
+  og/repo/[...slug]/   per-repo OG image
   score/           Live Score — entry form + /score/[host]/[owner]/[name] result page (cached 1h per repo)
   methodology/     how scoring works today
   roadmap/         upcoming versions (from lib/roadmap.ts)
@@ -153,7 +155,7 @@ app/          Next.js App Router — pages + API + SEO
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
-  robots.ts        /robots.txt — allows "/", blocks "/api/" and "/score/" (unbounded URL space)
+  robots.ts        /robots.txt — allows "/", blocks "/api/", "/score/" (unbounded URL space) and the leaderboard facet params
   sitemap.ts       /sitemap.xml — static routes + every repo
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
@@ -185,7 +187,7 @@ LICENSE       MIT
 
 ## Live Score
 
-[`/score`](https://www.agentfriendlycode.com/score) takes any public GitHub repository URL and returns its full score — signals, per-model breakdown, and the gaps worth fixing first — for repos the leaderboard has never indexed. Results are computed from the repository's current commit, and cached for an hour per repo; nothing about a scored repo is stored. Repos already on the board redirect to their canonical `/repo/:id` page.
+[`/score`](https://www.agentfriendlycode.com/score) takes any public GitHub repository URL and returns its full score — signals, per-model breakdown, and the gaps worth fixing first — for repos the leaderboard has never indexed. Results are computed from the repository's current commit, and cached for an hour per repo; nothing about a scored repo is stored. Repos already on the board redirect to their canonical repo page.
 
 GitLab and Bitbucket are implemented and score identically to a clone, but ship behind a "support coming" state: GitLab paginates its tree at 100 entries (a large project needs hundreds of sequential calls) and Bitbucket allows 60 unauthenticated API requests an hour.
 

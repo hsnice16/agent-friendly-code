@@ -13,12 +13,25 @@ export const ACTION_USES = `hsnice16/agent-friendly-action@${SIBLING_VERSION}`;
 export const SKILL_REPO_URL = "https://github.com/hsnice16/agent-friendly-skill";
 export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#${SIBLING_VERSION}`;
 
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agent-friendly-code.vercel.app";
+// Falling back to the apex, never the *.vercel.app alias: next.config.ts
+// serves `X-Robots-Tag: noindex` there, so a missing env var would point
+// every canonical and sitemap URL at a host this app tells Google to drop.
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agentfriendlycode.com";
 export const APP_DESCRIPTION =
   "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
 
 export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
 export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;
+export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
+
+// Pages that declare their own `openGraph` replace the parent's resolved one,
+// which drops the root opengraph-image.tsx that would otherwise cascade. Pages
+// with a dedicated image of their own set `images` themselves and win over it.
+export const DEFAULT_OG_IMAGE = {
+  url: "/opengraph-image",
+  ...OG_IMAGE_SIZE,
+  alt: `${APP_NAME} — AI coding agent friendliness leaderboard`,
+} as const;
 
 export const APP_KEYWORDS = [
   "ai",

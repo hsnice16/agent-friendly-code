@@ -1,18 +1,14 @@
 import { ImageResponse } from "next/og";
 
-import { getRepo } from "@/lib/db";
+import { getRepoByHostOwnerName } from "@/lib/db";
 import { hostLabel } from "@/lib/utils/format";
-import { APP_NAME } from "@/lib/version";
+import { repoIdentity } from "@/lib/utils/repo-path";
+import { APP_NAME, OG_IMAGE_SIZE } from "@/lib/version";
 
-export const contentType = "image/png";
-export const alt = "Agent-friendliness score";
-export const size = { width: 1200, height: 630 };
+export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
+  const identity = repoIdentity((await params).slug);
 
-export default async function Image({ params }: { params: Promise<{ id: string }> }) {
-  const { id: idStr } = await params;
-  const id = Number(idStr);
-
-  const repo = Number.isFinite(id) ? getRepo(id) : null;
+  const repo = identity ? getRepoByHostOwnerName(identity.host, identity.owner, identity.name) : null;
   const slug = repo ? `${repo.owner}/${repo.name}` : "Unknown repo";
   const score = repo?.overall_score != null ? repo.overall_score.toFixed(1) : "—";
   const host = repo ? hostLabel(repo.host) : "";
@@ -104,6 +100,6 @@ export default async function Image({ params }: { params: Promise<{ id: string }
         Claude Code · Cursor · Devin · Codex · Gemini · Kimi · Aider · OpenHands · Pi
       </div>
     </div>,
-    { ...size },
+    { ...OG_IMAGE_SIZE },
   );
 }
