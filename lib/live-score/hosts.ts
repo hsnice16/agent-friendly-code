@@ -227,35 +227,26 @@ export async function resolveCommit(
   ref: string,
   token?: string,
 ): Promise<string | null> {
-  const init = { headers: requestHeaders(host, token) };
+  const url =
+    host === "github"
+      ? `https://api.github.com/repos/${owner}/${name}/commits/${ref}`
+      : host === "gitlab"
+        ? `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/commits/${ref}`
+        : `https://api.bitbucket.org/2.0/repositories/${owner}/${name}/commit/${ref}`;
 
-  if (host === "github") {
-    const res = await fetch(`https://api.github.com/repos/${owner}/${name}/commits/${ref}`, init);
-    if (!res.ok) {
-      assertNotRateLimited(host, res);
-      return null;
-    }
-    return ((await res.json()) as { sha?: string }).sha ?? null;
-  }
+  const res = await fetch(url, { headers: requestHeaders(host, token) });
 
-  if (host === "gitlab") {
-    const res = await fetch(
-      `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/commits/${ref}`,
-      init,
-    );
-    if (!res.ok) {
-      assertNotRateLimited(host, res);
-      return null;
-    }
-    return ((await res.json()) as { id?: string }).id ?? null;
-  }
-
-  const res = await fetch(`https://api.bitbucket.org/2.0/repositories/${owner}/${name}/commit/${ref}`, init);
+  // Null is cached as "no such repo" for an hour, so only answers that really
+  // mean that may produce it: 404, and GitHub's 409 for an empty repo. A 401
+  // from an expired token must throw, or every unindexed repo reads as missing.
+  if (res.status === 404 || res.status === 409) return null;
   if (!res.ok) {
     assertNotRateLimited(host, res);
-    return null;
+    throw new Error(`${res.status} resolving commit`);
   }
-  return ((await res.json()) as { hash?: string }).hash ?? null;
+
+  const body = (await res.json()) as { sha?: string; id?: string; hash?: string };
+  return body.sha ?? body.id ?? body.hash ?? null;
 }
 
 export function hostToken(host: RepoHost): string | undefined {

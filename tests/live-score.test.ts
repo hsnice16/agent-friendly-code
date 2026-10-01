@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { describe, it } from "node:test";
+import { afterEach, describe, it } from "node:test";
 
 import { CONTENT_CANDIDATES } from "../lib/live-score/content-files";
-import { blobUrl, rawUrl } from "../lib/live-score/hosts";
+import { blobUrl, RateLimitedError, rawUrl, resolveCommit } from "../lib/live-score/hosts";
 import { safeAbsolute } from "../lib/live-score/materialize";
 import { SUPPORTED_HOSTS } from "../lib/live-score/supported";
 
@@ -56,6 +56,39 @@ describe("host URLs", () => {
     assert.ok(blobUrl("github", "o", "n", "sha"));
     assert.ok(blobUrl("gitlab", "o", "n", "sha"));
     assert.equal(blobUrl("bitbucket", "o", "n", "sha"), null);
+  });
+});
+
+describe("resolveCommit", () => {
+  const realFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = realFetch;
+  });
+
+  const respond = (status: number, body: unknown = {}) => {
+    globalThis.fetch = (async () => new Response(JSON.stringify(body), { status })) as unknown as typeof fetch;
+  };
+
+  it("returns the sha on success", async () => {
+    respond(200, { sha: "abc" });
+    assert.equal(await resolveCommit("github", "o", "n", "HEAD"), "abc");
+  });
+
+  it("returns null only when the repo is missing or empty", async () => {
+    respond(404);
+    assert.equal(await resolveCommit("github", "o", "n", "HEAD"), null);
+    respond(409);
+    assert.equal(await resolveCommit("github", "o", "n", "HEAD"), null);
+  });
+
+  it("throws on a rejected token instead of reporting the repo missing", async () => {
+    respond(401);
+    await assert.rejects(resolveCommit("github", "o", "n", "HEAD", "stale"));
+  });
+
+  it("throws RateLimitedError on a spent quota", async () => {
+    respond(403);
+    await assert.rejects(resolveCommit("github", "o", "n", "HEAD"), RateLimitedError);
   });
 });
 
