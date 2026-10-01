@@ -576,6 +576,10 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/hsnice16/agent-friendly-code",
   },
   {
+    url: "https://github.com/hsnice16/tula",
+    note: "tula — crypto liquidation-risk terminal tool",
+  },
+  {
     url: "https://github.com/farzaa/clicky",
     note: "Clicky — coding-agent side project",
   },
