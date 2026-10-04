@@ -65,7 +65,7 @@ export function RecentScores({ past }: Props) {
       )}
 
       <Panel>
-        <PanelHeading>Past scores</PanelHeading>
+        <PanelHeading>Top repos on the leaderboard</PanelHeading>
         <ScoreList rows={past} />
       </Panel>
     </>

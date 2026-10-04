@@ -14,45 +14,45 @@ export const metadata: Metadata = {
   twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology" },
   openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology", url: "/methodology", type: "article" },
   description:
-    "How scores are computed today: the signals checked, the per-model weight profiles, the scoring formula, and what the static-heuristic approach deliberately doesn't measure yet.",
+    "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.",
 };
 
 const FAQ = [
   {
-    q: "How is the agent-friendliness score computed?",
-    a: "Each repository is shallow-cloned and evaluated against sixteen static signals — twelve cross-agent (AGENTS.md / CLAUDE.md, CI, tests, README, linter, type config, license, contributing guide, reproducible dev environment, pre-commit hooks, dependency manifest, codebase size) plus four agent-specific instruction files (`.cursor/rules/*.mdc`, `GEMINI.md`, `.openhands/setup.sh`, `.aider.conf.yml`). File names are matched case-insensitively, so `readme.md` and `README.MD` count exactly like `README.md`. Per-model score = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100. Overall score = mean of per-model scores.",
+    q: "How is the score worked out?",
+    a: "We download a copy of each repo (latest version only, no history) and run sixteen checks on it. Twelve matter to every agent: AGENTS.md / CLAUDE.md, CI, tests, README, linter, type config, license, contributing guide, a reproducible dev setup, pre-commit hooks, a dependency list, and codebase size. Four are files only one agent reads: `.cursor/rules/*.mdc`, `GEMINI.md`, `.openhands/setup.sh`, and `.aider.conf.yml`. File names can be any case, so `readme.md` and `README.MD` count the same as `README.md`. Score for one agent = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100. The overall score is the average of the agent scores.",
   },
   {
-    q: "Why score per model instead of giving one overall number?",
-    a: "Different agents lean on different repository properties — and we know which because each vendor documents it. Claude Code loads CLAUDE.md at the start of every conversation, so AGENTS.md and tests carry the most weight. GPT-5 Codex reads AGENTS.md before doing any work, so AGENTS.md is the strongest single signal for it. Devin runs in a sandboxed VM and needs an explicit dev-env setup (deps, secrets, lint/test commands), so dev-environment beats CI. Cursor cites `.cursor/rules/` and AGENTS.md as its canonical instruction surface. The same repository can score very differently across models, and a single overall number would hide that.",
+    q: "Why give each agent its own score?",
+    a: "Each agent relies on different things in a repo, and each one's docs say which. Claude Code reads CLAUDE.md at the start of every chat, so AGENTS.md and tests count the most. GPT-5 Codex reads AGENTS.md before it does any work, so that file counts most for it. Devin works inside its own sandboxed machine and needs clear setup steps (dependencies, secrets, lint and test commands), so a dev setup counts more than CI. Cursor's docs name `.cursor/rules/` and AGENTS.md as the files it reads for instructions. One repo can score very differently for different agents. A single number would hide that.",
   },
   {
-    q: "Which AI coding agents are evaluated?",
-    a: "Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each has its own weight profile encoded in lib/scoring/weights.ts.",
+    q: "Which AI coding agents do you score for?",
+    a: "Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each has its own set of weights, in lib/scoring/weights.ts.",
   },
   {
-    q: "Is this a benchmark of agent performance?",
-    a: "No. Today every score is derived from static signals — file existence and content-length checks on the cloned tree. No agent is actually run. Per-model rationales are now derived from each agent's published documentation (see the Sources panel below for the URLs), but the weights themselves are still pre-benchmark — they're not yet calibrated against measured agent success. Treat the numbers as a directional signal, not a verdict.",
+    q: "Does this test how well agents actually work?",
+    a: "No. Every score comes from simple file checks: does a file exist, and how long is it. No agent is actually run. The reasons behind each agent's weights come from that agent's own docs (see the Sources links below). But the weight numbers are not yet tested against how agents really perform. Use the scores as a rough guide, not a final verdict.",
   },
   {
-    q: "How can I improve my repository's score?",
-    a: "Add an AGENTS.md or CLAUDE.md file describing the project for agents, configure CI, ensure tests run, write a substantive README, add a linter and type config, include a license and CONTRIBUTING guide, and provide a reproducible dev environment (devcontainer or Dockerfile). The repo detail page lists the highest-impact gaps for each model.",
+    q: "How can I raise my repo's score?",
+    a: "Add an AGENTS.md or CLAUDE.md file that explains the project to agents. Set up CI, make sure tests run, and write a detailed README. Add a linter and type config, a license, and a CONTRIBUTING guide. Add a reproducible dev setup (for example a devcontainer, Dockerfile, or Makefile). Each repo's page lists the fixes that help each agent most.",
   },
   {
-    q: "How do I keep my score from regressing on PRs?",
-    a: "Install the agent-friendly-action GitHub Action (hsnice16/agent-friendly-action). It scores the PR head and base inside your CI and posts a single comment with the score delta and per-signal changes — opt-in via an AGENTS_BADGE_TOKEN secret, falls through silently when the secret is unset. Each repo detail page shows a copy-paste workflow snippet under 'Catch score regressions on every PR'.",
+    q: "How do I stop pull requests from lowering my score?",
+    a: "Install the agent-friendly-action GitHub Action (hsnice16/agent-friendly-action). It scores the pull request and the branch it targets, inside your own CI, and posts one comment showing how the score changed and which checks changed. Turn it on by adding an AGENTS_BADGE_TOKEN secret. Without the secret, it does nothing. Each repo's page has a ready-to-copy workflow under 'Check the score on every pull request'.",
   },
   {
     q: "What is AGENTS.md or CLAUDE.md?",
-    a: "A markdown file at the root of a repository that gives an AI coding agent a quick orientation: what the project is, how to build and test it, key conventions, and where to look. It is the highest-weighted signal for Pi, tied with the test suite as the top weight for Claude Code, and meaningfully helps every other agent.",
+    a: "A markdown file at the top of a repo that gives an AI coding agent a quick tour: what the project is, how to build and test it, the main rules to follow, and where to look. It is the check that counts most for Pi. For Claude Code it ties with tests as the top check. It helps every other agent too.",
   },
   {
-    q: "How often is the data refreshed?",
-    a: "Every six hours — a GitHub Actions cron runs the full scorer over the curated seed list and commits the refreshed database to the repo, which auto-deploys. Repositories are also re-scored whenever the seed list changes or the rubric is updated.",
+    q: "How often are scores updated?",
+    a: "Every six hours. A scheduled GitHub Actions job scores every repo on our list again and saves the new results, and the site updates on its own. We also score repos again whenever the list or the scoring rules change.",
   },
   {
-    q: "Which forges are supported?",
-    a: "GitHub, GitLab, and Bitbucket. Cross-forge support is built into the cloning and scoring pipeline so the leaderboard can compare repositories regardless of host.",
+    q: "Which code hosts are supported?",
+    a: "GitHub, GitLab, and Bitbucket. All three go through the same download and scoring steps, so the leaderboard can compare repos no matter where they live.",
   },
 ];
 
@@ -82,24 +82,23 @@ export default function MethodologyPage() {
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Methodology</h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          How scores are computed today, what&apos;s being measured, and where the current approach stops short.
+          How we work out each score, what we check, and what we can&apos;t check yet.
         </p>
       </section>
 
       <Panel tone="warn">
-        <PanelHeading tone="warn">Status: documented rationales, pre-benchmark weights</PanelHeading>
+        <PanelHeading tone="warn">Where things stand: reasons from docs, weights not yet tested</PanelHeading>
 
         <p className="text-[14.5px] leading-relaxed text-ink-dim">
-          Today every score is derived from <strong className="text-ink">static signals</strong> — file existence and
-          content-length checks on the cloned tree. No agent is actually run. Per-model rationales are{" "}
-          <strong className="text-ink">derived from each agent's published documentation</strong> — see the Sources
-          links under every model below. The weight values themselves are still pre-benchmark; they aren't yet
-          calibrated against measured agent success. The combination is enough to produce meaningfully different
-          rankings and to show how the UX of per-model scoring feels, but it should not be read as a benchmark.
+          Every score comes from <strong className="text-ink">simple file checks</strong>: does a file exist, and how
+          long is it. No agent is actually run. The reasons behind each agent&apos;s weights{" "}
+          <strong className="text-ink">come from that agent&apos;s own docs</strong>. See the Sources links under each
+          agent below. The weight numbers are not yet tested against how agents really perform. That is enough to rank
+          repos in clearly different ways for each agent, but it is not a test of agent performance.
         </p>
 
         <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
-          The plan to replace pre-benchmark weights with measured ones is part of the v1.0.0 production cut on the{" "}
+          Replacing these weights with measured ones is planned for v1.0.0 on the{" "}
           <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
             roadmap
           </Link>{" "}
@@ -107,7 +106,7 @@ export default function MethodologyPage() {
           <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
             tasks/1.0.0/03-benchmark-harness.md
           </code>
-          ). Until then, treat the numbers as a directional signal, not a verdict.
+          ). Until then, use the scores as a rough guide, not a final verdict.
         </p>
       </Panel>
 
@@ -121,21 +120,21 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
           </pre>
 
           <p className="mt-3 text-[13.5px] leading-relaxed text-ink-dim">
-            <code className="font-mono text-[12.5px] text-ink">signal.pass</code> is a float in{" "}
-            <code className="font-mono text-[12.5px] text-ink">[0, 1]</code> — partial credit is allowed (e.g. a thin
-            README gets <code className="font-mono text-[12.5px] text-ink">0.3</code>, a long one gets{" "}
-            <code className="font-mono text-[12.5px] text-ink">1.0</code>).
+            <code className="font-mono text-[12.5px] text-ink">signal.pass</code> is a number from{" "}
+            <code className="font-mono text-[12.5px] text-ink">0</code> to{" "}
+            <code className="font-mono text-[12.5px] text-ink">1</code>, so a check can pass in part. For example, a
+            short README gets <code className="font-mono text-[12.5px] text-ink">0.3</code> and a long one gets{" "}
+            <code className="font-mono text-[12.5px] text-ink">1.0</code>.
           </p>
         </Panel>
       </div>
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Signals ({SIGNALS.length})</PanelHeading>
+          <PanelHeading>Checks ({SIGNALS.length})</PanelHeading>
 
           <p className="mt-2 mb-1 text-[13.5px] leading-relaxed text-ink-dim">
-            File names are matched case-insensitively —{" "}
-            <code className="font-mono text-[12.5px] text-ink">readme.md</code> and{" "}
+            File names can be any case: <code className="font-mono text-[12.5px] text-ink">readme.md</code> and{" "}
             <code className="font-mono text-[12.5px] text-ink">README.MD</code> both count as a README.
           </p>
 
@@ -164,11 +163,11 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Models & weight profiles ({MODELS.length})</PanelHeading>
+          <PanelHeading>AI agents and their weights ({MODELS.length})</PanelHeading>
 
           <ul className="m-0 list-none p-0">
             {MODELS.map((m) => (
-              <li key={m.id} className="border-b border-line py-3 last:border-b-0">
+              <li key={m.id} id={`model-${m.id}`} className="scroll-mt-20 border-b border-line py-3 last:border-b-0">
                 <div className="text-[15px] font-medium">{m.label}</div>
                 <div className="mt-1 text-[13.5px] text-ink-dim">{m.rationale}</div>
 
@@ -208,23 +207,24 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>What isn&apos;t measured yet</PanelHeading>
+          <PanelHeading>What we don&apos;t check yet</PanelHeading>
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
-            <li>Whether tests actually pass (we only detect their presence).</li>
-            <li>Whether the linter actually runs cleanly.</li>
+            <li>Whether tests actually pass. We only check that they exist.</li>
+            <li>Whether the linter runs without errors.</li>
 
-            <li>Whether the dev-env artifact (Makefile, Dockerfile) works end-to-end.</li>
+            <li>Whether the dev setup (Makefile, Dockerfile) really works from start to finish.</li>
 
             <li>
-              Commit-history signals — churn, commit frequency, contributor count. We use
+              Anything from commit history: how often code changes, how often people commit, how many people contribute.
+              We use
               <code className="mx-1 rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
                 --depth 1 --single-branch
               </code>
-              which fetches the whole working tree at HEAD of the default branch, but no history. These describe repo
-              health more than agent behavior, so they sit outside the score for now.
+              which downloads every file in the latest version of the main branch, but no history. These say more about
+              a repo&apos;s health than about how agents work with it, so we leave them out for now.
             </li>
 
-            <li>How agents actually perform on the repo — that&apos;s the v1.0.0 benchmark harness.</li>
+            <li>How well agents actually do on the repo. That comes with the v1.0.0 benchmark.</li>
           </ul>
         </Panel>
       </div>

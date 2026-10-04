@@ -12,7 +12,7 @@ const OPTIONS: SelectMenuOption[] = [
   {
     shortLabel: "Rank",
     value: "score-desc",
-    label: "Rank (agent-friendliness)",
+    label: "Rank (best score first)",
   },
   {
     value: "score-asc",

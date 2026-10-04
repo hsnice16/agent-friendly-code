@@ -180,8 +180,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           </main>
           <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
             <p className="m-0">
-              Signals are static heuristics — no agent is actually run. Per-model rationales are docs-cited; the weight
-              values themselves are still pre-benchmark.
+              Scores come from checking files in each repo. No agent is actually run. What each agent looks for comes
+              from its own docs, but how much each check counts is still our best guess, not yet tested.
             </p>
 
             <div className="mt-5 flex flex-wrap items-start gap-4">

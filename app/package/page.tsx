@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/package" },
   openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Packages", url: "/package", type: "website" },
   description:
-    "Look up any npm, PyPI, or Cargo package to see how agent-friendly its source repo is — the score, per-model breakdown, and an embeddable badge.",
+    "Look up any npm, PyPI, or Cargo package to see how ready its source repo is for AI coding agents: the score, a score for each agent, and a badge you can add to a README.",
 };
 
 const EXAMPLES = [
@@ -38,8 +38,8 @@ export default function PackageIndexPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Packages</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Developers pick dependencies in registry UIs, not on GitHub. Paste a package name and see how agent-friendly
-          its source repo actually is.
+          People usually pick packages on npm, PyPI, or crates.io, not on GitHub. Type a package name to see how ready
+          its source repo is for AI coding agents.
         </p>
       </section>
 
@@ -49,13 +49,13 @@ export default function PackageIndexPage() {
         <PackageLookupForm />
 
         <p className="mt-3 text-[13.5px] text-muted">
-          Prefer JSON? <code className="text-ink-dim">/api/package/&lt;registry&gt;/&lt;name&gt;</code>
+          Want JSON instead? <code className="text-ink-dim">/api/package/&lt;registry&gt;/&lt;name&gt;</code>
         </p>
       </Panel>
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Try it</PanelHeading>
+          <PanelHeading>Try one</PanelHeading>
 
           <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
             {EXAMPLES.map(({ registry, name }) => (
@@ -76,12 +76,11 @@ export default function PackageIndexPage() {
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>What happens when it&apos;s not scored?</PanelHeading>
+          <PanelHeading>What if a package has no score yet?</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            If a package resolves to a source repo we don&apos;t track yet, the page shows you which repo it mapped to
-            and links to a <strong className="text-ink mr-1">pre-filled GitHub issue</strong> you can submit to request
-            scoring. If the registry manifest doesn&apos;t point at a parseable source URL at all, the issue template
-            asks for the correct link.
+            If the package&apos;s source repo isn&apos;t on our list yet, the page shows which repo we found. It also
+            links to a <strong className="text-ink mr-1">ready-made GitHub issue</strong> you can send to ask us to
+            score it. If the package doesn&apos;t list a source link we can read, the issue asks you for the right link.
           </p>
         </Panel>
       </div>
@@ -91,7 +90,7 @@ export default function PackageIndexPage() {
           <hr className="my-9 border-0 border-t border-dotted border-line" />
 
           <Panel>
-            <PanelHeading>Top scored packages by registry</PanelHeading>
+            <PanelHeading>Top-scoring packages in each registry</PanelHeading>
 
             <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
               {topRows.map((row) => (

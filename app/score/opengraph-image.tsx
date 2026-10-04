@@ -54,7 +54,7 @@ export default function Image() {
         </div>
 
         <div style={{ display: "flex", marginTop: "28px", fontSize: "30px", color: "#525252", lineHeight: 1.35 }}>
-          Paste a public GitHub URL — scored from its current commit, per model.
+          Paste a link to a public GitHub repo. See its score for each agent, from its latest commit.
         </div>
       </div>
 

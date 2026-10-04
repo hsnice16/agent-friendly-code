@@ -61,7 +61,7 @@ export default function Image() {
             letterSpacing: "-0.02em",
           }}
         >
-          Which public repos are
+          Which public repos are easiest
         </div>
         <div
           style={{
@@ -72,11 +72,11 @@ export default function Image() {
             letterSpacing: "-0.02em",
           }}
         >
-          friendliest to AI coding agents?
+          for AI coding agents to work in?
         </div>
         <div style={{ display: "flex", color: "#525252", fontSize: "28px", marginTop: "24px", maxWidth: "1000px" }}>
-          Per-model leaderboard across GitHub, GitLab, and Bitbucket — ranked for Claude Code, Cursor, Devin, Codex,
-          Gemini, Kimi, Aider, OpenHands, and Pi.
+          Repos from GitHub, GitLab, and Bitbucket, ranked for each agent: Claude Code, Cursor, Devin, Codex, Gemini,
+          Kimi, Aider, OpenHands, and Pi.
         </div>
       </div>
 
@@ -92,7 +92,7 @@ export default function Image() {
         }}
       >
         <div style={{ display: "flex" }}>
-          {stats.count > 0 ? `${stats.count} repos scored · per-model` : "Per-model · static heuristics"}
+          {stats.count > 0 ? `${stats.count} repos scored for each agent` : "Scored for each agent"}
         </div>
         <div style={{ display: "flex" }}>agentfriendlycode.com</div>
       </div>

@@ -12,8 +12,8 @@ export default function LiveScoreError({ reset }: { error: Error; reset: () => v
     <Panel>
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo right now</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
-        Nothing is necessarily wrong with the repository — the host&apos;s API may be rate-limiting us, or the tree took
-        too long to read. Trying again usually works.
+        The repo is probably fine. The host may be limiting how often we can ask, or the files took too long to read.
+        Trying again usually works.
       </p>
 
       <div className="mt-3.5 flex flex-wrap items-center gap-4">

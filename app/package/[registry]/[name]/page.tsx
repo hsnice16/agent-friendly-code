@@ -20,7 +20,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { registry, name } = await params;
   const title = `${registry}/${name}`;
-  const description = `Agent-friendliness score for the ${registry} package "${name}" and its source repo.`;
+  const description = `How ready the ${registry} package "${name}" and its source repo are for AI coding agents.`;
 
   if (!isRegistry(registry)) {
     return { title, description, robots: { index: false, follow: true } };
@@ -111,7 +111,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
                   href={repoPath(result.repo)}
                   className="mt-2 inline-flex items-center gap-1 text-sm text-ink-dim hover:text-ink-soft"
                 >
-                  Full score breakdown <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
+                  See the full score <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
                 </Link>
               </div>
 
@@ -127,11 +127,11 @@ export default async function Page({ params }: { params: Promise<{ registry: str
             <PanelHeading>Not scored yet</PanelHeading>
 
             <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-              This package maps to{" "}
+              This package comes from{" "}
               <strong className="break-all text-ink">
                 {result.repo.host}/{result.repo.owner}/{result.repo.name}
               </strong>
-              , but we haven&apos;t scored it yet.
+              , but we haven&apos;t scored that repo yet.
             </p>
 
             <a
@@ -140,7 +140,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
             >
-              Request scoring <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
+              Ask us to score it <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
             </a>
           </Panel>
         </div>
@@ -152,8 +152,8 @@ export default async function Page({ params }: { params: Promise<{ registry: str
             <PanelHeading>Couldn&apos;t find the source repo</PanelHeading>
 
             <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-              The <span className="mr-1">{registry}</span> registry either doesn&apos;t list a source repo for this
-              package, or it lists one we can&apos;t parse (monorepo subdirectory, self-hosted host, etc.).
+              <span className="mr-1">{registry}</span> doesn&apos;t list a source repo for this package, or it lists one
+              we can&apos;t read (for example, a folder inside a larger repo, or a self-hosted git server).
             </p>
 
             <a
@@ -162,7 +162,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
               rel="noopener noreferrer"
               className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
             >
-              Tell us the correct URL <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
+              Tell us the right link <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
             </a>
           </Panel>
         </div>

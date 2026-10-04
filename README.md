@@ -193,7 +193,7 @@ GitLab and Bitbucket are implemented and score identically to a clone, but ship 
 
 ## Companion: PR-diff GitHub Action
 
-[`hsnice16/agent-friendly-action`](https://github.com/hsnice16/agent-friendly-action) runs the same scorer inside your CI and posts a per-PR score-delta comment — _"this PR drops your Claude Code score by 4.1 points because it removed CI config."_ Opt-in via an `AGENTS_BADGE_TOKEN` secret; falls through silently when unset. Each repo detail page on the dashboard ships a copy-paste workflow snippet under "Catch score regressions on every PR".
+[`hsnice16/agent-friendly-action`](https://github.com/hsnice16/agent-friendly-action) runs the same scorer inside your CI and posts a per-PR score-delta comment — _"this PR drops your Claude Code score by 4.1 points because it removed CI config."_ Opt-in via an `AGENTS_BADGE_TOKEN` secret; falls through silently when unset. Each repo detail page on the dashboard ships a copy-paste workflow snippet under "Check the score on every pull request".
 
 ## Companion: agent skill
 
@@ -204,7 +204,7 @@ GitLab and Bitbucket are implemented and score identically to a clone, but ship 
 Read-only JSON endpoints for external integrators (skills, hooks, browser overlays, third-party tools):
 
 - `GET /api/score?host=<host>&repo=<owner>/<name>` — look up an indexed repo by host + owner/name. Returns `{ repo, signals, modelScores }` on 200; `{ error: "not_indexed" }` with status 404 when the repo isn't in our DB. The natural lookup endpoint for any tool that has a repo URL but not our internal id.
-- `GET /api/repos` — full leaderboard (id, owner, name, host, stars, overall_score, per-model scores).
+- `GET /api/repos` — full leaderboard (each repo row plus its per-model scores).
 - `GET /api/repo/<id>` — per-repo detail (signals, model scores, top improvements). Requires the internal id; use `/api/score` first if you only have host + owner/name.
 - `GET /api/badge/<host>/<owner>/<name>.svg` — embeddable SVG badge. `?model=<id>` for per-model variants.
 - `GET /api/package/<registry>/<name>` — resolve npm / PyPI / Cargo package → source-repo score (or `unresolved` when the registry doesn't expose a repo URL).

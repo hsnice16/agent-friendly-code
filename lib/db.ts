@@ -9,6 +9,7 @@ import type {
   LeaderboardOptions,
   LeaderboardRow,
   LeaderboardStats,
+  ModelScoreRow,
   RepoRow,
   TopPackageRow,
 } from "./types/db";
@@ -40,6 +41,7 @@ db.exec(`
     previous_overall_score REAL,
     language               TEXT,
     badge_embedded         INTEGER,
+    content_changed_at     INTEGER,
     UNIQUE(host, owner, name)
   );
   CREATE TABLE IF NOT EXISTS model_score (
@@ -67,6 +69,14 @@ db.exec(`
   );
 `);
 
+// Immediate + re-check: two processes opening an old DB at once must not both ALTER.
+db.transaction(() => {
+  if (!db.prepare("SELECT 1 FROM pragma_table_info('repo') WHERE name = 'content_changed_at'").get()) {
+    db.exec("ALTER TABLE repo ADD COLUMN content_changed_at INTEGER");
+    db.exec("UPDATE repo SET content_changed_at = last_scored_at");
+  }
+}).immediate();
+
 export function saveScoredRepo(args: {
   url: string;
   host: string;
@@ -80,10 +90,11 @@ export function saveScoredRepo(args: {
   modelScores: ModelScore[];
   defaultBranch?: string | null;
 }): number {
+  const now = Math.floor(Date.now() / 1000);
   const tx = db.transaction(() => {
     db.prepare(
-      `INSERT INTO repo (host, owner, name, url, default_branch, stars, last_scored_at, overall_score, language, badge_embedded)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `INSERT INTO repo (host, owner, name, url, default_branch, stars, last_scored_at, overall_score, language, badge_embedded, content_changed_at)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
        ON CONFLICT(url) DO UPDATE SET
          default_branch         = excluded.default_branch,
          stars                  = excluded.stars,
@@ -91,7 +102,10 @@ export function saveScoredRepo(args: {
          previous_overall_score = repo.overall_score,
          overall_score          = excluded.overall_score,
          language               = COALESCE(excluded.language, repo.language),
-         badge_embedded         = excluded.badge_embedded`,
+         badge_embedded         = excluded.badge_embedded,
+         content_changed_at     = CASE
+           WHEN repo.overall_score IS excluded.overall_score AND repo.badge_embedded IS excluded.badge_embedded
+           THEN COALESCE(repo.content_changed_at, excluded.last_scored_at) ELSE excluded.last_scored_at END`,
     ).run(
       args.host,
       args.owner,
@@ -99,10 +113,11 @@ export function saveScoredRepo(args: {
       args.url,
       args.defaultBranch ?? null,
       args.stars ?? null,
-      Math.floor(Date.now() / 1000),
+      now,
       args.overall,
       args.language ?? null,
       args.badgeEmbedded ? 1 : 0,
+      now,
     );
 
     const row = db.prepare("SELECT id FROM repo WHERE url = ?").get(args.url) as { id: number };
@@ -135,7 +150,6 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
   const dir = opts.dir === "asc" ? "ASC" : "DESC";
   const sort = opts.sort === "stars" ? "stars" : "score";
   const secondary = sort === "stars" ? "score DESC" : "stars DESC";
-
   const hostFilter = opts.host ? "AND r.host = ?" : "";
   const hostArgs = opts.host ? [opts.host] : [];
 
@@ -151,7 +165,6 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
   }
 
   const sortCol = sort === "stars" ? "r.stars" : "m.score";
-
   return db
     .prepare(
       `SELECT r.*, m.score AS score FROM repo r
@@ -190,14 +203,13 @@ export function getPackageAlias(registry: string, name: string): string | null {
   const row = db.prepare("SELECT repo_url FROM package_alias WHERE registry = ? AND name = ?").get(registry, name) as
     | { repo_url: string }
     | undefined;
-
   return row?.repo_url ?? null;
 }
 
 export function getTopPackagesByRegistry(registry: string, limit: number): TopPackageRow[] {
   return db
     .prepare(
-      `SELECT pa.name, r.overall_score AS score, r.owner, r.name AS repoName
+      `SELECT pa.name, r.overall_score AS score, r.owner, r.name AS repoName, r.content_changed_at AS contentChangedAt
          FROM package_alias pa
          JOIN repo r ON r.url = pa.repo_url
         WHERE pa.registry = ?
@@ -218,11 +230,10 @@ export function putPackageAlias(registry: string, name: string, repoUrl: string)
   ).run(registry, name, repoUrl, Math.floor(Date.now() / 1000));
 }
 
-export function getModelScores(repoId: number): Array<{ modelId: string; score: number }> {
-  return db.prepare("SELECT model_id AS modelId, score FROM model_score WHERE repo_id = ?").all(repoId) as Array<{
-    modelId: string;
-    score: number;
-  }>;
+export function getModelScores(repoId: number): ModelScoreRow[] {
+  return db
+    .prepare("SELECT model_id AS modelId, score FROM model_score WHERE repo_id = ?")
+    .all(repoId) as ModelScoreRow[];
 }
 
 export function getSignalResults(repoId: number): SignalResult[] {
@@ -280,12 +291,10 @@ export function getAlternatives(repoId: number, modelId: string | null, limit: n
 }
 
 export function getLeaderboardStats(): LeaderboardStats {
-  const row = db
+  return db
     .prepare(
-      `SELECT COUNT(*) AS count, MAX(last_scored_at) AS lastScoredAt
+      `SELECT COUNT(*) AS count, MAX(last_scored_at) AS lastScoredAt, MAX(content_changed_at) AS contentChangedAt
        FROM repo WHERE overall_score IS NOT NULL`,
     )
     .get() as LeaderboardStats;
-
-  return { count: row.count ?? 0, lastScoredAt: row.lastScoredAt ?? null };
 }

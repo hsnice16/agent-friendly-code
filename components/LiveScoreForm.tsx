@@ -19,12 +19,12 @@ export function LiveScoreForm() {
 
     const parsed = parseRepoUrl(value);
     if (!parsed) {
-      setError("That doesn't look like a repo URL. Try github.com/owner/name.");
+      setError("That doesn't look like a repo link. Try github.com/owner/name.");
       return;
     }
 
     if (!SUPPORTED_HOSTS.includes(parsed.host)) {
-      setError(`${hostLabel(parsed.host)} support is coming — GitHub repos work today.`);
+      setError(`${hostLabel(parsed.host)} is coming soon. GitHub repos work today.`);
       return;
     }
 
@@ -45,7 +45,7 @@ export function LiveScoreForm() {
           autoCorrect="off"
           autoCapitalize="none"
           spellCheck={false}
-          aria-label="Repository URL"
+          aria-label="Repo link"
           aria-invalid={error ? true : undefined}
           aria-describedby={error ? "live-score-error" : undefined}
           placeholder="github.com/owner/name"

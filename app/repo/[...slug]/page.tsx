@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { cache } from "react";
 
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
@@ -9,17 +10,32 @@ import { ModelSuggestions } from "@/components/ModelSuggestions";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RepoHero } from "@/components/RepoHero";
+import { RepoSummary } from "@/components/RepoSummary";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import { getAlternatives, getModelScores, getRepoByHostOwnerName, getSignalResults } from "@/lib/db";
+import {
+  getAlternatives,
+  getModelScores,
+  getRepoByHostOwnerName,
+  getSignalResults,
+  listLeaderboardOverall,
+} from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
+import type { RepoRow } from "@/lib/types/db";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
+import { summarizeRepo, summaryDescription } from "@/lib/utils/repo-summary";
 import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string[] };
+
+// generateMetadata and the page both need the summary; cache() keeps it to one
+// leaderboard read per request.
+const loadSummary = cache((repo: RepoRow) =>
+  summarizeRepo(repo, listLeaderboardOverall(), getModelScores(repo.id), getSignalResults(repo.id)),
+);
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const identity = repoIdentity((await params).slug);
@@ -39,7 +55,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const score = repo.overall_score != null ? repo.overall_score.toFixed(1) : "unranked";
 
   const title = `${slug} — ${score} / 100`;
-  const description = `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi — with the top improvements ranked by score-gain.`;
+  const summary = loadSummary(repo);
+  const description = summaryDescription(slug, summary, repo.overall_score);
 
   const repoKeywords = [
     slug,
@@ -96,6 +113,7 @@ export default async function Page({
 
   const signals = getSignalResults(id);
   const modelScores = getModelScores(id);
+  const summary = loadSummary(repo);
   const alternatives = getAlternatives(id, selected, ALTERNATIVES_LIMIT);
 
   const suggestions = topImprovements(selected, signals);
@@ -130,11 +148,13 @@ export default async function Page({
         codeRepository: repo.url,
         url: `${APP_URL}${path}`,
         ...(repo.language ? { programmingLanguage: repo.language } : {}),
-        ...(repo.last_scored_at != null ? { dateModified: new Date(repo.last_scored_at * 1000).toISOString() } : {}),
+        ...(repo.content_changed_at != null
+          ? { dateModified: new Date(repo.content_changed_at * 1000).toISOString() }
+          : {}),
         keywords: [slug, repo.name, repo.owner, repo.language, "AGENTS.md", "AI coding agent"]
           .filter(Boolean)
           .join(", "),
-        description: `Agent-friendliness score for ${slug} across Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi.`,
+        description: summaryDescription(slug, summary, repo.overall_score),
         additionalProperty: signals.map((s) => ({
           "@type": "PropertyValue",
           name: s.label,
@@ -169,29 +189,35 @@ export default async function Page({
       >
         <span className="text-warn">Use on your repo:</span>
         <a href="#embed-badge" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Embed a badge ↓
+          Add a badge ↓
         </a>
         <span aria-hidden="true" className="text-line">
           ·
         </span>
         <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Add the PR-diff Action ↓
+          Check every pull request ↓
         </a>
         <span aria-hidden="true" className="text-line">
           ·
         </span>
         <Link href="/skill" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Install the agent skill →
+          Get the agent skill →
         </Link>
       </aside>
+
+      {summary && (
+        <div className="mt-3.5">
+          <RepoSummary summary={summary} />
+        </div>
+      )}
 
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <SignalListCard
           items={strengths}
           variant="strength"
-          empty={{ chip: "bad", text: "No fully-passing signals yet." }}
+          empty={{ chip: "bad", text: "Nothing passes fully yet." }}
         />
-        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "No missing signals — nice." }} />
+        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
       </div>
 
       <div className="mt-3.5">
@@ -199,7 +225,7 @@ export default async function Page({
       </div>
 
       <div className="mt-3.5">
-        <PerModelScores modelScores={modelScores} />
+        <PerModelScores modelScores={modelScores} signals={signals} />
       </div>
 
       <div className="mt-3.5">
@@ -212,7 +238,7 @@ export default async function Page({
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Signal breakdown</PanelHeading>
+          <PanelHeading>All checks</PanelHeading>
           {signals.map((s) => (
             <SignalRow key={s.id} signal={s} />
           ))}

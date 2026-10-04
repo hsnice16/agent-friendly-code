@@ -26,20 +26,20 @@ export const CODEX_HOOK_SNIPPET = `{
 
 export const SKILL_FAQ = [
   {
-    q: "Does the skill talk to the dashboard?",
-    a: "No. The scorer is vendored and bundled into the skill's dist/ via @vercel/ncc. After install, every score runs locally on your repo — no HTTP request. If this dashboard goes offline tomorrow, the skill keeps working unchanged.",
+    q: "Does the skill contact this website?",
+    a: "No. The scoring code is copied into the skill and packed into its dist/ folder with @vercel/ncc. Once installed, every score runs on your own computer, with no network request. If this site goes offline tomorrow, the skill keeps working the same way.",
   },
   {
     q: "Which agents does it score against?",
-    a: "Nine: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi — the same set this dashboard profiles. Scoring is the same regardless of which agent invokes the skill; you always get all 9 per-agent scores. The skill installs into any vercel-labs/skills-compatible agent (Cline, Copilot, Continue, Roo Code, Windsurf, Amp, etc.) via the same one-line install.",
+    a: "Nine: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi, the same ones this site scores. It doesn't matter which agent runs the skill: you always get all 9 scores. The same one-line install works in any agent that supports vercel-labs/skills (Cline, Copilot, Continue, Roo Code, Windsurf, Amp, and others).",
   },
   {
-    q: "How does the model recommendation work?",
-    a: "After scoring, the skill maps the overall score to a band (high / mid / low) and suggests a model class. High-scoring repos are agent-prepped enough to leverage a frontier model (Opus / GPT-5 / Gemini 2.5 Pro). Low-scoring repos can't take advantage of the extra reasoning, so a smaller / faster model is the better trade-off. The mapping is provider-neutral and lives in SKILL.md.",
+    q: "How does it pick a model to suggest?",
+    a: "After scoring, the skill puts the overall score in a band (high, mid, or low) and suggests a type of model. A high-scoring repo is set up well enough to get real value from a top model (Opus, GPT-5, Gemini 2.5 Pro). A low-scoring repo can't make use of the extra power, so a smaller, faster model is the better choice. The suggestion doesn't favor any provider, and the rules are in SKILL.md.",
   },
   {
     q: "Where is the source?",
-    a: "github.com/hsnice16/agent-friendly-skill. MIT-licensed, semver-tagged. Pin a ref using the vercel-labs/skills CLI's '#<ref>' fragment syntax — `npx skills add hsnice16/agent-friendly-skill#v0` floats on the latest 0.x.y; '#v0.1.0' pins precisely. (The CLI uses '#' for refs and reserves '@' for skill-name filters.) The scoring code is vendored from the agent-friendly-code dashboard repo's lib/scoring/ and stays in sync per AGENTS.md's mirror discipline.",
+    a: "github.com/hsnice16/agent-friendly-skill. It's MIT-licensed and uses version tags. To choose a version, add '#<version>' to the install command: `npx skills add hsnice16/agent-friendly-skill#v0` always gets the latest 0.x.y, and '#v0.1.0' stays on one exact version. (The CLI uses '#' for versions, because '@' picks a skill by name.) The scoring code is copied from this site's repo (lib/scoring/) and kept in sync by hand, as this site's AGENTS.md describes.",
   },
 ];
 
@@ -47,17 +47,18 @@ export const SCORE_BANDS: Array<{ band: string; range: string; recommendation: s
   {
     band: "High",
     range: "≥ 80",
-    recommendation: "Frontier — Opus / GPT-5 / Gemini 2.5 Pro. The repo is well-prepped, the model can leverage it.",
+    recommendation:
+      "Top model: Opus / GPT-5 / Gemini 2.5 Pro. The repo is well set up, so the model can make full use of it.",
   },
   {
     band: "Mid",
     range: "60 – 79",
-    recommendation: "Standard — Sonnet / GPT-5 Codex / Gemini 2.5 Flash. Solid baseline; frontier is optional.",
+    recommendation: "Standard model: Sonnet / GPT-5 Codex / Gemini 2.5 Flash. A good default; a top model is optional.",
   },
   {
     band: "Low",
     range: "< 60",
     recommendation:
-      "Small / fast — Haiku / GPT-4o-mini / Gemini 2.5 Flash-Lite. Repo lacks the scaffolding to justify a frontier run.",
+      "Small, fast model: Haiku / GPT-4o-mini / Gemini 2.5 Flash-Lite. The repo isn't set up well enough to get value from a top model.",
   },
 ];
