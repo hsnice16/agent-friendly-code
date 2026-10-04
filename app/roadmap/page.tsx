@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "/roadmap" },
   openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Roadmap", url: "/roadmap", type: "article" },
   description:
-    "What's planned for Agent Friendly Code: dogfooding, benchmark-derived weights, ecosystem integration (badges, PR diffs, scheduled rescoring, opt-out), discovery surfaces, production stability, and at-scale GitHub indexing.",
+    "What's coming next for Agent Friendly Code: letting maintainers opt out or claim their repo, scoring packages at scale, a sturdier database, scoring many more GitHub repos, and weights based on real tests.",
 };
 
 export default function RoadmapPage() {
@@ -22,8 +22,8 @@ export default function RoadmapPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Roadmap</h1>
         <p className="m-0 max-w-[70ch] text-[15.5px] text-ink-dim">
-          What&apos;s planned in upcoming versions. Each bullet links to a task file with the full spec, acceptance
-          criteria, and caveats.
+          What&apos;s coming in the next versions. Each item links to a task file with the full plan, what counts as
+          done, and known limits.
         </p>
       </section>
 

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
     url: "/about",
     type: "article",
   },
-  description: `Who built ${APP_NAME}, why it exists, and what it isn't. Independent, MIT-licensed, no affiliation with any AI agent vendor.`,
+  description: `Who built ${APP_NAME}, why, and what it is not. Independent, MIT-licensed, and not tied to any AI agent company.`,
 };
 
 const ABOUT_JSON_LD = {
@@ -59,50 +59,47 @@ export default function AboutPage() {
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">About</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Who built {APP_NAME}, why it exists, and what it deliberately isn&apos;t.
-        </p>
+        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">Who built {APP_NAME}, why, and what it is not.</p>
       </section>
 
       <Panel>
         <PanelHeading>Who</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>.
-          Independent project — no affiliation with Anthropic, OpenAI, Google, Cognition, Anysphere, or any of the agent
-          vendors ranked here.
+          Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>. It is
+          an independent project, not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other company
+          whose agent is ranked here.
         </p>
       </Panel>
 
       <div className="mt-3.5">
         <Panel tone="warn">
-          <PanelHeading tone="warn">Why this exists</PanelHeading>
+          <PanelHeading tone="warn">Why it exists</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The gap between &ldquo;repo with a README&rdquo; and &ldquo;repo that actually helps an AI coding agent ship
-            code&rdquo; keeps widening, and there&apos;s no public way to tell who&apos;s doing the work. {APP_NAME}{" "}
-            tries to make that visible — per model, because the agents aren&apos;t interchangeable. Claude Code wants an
-            AGENTS.md and a fast test loop; Cursor wants strong types and a skim-readable README; Devin wants a runnable
-            dev environment with declared deps and tests. The same repository can score very differently across them,
-            and a single overall number would hide that.
+            A repo that has a README is not the same as a repo that really helps an AI coding agent get work done. That
+            gap keeps growing, and there is no public way to see which repos have done the work. {APP_NAME} tries to
+            show it, for each agent separately, because the agents are not the same. Claude Code wants an AGENTS.md and
+            fast tests. Cursor wants strong types and a README that is easy to skim. Devin wants a dev setup it can run,
+            with its dependencies and tests listed. One repo can score very differently for each of them. A single
+            number would hide that.
           </p>
         </Panel>
       </div>
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>What it isn&apos;t</PanelHeading>
+          <PanelHeading>What it is not</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            This is not a benchmark of agent performance. Today every score is derived from{" "}
-            <strong className="text-ink">static signals</strong> — file existence and content-length checks on the
-            cloned tree. No agent is actually run. Per-model rationales are derived from each agent&apos;s published
-            documentation (sources are linked on the methodology page), but the weight values themselves are still
-            pre-benchmark — not yet calibrated against measured agent success. Read the{" "}
+            It is not a test of how well agents perform. Every score comes from{" "}
+            <strong className="text-ink">simple file checks</strong>: does a file exist, and how long is it. No agent is
+            actually run. The reasons behind each agent&apos;s weights come from that agent&apos;s own docs (linked on
+            the methodology page). But the weight numbers are not yet tested against how agents really perform. Read the{" "}
             <Link
               href="/methodology"
               className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
               methodology
             </Link>{" "}
-            for the full picture, including the production-cut plan to replace pre-benchmark weights with measured ones.
+            for the details, including the plan to replace these weights with measured ones.
           </p>
         </Panel>
       </div>
@@ -111,9 +108,9 @@ export default function AboutPage() {
         <Panel>
           <PanelHeading>Open source</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            MIT-licensed. The signal definitions, weight profiles, scoring code, seed list, and every score in the
-            database are all in the <ExternalLink href={REPO_URL}>source repository</ExternalLink>. If a repo&apos;s
-            score looks wrong, file an issue with a link and the rubric to revisit; if a signal is missing, propose one.
+            MIT-licensed. The checks, the weights, the scoring code, the list of repos, and every score are all in the{" "}
+            <ExternalLink href={REPO_URL}>source repository</ExternalLink>. If a score looks wrong, open an issue with a
+            link and say which rule to look at again. If a check is missing, suggest one.
           </p>
         </Panel>
       </div>
@@ -123,7 +120,8 @@ export default function AboutPage() {
           <PanelHeading>Contact</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            Best signal: open an issue or discussion on <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>.
+            The best way to reach me: open an issue or discussion on{" "}
+            <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>.
           </p>
         </Panel>
       </div>

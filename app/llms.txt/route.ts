@@ -54,14 +54,14 @@ ${MODELS.map((m) => `- ${m.label} — ${m.rationale}`).join("\n")}
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
 - [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, including repos the leaderboard has not indexed
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
-- [Skill](${APP_URL}/skill): Portable agent skill — install snippet, score → model mapping, optional SessionStart hooks for Claude Code / Codex
+- [Skill](${APP_URL}/skill): Portable agent skill — install snippet, which model to use for which score, optional SessionStart hooks for Claude Code / Codex
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL
 
 ## Public API
 
 - [\`GET /api/badge/{host}/{owner}/{name}.svg\`](${APP_URL}/api/badge/github/vercel/next.js.svg): Embeddable SVG badge (\`?model=<id>\` for per-model)
 - [\`GET /api/package/{registry}/{name}\`](${APP_URL}/api/package/npm/next): Resolve npm / PyPI / Cargo package → source-repo score
-- [\`GET /api/repos\`](${APP_URL}/api/repos): JSON dump of the leaderboard (id, owner, name, host, stars, overall_score, per-model scores)
+- [\`GET /api/repos\`](${APP_URL}/api/repos): JSON dump of the leaderboard (each repo row plus its per-model scores)
 - [\`GET /api/repo/{id}\`](${APP_URL}/api/repo/1): Per-repo detail — signals, model scores, top improvements
 - [\`GET /api/score?host=&repo=owner/name\`](${APP_URL}/api/score?host=github&repo=vercel/next.js): Look up an indexed repo by host + owner/name — public read for external integrators (the PR-diff Action and the agent skill both vendor the scorer locally and don't call this at runtime)
 

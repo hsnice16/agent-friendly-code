@@ -13,12 +13,12 @@ const VARIANTS = {
   strength: {
     glyph: "✓",
     ariaLabel: "Pass",
-    heading: "Strengths",
+    heading: "What it has",
     chipClass: "bg-ok/15 text-ok",
   },
   gap: {
     glyph: "✗",
-    heading: "Gaps",
+    heading: "What it's missing",
     ariaLabel: "Missing",
     chipClass: "bg-bad/15 text-bad",
   },

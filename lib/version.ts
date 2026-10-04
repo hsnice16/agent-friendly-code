@@ -18,7 +18,7 @@ export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#$
 // every canonical and sitemap URL at a host this app tells Google to drop.
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agentfriendlycode.com";
 export const APP_DESCRIPTION =
-  "Public dashboard ranking open-source repos by how friendly they are to AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) — per model, across GitHub, GitLab, and Bitbucket.";
+  "Open-source repos ranked by how easy they are for AI coding agents to work in, scored for each agent (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi), across GitHub, GitLab, and Bitbucket.";
 
 export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
 export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;

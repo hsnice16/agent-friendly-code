@@ -19,7 +19,7 @@ export function ModelPills({
   selected,
   scroll = true,
   includeOverall = false,
-  label = "Select a model",
+  label = "Pick an AI agent",
 }: Props) {
   return (
     <nav aria-label={label} className="mb-4 flex flex-wrap gap-2">

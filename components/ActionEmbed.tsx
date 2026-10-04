@@ -35,18 +35,18 @@ jobs:
 
   return (
     <Panel tone={tone}>
-      <PanelHeading tone={tone}>Catch score regressions on every PR</PanelHeading>
+      <PanelHeading tone={tone}>Check the score on every pull request</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Drop the workflow below into your repo and the action will post (or edit) a single comment on each PR with the
-        score delta and the per-signal changes — runs entirely inside your CI, no third-party server in the loop.
+        Add this file to your repo. On each pull request, it posts one comment showing how the score changed and why. It
+        runs in your own CI, with no outside server involved.
       </p>
 
       <CopySnippet text={yaml} highlight={highlight} />
 
       <p className="mt-3 text-[12.5px] text-muted">
-        Set <code className="text-ink-dim mr-0.5">AGENTS_BADGE_TOKEN</code> in the repo&apos;s secrets to enable the
-        comment; leave it unset and the action exits silently.
+        Add <code className="text-ink-dim mr-0.5">AGENTS_BADGE_TOKEN</code> to the repo&apos;s secrets to turn the
+        comment on. Without it, the action does nothing.
         {showSecretLink && (
           <>
             {" "}

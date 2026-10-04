@@ -14,9 +14,9 @@ import {
   TWITTER_DEFAULTS,
 } from "@/lib/version";
 
-const PAGE_TITLE = "Agent Friendly Action — PR-diff GitHub Action for AI agent-friendliness";
+const PAGE_TITLE = "Agent Friendly Action — check the AI agent score on every pull request";
 const PAGE_DESCRIPTION =
-  "GitHub Action that scores your PR's head and base in CI and posts a single comment with the agent-friendliness delta — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi. Opt-in, Marketplace-listed, runs entirely inside your CI.";
+  "A GitHub Action that scores each pull request and posts one comment showing how it changes the score for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. You turn it on yourself, it's on the Marketplace, and it runs only in your CI.";
 
 const PAGE_KEYWORDS = [
   ...APP_KEYWORDS,
@@ -49,24 +49,24 @@ export const metadata: Metadata = {
 
 const FAQ = [
   {
-    q: "What does the action do on a PR?",
-    a: "It runs inside your CI (no third-party server in the loop), checks out the PR head and the base ref, scores both trees with the bundled scorer, and posts a single PR comment with the overall delta plus per-signal changes. On the next push it edits that same comment instead of creating a new one.",
+    q: "What does the action do on a pull request?",
+    a: "It runs in your own CI, with no outside server involved. It scores the pull request and the branch it targets, then posts one comment showing how the overall score changed and which checks changed. On the next push it updates that same comment instead of adding a new one.",
   },
   {
     q: "Why is AGENTS_BADGE_TOKEN required?",
-    a: "It's an opt-in marker, not an API credential. Set it (any non-empty string) to enable the comment; leave it unset and the action exits silently. This lets template / starter repos ship the workflow without it firing for forks or unenrolled installs.",
+    a: "It's an on switch, not a password or API key. Set it to any text to turn the comment on. Leave it unset and the action quietly does nothing. This lets template and starter repos include the workflow without it running in every fork or copy.",
   },
   {
-    q: "Does it talk to your web app?",
-    a: "No. The scorer and weights are bundled into the action's dist via @vercel/ncc. If this dashboard goes offline, the action keeps producing PR comments unchanged. A future version will optionally fetch fresh weights from /api/weights once benchmark-derived weights ship (1.0.0).",
+    q: "Does it contact this website?",
+    a: "No. The scoring code and weights are packed into the action itself (its dist folder, built with @vercel/ncc). If this site goes offline, the action keeps working the same way. Once weights are based on real tests (version 1.0.0), a later version may optionally download fresh weights from /api/weights.",
   },
   {
     q: "Does it work on private repos?",
-    a: "Yes — it runs in your CI under your existing GITHUB_TOKEN. The action never sends repo contents anywhere; the scoring is local to the runner.",
+    a: "Yes. It runs in your CI with your existing GITHUB_TOKEN. The action never sends your code anywhere. All scoring happens on the CI machine.",
   },
   {
     q: "Where is the source?",
-    a: "github.com/hsnice16/agent-friendly-action. MIT-licensed, semver-tagged. Pin @v0 to track the latest 0.x release; pin @v0.1.0 to opt out of automatic minor / patch updates.",
+    a: "github.com/hsnice16/agent-friendly-action. It's MIT-licensed and uses version tags. Use @v0 to always get the latest 0.x release. Use @v0.1.0 to stay on one exact version with no automatic updates.",
   },
 ];
 
@@ -127,12 +127,12 @@ export default function ActionPage() {
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent Friendly Action — score every PR
+          Agent Friendly Action: score every pull request
         </h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          A GitHub Action that comments the agent-friendliness delta on every pull request — &ldquo;this PR drops your
-          Claude Code score by 4.1 points because it removed CI config&rdquo;. Runs entirely inside your CI, no
-          third-party server, opt-in via a single secret.
+          A GitHub Action that comments on every pull request with how it changes your score. For example: &ldquo;this
+          PR drops your Claude Code score by 4.1 points because it removed CI config&rdquo;. It runs only in your CI,
+          with no outside server, and you turn it on with one secret.
         </p>
       </section>
 
@@ -146,7 +146,7 @@ export default function ActionPage() {
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               AGENTS_BADGE_TOKEN
             </code>{" "}
-            is present — it&apos;s an opt-in marker, not a credential. Add it once and forget it:
+            is set. It&apos;s an on switch, not a password. Add it once and you&apos;re done:
           </p>
 
           <ol className="m-0 ml-5 mt-3 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
@@ -161,19 +161,19 @@ export default function ActionPage() {
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 AGENTS_BADGE_TOKEN
               </code>
-              . Value: any non-empty string —{" "}
+              . Value: any text, for example{" "}
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 enabled
               </code>{" "}
-              works. The string itself isn&apos;t checked.
+              . The value itself isn&apos;t checked.
             </li>
             <li>
-              Click <strong className="text-ink">Add secret</strong>. The action fires on the next PR.
+              Click <strong className="text-ink">Add secret</strong>. The action runs on your next pull request.
             </li>
           </ol>
 
           <p className="mt-3 text-[13px] text-muted">
-            Authoritative reference:{" "}
+            GitHub&apos;s guide:{" "}
             <ExternalLink href="https://docs.github.com/en/actions/security-guides/encrypted-secrets">
               docs.github.com — encrypted secrets
             </ExternalLink>
@@ -190,15 +190,18 @@ export default function ActionPage() {
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 actions/checkout
               </code>{" "}
-              with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the PR head and access to base
-              history.
+              with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the pull request and the
+              history of the branch it targets.
             </li>
 
-            <li>The action fetches the base ref locally and checks it out into a worktree — no network clone.</li>
-            <li>Scores both trees with the bundled scorer and computes the overall + per-signal + per-model delta.</li>
+            <li>
+              The action checks out the target branch from that history, fetching just that commit if it is missing. No
+              full clone.
+            </li>
+            <li>It scores both versions and works out what changed: overall, for each check, and for each agent.</li>
 
             <li>
-              Posts (or edits) a single PR comment marked with{" "}
+              It posts one comment on the pull request (or updates it), marked with{" "}
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 {"<!-- agent-friendly-action -->"}
               </code>
@@ -210,10 +213,10 @@ export default function ActionPage() {
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Self-contained by design</PanelHeading>
+          <PanelHeading>Works on its own</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The scorer and weights are bundled into{" "}
+            The scoring code and weights are packed into{" "}
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               dist/
             </code>{" "}
@@ -221,13 +224,13 @@ export default function ActionPage() {
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               @vercel/ncc
             </code>
-            . If {APP_NAME} goes offline tomorrow, the action keeps producing PR comments unchanged. Runtime weight
-            refresh from a future{" "}
+            . If {APP_NAME} goes offline tomorrow, the action keeps working the same way. Downloading fresh weights from
+            a future{" "}
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               /api/weights
             </code>{" "}
-            endpoint is deferred to v1.0.0 once benchmark-derived weights ship — until then both the head and the base
-            are scored with the same bundled weights, so any drift cancels in the diff.
+            endpoint waits until v1.0.0, when weights will be based on real tests. Until then, both versions are scored
+            with the same weights, so the comparison stays fair.
           </p>
         </Panel>
       </div>
@@ -255,7 +258,8 @@ export default function ActionPage() {
             <ExternalLink href={ACTION_REPO_URL} iconSize={12}>
               {ACTION_REPO_URL.replace(/^https:\/\//, "")}
             </ExternalLink>{" "}
-            — MIT-licensed, semver-tagged. Listed on the GitHub Marketplace under Code Quality / Continuous Integration.
+            — MIT-licensed, with version tags. Listed on the GitHub Marketplace under Code Quality / Continuous
+            Integration.
           </p>
         </Panel>
       </div>

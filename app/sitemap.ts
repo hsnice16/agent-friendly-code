@@ -9,50 +9,47 @@ const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
 const LEGAL_LAST_UPDATED = new Date("2026-05-19");
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  // Only a score or badge change moves lastmod: a date that moves on every crawl
+  // or rescore teaches Google to ignore it.
   const stats = getLeaderboardStats();
-  const lastScored = stats.lastScoredAt != null ? new Date(stats.lastScoredAt * 1000) : now;
+  const contentChanged = stats.contentChangedAt != null ? new Date(stats.contentChangedAt * 1000) : undefined;
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
       priority: 1,
       url: APP_URL,
-      lastModified: lastScored,
+      lastModified: contentChanged,
       changeFrequency: "daily",
     },
     {
       priority: 0.9,
       url: `${APP_URL}/score`,
-      lastModified: lastScored,
+      lastModified: contentChanged,
       changeFrequency: "weekly",
     },
     {
       priority: 0.8,
       url: `${APP_URL}/package`,
-      lastModified: lastScored,
+      lastModified: contentChanged,
       changeFrequency: "weekly",
     },
     {
       priority: 0.8,
-      lastModified: now,
       url: `${APP_URL}/action`,
       changeFrequency: "monthly",
     },
     {
       priority: 0.8,
-      lastModified: now,
       url: `${APP_URL}/skill`,
       changeFrequency: "monthly",
     },
     {
       priority: 0.7,
-      lastModified: now,
       changeFrequency: "monthly",
       url: `${APP_URL}/methodology`,
     },
     {
       priority: 0.5,
-      lastModified: now,
       url: `${APP_URL}/about`,
       changeFrequency: "monthly",
     },
@@ -70,19 +67,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
     {
       priority: 0.6,
-      lastModified: now,
       changeFrequency: "weekly",
       url: `${APP_URL}/roadmap`,
     },
     {
       priority: 0.6,
-      lastModified: now,
       changeFrequency: "weekly",
       url: `${APP_URL}/changelog`,
     },
     {
       priority: 0.4,
-      lastModified: lastScored,
+      lastModified: contentChanged,
       changeFrequency: "weekly",
       url: `${APP_URL}/llms.txt`,
     },
@@ -91,13 +86,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const repoRoutes: MetadataRoute.Sitemap = listLeaderboardOverall().map((r) => ({
     changeFrequency: "weekly",
     url: `${APP_URL}${repoPath(r)}`,
-    lastModified: r.last_scored_at != null ? new Date(r.last_scored_at * 1000) : now,
+    lastModified: r.content_changed_at != null ? new Date(r.content_changed_at * 1000) : undefined,
     priority: r.score != null ? Math.round((0.3 + (r.score / 100) * 0.6) * 10) / 10 : 0.4,
   }));
 
   const packageRoutes: MetadataRoute.Sitemap = REGISTRIES.flatMap((registry) =>
     getTopPackagesByRegistry(registry, SITEMAP_PACKAGE_LIMIT_PER_REGISTRY).map((p) => ({
-      lastModified: lastScored,
+      lastModified: p.contentChangedAt != null ? new Date(p.contentChangedAt * 1000) : undefined,
       changeFrequency: "weekly",
       url: `${APP_URL}/package/${registry}/${p.name}`,
       priority: Math.round((0.4 + (p.score / 100) * 0.4) * 10) / 10,

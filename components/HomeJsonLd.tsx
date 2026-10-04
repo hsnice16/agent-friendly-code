@@ -4,12 +4,10 @@ import { APP_URL } from "@/lib/version";
 
 type HomeJsonLdProps = {
   allOverall: LeaderboardRow[];
-  lastScoredAt: number | null;
+  contentChangedAt: number | null;
 };
 
-export function HomeJsonLd({ allOverall, lastScoredAt }: HomeJsonLdProps) {
-  const lastModified = lastScoredAt != null ? new Date(lastScoredAt * 1000).toISOString() : new Date().toISOString();
-
+export function HomeJsonLd({ allOverall, contentChangedAt }: HomeJsonLdProps) {
   const json = {
     "@context": "https://schema.org",
     "@graph": [
@@ -30,10 +28,10 @@ export function HomeJsonLd({ allOverall, lastScoredAt }: HomeJsonLdProps) {
         "@id": `${APP_URL}/#dataset`,
         name: "Agent Friendly Code — public repository scoring dataset",
         description:
-          "Per-model agent-friendliness scores for public repositories on GitHub, GitLab, and Bitbucket, evaluated against sixteen static signals — twelve cross-agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing, dev env, pre-commit, deps manifest, size) plus four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml) — for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi.",
+          "Scores for public GitHub, GitLab, and Bitbucket repos showing how easy each one is for AI coding agents to work in, with a separate score for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each repo gets sixteen file checks: twelve that matter to every agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing guide, dev setup, pre-commit, dependency list, size) and four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml).",
         url: APP_URL,
         isAccessibleForFree: true,
-        dateModified: lastModified,
+        ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
         creator: { "@id": `${APP_URL}/#org` },
         license: "https://opensource.org/licenses/MIT",
         mainEntity: { "@id": `${APP_URL}/#leaderboard` },

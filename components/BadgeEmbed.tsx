@@ -22,10 +22,9 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, highlight 
 
   return (
     <Panel tone={tone}>
-      <PanelHeading tone={tone}>Embed this badge</PanelHeading>
+      <PanelHeading tone={tone}>Add a badge to your README</PanelHeading>
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Drop the snippet below into the top of this repo&apos;s README so visitors can see its agent-friendliness at a
-        glance — clicks land back here.
+        Paste this at the top of the README. It shows the score, and links back to this page.
       </p>
 
       <div className="mb-3">

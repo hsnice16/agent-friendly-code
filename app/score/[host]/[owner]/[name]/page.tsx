@@ -55,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   return {
     title,
-    description: `On-demand agent-friendliness score for ${owner}/${name}, computed from its current commit.`,
+    description: `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`,
     twitter: { ...TWITTER_DEFAULTS, title },
     alternates: { canonical: `/score/${host}/${owner}/${name}` },
     // Unbounded URL space; robots.ts disallows /score/* and the sitemap stays on the repo pages.
@@ -71,7 +71,7 @@ function Unsupported({ host }: { host: string }) {
     <Panel>
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">{label} support is coming</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
-        {`Scoring works for ${label} repositories, but its API needs guards this page doesn't have yet — a wrong score would be worse than none. GitHub repositories work today.`}
+        {`We can score ${label} repos, but this page can't yet stay within ${label}'s limits, and a wrong score is worse than no score. GitHub repos work today.`}
       </p>
       <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
         ← try a GitHub repo
@@ -120,7 +120,7 @@ export default async function LiveScorePage({
   } catch (err) {
     if (err instanceof TooLargeError) {
       return (
-        <Unavailable reason="This repository is too large to score on demand. It can still be scored locally with the agent skill." />
+        <Unavailable reason="This repo is too big to score here. You can still score it on your own computer with the agent skill." />
       );
     }
     // Everything else is transient — a rate limit, a host blip. Let it reach
@@ -131,7 +131,7 @@ export default async function LiveScorePage({
   }
 
   if (!score) {
-    return <Unavailable reason="No such public repository on that host — check the owner and name." />;
+    return <Unavailable reason="We couldn't find a public repo with that name. Check the owner and repo name." />;
   }
 
   const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
@@ -149,6 +149,7 @@ export default async function LiveScorePage({
     stars: score.stars,
     language: score.language,
     last_scored_at: null,
+    content_changed_at: null,
     overall_score: score.overall,
     previous_overall_score: null,
     default_branch: score.defaultBranch,
@@ -172,9 +173,9 @@ export default async function LiveScorePage({
         <SignalListCard
           items={strengths}
           variant="strength"
-          empty={{ chip: "bad", text: "No fully-passing signals yet." }}
+          empty={{ chip: "bad", text: "Nothing passes fully yet." }}
         />
-        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "No missing signals — nice." }} />
+        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
       </div>
 
       <div className="mt-3.5">
@@ -182,7 +183,7 @@ export default async function LiveScorePage({
       </div>
 
       <div className="mt-3.5">
-        <PerModelScores modelScores={score.modelScores} />
+        <PerModelScores modelScores={score.modelScores} signals={score.signals} />
       </div>
 
       <div className="mt-3.5">
@@ -195,7 +196,7 @@ export default async function LiveScorePage({
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Signal breakdown</PanelHeading>
+          <PanelHeading>All checks</PanelHeading>
           {score.signals.map((s) => (
             <SignalRow key={s.id} signal={s} />
           ))}

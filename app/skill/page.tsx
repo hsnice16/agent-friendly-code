@@ -18,7 +18,7 @@ import {
 
 const PAGE_TITLE = "Agent Friendly Skill — score your repo locally and pick the right model";
 const PAGE_DESCRIPTION =
-  "Portable agent skill that scores the current repo's agent-friendliness on disk and recommends a model. Profiles 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi); installs into any vercel-labs/skills-compatible agent. Self-contained: vendored scorer, no service dependency, works offline.";
+  "An agent skill that scores the repo on your computer and suggests which model to use. It scores the repo for 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) and installs into any agent that supports vercel-labs/skills. Everything runs locally, works offline, and doesn't depend on this site.";
 
 const PAGE_KEYWORDS = [...APP_KEYWORDS, "model recommendation", "agent-friendliness score"];
 
@@ -95,36 +95,35 @@ export default function SkillPage() {
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent Friendly Skill — score the repo, pick the model
+          Agent Friendly Skill: score your repo, pick a model
         </h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          A portable agent skill that scores your current repo&apos;s agent-friendliness locally and recommends which
-          model to use for it. Vendored scorer, no service dependency — works offline, keeps working if {APP_NAME} goes
-          down.
+          An agent skill that scores the repo you&apos;re working in, on your own computer, and suggests which model to
+          use for it. The scoring code is built in, so it works offline and keeps working even if {APP_NAME} goes down.
         </p>
       </section>
 
       <Panel tone="warn">
         <PanelHeading tone="warn">Install</PanelHeading>
         <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
-          One command, any supported agent — the{" "}
+          One command works for any supported agent. The{" "}
           <ExternalLink href="https://github.com/vercel-labs/skills" tone="ink">
             vercel-labs/skills
           </ExternalLink>{" "}
-          CLI autodetects which agents you have configured locally and writes{" "}
-          <code className="text-ink-dim">SKILL.md</code> plus the bundled scorer to each one&apos;s skill directory.
+          CLI finds the agents you have set up and adds <code className="text-ink-dim">SKILL.md</code> and the scoring
+          code to each one&apos;s skills folder.
         </p>
 
         <CopySnippet text={SKILL_INSTALL_CMD} highlight="warn" />
 
         <p className="mt-3 text-[12.5px] text-muted">
-          After install, run <code className="text-ink-dim">/agent-friendly</code> (or however your agent invokes
-          skills) inside any local repo — the skill resolves the repo root, runs the bundled scorer, and prints the
-          score plus a model recommendation. The scorer profiles 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex,
-          Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) and always returns scores for all 9 — the best-fit pick is
-          score-driven, not driven by which agent invoked the skill, so the output is identical whether Claude Code,
-          Cline, Copilot, Continue, or anything else vercel-labs/skills installs into is calling it.
+          After installing, run <code className="text-ink-dim">/agent-friendly</code> (or however your agent runs
+          skills) inside any repo on your computer. The skill finds the repo&apos;s top folder, scores it, and prints
+          the score with a suggested model. It always gives scores for all 9 agents (Claude Code, Cursor, Devin, GPT-5
+          Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi). The best fit is picked by score, not by which agent ran
+          the skill, so you get the same result from Claude Code, Cline, Copilot, Continue, or any other supported
+          agent.
         </p>
       </Panel>
 
@@ -134,25 +133,24 @@ export default function SkillPage() {
 
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             <li>
-              The agent tells you upfront that it scores the current working directory — so make sure you&apos;re at
-              your project root before invoking. The CLI also emits a warning when the path has no project markers (
+              The agent tells you first that it scores the folder you&apos;re in, so start from your project&apos;s top
+              folder. The CLI also warns you if the folder has none of the usual project files (
               <code className="text-ink-dim">package.json</code> / <code className="text-ink-dim">README.md</code> /{" "}
-              <code className="text-ink-dim">AGENTS.md</code> / <code className="text-ink-dim">.git</code>) so a wrong
-              path can&apos;t silently produce a low score.
+              <code className="text-ink-dim">AGENTS.md</code> / <code className="text-ink-dim">.git</code>), so the
+              wrong folder can&apos;t quietly give you a low score.
             </li>
             <li>
-              The agent runs <code className="text-ink-dim">node &lt;skill-dir&gt;/dist/index.js .</code> — a single
-              ncc-bundled file with no runtime deps and no network.
+              The agent runs <code className="text-ink-dim">node &lt;skill-dir&gt;/dist/index.js .</code>. It&apos;s one
+              file (built with ncc) that needs only Node and never uses the network.
             </li>
             <li>
-              The scorer evaluates the same sixteen signals this dashboard uses (AGENTS.md, CI, tests, README, linter,
-              dev env, license, contributing, pre-commit, deps manifest, type config, codebase size, plus four
-              agent-specific instruction files) and returns per-agent scores.
+              It runs the same sixteen checks this site uses (AGENTS.md, CI, tests, README, linter, dev setup, license,
+              contributing guide, pre-commit, dependency list, type config, codebase size, plus four agent-specific
+              instruction files) and gives a score for each agent.
             </li>
             <li>
-              The agent picks the highest-scoring entry as the best-fit (score-driven, regardless of which agent is
-              invoking the skill), and recommends a model class using the table below — leaving the actual model switch
-              up to the user.
+              The agent picks the highest score as the best fit (no matter which agent ran the skill) and suggests a
+              type of model using the table below. Switching models is left to you.
             </li>
           </ol>
         </Panel>
@@ -160,11 +158,12 @@ export default function SkillPage() {
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Score → model mapping</PanelHeading>
+          <PanelHeading>Which model for which score</PanelHeading>
 
           <p className="m-0 mb-3 text-[13px] text-muted">
-            Provider-neutral. The skill recommends a model <em>class</em> — the user picks the actual ID for their agent
-            and runs <code className="text-ink-dim">/model</code> (or equivalent) themselves.
+            This doesn&apos;t favor any provider. The skill suggests a <em>type</em> of model. You pick the exact model
+            for your agent and switch with <code className="text-ink-dim">/model</code> (or your agent&apos;s
+            equivalent).
           </p>
 
           <div className="overflow-x-auto rounded-md border border-line">
@@ -173,7 +172,7 @@ export default function SkillPage() {
                 <tr className="bg-surface-2 [&>th]:border-b [&>th]:border-line [&>th]:px-3 [&>th]:py-2 [&>th]:text-left [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted">
                   <th scope="col">Band</th>
                   <th scope="col">Score</th>
-                  <th scope="col">Recommendation</th>
+                  <th scope="col">Suggested model</th>
                 </tr>
               </thead>
 
@@ -196,10 +195,10 @@ export default function SkillPage() {
 
       <div className="mt-3.5">
         <Panel tone="info">
-          <PanelHeading tone="info">Optional — score every session via SessionStart hook</PanelHeading>
+          <PanelHeading tone="info">Optional: score at the start of every session</PanelHeading>
           <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
-            For agents that support session-start hooks, you can have the skill print a one-line summary at the top of
-            every session. Drop one of these into the matching settings file:
+            If your agent supports session-start hooks, the skill can print a one-line summary at the start of every
+            session. Add one of these to the matching settings file:
           </p>
 
           <p className="m-0 mb-1.5 text-[12.5px] font-medium text-muted">
@@ -213,26 +212,26 @@ export default function SkillPage() {
           <CopySnippet text={CODEX_HOOK_SNIPPET} highlight="info" />
 
           <p className="mt-3 text-[12.5px] text-muted">
-            Cursor, Cline, and Copilot don&apos;t expose a session-start hook today — paste the same{" "}
+            Cursor, Cline, and Copilot don&apos;t have a session-start hook yet. Instead, paste the same{" "}
             <code className="text-ink-dim">node ... --summary</code> command into{" "}
             <code className="text-ink-dim">.cursorrules</code> / <code className="text-ink-dim">.clinerules</code> as a
-            static instruction, or invoke <code className="text-ink-dim">/agent-friendly</code> manually when you want a
-            fresh score.
+            fixed instruction, or run <code className="text-ink-dim">/agent-friendly</code> yourself whenever you want a
+            new score.
           </p>
         </Panel>
       </div>
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Self-contained by design</PanelHeading>
+          <PanelHeading>Works on its own</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The scorer and weights are bundled into <code className="text-ink-dim">dist/index.js</code> via{" "}
-            <code className="text-ink-dim">@vercel/ncc</code> and committed to the skill repo. Every run is a local
-            file-system pass — no network, no dashboard call, no token. If {APP_NAME} disappears, the skill keeps
-            scoring. The vendored scoring code is mirrored from {APP_NAME}&apos;s{" "}
-            <code className="text-ink-dim">lib/scoring/</code> (this dashboard&apos;s source) and stays in sync via the
-            mirror discipline documented in AGENTS.md.
+            The scoring code and weights are packed into <code className="text-ink-dim">dist/index.js</code> with{" "}
+            <code className="text-ink-dim">@vercel/ncc</code> and saved in the skill repo. Every run only reads files on
+            your computer: no network, no call to this site, no token. If {APP_NAME} disappears, the skill keeps
+            working. The scoring code is copied from {APP_NAME}&apos;s{" "}
+            <code className="text-ink-dim">lib/scoring/</code> (this site&apos;s source) and kept in sync by hand, as
+            described in its AGENTS.md.
           </p>
         </Panel>
       </div>
@@ -260,8 +259,8 @@ export default function SkillPage() {
             <ExternalLink href={SKILL_REPO_URL} iconSize={12}>
               {SKILL_REPO_URL.replace(/^https:\/\//, "")}
             </ExternalLink>{" "}
-            — MIT-licensed, semver-tagged. Sibling repo to{" "}
-            <ExternalLink href={ACTION_REPO_URL}>agent-friendly-action</ExternalLink> — both vendor the same scorer.
+            — MIT-licensed, with version tags. A sister project to{" "}
+            <ExternalLink href={ACTION_REPO_URL}>agent-friendly-action</ExternalLink>. Both use the same scoring code.
           </p>
         </Panel>
       </div>

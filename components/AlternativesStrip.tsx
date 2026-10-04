@@ -20,11 +20,11 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
 
   return (
     <Panel>
-      <PanelHeading>Alternatives</PanelHeading>
+      <PanelHeading>Similar repos</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Same-language repos scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. Heuristic v1
-        (same language + same host).
+        Scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. A simple first version: picked only
+        because they share this repo&apos;s language and host.
       </p>
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-3">

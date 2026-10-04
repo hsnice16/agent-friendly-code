@@ -22,7 +22,7 @@ import { APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 const HOME_TITLE =
   "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi";
 const HOME_DESCRIPTION =
-  "Public leaderboard ranking GitHub, GitLab, and Bitbucket repos by how agent-friendly they are for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi — per model, with AGENTS.md / CLAUDE.md, CI, tests, and dev-env signals.";
+  "A public ranking of GitHub, GitLab, and Bitbucket repos by how easy they are for AI coding agents to work in: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each agent gets its own score, based on checks like AGENTS.md / CLAUDE.md, CI, tests, and dev setup.";
 
 type SearchParams = {
   q?: string;
@@ -143,19 +143,19 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
 
   const activeLabel =
     selected === "overall"
-      ? "Overall (average across models)"
+      ? "Overall (average of all agents)"
       : (MODELS.find((m) => m.id === selected)?.label ?? selected);
 
   const rationale =
     selected === "overall"
-      ? "Simple average of every per-model score."
+      ? "The average of every agent's score."
       : (MODELS.find((m) => m.id === selected)?.rationale ?? "");
 
   const allOverall = listLeaderboardOverall();
 
   return (
     <>
-      <HomeJsonLd allOverall={allOverall} lastScoredAt={stats.lastScoredAt} />
+      <HomeJsonLd allOverall={allOverall} contentChangedAt={stats.contentChangedAt} />
 
       {/* Announced only once the release it describes is the one deployed —
           otherwise a version bump ahead of the changelog entry (or behind it)
@@ -165,14 +165,14 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
       )}
       <section className="mb-5">
         <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
-          Which public repos are friendliest to an AI coding agent?
+          Which public repos are easiest for AI coding agents to work in?
         </h1>
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Ranked per model across GitHub, GitLab, and Bitbucket — because agents aren&apos;t interchangeable.
+          Repos from GitHub, GitLab, and Bitbucket, ranked for each agent. Each agent looks for different things.
         </p>
 
         <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
-          Looking up a dependency?{" "}
+          Checking a package you use?{" "}
           <Link
             href="/package"
             className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
@@ -183,14 +183,14 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         </p>
 
         <p className="mt-1.5 max-w-[68ch] text-[13px] text-muted">
-          Repo not on the board?{" "}
+          Repo not on the list?{" "}
           <Link
             href="/score"
             className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
           >
-            Score any public GitHub repo live
+            Score any public GitHub repo now
           </Link>{" "}
-          from its current commit.
+          from its latest commit.
         </p>
       </section>
 

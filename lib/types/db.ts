@@ -10,6 +10,7 @@ export type RepoRow = {
   badge_embedded: number | null;
   default_branch: string | null;
   last_scored_at: number | null;
+  content_changed_at: number | null;
   previous_overall_score: number | null;
 };
 
@@ -29,7 +30,10 @@ export type TopPackageRow = {
   score: number;
   owner: string;
   repoName: string;
+  contentChangedAt: number | null;
 };
+
+export type ModelScoreRow = { modelId: string; score: number };
 
 export type AlternativeRow = {
   id: number;
@@ -43,4 +47,5 @@ export type AlternativeRow = {
 export type LeaderboardStats = {
   count: number;
   lastScoredAt: number | null;
+  contentChangedAt: number | null;
 };

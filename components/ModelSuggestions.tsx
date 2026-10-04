@@ -15,18 +15,18 @@ type Props = {
 export function ModelSuggestions({ basePath, selected, suggestions }: Props) {
   return (
     <Panel>
-      <PanelHeading>Suggestions to improve for a specific model</PanelHeading>
+      <PanelHeading>What to fix first</PanelHeading>
 
       <ModelPills
         scroll={false}
         selected={selected}
         hrefFor={(m) => `${basePath}?model=${m}`}
-        label="Select a model for per-model suggestions"
+        label="Pick an AI agent"
       />
 
       {suggestions.length === 0 ? (
         <div className="text-muted">
-          No gaps — this repo is already maxing out {MODEL_BY_ID[selected].label}&apos;s rubric.
+          Nothing to fix — this repo already has everything {MODEL_BY_ID[selected].label} looks for.
         </div>
       ) : (
         <ol className="m-0 list-none p-0">

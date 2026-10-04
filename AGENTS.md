@@ -66,7 +66,7 @@ app/
   twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
   og/repo/[...slug]/route.tsx               # per-repo OG image — a plain route, because the next/og file
                                             # convention would sit at a path the catch-all page route also claims
-  score/page.tsx                            # Live Score entry — URL form, past scores, FAQ
+  score/page.tsx                            # Live Score entry — URL form, visitor's recent scores + top leaderboard repos, FAQ
   score/opengraph-image.tsx                 # next/og convention — Live Score OG image (auto-wired)
   score/twitter-image.tsx                   # next/og convention — /score twitter:image, re-exports (auto-wired)
   score/[host]/[owner]/[name]/page.tsx      # live score; result cached 1h per repo (unstable_cache); redirects to the repo page when indexed
@@ -81,7 +81,7 @@ components/               # Tailwind-styled React components
   HostPill.tsx, HostSelect.tsx, Medal.tsx, ModelPills.tsx,
   MobileNav.tsx, Pagination.tsx, SearchBar.tsx, SelectMenu.tsx, SortSelect.tsx,
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
-  RepoHero.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
+  RepoHero.tsx, RepoSummary.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
   CopySnippet.tsx, PackageLookupForm.tsx,
@@ -99,6 +99,7 @@ lib/
     badge.ts              # SVG badge renderer (used by /api/badge)
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
     repo-path.ts          # repoPath / repoIdentity — the one place a repo URL is built or parsed
+    repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo pages
   scoring/
     signals/              # one file per signal + helpers + types + index
     weights.ts            # per-model weight tables
@@ -133,6 +134,7 @@ tests/
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
+  repo-summary.test.ts    # summarizeRepo / keySignals — ranks, ties, best/worst agent
   path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
   live-score.test.ts      # content-candidate coverage vs the signals, path traversal, host URLs
   signals/                # one *.test.ts per signal
@@ -210,7 +212,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
-3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the `generateMetadata` description + JSON-LD description in `app/repo/[...slug]/page.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count word (e.g. `eight`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
+3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/score/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count as a word and a digit (e.g. `nine`, `9`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
 4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getAlternatives` (the repo page's alternatives strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
 5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
