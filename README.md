@@ -178,7 +178,7 @@ lib/
 scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
-public/       Static assets — demo/ screenshots used by the README + OG image
+public/       Static assets — demo/ screenshots used by the README + OG image, IndexNow key (<key>.txt)
 .claude/      settings.json, hooks/ (Stop guard), skills/
 data/         rank.db (committed — shipped as a build artifact; rescoring runs locally)
 AGENTS.md     Agent instructions (source of truth)
