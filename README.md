@@ -75,7 +75,7 @@ Short answer: **low risk**. The app:
 - Only **reads** files after a shallow clone; never executes anything from the cloned tree (no `npm install`, no post-clone hooks).
 - Uses `--depth 1 --single-branch` and never clones submodules.
 - Runs all SQL via prepared statements.
-- Renders through React (auto-escaping); the only `dangerouslySetInnerHTML` use is server-built JSON-LD with `<` escaped to `<`.
+- Renders through React (auto-escaping); the only `dangerouslySetInnerHTML` use is server-built JSON-LD with `<` escaped to `\u003c`.
 - Has no auth and no writable API endpoints — read-only dashboard.
 
 **Operational concerns** for a public launch (not code-level security):
@@ -154,9 +154,10 @@ app/          Next.js App Router — pages + API + SEO
   action/          PR-diff GitHub Action explainer + install snippet
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)
+  language/        per-language hubs — /language, /language/<slug>
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
   robots.ts        /robots.txt — allows "/", blocks "/api/" and "/score/" (unbounded URL space)
-  sitemap.ts       /sitemap.xml — static routes + every repo
+  sitemap.ts       /sitemap.xml — static routes, language hubs, every repo, top packages
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
 components/   React components (Tailwind-styled)
@@ -166,9 +167,10 @@ lib/
   clients/    git clone, host API, npm/PyPI/Cargo registries
   constants/  thresholds, host labels, sort keys
   types/      shared row-shape types for db.ts
-  utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder
+  utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder, repo paths + summary, language grouping
   db.ts       better-sqlite3 schema + queries (all SQL lives here)
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
+  language-hubs.ts   language groups + hub stats (used by /language pages, sitemap)
   version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
   badge-adoption.ts  detectBadgeEmbed — dashboard metadata, not a scored signal
   release-notice.ts  localStorage "seen" marker for the home-page release announcement

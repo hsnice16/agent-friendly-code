@@ -2,6 +2,8 @@ import type { MetadataRoute } from "next";
 
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall } from "@/lib/db";
+import { getLanguageGroups } from "@/lib/language-hubs";
+import { hubPath, isHub } from "@/lib/utils/language";
 import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
@@ -49,6 +51,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${APP_URL}/methodology`,
     },
     {
+      priority: 0.7,
+      url: `${APP_URL}/language`,
+      lastModified: contentChanged,
+      changeFrequency: "weekly",
+    },
+    {
       priority: 0.5,
       url: `${APP_URL}/about`,
       changeFrequency: "monthly",
@@ -90,6 +98,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: r.score != null ? Math.round((0.3 + (r.score / 100) * 0.6) * 10) / 10 : 0.4,
   }));
 
+  const hubRoutes: MetadataRoute.Sitemap = getLanguageGroups()
+    .filter(isHub)
+    .map((g) => {
+      const changed = Math.max(...g.rows.map((r) => r.content_changed_at ?? 0));
+      return {
+        priority: 0.8,
+        changeFrequency: "weekly",
+        url: `${APP_URL}${hubPath(g.slug)}`,
+        lastModified: changed > 0 ? new Date(changed * 1000) : undefined,
+      };
+    });
+
   const packageRoutes: MetadataRoute.Sitemap = REGISTRIES.flatMap((registry) =>
     getTopPackagesByRegistry(registry, SITEMAP_PACKAGE_LIMIT_PER_REGISTRY).map((p) => ({
       lastModified: p.contentChangedAt != null ? new Date(p.contentChangedAt * 1000) : undefined,
@@ -99,5 +119,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
-  return [...staticRoutes, ...repoRoutes, ...packageRoutes];
+  return [...staticRoutes, ...hubRoutes, ...repoRoutes, ...packageRoutes];
 }

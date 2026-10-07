@@ -24,6 +24,9 @@ concurrency:
   group: parity-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+
 jobs:
   parity:
     name: Clone vs live path

@@ -1,13 +1,18 @@
 import { APP_URL } from "@/lib/version";
 
-export function BreadcrumbJsonLd({ current }: { current: { name: string; path: string } }) {
+type Crumb = { name: string; path: string };
+
+export function BreadcrumbJsonLd({ current, parent }: { current: Crumb; parent?: Crumb }) {
+  const trail = [{ name: "Home", path: "/" }, ...(parent ? [parent] : []), current];
   const json = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-      { "@type": "ListItem", position: 2, name: current.name, item: `${APP_URL}${current.path}` },
-    ],
+    itemListElement: trail.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: `${APP_URL}${c.path}`,
+    })),
   };
 
   return (

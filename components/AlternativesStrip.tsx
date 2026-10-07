@@ -11,9 +11,10 @@ type Props = {
   language: string | null;
   selectedModelLabel: string;
   alternatives: AlternativeRow[];
+  hubHref?: string;
 };
 
-export function AlternativesStrip({ language, alternatives, selectedModelLabel }: Props) {
+export function AlternativesStrip({ language, alternatives, selectedModelLabel, hubHref }: Props) {
   if (alternatives.length === 0) {
     return null;
   }
@@ -23,8 +24,8 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
       <PanelHeading>Similar repos</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. A simple first version: picked only
-        because they share this repo&apos;s language and host.
+        Scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. Same language and host as this repo,
+        scoring near it.
       </p>
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-3">
@@ -51,6 +52,12 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel }
           </li>
         ))}
       </ul>
+
+      {hubHref && language && (
+        <Link href={hubHref} className="mt-3 inline-block text-[13px] text-ink-dim hover:text-ink-soft">
+          All {language} repos →
+        </Link>
+      )}
     </Panel>
   );
 }

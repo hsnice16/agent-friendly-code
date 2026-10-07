@@ -4,8 +4,10 @@ data/*.db-journal
 data/*.db-wal
 data/*.db-shm
 tmp-clones/
-.env
-.env.local
+.env*
+!.env.example
+.vercel/
+coverage/
 .DS_Store
 next-env.d.ts
 tsconfig.tsbuildinfo

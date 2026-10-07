@@ -16,7 +16,7 @@ import { SignalRow } from "@/components/SignalRow";
 
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import {
-  getAlternatives,
+  getLanguagePeers,
   getModelScores,
   getRepoByHostOwnerName,
   getSignalResults,
@@ -25,6 +25,7 @@ import {
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
+import { groupByLanguage, hubPath, isHub, languageSlug, nearestByScore } from "@/lib/utils/language";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
 import { summarizeRepo, summaryDescription } from "@/lib/utils/repo-summary";
 import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
@@ -33,8 +34,9 @@ type Params = { slug: string[] };
 
 // generateMetadata and the page both need the summary; cache() keeps it to one
 // leaderboard read per request.
+const loadBoard = cache(listLeaderboardOverall);
 const loadSummary = cache((repo: RepoRow) =>
-  summarizeRepo(repo, listLeaderboardOverall(), getModelScores(repo.id), getSignalResults(repo.id)),
+  summarizeRepo(repo, loadBoard(), getModelScores(repo.id), getSignalResults(repo.id)),
 );
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -114,7 +116,16 @@ export default async function Page({
   const signals = getSignalResults(id);
   const modelScores = getModelScores(id);
   const summary = loadSummary(repo);
-  const alternatives = getAlternatives(id, selected, ALTERNATIVES_LIMIT);
+  const selectedScore = modelScores.find((m) => m.modelId === selected)?.score ?? repo.overall_score ?? 0;
+  const alternatives = nearestByScore(
+    getLanguagePeers(repo.host, repo.language, selected, id),
+    selectedScore,
+    ALTERNATIVES_LIMIT,
+  );
+
+  const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
+  const hub = groupByLanguage(loadBoard()).find((g) => g.slug === slugOfLanguage && isHub(g));
+  const hubHref = hub ? hubPath(hub.slug) : undefined;
 
   const suggestions = topImprovements(selected, signals);
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
@@ -134,10 +145,13 @@ export default async function Page({
             item: `${APP_URL}/`,
             name: "Leaderboard",
           },
+          ...(hub && hubHref
+            ? [{ "@type": "ListItem", position: 2, name: hub.label, item: `${APP_URL}${hubHref}` }]
+            : []),
           {
             "@type": "ListItem",
             name: slug,
-            position: 2,
+            position: hub ? 3 : 2,
             item: `${APP_URL}${path}`,
           },
         ],
@@ -181,7 +195,7 @@ export default async function Page({
         ← back to leaderboard
       </Link>
 
-      <RepoHero repo={repo} />
+      <RepoHero repo={repo} language={hub && hubHref ? { label: hub.label, href: hubHref } : undefined} />
 
       <aside
         aria-label="Tools you can add to this repo"
@@ -230,7 +244,8 @@ export default async function Page({
 
       <div className="mt-3.5">
         <AlternativesStrip
-          language={repo.language}
+          language={hub?.label ?? repo.language}
+          hubHref={hubHref}
           alternatives={alternatives}
           selectedModelLabel={MODEL_BY_ID[selected].label}
         />

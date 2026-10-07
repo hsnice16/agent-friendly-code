@@ -11,6 +11,7 @@ import type {
   LeaderboardStats,
   ModelScoreRow,
   RepoRow,
+  SignalPassRate,
   TopPackageRow,
 } from "./types/db";
 
@@ -245,49 +246,37 @@ export function getSignalResults(repoId: number): SignalResult[] {
     .all(repoId) as any as SignalResult[];
 }
 
-// Keyed by language + host rather than a repo id, because a live-scored repo has
-// no row of its own to derive them from. `excludeId` keeps an indexed repo out of
-// its own alternatives list.
-export function getAlternativesFor(
+// Keyed by language + host, not a repo id: a live-scored repo has no row.
+// NOCASE because stored casing varies ("java", "Java").
+export function getLanguagePeers(
   host: string,
   language: string | null,
-  modelId: string | null,
-  limit: number,
+  modelId: string,
   excludeId?: number,
 ): AlternativeRow[] {
   if (!language) return [];
 
   const skip = excludeId == null ? "" : "AND r.id != ?";
-  const args = excludeId == null ? [language, host, limit] : [language, host, excludeId, limit];
-
-  if (modelId) {
-    return db
-      .prepare(
-        `SELECT r.id, r.host, r.owner, r.name, r.stars, m.score
-           FROM repo r
-           JOIN model_score m ON m.repo_id = r.id AND m.model_id = ?
-          WHERE r.language = ? AND r.host = ? ${skip}
-          ORDER BY m.score DESC
-          LIMIT ?`,
-      )
-      .all(modelId, ...args) as AlternativeRow[];
-  }
-
   return db
     .prepare(
-      `SELECT r.id, r.host, r.owner, r.name, r.stars, r.overall_score AS score
+      `SELECT r.id, r.host, r.owner, r.name, r.stars, m.score
          FROM repo r
-        WHERE r.language = ? AND r.host = ? ${skip}
-        ORDER BY r.overall_score DESC
-        LIMIT ?`,
+         JOIN model_score m ON m.repo_id = r.id AND m.model_id = ?
+        WHERE r.language = ? COLLATE NOCASE AND r.host = ? ${skip}
+        ORDER BY m.score DESC, r.id`,
     )
-    .all(...args) as AlternativeRow[];
+    .all(modelId, language, host, ...(excludeId == null ? [] : [excludeId])) as AlternativeRow[];
 }
 
-export function getAlternatives(repoId: number, modelId: string | null, limit: number): AlternativeRow[] {
-  const repo = getRepo(repoId);
-  if (!repo) return [];
-  return getAlternativesFor(repo.host, repo.language, modelId, limit, repoId);
+export function getSignalPassRates(repoIds: number[]): SignalPassRate[] {
+  if (repoIds.length === 0) return [];
+  return db
+    .prepare(
+      `SELECT signal_id AS id, label, AVG(pass) AS rate FROM signal_result
+        WHERE repo_id IN (${repoIds.map(() => "?").join(", ")})
+        GROUP BY signal_id ORDER BY rate, signal_id`,
+    )
+    .all(...repoIds) as SignalPassRate[];
 }
 
 export function getLeaderboardStats(): LeaderboardStats {

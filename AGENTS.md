@@ -48,6 +48,8 @@ app/
                           # GitLab owner can be a nested group: host first, repo name last, owner is the rest
   repo-redirect/[id]/page.tsx          # 308 to the slug — serves the pre-slug /repo/:id URLs, rewritten here by next.config.ts
   methodology/page.tsx    # how the static scoring works
+  language/page.tsx       # every language: hub cards, plus the repos of languages too small for a hub
+  language/[slug]/page.tsx # language hub — that language's ranked repos and its most-missed cross-agent checks
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
@@ -55,7 +57,7 @@ app/
   terms/page.tsx          # terms of use (footer-linked)
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
                           # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive
-  sitemap.ts              # /sitemap.xml — static routes + every repo detail page (priority scaled by score)
+  sitemap.ts              # /sitemap.xml — static routes, language hubs, every repo (priority scaled by score), top packages
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
@@ -100,6 +102,7 @@ lib/
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
     repo-path.ts          # repoPath / repoIdentity — the one place a repo URL is built or parsed
     repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo pages
+    language.ts           # language slugs + grouping (casing varies in the data) + nearest-score peers for "Similar repos"
   scoring/
     signals/              # one file per signal + helpers + types + index
     weights.ts            # per-model weight tables
@@ -116,6 +119,7 @@ lib/
     recents.ts            # localStorage read/write for the visitor's own scores
     score.ts              # liveScore(): commit resolve + metadata + materialize + scoreRepo
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
+  language-hubs.ts                    # language groups + hub stats (used by /language pages, sitemap)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 schema + queries
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS, OG_IMAGE_SIZE, DEFAULT_OG_IMAGE (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
@@ -134,7 +138,9 @@ tests/
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
+  repo-path.test.ts       # repoPath / repoIdentity
   repo-summary.test.ts    # summarizeRepo / keySignals — ranks, ties, best/worst agent
+  language.test.ts        # languageSlug / groupByLanguage / nearestByScore
   path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
   live-score.test.ts      # content-candidate coverage vs the signals, path traversal, host URLs
   signals/                # one *.test.ts per signal
@@ -213,7 +219,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
 3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/score/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count as a word and a digit (e.g. `nine`, `9`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
-4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getAlternatives` (the repo page's alternatives strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
+4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getLanguagePeers` (the Similar repos strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
 5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
 ## Adding a host
@@ -258,14 +264,14 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Languages / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
 - The clone workspace lives in the OS temp dir and each clone is removed after it is scored (`scripts/score.ts`); a crashed run can still leave one behind.
-- Unauthenticated API → add rate limits before going public. `/score/*` is the expensive one: an uncached slug costs a tree listing plus a burst of raw fetches against the shared `GITHUB_TOKEN` quota. ISR absorbs repeats, not breadth.
+- Unauthenticated API → add rate limits before going public. `/score/*` is the expensive one: an uncached slug costs a tree listing plus a burst of raw fetches against the shared `GITHUB_TOKEN` quota. The hour cache absorbs repeats, not breadth.
 - Sandbox the cloner in a container when running on remote infra, just in case of future git CVEs.
 
 ## Things to leave alone

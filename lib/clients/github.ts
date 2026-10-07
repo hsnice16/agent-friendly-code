@@ -97,7 +97,7 @@ export async function fetchRepoMeta(parsed: ParsedRepo): Promise<{
       }
 
       const j: any = await res.json();
-      // GitLab's primary-language requires a separate /languages call; skip for v1.
+      // Language needs a separate /languages call, so GitLab repos have none.
       return {
         language: null,
         stars: j.star_count,

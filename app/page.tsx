@@ -17,6 +17,7 @@ import { getLeaderboardStats, listLeaderboard, listLeaderboardOverall } from "@/
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { relativeTime } from "@/lib/utils/format";
+import { groupByLanguage, hubPath, isHub } from "@/lib/utils/language";
 import { APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE =
@@ -152,6 +153,7 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
       : (MODELS.find((m) => m.id === selected)?.rationale ?? "");
 
   const allOverall = listLeaderboardOverall();
+  const hubs = groupByLanguage(allOverall).filter(isHub);
 
   return (
     <>
@@ -245,6 +247,23 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           hrefFor={(p) => buildHref({ model: selected, host, q, sort, dir, page: p })}
         />
       </div>
+
+      {hubs.length > 0 && (
+        <nav
+          aria-label="Browse by language"
+          className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-muted"
+        >
+          <span>Browse by language:</span>
+          {hubs.map((g) => (
+            <Link key={g.slug} href={hubPath(g.slug)} className="text-ink-dim hover:text-ink-soft">
+              {g.label}
+            </Link>
+          ))}
+          <Link href="/language" className="text-ink-dim hover:text-ink-soft">
+            All languages →
+          </Link>
+        </nav>
+      )}
     </>
   );
 }

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { RepoRow } from "@/lib/types/db";
 import { compactStars, relativeTime } from "@/lib/utils/format";
 import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
@@ -9,7 +11,16 @@ import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
 
 // `commitSha` is the live-score path: there is no "last scored" when the page
 // render *is* the scoring, so the commit is the only honest freshness fact.
-export function RepoHero({ repo, commitSha }: { repo: RepoRow; commitSha?: string }) {
+export function RepoHero({
+  repo,
+  commitSha,
+  language,
+}: {
+  repo: RepoRow;
+  commitSha?: string;
+  /** The hub to link, when the repo's language has one. */
+  language?: { label: string; href: string };
+}) {
   const overall = repo.overall_score ?? 0;
   const overallTier = scoreTier(overall);
 
@@ -41,6 +52,24 @@ export function RepoHero({ repo, commitSha }: { repo: RepoRow; commitSha?: strin
               <dt className="inline">Stars: </dt>
               <dd className="inline font-medium text-ink">{compactStars(repo.stars, false)}</dd>
             </div>
+
+            {repo.language && (
+              <div>
+                <dt className="inline">Language: </dt>
+                <dd className="inline font-medium text-ink">
+                  {language ? (
+                    <Link
+                      href={language.href}
+                      className="border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft"
+                    >
+                      {language.label}
+                    </Link>
+                  ) : (
+                    repo.language
+                  )}
+                </dd>
+              </div>
+            )}
 
             <div>
               <dt className="inline">Default branch: </dt>

@@ -8,3 +8,4 @@ Two heavier items that depend on real surface-area additions: an OAuth flow with
 
 - [01-opt-out-claim-flow.md](./01-opt-out-claim-flow.md) — OAuth so maintainers can claim or opt out of their listing. First touchpoint that writes to the DB on behalf of a user.
 - [02-package-registry-overlay.md](./02-package-registry-overlay.md) — at-scale package overlay: per-registry leaderboards on the dashboard + a browser userscript that renders the badge inline on npmjs.com / PyPI / crates.io. Builds on the v0.3.0 lookup endpoint.
+- [03-language-hubs.md](./03-language-hubs.md) — per-language hub pages and near-score Similar repos, so repo pages are reachable from more than deep pagination. Done.

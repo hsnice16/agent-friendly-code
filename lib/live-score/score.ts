@@ -26,15 +26,14 @@ export type LiveScore = {
  * one instance and vanish.
  *
  * Returns null only when the host says the ref does not exist. Everything else
- * throws: the caller renders into an ISR cache, so a swallowed rate limit or
+ * throws: the caller caches the result for an hour, so a swallowed rate limit or
  * network blip would pin "this repo doesn't exist" on a real repo for an hour.
  */
 export async function liveScore(parsed: ParsedRepo): Promise<LiveScore | null> {
   const dir = mkdtempSync(join(tmpdir(), "afc-live-"));
 
   try {
-    // Metadata runs alongside the commit lookup, so it costs no extra latency —
-    // and on an ISR cache hit it costs no request at all.
+    // Alongside the commit lookup, so it adds no latency.
     const [meta, sha] = await Promise.all([
       fetchRepoMeta(parsed),
       resolveCommit(parsed.host, parsed.owner, parsed.name, "HEAD", hostToken(parsed.host)),

@@ -44,6 +44,8 @@ export type AlternativeRow = {
   stars: number | null;
 };
 
+export type SignalPassRate = { id: string; label: string; rate: number };
+
 export type LeaderboardStats = {
   count: number;
   lastScoredAt: number | null;

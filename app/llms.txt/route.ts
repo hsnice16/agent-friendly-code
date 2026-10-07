@@ -50,6 +50,7 @@ ${MODELS.map((m) => `- ${m.label} — ${m.rationale}`).join("\n")}
 - [About](${APP_URL}/about): Who built this, why, and the project's independence statement
 - [Action](${APP_URL}/action): PR-diff GitHub Action — install snippet, FAQ, JSON-LD SoftwareApplication
 - [Changelog](${APP_URL}/changelog): What shipped per release
+- [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
 - [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
 - [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, including repos the leaderboard has not indexed

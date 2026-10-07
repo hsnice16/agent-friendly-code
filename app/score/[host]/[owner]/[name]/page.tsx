@@ -13,7 +13,7 @@ import { SignalRow } from "@/components/SignalRow";
 import { type ParsedRepo, parseRepoUrl } from "@/lib/clients/github";
 import { HOST_DOMAINS, isHost } from "@/lib/constants/hosts";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import { getAlternativesFor, getRepoByHostOwnerName } from "@/lib/db";
+import { getLanguagePeers, getRepoByHostOwnerName } from "@/lib/db";
 import { TooLargeError } from "@/lib/live-score/hosts";
 import { liveScore } from "@/lib/live-score/score";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
@@ -21,6 +21,7 @@ import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { hostLabel } from "@/lib/utils/format";
+import { nearestByScore } from "@/lib/utils/language";
 import { repoPath } from "@/lib/utils/repo-path";
 import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -138,7 +139,12 @@ export default async function LiveScorePage({
   const suggestions = topImprovements(selected, score.signals);
   const strengths = score.signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
   const gaps = score.signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
-  const alternatives = getAlternativesFor(host, score.language, selected, ALTERNATIVES_LIMIT);
+  const selectedScore = score.modelScores.find((m) => m.modelId === selected)?.score ?? score.overall;
+  const alternatives = nearestByScore(
+    getLanguagePeers(host, score.language, selected),
+    selectedScore,
+    ALTERNATIVES_LIMIT,
+  );
 
   const repo: RepoRow = {
     id: -1,
