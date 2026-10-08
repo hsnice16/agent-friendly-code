@@ -18,6 +18,10 @@ pre-commit:
       glob: "*.{ts,tsx}"
       run: bun run test
 
+    - name: db-leaks
+      glob: "data/*.db"
+      run: bun run check-db-leaks {staged_files}
+
     - name: file-length
       glob: "{app,components,lib}/**/*.{ts,tsx}"
       run: |

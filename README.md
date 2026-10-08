@@ -90,7 +90,7 @@ Auth and per-maintainer controls land with the opt-out / claim flow in v0.8.0.
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test + file-length)
+bun run prepare-hooks  # once — installs lefthook pre-commit (Biome + tsc + test + db-leaks + file-length)
 bun run seed           # score the curated set across GH / GL / BB + cache popular package aliases
 bun run dev            # http://localhost:3000
 ```
@@ -169,18 +169,19 @@ lib/
   types/      shared row-shape types for db.ts
   utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder, repo paths + summary, language grouping
   db.ts       better-sqlite3 schema + queries (all SQL lives here)
+  db-leaks.ts  local-path / token scan of the raw DB bytes before it is committed
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts   language groups + hub stats (used by /language pages, sitemap)
   version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
   badge-adoption.ts  detectBadgeEmbed — dashboard metadata, not a scored signal
   release-notice.ts  localStorage "seen" marker for the home-page release announcement
   changelog.ts / roadmap.ts / skill-content.ts
-scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check
+scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check, check-db-leaks
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README + OG image, IndexNow key (<key>.txt)
 .claude/      settings.json, hooks/ (Stop guard), skills/
-data/         rank.db (committed — shipped as a build artifact; rescoring runs locally)
+data/         rank.db (committed — shipped as a build artifact; refreshed by the 6-hourly rescore cron)
 AGENTS.md     Agent instructions (source of truth)
 CONTRIBUTING.md  Human-contributor guide — PR workflow, review bar
 CLAUDE.md     Pointer → AGENTS.md

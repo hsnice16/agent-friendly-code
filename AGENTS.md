@@ -27,7 +27,7 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 
 ```bash
 bun install
-bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test + file-length on pre-commit)
+bun run prepare-hooks  # once — installs lefthook git hooks (Biome + tsc + test + db-leaks + file-length on pre-commit)
 bun run init-db        # optional — auto-runs on first score
 bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
@@ -122,6 +122,7 @@ lib/
   language-hubs.ts                    # language groups + hub stats (used by /language pages, sitemap)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 schema + queries
+  db-leaks.ts             # findLeaks — local paths / tokens in the raw DB bytes (gate before committing data/rank.db)
   version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS, OG_IMAGE_SIZE, DEFAULT_OG_IMAGE (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
@@ -129,6 +130,7 @@ lib/
   release-notice.ts       # localStorage "seen" marker for the home-page release announcement
 scripts/
   init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
+  check-db-leaks.ts     # findLeaks gate — lefthook, ci.yml, and the rescore workflow before it pushes
   parity-check.ts       # asserts the live-score path equals `bun run score`. CI gate: .github/workflows/parity.yml
   audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone.
                         # Needs a valid GITHUB_TOKEN — unauthenticated it covers ~60 repos/hr.
@@ -264,6 +266,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - We `git clone --depth 1 --single-branch` arbitrary URLs — safe by default. We never run post-clone scripts, never `npm install`, never execute code from the clone.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
+- `data/rank.db` is committed to a public repo, freed pages included. `bun run check-db-leaks` must pass before any commit of it; the rescore workflow runs it before pushing.
 - HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Languages / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.

@@ -42,6 +42,9 @@ jobs:
       - name: Test
         run: bun run test
 
+      - name: DB leak scan
+        run: bun run check-db-leaks
+
       # tsc does not see what only the bundler sees — a server-only import
       # pulled into a client component, an RSC boundary violation. Without this
       # the first place a broken build shows up is the Vercel deploy.

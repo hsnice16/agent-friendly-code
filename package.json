@@ -17,6 +17,7 @@
     "seed-packages": "tsx scripts/seed-packages.ts",
     "audit-seeds": "tsx scripts/audit-seeds.ts",
     "init-db": "tsx scripts/init-db.ts",
+    "check-db-leaks": "tsx scripts/check-db-leaks.ts",
     "prepare-hooks": "lefthook install",
     "test": "node --import tsx --test 'tests/**/*.test.ts'"
   },
