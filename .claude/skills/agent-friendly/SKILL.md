@@ -1,11 +1,11 @@
 ---
 name: agent-friendly
-description: Score the current repo's agent-friendliness on disk and recommend a model class to use for it. Use when the user asks "is this repo a mess?", "which model should I use here?", "is my repo agent-ready?", or invokes /agent-friendly.
+description: Score the current repo's readiness for AI coding agents on disk, show which agent it is best set up for, and recommend a model class. Use when the user asks "is my repo agent-ready?", "which agent or model should I use here?", "is this repo a mess?", or invokes /agent-friendly.
 ---
 
 # agent-friendly
 
-Score the user's current repo locally with a bundled scorer and recommend a model class. Evaluates 16 static signals (AGENTS.md, CI, tests, README, linter, dev env, license, contributing, pre-commit hooks, deps manifest, type config, codebase size, plus four agent-specific instruction files) and produces overall + per-model scores. Entirely local — no HTTP calls.
+Score the user's current repo locally with a bundled scorer and recommend a model class. Evaluates 16 static signals (AGENTS.md, CI, tests, README, linter, dev env, license, contributing, pre-commit hooks, deps manifest, type config, codebase size, plus four agent-specific instruction files) and produces overall + per-agent scores. Entirely local — no HTTP calls.
 
 ## When to use
 
@@ -50,7 +50,7 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
            /* ... */
          ]
        }
-       // 8 more models...
+       // 8 more agents...
      ],
      "topImprovements": [
        { "label": "Contributing guide", "signalId": "contributing", "scoreGain": 2.1, "suggestion": "..." }
@@ -59,11 +59,11 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
    }
    ```
 
-   The `warnings` array is the CLI's heads-up channel. Today it fires when the path being scored doesn't look like a project root (no `package.json`/`README.md`/`AGENTS.md`/`.git` found). If non-empty, render the warning(s) to the user **before** showing the score so they can re-invoke from the right place.
+   The `warnings` array is the CLI's heads-up channel. It fires when the path being scored doesn't look like a project root (no `package.json`, `README.md`, `AGENTS.md`, `.git`, or other project marker found). If non-empty, render the warning(s) to the user **before** showing the score so they can re-invoke from the right place.
 
 ## How to render the result
 
-The scorer profiles **9 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, GPT-5 Codex, Kimi CLI, Gemini CLI, Aider, OpenHands, and Pi.
+The scorer profiles **9 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi.
 
 **The recommendation is score-driven.** Don't try to detect which agent is invoking this skill — the answer is the same either way: find the highest-scoring entry in `modelScores`, that's the agent this repo is most tuned for. Show the user; let them decide whether to switch. Never programmatically switch the agent or model.
 
@@ -103,13 +103,13 @@ The reasoning: a high-scoring repo has the scaffolding (AGENTS.md, fast tests, c
 
 ## On first invocation
 
-After the first successful run, mention to the user that they can wire the skill into a `SessionStart` hook so it fires automatically each session — pointing at the dashboard's `/skill` page for copy-paste snippets:
+After the first successful run, mention to the user that they can wire the skill into a `SessionStart` hook so it fires automatically each session — pointing at the website's `/skill` page for copy-paste snippets:
 
 - **Claude Code** → `.claude/settings.json` `SessionStart` matcher.
 - **Codex CLI** → `.codex/hooks.json` `SessionStart` matcher.
 - **Cursor / Cline / Copilot** → no `SessionStart` event today; paste the same `node ... --summary` command into `.cursorrules` / `.clinerules` as a static instruction, or invoke this skill manually.
 
-Snippets live at <https://www.agentfriendlycode.com/skill>.
+Snippets live at <https://agentfriendlycode.com/skill>.
 
 ## Failure modes
 
@@ -119,6 +119,6 @@ Snippets live at <https://www.agentfriendlycode.com/skill>.
 
 ## Out of scope
 
-- Scoring a remote URL, a different repo, or a package by name. This skill works on the active repo only. Direct the user to the dashboard at <https://www.agentfriendlycode.com> or its `/api/score?host=&repo=owner/name` endpoint for indexed lookups.
+- Scoring a remote URL, a different repo, or a package by name. This skill works on the active repo only. Direct the user to the website at <https://agentfriendlycode.com> or its `/api/score?host=&repo=owner/name` endpoint for indexed lookups.
 - Programmatic model switching. The skill recommends; the user runs `/model` (or the agent's equivalent) themselves.
-- Submitting the repo to the dashboard. The skill is read-only — it never writes files, contacts the dashboard, or registers the repo. Unindexed repos stay unindexed.
+- Submitting the repo to the website. The skill is read-only — it never writes files, contacts the website, or registers the repo. Unindexed repos stay unindexed.
