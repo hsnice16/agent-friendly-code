@@ -49,6 +49,15 @@ describe("summarizeRepo", () => {
     assert.equal(summarizeRepo(row(9, 50, "Go"), board, [], signals), null);
   });
 
+  test("counts one language spelled differently by two hosts as one", () => {
+    const mixed = [row(1, 90, "Java"), row(2, 80, "java"), row(3, 70, "Java")];
+    assert.deepEqual(summarizeRepo(mixed[1], mixed, [], signals)?.languageRank, {
+      rank: 2,
+      total: 3,
+      language: "Java",
+    });
+  });
+
   test("omits the language rank when the repo is alone in its language", () => {
     assert.equal(summarizeRepo(board[3], board, [], signals)?.languageRank, null);
   });
@@ -74,7 +83,7 @@ describe("summarizeRepo", () => {
     const s = summarizeRepo(board[0], board, scores, signals);
     assert.equal(s?.worst, null);
     assert.equal(s?.best?.tiedWith, 1);
-    assert.doesNotMatch(summaryDescription("o/r1", s, 90), /Works best/);
+    assert.doesNotMatch(summaryDescription("o/r1", s, 90), /Scores highest/);
   });
 });
 

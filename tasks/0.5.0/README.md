@@ -1,6 +1,6 @@
 # 0.5.0 — quick wins
 
-**Status**: done
+**Status**: released
 
 The cheapest items on the roadmap, paired so they can ship in one cut. The PR-diff GitHub Action ships from a sibling repo (`agent-friendly-action`) with the scorer vendored into its bundle, listed on the GitHub Marketplace; the agent skill ships from a second sibling repo (`agent-friendly-skill`) with the same vendored scorer + a portable `SKILL.md`, plus a `/skill` UI integration page on the dashboard. The scorer becomes shared infrastructure across two siblings; we extract it to a standalone package (`agent-friendly-scorer`) when the benchmark harness needs a third consumer.
 

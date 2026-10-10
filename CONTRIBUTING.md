@@ -11,10 +11,21 @@ bun install
 bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc + test + db-leaks + file-length)
 bun run seed            # optional: populate the DB with the curated set
 bun run dev             # http://localhost:3000
-bun run test            # unit tests (node --test + tsx) — requires Node ≥20.9.0
+bun run test            # unit tests (node --test + tsx) — requires Node ≥22
 ```
 
 > **About `data/rank.db`** — a GitHub Actions cron (`.github/workflows/scheduled-rescore.yml`) re-runs `bun run seed` every six hours and commits the refreshed database to `main`. If your branch touches `scripts/seed-list.ts` and you also commit a re-seeded `rank.db`, you may hit a merge conflict against a cron commit. Easiest resolution: rebase, `git checkout --theirs -- data/rank.db`, and re-run `bun run seed` before pushing.
+
+## Changing the seed list
+
+`scripts/seed-list.ts` is the whole set of tracked repos. `bun run seed` makes `data/rank.db` match it before it scores anything, so an edit there is all a change needs — the next scheduled rescore applies it.
+
+- **Add** — append `{ url, note }`.
+- **Remove** — delete the entry. The seed run deletes its row and its scores. It refuses to delete more than 10 rows in one run, because a broken list looks the same as a large removal; set `SEED_MAX_PRUNE` for a deliberate bulk removal.
+- **Rename or transfer** — change `url` to the new address and add the old one to `was: [...]`. The row is renamed in place, keeping its id and score history, and the old page, badge and API URLs keep resolving. Never drop a `was` entry: READMEs embed the old badge path. Deleting the entry and adding a new one instead breaks all of those.
+- **Keep despite a finding** — add the finding's kind to `accept`, e.g. `accept: ["archived"]`.
+
+`.github/workflows/seed-audit.yml` runs `bun run audit-seeds` every Monday. Findings — renamed, archived, gone or private, forks, mirrors, seeds whose score has stopped refreshing — go into one GitHub issue labelled `seed-audit`, and the job fails until each is fixed or accepted.
 
 ## Branch naming
 
@@ -47,13 +58,13 @@ Don't squash-amend published commits. Don't skip hooks (`--no-verify`); if a hoo
 
 1. **Biome** — `check --write` on staged JS/TS/JSON/CSS. Fixes and re-stages.
 2. **tsc** — `--noEmit` on `*.{ts,tsx}`. Blocks commits that don't typecheck.
-3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite (~1–2 s); blocks on regressions.
+3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite; blocks on regressions.
 4. **db-leaks** — when `data/*.db` is staged, scans its raw bytes (freed pages too) for local paths and tokens. The DB is public once pushed.
 5. **file-length** — blocks staged `.ts`/`.tsx` under `app/`, `components/`, `lib/` that exceed 300 lines. Split into subcomponents or pull helpers into `lib/utils/`. `scripts/` is exempt.
 
-Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/ci.yml`) runs the same checks on PR for belt-and-braces.
+Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/ci.yml`) runs Biome, tsc, the tests and the DB leak scan again on every PR, plus a production build. It does not run the file-length check.
 
-One extra workflow fires only when it has to: `.github/workflows/parity.yml` runs `bun run parity-check --pr` when a PR touches `lib/scoring/`, `lib/live-score/`, `lib/clients/git.ts` or `lib/badge-adoption.ts`. It clones a handful of real repos and asserts the live-score path produces the same numbers as `bun run score`, so it takes minutes rather than seconds — the full fixture set runs nightly. If it reports a diff, the score shown on `/score/…` and the score on the leaderboard have drifted apart; fix that before merging rather than re-running.
+One extra workflow fires only when it has to: `.github/workflows/parity.yml` runs `bun run parity-check --pr` when a PR touches `lib/scoring/`, `lib/live-score/`, `lib/clients/git.ts`, `lib/badge-adoption.ts` or `scripts/parity-check.ts`. It clones a handful of real repos and asserts the live-score path produces the same numbers as `bun run score`, so it takes minutes rather than seconds — the full fixture set runs nightly. If it reports a diff, the score shown on `/score/…` and the score on the leaderboard have drifted apart; fix that before merging rather than re-running.
 
 ## PR workflow
 

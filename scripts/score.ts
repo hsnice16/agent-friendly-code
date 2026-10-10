@@ -100,7 +100,7 @@ async function scoreCommand(target: string): Promise<void> {
 
   console.log(`\n═══ ${owner}/${name} ═══`);
   console.log(`Overall: ${result.overall.toFixed(1)} / 100`);
-  console.log("Per-model:");
+  console.log("Per-agent:");
 
   for (const m of result.modelScores) {
     console.log(`  ${m.modelLabel.padEnd(14)}  ${m.score.toFixed(1)}`);

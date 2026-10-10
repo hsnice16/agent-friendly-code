@@ -48,7 +48,7 @@ export function RepoSummary({ summary }: { summary: Summary }) {
     best && (
       <Stat
         key="best"
-        label="Works best with"
+        label="Scores highest for"
         value={best.tiedWith > 0 ? `${best.model.label} + ${best.tiedWith} more` : best.model.label}
         note={
           <>

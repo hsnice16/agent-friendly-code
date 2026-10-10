@@ -50,7 +50,6 @@ export const metadata: Metadata = {
       "max-image-preview": "large",
     },
   },
-  other: { "google-adsense-account": "ca-pub-8901860576820221" },
 };
 
 const JSON_LD = {

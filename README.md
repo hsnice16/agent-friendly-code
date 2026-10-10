@@ -1,15 +1,15 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.7.0-blue?style=flat-square)](./lib/changelog.ts)
+[![Release](https://img.shields.io/badge/release-0.8.0-blue?style=flat-square)](./lib/changelog.ts)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Next.js 16](https://img.shields.io/badge/Next.js-16-black?style=flat-square)](https://nextjs.org)
-[![Node ≥20.9](https://img.shields.io/badge/node-%E2%89%A520.9-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Node ≥22](https://img.shields.io/badge/node-%E2%89%A522-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/hsnice16)
-[![Agent Friendly](https://www.agentfriendlycode.com/api/badge/github/hsnice16/agent-friendly-code.svg)](https://www.agentfriendlycode.com)
+[![Agent Friendly](https://agentfriendlycode.com/api/badge/github/hsnice16/agent-friendly-code.svg)](https://agentfriendlycode.com)
 
-**A public dashboard that ranks open-source repos by how friendly they are for AI coding agents — per model.**
+**Scores how ready a repo is for AI coding agents, one score per agent, from static file checks.** Four ways to use it: the [ranked list of public repos](https://agentfriendlycode.com), a [live score for any GitHub URL](https://agentfriendlycode.com/score), an [agent skill](https://github.com/hsnice16/agent-friendly-skill) for the repo you are in, and a [GitHub Action](https://github.com/hsnice16/agent-friendly-action) for pull requests.
 
-Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.7.0**.
+Next.js 16 + SQLite (`better-sqlite3`), styled with Tailwind CSS 4. Spans GitHub, GitLab, and Bitbucket out of the box. Current release: **0.8.0**.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -28,10 +28,10 @@ Follows `prefers-color-scheme` automatically — same tokens, different values.
 
 AI coding agents — Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi — succeed dramatically more often on some repos than others. The difference is rarely the agent; it's the repo. A codebase with fast tests, a clear `AGENTS.md`, a Makefile, and CI is a massively different environment than one without.
 
-**Goal**: a public leaderboard where anyone can look up a repo and see:
+**Goal**: anyone can look up a repo, or score their own, and see:
 
 1. How agent-friendly is it overall?
-2. How friendly is it for _my_ agent? (Claude Code weights `AGENTS.md` heavily; Devin cares about CI + reproducible envs; Cursor prefers strong types + a good README.)
+2. How friendly is it for _my_ agent? (Claude Code weights `AGENTS.md` heavily; Devin weights a reproducible dev environment above CI; Cursor prefers strong types + a good README.)
 3. _Why_ does it rank there, and **what would it take to improve for my agent?** — top-3 gaps ranked by score-gain.
 
 Two audiences:
@@ -43,9 +43,9 @@ Two audiences:
 
 | Project                                                                   | What it does                                                                                                      | What we do differently                                                                                                                                                                            |
 | ------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Factory.ai Agent Readiness**                                            | Single-tenant scanner: you point it at your repo and get a score with auto-fix PRs. 8 pillars, 5 maturity levels. | **Public + cross-forge + per-model.** Factory rates your own repo in isolation — we rank _across_ repos, on GitHub/GitLab/Bitbucket, and the ranking changes based on which agent you care about. |
-| **`kodustech/agent-readiness`**                                           | OSS alternative to Factory — static checks, local scan.                                                           | We're a public ranking service, not a local scanner. Scoring logic is similar in spirit; the product is the leaderboard and the per-model lens.                                                   |
-| **`jpequegn/agent-readiness-score`**                                      | Explicitly "inspired by Factory.ai" — OSS framework to measure codebase readiness.                                | Same delta as above — single-tenant vs. public + per-model.                                                                                                                                       |
+| **Factory.ai Agent Readiness**                                            | Single-tenant scanner: you point it at your repo and get a score with auto-fix PRs. 8 pillars, 5 maturity levels. | **Public + cross-forge + per-agent.** Factory rates your own repo in isolation — we rank _across_ repos, on GitHub/GitLab/Bitbucket, and the ranking changes based on which agent you care about. |
+| **`kodustech/agent-readiness`**                                           | OSS alternative to Factory — static checks, local scan.                                                           | We're a public ranking service, not a local scanner. Scoring logic is similar in spirit; the product is the leaderboard and the per-agent lens.                                                   |
+| **`jpequegn/agent-readiness-score`**                                      | Explicitly "inspired by Factory.ai" — OSS framework to measure codebase readiness.                                | Same delta as above — single-tenant vs. public + per-agent.                                                                                                                                       |
 | **`viktor-silakov/ai-ready`**                                             | 39 checks, 7 pillars, 10+ languages. Scanner.                                                                     | Same delta.                                                                                                                                                                                       |
 | **`ambient-code/agentready`**                                             | Assesses git repos against evidence-based attributes.                                                             | Same delta.                                                                                                                                                                                       |
 | **Cloudflare Agent Readiness**                                            | Rates _websites_ for agent consumption.                                                                           | Wrong object — we rate code repos.                                                                                                                                                                |
@@ -54,17 +54,17 @@ Two audiences:
 | **SWE-Bench (Verified / Pro), GitTaskBench, FeatureBench, HAL, PR Arena** | Rank _agents_ on a fixed set of repos.                                                                            | We want the **transpose**: rank repos _per agent_. Our measurement story (once the benchmark harness lands) looks a lot like these, with the axes flipped.                                        |
 | **GitHub Trending, ossinsight**                                           | Popularity / activity rankings.                                                                                   | Stars ≠ agent-friendliness.                                                                                                                                                                       |
 
-**Our differentiators, in one line**: cross-forge, public, **per-model**, and explainable — every score decomposes to signals, and every repo page shows _what to improve next_ for the selected model.
+**Our differentiators, in one line**: cross-forge, public, **per-agent**, and explainable — every score decomposes to signals, and every repo page shows _what to improve next_ for the selected agent.
 
 ## Honest product concerns
 
 Not pretending the idea is free of risk:
 
-- **Per-model scoring is the hardest part and the easiest to fake.** Per-model rationales are now sourced from each agent's published docs (see `MODELS[].sources` in `lib/scoring/weights.ts`), but the weight values themselves are still pre-benchmark. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
+- **Per-agent scoring is the hardest part and the easiest to fake.** Per-agent rationales are now sourced from each agent's published docs (see `MODELS[].sources` in `lib/scoring/weights.ts`), but the weight values themselves are still pre-benchmark. Real "Claude ranks this higher than GPT-5" requires actually running each agent on each repo. That's `tasks/1.0.0/03-benchmark-harness.md`.
 - **Factory.ai is already in this space.** Differentiation has to stay sharp.
-- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.8.0/01-opt-out-claim-flow.md`.
+- **Public-shaming risk.** Ranking #47,823 without consent invites angry maintainers. Planned via `tasks/0.9.0/01-opt-out-claim-flow.md`.
 - **Score gaming.** Once public, people add boilerplate `AGENTS.md` to pass the rubric without being useful. Dynamic (actually-run-an-agent) checks are the counter — see benchmark harness.
-- **Freshness.** Scores decay with every push. A 6-hourly GitHub Actions cron rescores the curated set; webhook-driven sub-minute refresh is deferred until the claim flow lands in 0.8.0.
+- **Freshness.** Scores decay with every push. A 6-hourly GitHub Actions cron rescores the curated set and drops repos removed from it, and a weekly audit opens an issue for seeds that were renamed, archived or taken private; webhook-driven sub-minute refresh is deferred until the claim flow lands in 0.9.0.
 
 See `/methodology` in the running app for a candid walkthrough of what's measured today and what isn't.
 
@@ -76,7 +76,7 @@ Short answer: **low risk**. The app:
 - Uses `--depth 1 --single-branch` and never clones submodules.
 - Runs all SQL via prepared statements.
 - Renders through React (auto-escaping); the only `dangerouslySetInnerHTML` use is server-built JSON-LD with `<` escaped to `\u003c`.
-- Has no auth and no writable API endpoints — read-only dashboard.
+- Has no auth. The only write a request can trigger is a package lookup caching its package → repo alias.
 
 **Operational concerns** for a public launch (not code-level security):
 
@@ -84,7 +84,7 @@ Short answer: **low risk**. The app:
 - Rate limiting the public API.
 - Sandbox the cloner in a container (future-proofing against hypothetical git CVEs).
 
-Auth and per-maintainer controls land with the opt-out / claim flow in v0.8.0.
+Auth and per-maintainer controls land with the opt-out / claim flow in v0.9.0.
 
 ## Quickstart
 
@@ -104,13 +104,13 @@ bun run score https://bitbucket.org/snakeyaml/snakeyaml
 bun run score /path/to/local/checkout
 ```
 
-Optional: `GITHUB_TOKEN` / `GITLAB_TOKEN` in env to raise API rate limits.
+`GITHUB_TOKEN` / `GITLAB_TOKEN` raise API rate limits: optional locally, but `GITHUB_TOKEN` is required for the deployed app (see `.env.example`).
 
-Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Node ≥20.9.0).
+Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Node ≥22).
 
 ## Versioning
 
-`lib/version.ts` and `package.json` carry the current release number (currently **0.7.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
+`lib/version.ts` and `package.json` carry the current release number (currently **0.8.0**). Bumps happen only when we actually cut a release — never when merging intermediate work. The version pill in the header surfaces the number directly; `/changelog` lists what each release shipped.
 
 ## Stack & rationale
 
@@ -130,7 +130,7 @@ Run the unit tests with `bun run test` (uses `node --test` + `tsx`; requires Nod
 Both paths run the **same** `scoreRepo()` against a real directory — they differ only in how that directory is produced.
 
 - **Batch (`bun run score`, the 6-hourly rescore)** clones. One `git clone --depth 1` is a single uniform substrate across GitHub, GitLab and Bitbucket, needs no token, and puts code on disk for the dynamic signals a benchmark harness will eventually need.
-- **Live (`/score/…`)** can't clone — a Vercel function has no `git` binary — so it materializes the tree from the host API instead: every path present, real bytes fetched only for the ~14 files a signal actually reads. `scripts/parity-check.ts` asserts the two produce identical scores.
+- **Live (`/score/…`)** can't clone — a Vercel function has no `git` binary — so it materializes the tree from the host API instead: every path present, real bytes fetched only for the ~12 files a signal actually reads. `scripts/parity-check.ts` asserts the two produce identical scores.
 
 Note what it deliberately does **not** use: the host tarball endpoints. Those run `git archive`, which honors `export-ignore` in `.gitattributes`, so an archive reflects a release rather than the repository — measured at 7.4% of repos scoring differently. See `tasks/0.7.0/01-tree-materializer.md`.
 
@@ -149,7 +149,7 @@ app/          Next.js App Router — pages + API + SEO
   roadmap/         upcoming versions (from lib/roadmap.ts)
   changelog/       what's shipped (from lib/changelog.ts)
   about/           independent project, no vendor affiliation (footer-linked, E-E-A-T)
-  privacy/         privacy policy (footer-linked, AdSense/GDPR/CCPA)
+  privacy/         privacy policy (footer-linked, GDPR/CCPA)
   terms/           terms of use (footer-linked)
   action/          PR-diff GitHub Action explainer + install snippet
   skill/           agent-skill explainer + install command
@@ -168,7 +168,8 @@ lib/
   constants/  thresholds, host labels, sort keys
   types/      shared row-shape types for db.ts
   utils/      format + score-tier helpers, SVG badge renderer, package-request URL builder, repo paths + summary, language grouping
-  db.ts       better-sqlite3 schema + queries (all SQL lives here)
+  db.ts       better-sqlite3 queries (all SQL lives here; tables in db-schema.ts)
+  seeds.ts    seed-list checks shared by the seed run and the seed audit
   db-leaks.ts  local-path / token scan of the raw DB bytes before it is committed
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts   language groups + hub stats (used by /language pages, sitemap)
@@ -179,7 +180,7 @@ lib/
 scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check, check-db-leaks
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
-public/       Static assets — demo/ screenshots used by the README + OG image, IndexNow key (<key>.txt)
+public/       Static assets — demo/ screenshots used by the README, IndexNow key (<key>.txt)
 .claude/      settings.json, hooks/ (Stop guard), skills/
 data/         rank.db (committed — shipped as a build artifact; refreshed by the 6-hourly rescore cron)
 AGENTS.md     Agent instructions (source of truth)
@@ -190,7 +191,7 @@ LICENSE       MIT
 
 ## Live Score
 
-[`/score`](https://www.agentfriendlycode.com/score) takes any public GitHub repository URL and returns its full score — signals, per-model breakdown, and the gaps worth fixing first — for repos the leaderboard has never indexed. Results are computed from the repository's current commit, and cached for an hour per repo; nothing about a scored repo is stored. Repos already on the board redirect to their canonical repo page.
+[`/score`](https://agentfriendlycode.com/score) takes any public GitHub repository URL and returns its full score — signals, per-agent breakdown, and the gaps worth fixing first — for repos the leaderboard has never indexed. Results are computed from the repository's current commit, and cached for an hour per repo; nothing about a scored repo is added to the database. Repos already on the board redirect to their canonical repo page.
 
 GitLab and Bitbucket are implemented and score identically to a clone, but ship behind a "support coming" state: GitLab paginates its tree at 100 entries (a large project needs hundreds of sequential calls) and Bitbucket allows 60 unauthenticated API requests an hour.
 
@@ -200,16 +201,16 @@ GitLab and Bitbucket are implemented and score identically to a clone, but ship 
 
 ## Companion: agent skill
 
-[`hsnice16/agent-friendly-skill`](https://github.com/hsnice16/agent-friendly-skill) is a portable agent skill installable in one command — `npx skills add hsnice16/agent-friendly-skill#v0` — that scores the user's current repo locally and recommends a model. Profiles the same 9 agents this dashboard does (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi); installs into any [`vercel-labs/skills`](https://github.com/vercel-labs/skills)-compatible host (Cline, Copilot, Continue, Roo Code, …) and produces identical output regardless of which host invokes it — scoring is score-driven, not host-driven. Same self-contained property as the action: vendored scorer, no service dependency, works offline. The dashboard's [`/skill`](https://www.agentfriendlycode.com/skill) page hosts the install command, the score → model mapping, and optional `SessionStart` hook snippets for Claude Code and Codex.
+[`hsnice16/agent-friendly-skill`](https://github.com/hsnice16/agent-friendly-skill) is a portable agent skill installable in one command — `npx skills add hsnice16/agent-friendly-skill#v0` — that scores the user's current repo locally and recommends a model. Profiles the same 9 agents this dashboard does (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi); installs into any [`vercel-labs/skills`](https://github.com/vercel-labs/skills)-compatible host (Cline, Copilot, Continue, Roo Code, …) and produces identical output regardless of which host invokes it — scoring is score-driven, not host-driven. Same self-contained property as the action: vendored scorer, no service dependency, works offline. The dashboard's [`/skill`](https://agentfriendlycode.com/skill) page hosts the install command, the score → model mapping, and optional `SessionStart` hook snippets for Claude Code and Codex.
 
 ## Public API
 
 Read-only JSON endpoints for external integrators (skills, hooks, browser overlays, third-party tools):
 
 - `GET /api/score?host=<host>&repo=<owner>/<name>` — look up an indexed repo by host + owner/name. Returns `{ repo, signals, modelScores }` on 200; `{ error: "not_indexed" }` with status 404 when the repo isn't in our DB. The natural lookup endpoint for any tool that has a repo URL but not our internal id.
-- `GET /api/repos` — full leaderboard (each repo row plus its per-model scores).
-- `GET /api/repo/<id>` — per-repo detail (signals, model scores, top improvements). Requires the internal id; use `/api/score` first if you only have host + owner/name.
-- `GET /api/badge/<host>/<owner>/<name>.svg` — embeddable SVG badge. `?model=<id>` for per-model variants.
+- `GET /api/repos` — every ranked repo: the repo row plus its overall score.
+- `GET /api/repo/<id>` — per-repo detail, `{ repo, signals, modelScores }`. Requires the internal id; use `/api/score` first if you only have host + owner/name.
+- `GET /api/badge/<host>/<owner>/<name>.svg` — embeddable SVG badge. `?model=<id>` for per-agent variants.
 - `GET /api/package/<registry>/<name>` — resolve npm / PyPI / Cargo package → source-repo score (or `unresolved` when the registry doesn't expose a repo URL).
 
 Neither the action nor the agent skill calls these at runtime — both vendor the scorer and run locally. The endpoints exist so any third party can build on top of the dashboard without a network round-trip becoming a critical-path dependency.
@@ -220,8 +221,8 @@ See `/roadmap` in the running app or the per-version `tasks/` folders for the fu
 
 Versions are sequenced cheap-first so the highest-impact small additions don't get gated on heavy infra:
 
-- **0.8.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
-- **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-model weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
+- **0.9.0 — maintainer ownership + at-scale discovery**: OAuth opt-out / claim flow for maintainers + at-scale package overlay (per-registry leaderboards + userscript that renders the badge inline on npmjs.com / PyPI / crates.io).
+- **1.0.0 — production cut**: Postgres migration for concurrent writers + auto-discovered crawl (target 10k repos) + benchmark harness that derives per-agent weights from measured agent success. From here on, breaking API changes require a MAJOR bump.
 
 ## Defensibility
 

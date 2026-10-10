@@ -22,7 +22,7 @@ Instead: a GitHub Actions cron in this repo runs `bun run seed` every 6 hours, c
 ## What this gives up vs the original spec
 
 - **Sub-minute freshness on push** → up to 6h stale. For signals like README / AGENTS.md / CI files, that's well inside the noise floor.
-- **Per-repo subscription** → no such concept. Webhook subscription only becomes meaningful once `tasks/0.8.0/01-opt-out-claim-flow.md` introduces repo ownership.
+- **Per-repo subscription** → no such concept. Webhook subscription only becomes meaningful once `tasks/0.9.0/01-opt-out-claim-flow.md` introduces repo ownership.
 
 ## Cost / footprint
 

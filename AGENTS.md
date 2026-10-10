@@ -8,7 +8,7 @@ Instructions for AI coding agents (Claude Code, Cursor, Devin, GPT-5 Codex, etc.
 
 ## What this project is
 
-A public dashboard that ranks open-source repos (GitHub, GitLab, Bitbucket) by how friendly they are to AI coding agents — **per model**, because the right scaffolding differs between Claude Code, Cursor, Devin, and others.
+Scores how ready a repo is for AI coding agents, with separate weights per agent (called `model` in the code) because the right scaffolding differs between Claude Code, Cursor, Devin, and others. This repo is the website and the canonical scorer that `agent-friendly-skill` and `agent-friendly-action` vendor.
 
 See `README.md` for the full product narrative. See `tasks/` for per-version work breakdown. Visit the app's `/methodology` page for the live scoring formula.
 
@@ -16,7 +16,7 @@ See `README.md` for the full product narrative. See `tasks/` for per-version wor
 
 - **Next.js 16** (App Router) — web UI + API routes.
 - **React 19** — server components by default; no client JS unless interactivity requires it.
-- **Node (≥20.9.0)** — runtime for Next.js and CLI scripts (via `tsx`). Matches Vercel's serverless runtime. Bun is supported as a faster local package manager (`bun install`) but not required.
+- **Node (≥22)** — runtime for Next.js and CLI scripts (via `tsx`). Matches Vercel's serverless runtime. Bun is supported as a faster local package manager (`bun install`) but not required.
 - **TypeScript** — strict mode.
 - **Tailwind CSS 4** — `@theme` tokens in `app/globals.css`; no `tailwind.config.*` file.
 - **Phosphor Icons** (`@phosphor-icons/react`) — the only icon library. The `code-review` skill blocks non-Phosphor icons.
@@ -32,9 +32,9 @@ bun run init-db        # optional — auto-runs on first score
 bun run seed           # score the curated set across GH / GL / BB
 bun run dev            # http://localhost:3000
 bun run score <url>    # score a single repo
-bun run audit-seeds    # check every seed is public, original, and still there
+bun run audit-seeds    # check every seed is public, original, still there, and still being rescored
 bun run parity-check   # clone-vs-live-path scores must match (add --pr for the PR subset)
-bun run test           # unit tests (node --test + tsx) — requires Node ≥20.9.0
+bun run test           # unit tests (node --test + tsx) — requires Node ≥22
 ```
 
 ## Layout
@@ -45,7 +45,8 @@ app/
   page.tsx                # leaderboard
   not-found.tsx           # 404 — every unmatched path and every notFound() from the repo / score / package routes
   repo/[...slug]/page.tsx # repo detail with per-model suggestions (includes generateMetadata). Catch-all because a
-                          # GitLab owner can be a nested group: host first, repo name last, owner is the rest
+                          # GitLab owner can be a nested group: host first, repo name last, owner is the rest.
+                          # Another casing or a repo's former name 308s to the stored slug
   repo-redirect/[id]/page.tsx          # 308 to the slug — serves the pre-slug /repo/:id URLs, rewritten here by next.config.ts
   methodology/page.tsx    # how the static scoring works
   language/page.tsx       # every language: hub cards, plus the repos of languages too small for a hub
@@ -53,7 +54,7 @@ app/
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
-  privacy/page.tsx        # privacy policy (footer-linked, AdSense/GDPR/CCPA)
+  privacy/page.tsx        # privacy policy (footer-linked, GDPR/CCPA)
   terms/page.tsx          # terms of use (footer-linked)
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
                           # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive
@@ -62,7 +63,7 @@ app/
   api/repos/route.ts
   api/repo/[id]/route.ts
   api/score/route.ts                        # /api/score?host=&repo=owner/name — public lookup for external integrators (siblings vendor the scorer; they don't call this)
-  api/badge/[host]/[owner]/[name]/route.ts  # SVG badge for README embeds (?model=<id> for per-model)
+  api/badge/[...slug]/route.ts              # SVG badge for README embeds (?model=<id> for per-model). Catch-all for nested GitLab owners, like repo/[...slug]
   api/package/[registry]/[name]/route.ts    # npm/PyPI/Cargo lookup → source-repo score
   opengraph-image.tsx                       # next/og convention — home OG image, 1200×630 (auto-wired)
   twitter-image.tsx                         # next/og convention — twitter:image, re-exports opengraph-image (auto-wired)
@@ -78,6 +79,7 @@ app/
   action/page.tsx                           # PR-diff GitHub Action explainer + install snippet (SEO landing for the sibling action repo)
   skill/page.tsx                            # agent-skill explainer + install snippet (SEO landing for the sibling skill repo)
   globals.css             # Tailwind import + @theme tokens (no custom utilities)
+proxy.ts                  # 308s /language/<Mixed-Case> to the lowercase hub slug (the only proxy; matcher-scoped)
 components/               # Tailwind-styled React components
   Panel.tsx, ScoreBar.tsx, ScoreNumber.tsx, ScoreCell.tsx,
   HostPill.tsx, HostSelect.tsx, Medal.tsx, ModelPills.tsx,
@@ -85,7 +87,7 @@ components/               # Tailwind-styled React components
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, RepoSummary.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
-  BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistCard.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
+  BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
   CopySnippet.tsx, PackageLookupForm.tsx,
   BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx,
   LiveScoreForm.tsx, RecentScores.tsx, RecordScore.tsx, ReleaseAnnouncement.tsx,
@@ -100,7 +102,7 @@ lib/
     score.ts              # scoreTier + Tailwind class maps
     badge.ts              # SVG badge renderer (used by /api/badge)
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
-    repo-path.ts          # repoPath / repoIdentity — the one place a repo URL is built or parsed
+    repo-path.ts          # repoPath / repoIdentity / ownerAndName — the one place a repo URL is built or parsed
     repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo pages
     language.ts           # language slugs + grouping (casing varies in the data) + nearest-score peers for "Similar repos"
   scoring/
@@ -114,36 +116,44 @@ lib/
   live-score/             # on-the-fly scoring: host tree API → materialized dir → scoreRepo
     hosts.ts              # per-host tree listing / raw / blob URLs + MAX_ENTRIES guard
     materialize.ts        # build a scoreable dir; symlinks reproduced, never repaired
-    content-files.ts      # the ~14 paths whose *bytes* a signal reads
+    content-files.ts      # the ~12 paths whose *bytes* a signal reads
     supported.ts          # SUPPORTED_HOSTS — client-importable (no node:fs)
     recents.ts            # localStorage read/write for the visitor's own scores
     score.ts              # liveScore(): commit resolve + metadata + materialize + scoreRepo
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts                    # language groups + hub stats (used by /language pages, sitemap)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
-  db.ts                   # better-sqlite3 schema + queries
+  db.ts                   # better-sqlite3 connection + queries (RANK_DB_PATH overrides the file)
+  db-schema.ts            # table definitions + migrations, applied by db.ts on open; repo_alias is created by the seed run instead
+  seeds.ts                # Seed type, seedTargets (seed list → what reconcileSeeds acts on), audit classification — pure
   db-leaks.ts             # findLeaks — local paths / tokens in the raw DB bytes (gate before committing data/rank.db)
-  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, REPO_URL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS, OG_IMAGE_SIZE, DEFAULT_OG_IMAGE (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
+  version.ts              # APP_NAME, APP_VERSION, IS_PRE_RELEASE, APP_URL, APP_DESCRIPTION, APP_KEYWORDS, REPO_URL, CONTACT_EMAIL, SIBLING_VERSION, ACTION_REPO_URL, ACTION_USES, SKILL_REPO_URL, SKILL_INSTALL_CMD, OG_DEFAULTS, TWITTER_DEFAULTS, OG_IMAGE_SIZE, DEFAULT_OG_IMAGE (spread into per-page openGraph / twitter — Next.js shallow-merges these objects so defaults must be re-spread on every page)
   changelog.ts            # typed ChangelogEntry[]
   roadmap.ts              # typed RoadmapVersion[]
   skill-content.ts        # SKILL_FAQ + SCORE_BANDS + hook snippets — content for /skill page
   release-notice.ts       # localStorage "seen" marker for the home-page release announcement
 scripts/
-  init-db.ts, score.ts, seed.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
+  init-db.ts, score.ts, seed-list.ts, seed-packages.ts (auto-runs after seed.ts)
+  seed.ts               # reconciles the DB with seed-list.ts (rename in place, then prune), then scores every seed
   check-db-leaks.ts     # findLeaks gate — lefthook, ci.yml, and the rescore workflow before it pushes
   parity-check.ts       # asserts the live-score path equals `bun run score`. CI gate: .github/workflows/parity.yml
-  audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone.
+  audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone / no longer rescored.
                         # Needs a valid GITHUB_TOKEN — unauthenticated it covers ~60 repos/hr.
+                        # Weekly via .github/workflows/seed-audit.yml, which files the findings as an issue.
 tests/
   _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
   format.test.ts          # compactStars, relativeTime, hostLabel
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
-  repo-path.test.ts       # repoPath / repoIdentity
+  db-leaks.test.ts        # findLeaks — local paths / tokens in DB bytes
+  repo-path.test.ts       # repoPath / repoIdentity / ownerAndName
   repo-summary.test.ts    # summarizeRepo / keySignals — ranks, ties, best/worst agent
   language.test.ts        # languageSlug / groupByLanguage / nearestByScore
   path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
+  seeds.test.ts           # seedTargets guards, host-API finding classification, staleness, accept
+  seed-reconcile.test.ts  # reconcileSeeds against a temp DB — prune, rename in place, former-name lookup
+  _temp-db.ts             # side-effect import that points lib/db.ts at a temp file; must precede any lib/db import
   live-score.test.ts      # content-candidate coverage vs the signals, path traversal, host URLs
   signals/                # one *.test.ts per signal
 tasks/
@@ -155,7 +165,8 @@ tasks/
   0.5.0/                  # released — quick wins (PR score-diff action + agent skill)
   0.6.0/                  # released — auto-refresh (scheduled rescoring)
   0.7.0/                  # released — Live Score (tree materializer + parity harness + live score pages + release notice)
-  0.8.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
+  0.8.0/                  # released — language hubs, slug repo URLs, seed freshness (renames, pruning, weekly audit)
+  0.9.0/                  # planned — maintainer ownership + at-scale discovery (OAuth opt-out + package overlay at scale)
   1.0.0/                  # planned — production cut (Postgres + at-scale indexing + benchmark harness)
 .claude/
   settings.json           # SessionStart + Stop hooks (Stop → hooks/stop-guard.sh)
@@ -178,14 +189,15 @@ Keep it that way when adding features. If a component needs data, fetch in the p
 
 - **Exact-pinned deps** in `package.json` (no `^`, no `latest`). Deterministic scoring.
 - **Server components** unless interactivity requires client. Prefer `<Link>` + query params over client state.
-- **All SQL** lives in `lib/db.ts`. Don't scatter `db.prepare(...)` elsewhere.
+- **All SQL** lives in `lib/db.ts` (table definitions in `lib/db-schema.ts`). Don't scatter `db.prepare(...)` elsewhere.
+- **Seeds**: `scripts/seed-list.ts` is the tracked set and `bun run seed` deletes rows that are not in it. A renamed repo keeps its entry — new `url`, old one in `was` — so the row, its history and its old URLs survive; `getRepoByHostOwnerName` resolves former names through `repo_alias`. CONTRIBUTING.md has the add / remove / rename steps.
 - **Signal IDs** are stable strings (`agents_md`, `tests`, etc.). Changing one = migration.
 - **Repo path lookups** in `lib/scoring/signals/` go through `firstExisting` / `resolveRelative` / `resolveAllRelative` in `helpers.ts` — never a raw `existsSync(join(repo, …))`. They match case-insensitively because README / LICENSE / CONTRIBUTING casing varies in the wild (`readme.md`, `Readme.md`, `README.MD`); an exact-match lookup scores those files as missing on case-sensitive filesystems, so Linux CI and a macOS dev box disagree on the same commit. `resolveAllRelative` dedupes by resolved path — a candidate list carrying two spellings of one file must not count as two hits.
 - **Client-side persistence**: components stay presentational, except that a `"use client"` component may read/write `localStorage` in an effect — there are no accounts, so per-visitor state has nowhere else to live. The storage access goes in `lib/` (`live-score/recents.ts`, `release-notice.ts`), wrapped in try/catch because private mode throws, and the read happens after mount so the server HTML still matches.
 - **Tailwind first**, then `@theme` tokens. Avoid inline styles; avoid custom classes unless the pattern is truly repeatable.
 - **No comments** explaining _what_ the code does. Only comment _why_ — the shallow-clone rationale in `lib/clients/git.ts` is the model.
 - **Brand on UI**: "Agent Friendly Code" (no hyphen). Repo/package slug + GitHub `User-Agent` string: `agent-friendly-code`.
-- **Version**: `APP_VERSION` in `lib/version.ts` and `package.json`'s `version` carry the current release number. Bump both (and add a new bucket in `lib/changelog.ts`) only when cutting a release — never when merging intermediate work.
+- **Version**: `APP_VERSION` in `lib/version.ts` and `package.json`'s `version` carry the current release number. Bump both (and add a new bucket in `lib/changelog.ts`) only when cutting a release — never when merging intermediate work. The number is also hard-coded in `README.md` (release badge, intro, Versioning section) and in the `SessionStart` hook text in `.claude/settings.json`.
 - **Versioning + changelog**: bumps on `lib/version.ts` + `package.json` `version` happen only on a real release, coordinated with a new bucket in `lib/changelog.ts`. The changelog is a **user-facing capability log** — every bullet describes something a dashboard visitor or API caller can see, click, or call. Codebase hygiene (CI, linters, pre-commit, tests), pure internal refactors, dep bumps, and contributor-facing docs (CONTRIBUTING, PR templates) do **not** earn a changelog line — they stay in `tasks/` and the PR description. When a roadmap item ships, remove it from `lib/roadmap.ts` in the same PR — moved, not duplicated.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines — enforced by the `file-length` pre-commit job in `lefthook.yml`. Near the cap, split into subcomponents or extract helpers to `lib/utils/`. `scripts/` is exempt (seed data lists).
 
@@ -198,7 +210,7 @@ Two sibling repos live alongside this one (checked out as `../agent-friendly-act
 
 Both vendor their own copy of `lib/scoring/` and ship it as a single `dist/` bundle via `@vercel/ncc`. Extracting `agent-friendly-scorer` as a standalone npm package is still deferred to `tasks/1.0.0/03-benchmark-harness.md`; the harness would be the third consumer that finally tips the balance. Until then, all three copies of the scorer must stay in sync by hand.
 
-Both siblings tag the same major in lockstep — `SIBLING_VERSION` in `lib/version.ts` is the single source of truth that drives `ACTION_USES`, `SKILL_INSTALL_CMD`, and the `#v0` ref in `skills-lock.json`. Bump it only when **both** siblings cut a new major together.
+Both siblings tag the same major in lockstep — `SIBLING_VERSION` in `lib/version.ts` builds `ACTION_USES` and `SKILL_INSTALL_CMD`. The same major is also written by hand in `skills-lock.json` (`ref`), `.github/workflows/agent-friendly.yml` (`@v0`), and the `/action` and `/skill` FAQ text. Change them all together, and only when **both** siblings cut a new major.
 
 **Whenever you change `lib/scoring/`** — adding a signal, tweaking a weight, refactoring `scorer.ts`, anything — also:
 
@@ -220,7 +232,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
 2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
-3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_DESCRIPTION` + `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/page.tsx`, `app/score/page.tsx`, `app/skill/page.tsx`, `app/action/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count as a word and a digit (e.g. `nine`, `9`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
+3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/skill/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count as a word and a digit (e.g. `nine`, `9`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
 4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getLanguagePeers` (the Similar repos strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
 5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
@@ -257,7 +269,7 @@ The `Stop` guard exists because reminders alone weren't enough — agents would 
 
 Skill granularity rule of thumb: one skill per _phase_ of work (writing, reviewing, wrapping-up), not one skill per _rule_. Narrow skills fragment context; broad skills stay coherent.
 
-In addition to those project-authored workflow skills, `.claude/skills/agent-friendly/` is **vendored** — installed from the sibling `hsnice16/agent-friendly-skill` repo via `npx skills add hsnice16/agent-friendly-skill --agent claude-code -y` (pinned to `#v0`). It's a self-contained scorer bundle (SKILL.md + ncc-built `dist/index.js`), not a workflow skill, so the granularity rule above doesn't apply. Don't hand-edit the vendored files — re-run the install command to update. The install also writes `skills-lock.json` at the repo root (ref + content hash); commit it so `npx skills experimental_install` can restore the exact bundle reproducibly.
+In addition to those project-authored workflow skills, `.claude/skills/agent-friendly/` is **vendored** — installed from the sibling `hsnice16/agent-friendly-skill` repo via `npx skills add hsnice16/agent-friendly-skill#v0 --agent claude-code -y`. It's a self-contained scorer bundle (SKILL.md + ncc-built `dist/index.js`), not a workflow skill, so the granularity rule above doesn't apply. Don't hand-edit the vendored files — re-run the install command to update. The install also writes `skills-lock.json` at the repo root (ref + content hash); commit it so `npx skills experimental_install` can restore the exact bundle reproducibly.
 
 Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 
@@ -267,9 +279,9 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
 - `data/rank.db` is committed to a public repo, freed pages included. `bun run check-db-leaks` must pass before any commit of it; the rescore workflow runs it before pushing.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/package/[registry]/[name]/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Languages / Methodology / Packages / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Languages / Methodology / Packages (index and result) / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
-- No auth yet (read-only dashboard). When auth lands (`tasks/0.8.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
+- No auth yet. The only write a request can trigger is a package lookup caching its package → repo alias. When auth lands (`tasks/0.9.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 
 **Operational concerns** (not code-level security) worth flagging before public launch:
 
@@ -287,7 +299,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 ## Useful pre-commit checks
 
 - `bun run score https://github.com/honojs/hono` — end-to-end smoke.
-- `bun run test` — unit tests (Node ≥20.9.0 required).
+- `bun run test` — unit tests (Node ≥22 required).
 - `curl -s localhost:3000/api/repos | head` — verify persistence + API.
 - `bun x tsc --noEmit` — typecheck.
 - Manual pass over `/`, `/repo/<host>/<owner>/<name>`, `/methodology`, `/roadmap`, `/changelog` after UI changes.

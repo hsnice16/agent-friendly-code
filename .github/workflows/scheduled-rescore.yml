@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 60
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@v2
@@ -25,7 +25,7 @@ jobs:
           bun-version: 1.2.16
 
       - name: Setup Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "22"
 
@@ -34,7 +34,8 @@ jobs:
 
       # badge_embedded is here despite not being a score: adoption leaves every
       # overall_score identical, so a scores-only diff reads the run as a no-op
-      # and discards the flag with the runner, every run, forever.
+      # and discards the flag with the runner, every run, forever. url is what
+      # makes a pruned or renamed seed count as a change.
       - name: Snapshot pre-rescore state
         run: sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-before.txt
 
@@ -43,11 +44,11 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run seed
 
-      - name: Commit and push if any score or badge adoption changed
+      - name: Commit and push if the repo set, a score or badge adoption changed
         run: |
           sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-after.txt
           if diff -q /tmp/state-before.txt /tmp/state-after.txt > /dev/null; then
-            echo "No score or badge-adoption changes — skipping commit (last_scored_at churn ignored)."
+            echo "No repo, score or badge-adoption changes — skipping commit (last_scored_at churn ignored)."
             exit 0
           fi
           bun run check-db-leaks

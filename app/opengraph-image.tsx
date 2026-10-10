@@ -1,10 +1,10 @@
 import { ImageResponse } from "next/og";
 
 import { getLeaderboardStats } from "@/lib/db";
-import { APP_NAME } from "@/lib/version";
+import { APP_NAME, DEFAULT_OG_IMAGE } from "@/lib/version";
 
 export const contentType = "image/png";
-export const alt = `${APP_NAME} — public agent-friendliness leaderboard`;
+export const alt = DEFAULT_OG_IMAGE.alt;
 export const size = { width: 1200, height: 630 };
 
 export default function Image() {
@@ -61,7 +61,7 @@ export default function Image() {
             letterSpacing: "-0.02em",
           }}
         >
-          Which public repos are easiest
+          How ready is your codebase
         </div>
         <div
           style={{
@@ -72,11 +72,11 @@ export default function Image() {
             letterSpacing: "-0.02em",
           }}
         >
-          for AI coding agents to work in?
+          for AI coding agents?
         </div>
         <div style={{ display: "flex", color: "#525252", fontSize: "28px", marginTop: "24px", maxWidth: "1000px" }}>
-          Repos from GitHub, GitLab, and Bitbucket, ranked for each agent: Claude Code, Cursor, Devin, Codex, Gemini,
-          Kimi, Aider, OpenHands, and Pi.
+          One score per agent, from file checks: Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, and
+          Pi.
         </div>
       </div>
 

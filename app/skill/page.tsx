@@ -16,9 +16,9 @@ import {
   TWITTER_DEFAULTS,
 } from "@/lib/version";
 
-const PAGE_TITLE = "Agent Friendly Skill — score your repo locally and pick the right model";
+const PAGE_TITLE = "Agent Skill: score the repo you're in";
 const PAGE_DESCRIPTION =
-  "An agent skill that scores the repo on your computer and suggests which model to use. It scores the repo for 9 agents (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi) and installs into any agent that supports vercel-labs/skills. Everything runs locally, works offline, and doesn't depend on this site.";
+  "An agent skill that scores the repo you're in for nine coding agents, shows which one it is best set up for, and suggests a model class. Runs locally.";
 
 const PAGE_KEYWORDS = [...APP_KEYWORDS, "model recommendation", "agent-friendliness score"];
 
@@ -95,12 +95,13 @@ export default function SkillPage() {
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent Friendly Skill: score your repo, pick a model
+          Agent Friendly Skill: score the repo you&apos;re in
         </h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          An agent skill that scores the repo you&apos;re working in, on your own computer, and suggests which model to
-          use for it. The scoring code is built in, so it works offline and keeps working even if {APP_NAME} goes down.
+          An agent skill that scores the repo you&apos;re working in, on your own computer. It shows which of nine
+          agents the repo is best set up for and suggests a model class. The scoring code is built in, so it works
+          offline.
         </p>
       </section>
 
@@ -119,7 +120,7 @@ export default function SkillPage() {
 
         <p className="mt-3 text-[12.5px] text-muted">
           After installing, run <code className="text-ink-dim">/agent-friendly</code> (or however your agent runs
-          skills) inside any repo on your computer. The skill finds the repo&apos;s top folder, scores it, and prints
+          skills) from the top folder of any repo on your computer. The skill scores the folder you are in and prints
           the score with a suggested model. It always gives scores for all 9 agents (Claude Code, Cursor, Devin, GPT-5
           Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi). The best fit is picked by score, not by which agent ran
           the skill, so you get the same result from Claude Code, Cline, Copilot, Continue, or any other supported
@@ -134,9 +135,10 @@ export default function SkillPage() {
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               The agent tells you first that it scores the folder you&apos;re in, so start from your project&apos;s top
-              folder. The CLI also warns you if the folder has none of the usual project files (
-              <code className="text-ink-dim">package.json</code> / <code className="text-ink-dim">README.md</code> /{" "}
-              <code className="text-ink-dim">AGENTS.md</code> / <code className="text-ink-dim">.git</code>), so the
+              folder. The CLI also warns you if the folder has no project file such as{" "}
+              <code className="text-ink-dim">package.json</code>, <code className="text-ink-dim">pyproject.toml</code>,{" "}
+              <code className="text-ink-dim">Cargo.toml</code>, <code className="text-ink-dim">go.mod</code>, a README,{" "}
+              <code className="text-ink-dim">AGENTS.md</code> or <code className="text-ink-dim">.git</code>, so the
               wrong folder can&apos;t quietly give you a low score.
             </li>
             <li>

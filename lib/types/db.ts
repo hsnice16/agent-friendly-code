@@ -51,3 +51,10 @@ export type LeaderboardStats = {
   lastScoredAt: number | null;
   contentChangedAt: number | null;
 };
+
+export type RepoName = Pick<RepoRow, "host" | "owner" | "name">;
+
+/** `url` is the canonical form; `was` holds the repo's former names. */
+export type SeedTarget = RepoName & { url: string; was: RepoName[] };
+
+export type ScoreTime = { url: string; lastScoredAt: number | null };

@@ -18,12 +18,11 @@ import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { relativeTime } from "@/lib/utils/format";
 import { groupByLanguage, hubPath, isHub } from "@/lib/utils/language";
-import { APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME, APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const HOME_TITLE =
-  "Agent Friendly Code — AI coding agent friendliness leaderboard for Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi";
+const HOME_TITLE = "Agent Friendly Code — is your codebase ready for AI agents?";
 const HOME_DESCRIPTION =
-  "A public ranking of GitHub, GitLab, and Bitbucket repos by how easy they are for AI coding agents to work in: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each agent gets its own score, based on checks like AGENTS.md / CLAUDE.md, CI, tests, and dev setup.";
+  "Public GitHub, GitLab and Bitbucket repos ranked by how ready they are for AI coding agents, with a score for each agent. Or score your own codebase.";
 
 type SearchParams = {
   q?: string;
@@ -115,7 +114,7 @@ const resolveView = cache(async (sp: SearchParams): Promise<View> => {
 });
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<SearchParams> }): Promise<Metadata> {
-  const { q, page, dir, sort, host, selected } = await resolveView(await searchParams);
+  const { q, page, totalPages, dir, sort, host, selected, filteredRows } = await resolveView(await searchParams);
   const canonical = buildHref({ model: selected, host, q, sort, dir, page });
 
   // Every view points at itself. Canonicalising page 2+ back to `/` declared
@@ -125,13 +124,23 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
   // would instead hide that directive from the crawler that has to read it.
   const filtered = selected !== "overall" || host !== "all" || q !== "" || sort !== DEFAULT_SORT || dir !== DEFAULT_DIR;
 
+  // Deeper pages are indexed in their own right, so each needs its own title
+  // and description or they read as copies of page 1.
+  const first = (page - 1) * LEADERBOARD_PAGE_SIZE + 1;
+  const last = Math.min(page * LEADERBOARD_PAGE_SIZE, filteredRows.length);
+  const title = page > 1 ? `Leaderboard page ${page} of ${totalPages} — ${APP_NAME}` : HOME_TITLE;
+  const description =
+    page > 1
+      ? `Repos ranked ${first} to ${last} of ${filteredRows.length} by how ready they are for AI coding agents, with a score for each agent.`
+      : HOME_DESCRIPTION;
+
   return {
-    title: HOME_TITLE,
-    description: HOME_DESCRIPTION,
+    title,
+    description,
     alternates: { canonical },
     ...(filtered ? { robots: { index: false, follow: true } } : {}),
-    twitter: { ...TWITTER_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION },
-    openGraph: { ...OG_DEFAULTS, title: HOME_TITLE, description: HOME_DESCRIPTION, url: canonical, type: "website" },
+    twitter: { ...TWITTER_DEFAULTS, title, description },
+    openGraph: { ...OG_DEFAULTS, title, description, url: canonical, type: "website" },
   };
 }
 
@@ -159,18 +168,12 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
     <>
       <HomeJsonLd allOverall={allOverall} contentChangedAt={stats.contentChangedAt} />
 
-      {/* Announced only once the release it describes is the one deployed —
-          otherwise a version bump ahead of the changelog entry (or behind it)
-          would advertise the wrong thing. */}
-      {CHANGELOG[0]?.label === APP_VERSION && (
-        <ReleaseAnnouncement anchorHref="/score" version={APP_VERSION} title={CHANGELOG[0].title} />
-      )}
       <section className="mb-5">
         <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
           Which public repos are easiest for AI coding agents to work in?
         </h1>
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Repos from GitHub, GitLab, and Bitbucket, ranked for each agent. Each agent looks for different things.
+          Repos from GitHub, GitLab, and Bitbucket, scored on what each agent looks for, then ranked.
         </p>
 
         <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
@@ -185,14 +188,28 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
         </p>
 
         <p className="mt-1.5 max-w-[68ch] text-[13px] text-muted">
-          Repo not on the list?{" "}
+          Your own codebase?{" "}
           <Link
             href="/score"
             className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
           >
-            Score any public GitHub repo now
+            Score any public GitHub repo
           </Link>{" "}
-          from its latest commit.
+          from its latest commit, run the{" "}
+          <Link
+            href="/skill"
+            className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
+          >
+            agent skill
+          </Link>{" "}
+          inside it, or add the{" "}
+          <Link
+            href="/action"
+            className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
+          >
+            GitHub Action
+          </Link>{" "}
+          to score every pull request.
         </p>
       </section>
 
@@ -247,6 +264,14 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           hrefFor={(p) => buildHref({ model: selected, host, q, sort, dir, page: p })}
         />
       </div>
+
+      {/* Announced only once the release it describes is the one deployed —
+          otherwise a version bump ahead of the changelog entry (or behind it)
+          would advertise the wrong thing. It sits above the section that
+          release is about, so move it when the next one is cut. */}
+      {hubs.length > 0 && CHANGELOG[0]?.label === APP_VERSION && (
+        <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} />
+      )}
 
       {hubs.length > 0 && (
         <nav

@@ -33,8 +33,8 @@ export class TooLargeError extends Error {
   }
 }
 
-// Distinct from a generic failure so the page can say "come back shortly"
-// instead of "check the URL" — unauthenticated GitHub allows 60 requests/hour
+// Thrown rather than reported as "not found" so the visitor gets the retry
+// page, not "check the URL" — unauthenticated GitHub allows 60 requests/hour
 // per IP and serverless egress IPs are shared, so this is the failure a missing
 // GITHUB_TOKEN actually produces.
 export class RateLimitedError extends Error {

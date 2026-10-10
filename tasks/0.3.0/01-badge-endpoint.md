@@ -4,7 +4,7 @@
 
 ## Goal
 
-`GET /badge/:host/:owner/:name.svg` → shields.io-style badge with overall (or per-model) score.
+`GET /api/badge/:host/:owner/:name.svg` → shields.io-style badge with overall (or per-model) score.
 
 ## What shipped
 
@@ -24,7 +24,7 @@
 
 ## Verified
 
-- `curl /badge/github/hsnice16/agent-friendly-code.svg` → 200, valid SVG, score 96, green tier.
+- `curl /api/badge/github/hsnice16/agent-friendly-code.svg` → 200, valid SVG, score 96, green tier.
 - `?model=claude-code` returns the per-model variant.
-- `/badge/github/nope/does-not-exist.svg` → "not scored" badge.
+- `/api/badge/github/nope/does-not-exist.svg` → "not scored" badge.
 - Cache headers present.

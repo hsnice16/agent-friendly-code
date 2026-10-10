@@ -1,11 +1,12 @@
 {
   "name": "agent-friendly-code",
-  "version": "0.7.0",
+  "version": "0.8.0",
+  "description": "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.",
   "private": true,
   "license": "MIT",
   "author": "Himanshu Singh (https://github.com/hsnice16)",
   "engines": {
-    "node": ">=20.9.0"
+    "node": ">=22.0.0"
   },
   "scripts": {
     "dev": "next dev -p 3000",

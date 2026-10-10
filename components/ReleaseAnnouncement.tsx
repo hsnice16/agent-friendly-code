@@ -6,92 +6,44 @@ import { useCallback, useEffect, useState } from "react";
 
 import { hasSeenRelease, markReleaseSeen } from "@/lib/release-notice";
 
-const AUTO_HIDE_MS = 12_000;
-
-/** Fixed, so the pointer maths has one known number rather than a measured one. */
-const WIDTH = 280;
-const GAP = 10;
-const EDGE = 12;
-
-type Anchor = { left: number; top: number; pointer: number };
-
 type Props = {
   version: string;
   /** Newest changelog headline — the whole point of the notice. */
   title: string;
-  /** Nav link to sit under. The release is about that page, so that is what the pointer should mean. */
-  anchorHref: string;
 };
 
-// Measured, not offset from the container edge: the nav's own contents decide
-// where the link lands, and they change.
-//
-// Null means "don't show at all" — below `md` the header collapses to a
-// hamburger, the nav is display:none, and there is nothing to point at.
-function anchorTo(href: string): Anchor | null {
-  const link = document.querySelector<HTMLElement>(`header a[href="${href}"]`);
-  if (!link) return null;
+// Render it directly above the section the release is about. `sticky bottom`
+// pins it to the foot of the viewport while that spot is below the fold and
+// lets it settle there once scrolled to, so the pointer always means "this,
+// here" with no measuring and nothing to redo on resize.
+export function ReleaseAnnouncement({ version, title }: Props) {
+  // Never set during the server render — localStorage is unreadable there, and
+  // deciding at render time would hydrate a mismatch.
+  const [isOpen, setIsOpen] = useState(false);
 
-  const rect = link.getBoundingClientRect();
-  if (rect.width === 0) return null;
-
-  const center = rect.left + rect.width / 2;
-  const rightMost = Math.max(window.innerWidth - WIDTH - EDGE, EDGE);
-  const left = Math.min(Math.max(center - WIDTH / 2, EDGE), rightMost);
-
-  return { left, top: rect.bottom + GAP, pointer: center - left };
-}
-
-export function ReleaseAnnouncement({ version, title, anchorHref }: Props) {
-  // One state, not an `open` flag beside it: anchored *is* open, so the
-  // "showing but unpositioned" combination cannot be represented. Never set
-  // during the server render — localStorage is unreadable there, and deciding
-  // at render time would hydrate a mismatch.
-  const [anchor, setAnchor] = useState<Anchor | null>(null);
-  const isOpen = anchor !== null;
-
-  const dismiss = useCallback(() => setAnchor(null), []);
+  const dismiss = useCallback(() => setIsOpen(false), []);
 
   useEffect(() => {
     if (hasSeenRelease(version)) return;
 
-    // Measured before anything else: on a hamburger-width screen there is no
-    // anchor, so nothing is shown — and nothing is marked seen either, or the
-    // one announcement would be spent on a screen that never displayed it.
-    const at = anchorTo(anchorHref);
-    if (!at) return;
-
     // Marked on show, not on hide: a visitor who leaves after two seconds has
     // still had their one announcement, and a reload should not repeat it.
     markReleaseSeen(version);
-    setAnchor(at);
-
-    const timer = setTimeout(() => setAnchor(null), AUTO_HIDE_MS);
-    return () => clearTimeout(timer);
-  }, [version, anchorHref]);
+    setIsOpen(true);
+  }, [version]);
 
   useEffect(() => {
     if (!isOpen) return;
-
-    // The header is `sticky top-0`, so the link never moves on scroll — only a
-    // resize can invalidate the measurement. Narrowing into the hamburger
-    // breakpoint returns null, which closes it.
-    const measure = () => setAnchor(anchorTo(anchorHref));
 
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") dismiss();
     };
 
-    window.addEventListener("resize", measure);
     document.addEventListener("keydown", onKey);
+    return () => document.removeEventListener("keydown", onKey);
+  }, [isOpen, dismiss]);
 
-    return () => {
-      window.removeEventListener("resize", measure);
-      document.removeEventListener("keydown", onKey);
-    };
-  }, [isOpen, dismiss, anchorHref]);
-
-  if (!anchor) return null;
+  if (!isOpen) return null;
 
   return (
     <aside
@@ -100,13 +52,11 @@ export function ReleaseAnnouncement({ version, title, anchorHref }: Props) {
       role="status"
       aria-live="polite"
       aria-label="What's new"
-      style={{ left: anchor.left, top: anchor.top, width: WIDTH }}
-      className="animate-pop-in fixed z-30 rounded-card border border-line bg-surface p-3.5 shadow-lg"
+      className="animate-pop-in sticky bottom-4 z-30 -mb-3 mt-6 w-[280px] max-w-full rounded-card border border-line bg-surface p-3.5 shadow-lg"
     >
       <span
         aria-hidden="true"
-        style={{ left: anchor.pointer }}
-        className="absolute -top-[5px] -ml-1 h-2 w-2 rotate-45 border-l border-t border-line bg-surface"
+        className="absolute -bottom-[5px] left-6 h-2 w-2 rotate-45 border-b border-r border-line bg-surface"
       />
 
       <div className="flex items-start justify-between gap-3">

@@ -25,9 +25,9 @@ _Tick whichever applies:_
 
 ## Reproduction
 
-- **URL or repo affected (if any)**: _e.g. `https://<deploy-host>/repo/123` or the repo being scored, like `vercel/next.js`._
+- **URL or repo affected (if any)**: _e.g. `https://<deploy-host>/repo/github/vercel/next.js` or the repo being scored, like `vercel/next.js`._
 - **Browser / OS** (for UI bugs): _e.g. Chrome 130 on macOS 15._
-- **`bun --version` / Node version** (for local-dev bugs): _e.g. `bun 1.1.x`, `node 20.9.0`._
+- **`bun --version` / Node version** (for local-dev bugs): _e.g. `bun 1.1.x`, `node 22.x`._
 - **Steps**:
   1. _…_
   2. _…_

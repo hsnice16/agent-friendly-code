@@ -6,20 +6,23 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, CONTACT_EMAIL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const LAST_UPDATED = "May 19, 2026";
+const LAST_UPDATED = "October 10, 2026";
+
+const DESCRIPTION = `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`;
 
 export const metadata: Metadata = {
   title: "Privacy Policy",
+  description: DESCRIPTION,
   alternates: { canonical: "/privacy" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: `Privacy Policy — ${APP_NAME}` },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Privacy Policy", description: DESCRIPTION },
   openGraph: {
     ...OG_DEFAULTS,
     images: [DEFAULT_OG_IMAGE],
-    title: `Privacy Policy — ${APP_NAME}`,
+    title: "Privacy Policy",
+    description: DESCRIPTION,
     url: "/privacy",
     type: "article",
   },
-  description: `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`,
 };
 
 export default function PrivacyPage() {
@@ -40,9 +43,9 @@ export default function PrivacyPage() {
         <PanelHeading>Overview</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an
-          independent, MIT-licensed project. There are no user accounts. The Service is a public, read-only dashboard
-          that ranks publicly accessible source repositories. This policy explains the limited information that is
-          collected when you visit and how it is used.
+          independent, MIT-licensed project. There are no user accounts. The Service scores publicly accessible source
+          repositories and ranks the ones it tracks. This policy explains the limited information that is collected when
+          you visit and how it is used.
         </p>
       </Panel>
 
@@ -57,12 +60,6 @@ export default function PrivacyPage() {
               and time on page. This data is not used to identify individual visitors.
             </li>
             <li className="mt-2">
-              <strong className="text-ink">Advertising.</strong> The Service may serve advertisements through Google
-              AdSense. AdSense and its partners use cookies and similar technologies to serve ads and measure their
-              performance. You can manage personalised advertising at{" "}
-              <ExternalLink href="https://myadcenter.google.com">myadcenter.google.com</ExternalLink>.
-            </li>
-            <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard
               request metadata — IP address, user-agent, timestamps — for short retention periods, for operational and
               security purposes.
@@ -72,12 +69,23 @@ export default function PrivacyPage() {
               derived from public source repositories on GitHub, GitLab, and Bitbucket. No private code or non-public
               information is read or stored.
             </li>
+            <li className="mt-2">
+              <strong className="text-ink">Live Score.</strong> A repository URL you submit is sent from our server to
+              GitHub to read that repository&apos;s public file list, its basic details, and the few files the checks
+              read. The result is cached on our servers for up to one hour and is not added to our database.
+            </li>
+            <li className="mt-2">
+              <strong className="text-ink">Browser storage.</strong> The repositories you scored, with their scores, and
+              the last release notice you were shown are kept in your browser&apos;s localStorage. They are never sent
+              to us, and clearing site data for this site removes them.
+            </li>
           </ul>
 
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
             We do <strong className="text-ink mr-0.5">not</strong> ask for, or store, your name, email address, payment
-            details, account credentials, or any content you submit — beyond information you optionally include in
-            GitHub issues filed via links from this Service (which are governed by GitHub&apos;s own privacy policy).
+            details, account credentials, or any content you submit — beyond a repository URL sent to Live Score, as
+            described above, and information you optionally include in GitHub issues filed via links from this Service
+            (which are governed by GitHub&apos;s own privacy policy).
           </p>
         </Panel>
       </div>
@@ -86,10 +94,9 @@ export default function PrivacyPage() {
         <Panel>
           <PanelHeading>Cookies</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The Service itself does not set first-party cookies. Cookies may be set by the third-party services we embed
-            — Google Analytics (for usage measurement) and Google AdSense (for advertising). You can disable or delete
-            cookies in your browser at any time; doing so will not break the Service, only analytics and advertising
-            features will be affected.
+            The Service itself does not set first-party cookies. Cookies may be set by Google Analytics, which we embed
+            for usage measurement. The Service shows no advertising. You can disable or delete cookies in your browser
+            at any time; doing so will not break the Service, only analytics will be affected.
           </p>
         </Panel>
       </div>
@@ -103,18 +110,15 @@ export default function PrivacyPage() {
               <ExternalLink href="https://policies.google.com/privacy">policies.google.com/privacy</ExternalLink>.
             </li>
             <li className="mt-1">
-              Google AdSense —{" "}
-              <ExternalLink href="https://policies.google.com/technologies/ads">
-                policies.google.com/technologies/ads
+              Vercel (hosting) —{" "}
+              <ExternalLink href="https://vercel.com/legal/privacy-notice">
+                vercel.com/legal/privacy-notice
               </ExternalLink>
               .
             </li>
             <li className="mt-1">
-              Vercel (hosting) —{" "}
-              <ExternalLink href="https://vercel.com/legal/privacy-policy">
-                vercel.com/legal/privacy-policy
-              </ExternalLink>
-              .
+              Peerlist and Product Hunt — pages load badge images from peerlist.io and api.producthunt.com, which
+              receive your IP address and user-agent when the image loads.
             </li>
           </ul>
         </Panel>

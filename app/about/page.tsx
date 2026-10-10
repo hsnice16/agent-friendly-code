@@ -6,18 +6,21 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
+const DESCRIPTION = `Who built ${APP_NAME}, why, and what it is not. Independent, MIT-licensed, and not tied to any AI agent company.`;
+
 export const metadata: Metadata = {
   title: "About",
+  description: DESCRIPTION,
   alternates: { canonical: "/about" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: `About — ${APP_NAME}` },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "About", description: DESCRIPTION },
   openGraph: {
     ...OG_DEFAULTS,
     images: [DEFAULT_OG_IMAGE],
-    title: `About — ${APP_NAME}`,
+    title: "About",
+    description: DESCRIPTION,
     url: "/about",
     type: "article",
   },
-  description: `Who built ${APP_NAME}, why, and what it is not. Independent, MIT-licensed, and not tied to any AI agent company.`,
 };
 
 const ABOUT_JSON_LD = {
@@ -67,7 +70,7 @@ export default function AboutPage() {
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>. It is
           an independent project, not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other company
-          whose agent is ranked here.
+          whose agent is scored for here.
         </p>
       </Panel>
 
@@ -78,8 +81,8 @@ export default function AboutPage() {
             A repo that has a README is not the same as a repo that really helps an AI coding agent get work done. That
             gap keeps growing, and there is no public way to see which repos have done the work. {APP_NAME} tries to
             show it, for each agent separately, because the agents are not the same. Claude Code wants an AGENTS.md and
-            fast tests. Cursor wants strong types and a README that is easy to skim. Devin wants a dev setup it can run,
-            with its dependencies and tests listed. One repo can score very differently for each of them. A single
+            fast tests. Cursor reads its own rules in .cursor/rules, and AGENTS.md too. Devin wants a dev setup it can
+            run, with its dependencies and tests listed. One repo can score very differently for each of them. A single
             number would hide that.
           </p>
         </Panel>

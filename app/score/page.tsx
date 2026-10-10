@@ -7,9 +7,9 @@ import { RecentScores } from "@/components/RecentScores";
 import { listLeaderboardOverall } from "@/lib/db";
 import { APP_KEYWORDS, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const PAGE_TITLE = "Live Score — check how ready any GitHub repo is for AI coding agents";
+const PAGE_TITLE = "Live Score: check any GitHub repo";
 const PAGE_DESCRIPTION =
-  "Paste a link to any public GitHub repo and see how ready it is for AI coding agents: one overall score, a score for each agent (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi), and what to fix first. Uses the latest commit. No sign-up, and nothing is saved.";
+  "Paste a public GitHub repo URL to see how ready it is for AI coding agents: an overall score, a score per agent, and what to fix first. No sign-up.";
 
 const PAGE_KEYWORDS = [
   ...APP_KEYWORDS,
@@ -19,7 +19,6 @@ const PAGE_KEYWORDS = [
   "check repo ai readiness",
   "agent friendliness checker",
   "is my repo agent friendly",
-  "AGENTS.md checker",
   "repo agent readiness test",
 ];
 
@@ -42,7 +41,7 @@ type FaqEntry = {
 const FAQ: FaqEntry[] = [
   {
     q: "Does the repo have to be on the leaderboard?",
-    a: "No. That is what this page is for. Paste a link to any public GitHub repo and we score it right away, even if we have never seen it before. If the repo is already on the leaderboard, we send you to its own page instead. It has the same numbers, plus how the score changed over time.",
+    a: "No. That is what this page is for. Paste a link to any public GitHub repo and we score it right away, even if we have never seen it before. If the repo is already on the leaderboard, we send you to its own page instead. It has the same numbers, plus how the score changed since the previous rescore.",
   },
   {
     q: "Is this score different from the leaderboard score?",
@@ -50,7 +49,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Do you save or list my repo anywhere?",
-    a: "No. We work out the score, show it, and throw it away. Nothing about the repo goes into our database, and scoring a repo never adds it to the public leaderboard. Search engines are told not to show the result page. The list of repos you scored stays in your own browser and is never sent anywhere.",
+    a: "No. We work out the score and show it. The result is kept for up to an hour so a repeat visit is fast, then dropped. Nothing about the repo goes into our database, and scoring a repo never adds it to the public leaderboard. Search engines are told not to show the result page. The list of repos you scored stays in your own browser and is never sent anywhere.",
   },
   {
     q: "How up to date is the score?",
@@ -144,7 +143,8 @@ export default function ScoreIndexPage() {
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Live Score</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
           Paste a link to a public GitHub repo. You get a score based on what an AI agent can find, read, and run in it,
-          using the same numbers as the leaderboard. We score the latest commit right away, and save nothing.
+          using the same numbers as the leaderboard. We score the latest commit right away. The result is not saved to
+          our database; it is cached for up to an hour.
         </p>
 
         <LiveScoreForm />

@@ -1,8 +1,8 @@
-export type Seed = { url: string; note?: string };
+import type { Seed } from "../lib/seeds";
 
 export const SEEDS: Seed[] = [
   // --- GitHub, JavaScript / TypeScript ---
-  { url: "https://github.com/facebook/react", note: "React" },
+  { url: "https://github.com/react/react", note: "React", was: ["https://github.com/facebook/react"] },
   { url: "https://github.com/vercel/next.js", note: "Next.js framework" },
   { url: "https://github.com/tailwindlabs/tailwindcss", note: "Tailwind CSS" },
   { url: "https://github.com/honojs/hono", note: "Hono web framework" },
@@ -56,7 +56,7 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/trpc/trpc",
     note: "tRPC end-to-end typesafe APIs",
   },
-  { url: "https://github.com/prisma/prisma", note: "Prisma ORM" },
+  { url: "https://github.com/prisma/orm", note: "Prisma ORM", was: ["https://github.com/prisma/prisma"] },
   { url: "https://github.com/drizzle-team/drizzle-orm", note: "Drizzle ORM" },
   { url: "https://github.com/nestjs/nest", note: "NestJS framework" },
   { url: "https://github.com/fastify/fastify", note: "Fastify web framework" },
@@ -108,7 +108,11 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/immich-app/immich",
     note: "Immich — self-hosted photo + video backup",
   },
-  { url: "https://github.com/11ty/eleventy", note: "Eleventy — static site generator" },
+  {
+    url: "https://github.com/11ty/buildawesome",
+    note: "Eleventy — static site generator",
+    was: ["https://github.com/11ty/eleventy"],
+  },
   { url: "https://github.com/lit/lit", note: "Lit — fast, lightweight web components" },
   {
     url: "https://github.com/refinedev/refine",
@@ -177,8 +181,9 @@ export const SEEDS: Seed[] = [
     note: "Superset — data exploration + viz",
   },
   {
-    url: "https://github.com/microsoft/presidio",
+    url: "https://github.com/data-privacy-stack/presidio",
     note: "Presidio — PII detection / anonymization",
+    was: ["https://github.com/microsoft/presidio"],
   },
   { url: "https://github.com/psf/requests", note: "HTTP for humans" },
   {
@@ -205,13 +210,21 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/run-llama/llama_index",
   },
   { url: "https://github.com/wagtail/wagtail", note: "Wagtail — Django-based CMS" },
-  { url: "https://github.com/encode/uvicorn", note: "Uvicorn — lightning-fast ASGI server" },
+  {
+    url: "https://github.com/Kludex/uvicorn",
+    note: "Uvicorn — lightning-fast ASGI server",
+    was: ["https://github.com/encode/uvicorn"],
+  },
   {
     url: "https://github.com/sqlfluff/sqlfluff",
     note: "SQLFluff — multi-dialect SQL linter / formatter",
   },
   { url: "https://github.com/encode/httpx", note: "HTTPX — next-gen Python HTTP client" },
-  { url: "https://github.com/encode/starlette", note: "Starlette — lightweight ASGI framework" },
+  {
+    url: "https://github.com/Kludex/starlette",
+    note: "Starlette — lightweight ASGI framework",
+    was: ["https://github.com/encode/starlette"],
+  },
   { url: "https://github.com/celery/celery", note: "Celery — distributed task queue" },
   { url: "https://github.com/scrapy/scrapy", note: "Scrapy — web crawling framework" },
   {
@@ -344,7 +357,11 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/traefik/traefik",
     note: "Traefik — cloud-native reverse proxy / load balancer",
   },
-  { url: "https://github.com/minio/minio", note: "MinIO — high-performance object storage" },
+  {
+    url: "https://github.com/minio/minio",
+    note: "MinIO — high-performance object storage",
+    accept: ["archived"],
+  },
   { url: "https://github.com/go-gorm/gorm", note: "GORM — Go ORM library" },
   { url: "https://github.com/go-chi/chi", note: "chi — lightweight, idiomatic Go HTTP router" },
   { url: "https://github.com/uber-go/zap", note: "zap — blazing-fast structured logging for Go" },
@@ -410,17 +427,25 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/Anuken/Mindustry",
     note: "Mindustry — open-source factory / tower-defense game (Java + libGDX)",
   },
-  { url: "https://github.com/square/okhttp", note: "OkHttp — HTTP client for JVM / Android" },
+  {
+    url: "https://github.com/lysine-dev/okhttp",
+    note: "OkHttp — HTTP client for JVM / Android",
+    was: ["https://github.com/square/okhttp"],
+  },
   {
     url: "https://github.com/netty/netty",
     note: "Netty — async event-driven network framework",
   },
   { url: "https://github.com/ReactiveX/RxJava", note: "RxJava — reactive extensions for the JVM" },
-  { url: "https://github.com/square/retrofit", note: "Retrofit — type-safe HTTP client for Java / Android" },
+  {
+    url: "https://github.com/lysine-dev/retrofit",
+    note: "Retrofit — type-safe HTTP client for Java / Android",
+    was: ["https://github.com/square/retrofit"],
+  },
   { url: "https://github.com/quarkusio/quarkus", note: "Quarkus — Kubernetes-native Java" },
 
   // --- GitHub, Swift ---
-  { url: "https://github.com/apple/swift", note: "Swift language" },
+  { url: "https://github.com/swiftlang/swift", note: "Swift language", was: ["https://github.com/apple/swift"] },
   {
     note: "Vapor — Swift web framework",
     url: "https://github.com/vapor/vapor",
@@ -557,11 +582,13 @@ export const SEEDS: Seed[] = [
   // --- AI-native: coding agents ---
   {
     note: "Open coding agent (formerly OpenDevin)",
-    url: "https://github.com/All-Hands-AI/OpenHands",
+    url: "https://github.com/OpenHands/OpenHands",
+    was: ["https://github.com/All-Hands-AI/OpenHands"],
   },
   {
     note: "OpenCode — CLI coding agent",
-    url: "https://github.com/sst/opencode",
+    url: "https://github.com/anomalyco/opencode",
+    was: ["https://github.com/sst/opencode"],
   },
   {
     url: "https://github.com/anthropics/claude-code",
@@ -620,8 +647,9 @@ export const SEEDS: Seed[] = [
     note: "Pi — self-extensible coding agent CLI + unified multi-provider LLM API (TypeScript)",
   },
   {
-    url: "https://github.com/block/goose",
+    url: "https://github.com/aaif-goose/goose",
     note: "Goose — open-source on-machine AI coding agent",
+    was: ["https://github.com/block/goose"],
   },
   {
     url: "https://github.com/cline/cline",

@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.7.0";
+export const APP_VERSION = "0.8.0";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
@@ -18,7 +18,7 @@ export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#$
 // every canonical and sitemap URL at a host this app tells Google to drop.
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agentfriendlycode.com";
 export const APP_DESCRIPTION =
-  "Open-source repos ranked by how easy they are for AI coding agents to work in, scored for each agent (Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, Pi), across GitHub, GitLab, and Bitbucket.";
+  "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.";
 
 export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
 export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;
@@ -30,7 +30,7 @@ export const OG_IMAGE_SIZE = { width: 1200, height: 630 } as const;
 export const DEFAULT_OG_IMAGE = {
   url: "/opengraph-image",
   ...OG_IMAGE_SIZE,
-  alt: `${APP_NAME} — AI coding agent friendliness leaderboard`,
+  alt: `${APP_NAME} — how ready a repo is for AI coding agents`,
 } as const;
 
 export const APP_KEYWORDS = [
@@ -76,23 +76,8 @@ export const APP_KEYWORDS = [
   "agent readiness",
   "developer tools",
   "agent ready repo",
-  "gemini code assist",
-  "v0",
-  "amp",
-  "cline",
-  "codeium",
-  "copilot",
-  "lovable",
-  "tabnine",
-  "bolt.new",
-  "roo code",
-  "windsurf",
-  "continue.dev",
-  "replit agent",
-  "copilot agent",
-  "github copilot",
-  "sourcegraph amp",
-  "copilot agent mode",
+  "agent-ready codebase",
+  "agent readiness score",
   "MCP",
   "spec kit",
   "claude agent sdk",
@@ -113,14 +98,11 @@ export const APP_KEYWORDS = [
   "ai software development",
   "autonomous coding agent",
   "autonomous developer agent",
-  "agent eval",
   "ai readiness",
   "ai ready repo",
-  "agent benchmark",
   "agent leaderboard",
   "ai ready codebase",
   "agent friendliness",
-  "ai agent benchmark",
   "agent compatibility",
   "ai agent leaderboard",
   "pr score check",
@@ -142,7 +124,6 @@ export const APP_KEYWORDS = [
   "Anthropic",
   "Anysphere",
   "Cognition",
-  "agentic ide",
   "code agent ranking",
   "context engineering",
   "ai coding leaderboard",
@@ -155,6 +136,5 @@ export const APP_KEYWORDS = [
   "ai readiness check",
   "cursor leaderboard",
   "make repo ai friendly",
-  "ai code agent comparison",
   "ai pair programmer leaderboard",
 ];

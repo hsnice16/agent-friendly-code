@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { repoIdentity, repoPath } from "../lib/utils/repo-path";
+import { ownerAndName, repoIdentity, repoPath } from "../lib/utils/repo-path";
 
 describe("repoPath", () => {
   it("puts the host first and the repo name last", () => {
@@ -50,5 +50,21 @@ describe("repoIdentity", () => {
   it("rejects empty segments", () => {
     assert.equal(repoIdentity(["github", "", "name"]), null);
     assert.equal(repoIdentity(["github", "owner", ""]), null);
+  });
+});
+
+describe("ownerAndName", () => {
+  it("splits a plain owner/name", () => {
+    assert.deepEqual(ownerAndName("vercel/next.js"), { owner: "vercel", name: "next.js" });
+  });
+
+  it("keeps a nested GitLab group in the owner", () => {
+    assert.deepEqual(ownerAndName("kicad/code/kicad"), { owner: "kicad/code", name: "kicad" });
+  });
+
+  it("rejects a missing or empty part", () => {
+    for (const bad of ["", "name", "/name", "owner/", "a//b"]) {
+      assert.equal(ownerAndName(bad), null, bad);
+    }
   });
 });

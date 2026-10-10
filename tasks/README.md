@@ -21,6 +21,8 @@ Each task file has a `**Status**: …` line:
 - `planned` — scheduled for this version, not yet started.
 - `deferred` — considered for this version's release but postponed before shipping. The file stays as a future reference with the rationale; may or may not return in a later version.
 
+A version's `README.md` has the same line with `planned`, `in_progress`, or `released` (tagged).
+
 ## How to use in a session
 
 Starting a session, point the agent at a specific task:

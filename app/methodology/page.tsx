@@ -8,13 +8,22 @@ import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
+const DESCRIPTION =
+  "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.";
+
 export const metadata: Metadata = {
   title: "Methodology",
+  description: DESCRIPTION,
   alternates: { canonical: "/methodology" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology" },
-  openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology", url: "/methodology", type: "article" },
-  description:
-    "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.",
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology", description: DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: "Methodology",
+    description: DESCRIPTION,
+    url: "/methodology",
+    type: "article",
+  },
 };
 
 const FAQ = [
@@ -44,7 +53,7 @@ const FAQ = [
   },
   {
     q: "What is AGENTS.md or CLAUDE.md?",
-    a: "A markdown file at the top of a repo that gives an AI coding agent a quick tour: what the project is, how to build and test it, the main rules to follow, and where to look. It is the check that counts most for Pi. For Claude Code it ties with tests as the top check. It helps every other agent too.",
+    a: "A markdown file at the top of a repo that gives an AI coding agent a quick tour: what the project is, how to build and test it, the main rules to follow, and where to look. It is the check that counts most for Pi and Kimi CLI. For Claude Code it ties with tests as the top check. It helps every other agent too.",
   },
   {
     q: "How often are scores updated?",
@@ -114,8 +123,8 @@ export default function MethodologyPage() {
         <Panel>
           <PanelHeading>Score formula</PanelHeading>
           <pre className="m-0 overflow-x-auto rounded-lg border border-line bg-surface-2 px-4 py-3.5 font-mono text-[13px] leading-relaxed text-ink-dim">
-            {`per-model score = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100
-overall         = mean(per-model scores)
+            {`per-agent score = Σ(signal.pass × agent.weight[signal]) / Σ(agent.weight) × 100
+overall         = mean(per-agent scores)
 improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100  points`}
           </pre>
 

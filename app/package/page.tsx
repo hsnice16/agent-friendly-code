@@ -7,13 +7,21 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
+const DESCRIPTION = "Look up an npm, PyPI, or Cargo package to see how ready its source repo is for AI coding agents.";
+
 export const metadata: Metadata = {
   title: "Packages",
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Packages" },
+  description: DESCRIPTION,
   alternates: { canonical: "/package" },
-  openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Packages", url: "/package", type: "website" },
-  description:
-    "Look up any npm, PyPI, or Cargo package to see how ready its source repo is for AI coding agents: the score, a score for each agent, and a badge you can add to a README.",
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Packages", description: DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: "Packages",
+    description: DESCRIPTION,
+    url: "/package",
+    type: "website",
+  },
 };
 
 const EXAMPLES = [

@@ -2,6 +2,7 @@ import { copyFileSync, existsSync, mkdirSync } from "node:fs";
 import { dirname, join } from "node:path";
 import Database from "better-sqlite3";
 
+import { applySchema, ensureRepoAlias } from "./db-schema";
 import type { ModelScore } from "./scoring/scorer";
 import type { SignalResult } from "./scoring/signals";
 import type {
@@ -11,14 +12,18 @@ import type {
   LeaderboardStats,
   ModelScoreRow,
   RepoRow,
+  ScoreTime,
+  SeedTarget,
   SignalPassRate,
   TopPackageRow,
 } from "./types/db";
 
 const BUNDLED_DB = join(process.cwd(), "data", "rank.db");
-const DB_PATH = process.env.VERCEL ? "/tmp/rank.db" : BUNDLED_DB;
+// RANK_DB_PATH points tests and local rehearsals at a copy: the bundled file is
+// rewritten by the rescore workflow, so a local write to it conflicts on pull.
+const DB_PATH = process.env.RANK_DB_PATH ?? (process.env.VERCEL ? "/tmp/rank.db" : BUNDLED_DB);
 
-if (process.env.VERCEL) {
+if (process.env.VERCEL && !process.env.RANK_DB_PATH) {
   if (!existsSync(DB_PATH)) copyFileSync(BUNDLED_DB, DB_PATH);
 } else {
   mkdirSync(dirname(DB_PATH), { recursive: true });
@@ -28,55 +33,7 @@ export const db = new Database(DB_PATH);
 db.exec("PRAGMA journal_mode = WAL;");
 db.exec("PRAGMA foreign_keys = ON;");
 
-db.exec(`
-  CREATE TABLE IF NOT EXISTS repo (
-    id                     INTEGER PRIMARY KEY AUTOINCREMENT,
-    host                   TEXT    NOT NULL,
-    owner                  TEXT    NOT NULL,
-    name                   TEXT    NOT NULL,
-    url                    TEXT    NOT NULL UNIQUE,
-    default_branch         TEXT,
-    stars                  INTEGER,
-    last_scored_at         INTEGER,
-    overall_score          REAL,
-    previous_overall_score REAL,
-    language               TEXT,
-    badge_embedded         INTEGER,
-    content_changed_at     INTEGER,
-    UNIQUE(host, owner, name)
-  );
-  CREATE TABLE IF NOT EXISTS model_score (
-    repo_id    INTEGER NOT NULL REFERENCES repo(id) ON DELETE CASCADE,
-    model_id   TEXT    NOT NULL,
-    score      REAL    NOT NULL,
-    PRIMARY KEY (repo_id, model_id)
-  );
-  CREATE TABLE IF NOT EXISTS signal_result (
-    repo_id      INTEGER NOT NULL REFERENCES repo(id) ON DELETE CASCADE,
-    signal_id    TEXT    NOT NULL,
-    label        TEXT    NOT NULL,
-    pass         REAL    NOT NULL,
-    detail       TEXT,
-    matched_path TEXT,
-    PRIMARY KEY (repo_id, signal_id)
-  );
-  CREATE INDEX IF NOT EXISTS idx_model_score_model ON model_score(model_id, score DESC);
-  CREATE TABLE IF NOT EXISTS package_alias (
-    registry    TEXT    NOT NULL,
-    name        TEXT    NOT NULL,
-    repo_url    TEXT    NOT NULL,
-    resolved_at INTEGER NOT NULL,
-    PRIMARY KEY (registry, name)
-  );
-`);
-
-// Immediate + re-check: two processes opening an old DB at once must not both ALTER.
-db.transaction(() => {
-  if (!db.prepare("SELECT 1 FROM pragma_table_info('repo') WHERE name = 'content_changed_at'").get()) {
-    db.exec("ALTER TABLE repo ADD COLUMN content_changed_at INTEGER");
-    db.exec("UPDATE repo SET content_changed_at = last_scored_at");
-  }
-}).immediate();
+applySchema(db);
 
 export function saveScoredRepo(args: {
   url: string;
@@ -184,20 +141,69 @@ export function getRepo(id: number): RepoRow | null {
   return (db.prepare("SELECT * FROM repo WHERE id = ?").get(id) as RepoRow) ?? null;
 }
 
+const BY_NAME = "host = ? COLLATE NOCASE AND owner = ? COLLATE NOCASE AND name = ? COLLATE NOCASE";
+
 // NOCASE because the hosts are: github.com/HonoJS/hono and github.com/honojs/hono
 // are one repo, and the display casing is what ends up in a pasted link.
+// A former name resolves to the renamed row, so a caller that renders a page
+// must compare the result with what was asked for and redirect on a mismatch.
 export function getRepoByHostOwnerName(host: string, owner: string, name: string): RepoRow | null {
-  return (
-    (db
-      .prepare(
-        "SELECT * FROM repo WHERE host = ? COLLATE NOCASE AND owner = ? COLLATE NOCASE AND name = ? COLLATE NOCASE",
-      )
-      .get(host, owner, name) as RepoRow) ?? null
-  );
+  const row = db.prepare(`SELECT * FROM repo WHERE ${BY_NAME}`).get(host, owner, name);
+  // The alias table exists only once a seed run has created it.
+  if (row || !db.prepare("SELECT 1 FROM sqlite_master WHERE name = 'repo_alias'").get()) {
+    return (row as RepoRow) ?? null;
+  }
+
+  const former =
+    "SELECT r.* FROM repo_alias a JOIN repo r ON r.id = a.repo_id WHERE a.host = ? AND a.owner = ? AND a.name = ?";
+  return (db.prepare(former).get(host, owner, name) as RepoRow) ?? null;
 }
 
-export function getRepoByUrl(url: string): RepoRow | null {
-  return (db.prepare("SELECT * FROM repo WHERE url = ?").get(url) as RepoRow) ?? null;
+// One transaction, renames first — pruned the other way round, a renamed repo
+// loses its id, score history and badge flag.
+export function reconcileSeeds(seeds: SeedTarget[], maxPrune: number): { renamed: string[]; pruned: string[] } {
+  ensureRepoAlias(db);
+  const find = db.prepare(`SELECT * FROM repo WHERE ${BY_NAME}`);
+  const rename = db.prepare("UPDATE repo SET host = ?, owner = ?, name = ?, url = ? WHERE id = ?");
+  const repoint = db.prepare("UPDATE package_alias SET repo_url = ? WHERE repo_url = ?");
+  const unalias = db.prepare("DELETE FROM repo_alias WHERE host = ? AND owner = ? AND name = ?");
+  const alias = db.prepare("INSERT OR REPLACE INTO repo_alias (host, owner, name, repo_id) VALUES (?, ?, ?, ?)");
+
+  return db.transaction(() => {
+    const renamed: string[] = [];
+
+    for (const s of seeds) {
+      const row = [s, ...s.was].map((n) => find.get(n.host, n.owner, n.name) as RepoRow | undefined).find(Boolean);
+      if (!row) continue;
+
+      if (row.url !== s.url) {
+        repoint.run(s.url, row.url);
+        rename.run(s.host, s.owner, s.name, s.url, row.id);
+        renamed.push(`${row.url} → ${s.url}`);
+      }
+
+      unalias.run(s.host, s.owner, s.name);
+      for (const w of s.was) alias.run(w.host, w.owner, w.name, row.id);
+    }
+
+    const keep = new Set(seeds.map((s) => s.url.toLowerCase()));
+    const stale = (db.prepare("SELECT id, url FROM repo ORDER BY url").all() as RepoRow[])
+      .filter((r) => !keep.has(r.url.toLowerCase()))
+      .map((r) => r.url);
+
+    // A mangled seed list looks exactly like a large removal.
+    if (stale.length > maxPrune) {
+      throw new Error(`refusing to prune ${stale.length} rows (limit ${maxPrune}): ${stale.join(", ")}`);
+    }
+
+    for (const url of stale) db.prepare("DELETE FROM repo WHERE url = ?").run(url);
+
+    return { renamed, pruned: stale };
+  })();
+}
+
+export function listScoreTimes(): ScoreTime[] {
+  return db.prepare("SELECT url, last_scored_at AS lastScoredAt FROM repo ORDER BY url").all() as ScoreTime[];
 }
 
 export function getPackageAlias(registry: string, name: string): string | null {

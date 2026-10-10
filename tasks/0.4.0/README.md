@@ -1,6 +1,6 @@
 # 0.4.0 — credible scores + better discoverability
 
-**Status**: done
+**Status**: released
 
 The credibility cut. Two related items make the per-model scores defensible: rationale strings sourced from each agent's official docs (instead of the "illustrative" hedge that has shipped since 0.3.0), and a new family of agent-specific instruction-file signals discovered during the docs verification (`.cursor/rules/`, `GEMINI.md`, `.openhands/setup.sh`, `.aider.conf.yml`). The third item lifts the dashboard's discoverability — an About page (E-E-A-T), `/llms.txt` for LLM crawlers, and per-repo Open Graph images — capturing the SEO / discoverability work that landed alongside the rationale audit.
 

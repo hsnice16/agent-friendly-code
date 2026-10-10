@@ -12,7 +12,7 @@ import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const TITLE = "Agent-friendly repos by language";
 const DESCRIPTION =
-  "Browse the agent-friendliness leaderboard by programming language: TypeScript, Python, Rust, Go, Java and more, each ranked for AI coding agents like Claude Code, Cursor and Codex.";
+  "Browse the leaderboard by programming language: TypeScript, Python, Rust, Go, Java and more, each ranked for AI coding agents like Claude Code and Cursor.";
 
 export const metadata: Metadata = {
   title: TITLE,

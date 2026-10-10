@@ -8,7 +8,7 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
 const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
-const LEGAL_LAST_UPDATED = new Date("2026-05-19");
+const LEGAL_LAST_UPDATED = new Date("2026-10-10");
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Only a score or badge change moves lastmod: a date that moves on every crawl

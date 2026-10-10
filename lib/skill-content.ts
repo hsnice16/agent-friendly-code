@@ -52,7 +52,7 @@ export const SCORE_BANDS: Array<{ band: string; range: string; recommendation: s
   },
   {
     band: "Mid",
-    range: "60 – 79",
+    range: "≥ 60, < 80",
     recommendation: "Standard model: Sonnet / GPT-5 Codex / Gemini 2.5 Flash. A good default; a top model is optional.",
   },
   {

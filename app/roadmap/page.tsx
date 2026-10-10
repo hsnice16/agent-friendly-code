@@ -5,13 +5,22 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { ROADMAP } from "@/lib/roadmap";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
+const DESCRIPTION =
+  "What's coming next for Agent Friendly Code: letting maintainers opt out or claim their repo, scoring packages at scale, a sturdier database, scoring many more GitHub repos, and weights based on real tests.";
+
 export const metadata: Metadata = {
   title: "Roadmap",
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Roadmap" },
+  description: DESCRIPTION,
   alternates: { canonical: "/roadmap" },
-  openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Roadmap", url: "/roadmap", type: "article" },
-  description:
-    "What's coming next for Agent Friendly Code: letting maintainers opt out or claim their repo, scoring packages at scale, a sturdier database, scoring many more GitHub repos, and weights based on real tests.",
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Roadmap", description: DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: "Roadmap",
+    description: DESCRIPTION,
+    url: "/roadmap",
+    type: "article",
+  },
 };
 
 export default function RoadmapPage() {

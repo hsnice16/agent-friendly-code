@@ -1,7 +1,7 @@
 import { firstExisting, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
-const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".cursor/rules", ".cursorrules"];
+const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
 const LABEL = "AGENTS.md / CLAUDE.md";
 
 export const agentsMd: Signal = {

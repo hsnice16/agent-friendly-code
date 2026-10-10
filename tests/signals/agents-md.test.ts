@@ -54,4 +54,12 @@ describe("agentsMd signal", () => {
     assert.equal(r.pass, 1);
     assert.match(r.matchedPath ?? "", /CLAUDE\.md$/);
   });
+
+  test("Cursor rule files are the cursor_rules check's, not this one's", () => {
+    fixture = makeFixture({ ".cursor/rules/style.mdc": "Use Tailwind.", ".cursorrules": "x".repeat(1000) });
+    const r = agentsMd.check(fixture);
+
+    assert.equal(r.pass, 0);
+    assert.equal(r.matchedPath, undefined);
+  });
 });

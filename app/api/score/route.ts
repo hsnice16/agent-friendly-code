@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 
 import { isHost } from "@/lib/constants/hosts";
 import { getModelScores, getRepoByHostOwnerName, getSignalResults } from "@/lib/db";
+import { ownerAndName } from "@/lib/utils/repo-path";
 
 export const dynamic = "force-dynamic";
 
@@ -20,13 +21,12 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "repo required" }, { status: 400 });
   }
 
-  const parts = repoParam.split("/");
-  if (parts.length !== 2 || !parts[0] || !parts[1]) {
+  const parsed = ownerAndName(repoParam);
+  if (!parsed) {
     return NextResponse.json({ error: "repo must be owner/name" }, { status: 400 });
   }
 
-  const [owner, name] = parts;
-  const repo = getRepoByHostOwnerName(hostParam, owner, name);
+  const repo = getRepoByHostOwnerName(hostParam, parsed.owner, parsed.name);
   if (!repo) {
     return NextResponse.json({ error: "not_indexed" }, { status: 404 });
   }

@@ -1,6 +1,7 @@
 import { getModelScores, getRepoByHostOwnerName } from "@/lib/db";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
 import { badgeSvg } from "@/lib/utils/badge";
+import { repoIdentity } from "@/lib/utils/repo-path";
 
 export const dynamic = "force-dynamic";
 
@@ -9,14 +10,13 @@ const HEADERS = {
   "Cache-Control": "public, max-age=3600, s-maxage=3600",
 };
 
-export async function GET(req: Request, ctx: { params: Promise<{ host: string; owner: string; name: string }> }) {
-  const { host, owner, name: rawName } = await ctx.params;
-  const name = rawName.replace(/\.svg$/i, "");
+export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] }> }) {
+  const identity = repoIdentity((await ctx.params).slug);
 
   const url = new URL(req.url);
   const modelParam = url.searchParams.get("model");
 
-  const repo = getRepoByHostOwnerName(host, owner, name);
+  const repo = identity && getRepoByHostOwnerName(identity.host, identity.owner, identity.name.replace(/\.svg$/i, ""));
   if (!repo) {
     return new Response(badgeSvg("agent friendly", "not scored", null), {
       headers: HEADERS,

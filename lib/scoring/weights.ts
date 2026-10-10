@@ -48,7 +48,7 @@ export const MODELS: ModelProfile[] = [
     label: "Cursor",
     rationale:
       "Per Cursor's Rules docs, reads `.cursor/rules/*.mdc` and AGENTS.md as the canonical repo-side input. Type config and a clean README still aid the codebase index but aren't the docs-cited signal.",
-    sources: ["https://cursor.com/docs/context/rules"],
+    sources: ["https://cursor.com/docs/rules"],
     weights: {
       ci: 0.4,
       size: 0.4,
@@ -72,8 +72,8 @@ export const MODELS: ModelProfile[] = [
     id: "devin",
     label: "Devin",
     rationale:
-      "Operates from a sandboxed Ubuntu VM and runs an 8-step machine setup (deps, secrets, language versions, lint/test commands) per Cognition's repo-setup docs. CI config files alone aren't what the docs ask for — a runnable dev environment is.",
-    sources: ["https://docs.devin.ai/onboard-devin/repo-setup"],
+      "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs. CI config files alone aren't what the docs ask for — a runnable dev environment is.",
+    sources: ["https://docs.devin.ai/onboard-devin/environment"],
     weights: {
       ci: 0.7,
       size: 0.6,
@@ -122,7 +122,7 @@ export const MODELS: ModelProfile[] = [
     id: "kimi-cli",
     label: "Kimi CLI",
     rationale:
-      "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one — the strictest AGENTS.md-only adherent here, with no CLAUDE.md fallback. Runs shell commands step-by-step under an approval gate rather than a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
+      "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Runs shell commands step-by-step under an approval gate rather than a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
     sources: [
       "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md",
       "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md",
@@ -202,8 +202,8 @@ export const MODELS: ModelProfile[] = [
     rationale:
       "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is now the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
     sources: [
-      "https://docs.openhands.dev/usage/prompting/repository",
-      "https://docs.openhands.dev/usage/prompting/microagents-overview",
+      "https://docs.openhands.dev/openhands/usage/customization/repository",
+      "https://docs.openhands.dev/overview/skills",
     ],
     weights: {
       ci: 1.0,
@@ -228,8 +228,8 @@ export const MODELS: ModelProfile[] = [
     id: "pi",
     label: "Pi",
     rationale:
-      "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) at startup — global, parent dirs, then cwd — per the Pi coding-agent README. Sandboxing is deferred to user-installed extensions.",
-    sources: ["https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/README.md"],
+      "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) from its agent directory, the working directory and its parent directories, per Pi's configuration docs. It has no built-in sandbox; isolation is left to a container the user runs it in.",
+    sources: ["https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md"],
     weights: {
       ci: 0.4,
       size: 0.5,

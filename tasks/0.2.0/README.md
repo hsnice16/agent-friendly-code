@@ -1,6 +1,6 @@
 # 0.2.0 — complete the dogfood
 
-**Status**: released (see `lib/changelog.ts` for the user-facing line-up; `lib/version.ts` is pinned at 0.2.0).
+**Status**: released (see `lib/changelog.ts` for the user-facing line-up).
 
 Finish what 0.1.0 started: make the repo score ≥90 on its own rubric. Two tasks.
 

@@ -6,13 +6,22 @@ import { Panel } from "@/components/Panel";
 import { CHANGELOG } from "@/lib/changelog";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
+const DESCRIPTION =
+  "What's shipped in each release of Agent Friendly Code — user-facing capabilities, not internal churn. Every bullet corresponds to a roadmap item that landed.";
+
 export const metadata: Metadata = {
   title: "Changelog",
+  description: DESCRIPTION,
   alternates: { canonical: "/changelog" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Changelog" },
-  openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Changelog", url: "/changelog", type: "article" },
-  description:
-    "What's shipped in each release of Agent Friendly Code — user-facing capabilities, not internal churn. Every bullet corresponds to a roadmap item that landed.",
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Changelog", description: DESCRIPTION },
+  openGraph: {
+    ...OG_DEFAULTS,
+    images: [DEFAULT_OG_IMAGE],
+    title: "Changelog",
+    description: DESCRIPTION,
+    url: "/changelog",
+    type: "article",
+  },
 };
 
 export default function ChangelogPage() {

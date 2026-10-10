@@ -5,18 +5,19 @@ import { Panel, PanelHeading } from "./Panel";
 
 type Props = {
   actionUses: string;
+  branch?: string | null;
   highlight?: SnippetTone;
   showSecretLink?: boolean;
 };
 
-export function ActionEmbed({ actionUses, showSecretLink = false, highlight = false }: Props) {
+export function ActionEmbed({ actionUses, branch, showSecretLink = false, highlight = false }: Props) {
   const tone = highlight || undefined;
   const yaml = `# .github/workflows/agent-friendly.yml
 name: Agent-friendly score diff
 
 on:
   pull_request:
-    branches: [main]
+    branches: [${branch || "main"}]
 
 permissions:
   contents: read
@@ -26,7 +27,7 @@ jobs:
   score-diff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
       - uses: ${actionUses}

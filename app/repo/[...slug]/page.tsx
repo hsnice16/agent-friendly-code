@@ -105,10 +105,11 @@ export default async function Page({
   const id = repo.id;
   const path = repoPath(repo);
 
-  // The lookup ignores case, so one repo answers to several spellings. Serve
-  // the stored one and redirect the rest, rather than duplicating the page.
+  // The lookup ignores case and follows former names, so one repo answers to
+  // several addresses. Serve the stored one and redirect the rest, rather than
+  // duplicating the page.
   if (identity.host !== repo.host || identity.owner !== repo.owner || identity.name !== repo.name) {
-    permanentRedirect(path);
+    permanentRedirect(model ? `${path}?model=${encodeURIComponent(model)}` : path);
   }
 
   const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
@@ -126,6 +127,8 @@ export default async function Page({
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
   const hub = groupByLanguage(loadBoard()).find((g) => g.slug === slugOfLanguage && isHub(g));
   const hubHref = hub ? hubPath(hub.slug) : undefined;
+  // The Action is a GitHub workflow; it cannot run on other hosts.
+  const onGitHub = repo.host === "github";
 
   const suggestions = topImprovements(selected, signals);
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
@@ -143,7 +146,7 @@ export default async function Page({
             "@type": "ListItem",
             position: 1,
             item: `${APP_URL}/`,
-            name: "Leaderboard",
+            name: "Home",
           },
           ...(hub && hubHref
             ? [{ "@type": "ListItem", position: 2, name: hub.label, item: `${APP_URL}${hubHref}` }]
@@ -205,12 +208,16 @@ export default async function Page({
         <a href="#embed-badge" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
           Add a badge ↓
         </a>
-        <span aria-hidden="true" className="text-line">
-          ·
-        </span>
-        <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Check every pull request ↓
-        </a>
+        {onGitHub && (
+          <>
+            <span aria-hidden="true" className="text-line">
+              ·
+            </span>
+            <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+              Check every pull request ↓
+            </a>
+          </>
+        )}
         <span aria-hidden="true" className="text-line">
           ·
         </span>
@@ -271,9 +278,11 @@ export default async function Page({
         />
       </div>
 
-      <div id="pr-action" className="mt-3.5 scroll-mt-20">
-        <ActionEmbed actionUses={ACTION_USES} showSecretLink highlight="info" />
-      </div>
+      {onGitHub && (
+        <div id="pr-action" className="mt-3.5 scroll-mt-20">
+          <ActionEmbed actionUses={ACTION_USES} branch={repo.default_branch} showSecretLink highlight="info" />
+        </div>
+      )}
     </>
   );
 }

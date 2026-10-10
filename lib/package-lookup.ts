@@ -1,6 +1,6 @@
 import { parseRepoUrl } from "./clients/github";
 import { type Registry, resolvePackageToRepo } from "./clients/registries";
-import { getModelScores, getPackageAlias, getRepoByUrl, putPackageAlias } from "./db";
+import { getModelScores, getPackageAlias, getRepoByHostOwnerName, putPackageAlias } from "./db";
 import type { RepoRow } from "./types/db";
 import { packageRequestIssueUrl } from "./utils/contact";
 
@@ -30,12 +30,9 @@ export async function lookupPackage(registry: Registry, pkg: string): Promise<Pa
   const cachedUrl = getPackageAlias(registry, pkg);
   let parsed = cachedUrl ? parseRepoUrl(cachedUrl) : null;
 
+  const isFresh = !parsed;
   if (!parsed) {
     parsed = await resolvePackageToRepo(registry, pkg);
-
-    if (parsed) {
-      putPackageAlias(registry, pkg, parsed.canonicalUrl);
-    }
   }
 
   if (!parsed) {
@@ -47,7 +44,14 @@ export async function lookupPackage(registry: Registry, pkg: string): Promise<Pa
     };
   }
 
-  const repo = getRepoByUrl(parsed.canonicalUrl);
+  // By name, not URL: registries keep pointing at a renamed repo's old name.
+  const repo = getRepoByHostOwnerName(parsed.host, parsed.owner, parsed.name);
+
+  // The stored repo's URL when there is one: the sitemap joins aliases to repos
+  // by URL, which the registry's old name would miss.
+  if (isFresh) {
+    putPackageAlias(registry, pkg, repo?.url ?? parsed.canonicalUrl);
+  }
 
   if (!repo) {
     return {

@@ -23,7 +23,7 @@ import type { RepoRow } from "@/lib/types/db";
 import { hostLabel } from "@/lib/utils/format";
 import { nearestByScore } from "@/lib/utils/language";
 import { repoPath } from "@/lib/utils/repo-path";
-import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
 export const maxDuration = 60;
@@ -53,15 +53,23 @@ const SLUG = /^[A-Za-z0-9._-]+$/;
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { host, owner, name } = await params;
   const title = `${owner}/${name} — Live Score`;
+  const description = `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`;
 
   return {
     title,
-    description: `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`,
-    twitter: { ...TWITTER_DEFAULTS, title },
+    description,
+    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
     alternates: { canonical: `/score/${host}/${owner}/${name}` },
     // Unbounded URL space; robots.ts disallows /score/* and the sitemap stays on the repo pages.
     robots: { index: false, follow: true },
-    openGraph: { ...OG_DEFAULTS, title, url: `/score/${host}/${owner}/${name}`, type: "website" },
+    openGraph: {
+      ...OG_DEFAULTS,
+      images: [DEFAULT_OG_IMAGE],
+      title,
+      description,
+      url: `/score/${host}/${owner}/${name}`,
+      type: "website",
+    },
   };
 }
 

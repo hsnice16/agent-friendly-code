@@ -4,7 +4,7 @@
 
 Today the dashboard only answers "how agent-friendly is a repo we already indexed?". This version answers it for any public GitHub repo, on demand, in about a second — paste a URL, get the same score the GitHub Action and the local skill would produce.
 
-The whole version is built around one constraint: it must stay free, and it must survive a traffic spike without a queue, a database, or a second deploy target. That rules out cloning (no `git` binary in a Vercel function) and rules out persistence (`lib/db.ts` copies the bundled SQLite to `/tmp` per instance, so a write lands on one lambda and vanishes). What's left is a directory materialized from the host's tree API, scored by the untouched `scoreRepo()`, served from an ISR page so repeat traffic never reaches a function.
+The whole version is built around one constraint: it must stay free, and it must survive a traffic spike without a queue, a database, or a second deploy target. That rules out cloning (no `git` binary in a Vercel function) and rules out persistence (`lib/db.ts` copies the bundled SQLite to `/tmp` per instance, so a write lands on one lambda and vanishes). What's left is a directory materialized from the host's tree API, scored by the untouched `scoreRepo()`, with the result cached per repo for an hour (`unstable_cache`) so repeat traffic does not re-score.
 
 Nothing here writes to `data/rank.db`. The live path and the leaderboard share `lib/scoring/` and nothing else.
 

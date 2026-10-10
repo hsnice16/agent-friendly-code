@@ -1,6 +1,6 @@
 # 0.3.0 — embeddable scores + broader coverage
 
-**Status**: released (see `lib/changelog.ts` for the user-facing line-up; `lib/version.ts` is pinned at 0.3.0).
+**Status**: released (see `lib/changelog.ts` for the user-facing line-up).
 
 Make the current scores usable outside the dashboard (badge SVG for READMEs) and widen the per-model lens with more agents on illustrative weights. Small, shippable steps — the expensive benchmark-harness work moved into the v1.0.0 production cut so it doesn't gate this release.
 

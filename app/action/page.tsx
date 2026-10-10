@@ -14,9 +14,9 @@ import {
   TWITTER_DEFAULTS,
 } from "@/lib/version";
 
-const PAGE_TITLE = "Agent Friendly Action — check the AI agent score on every pull request";
+const PAGE_TITLE = "GitHub Action: score every pull request";
 const PAGE_DESCRIPTION =
-  "A GitHub Action that scores each pull request and posts one comment showing how it changes the score for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. You turn it on yourself, it's on the Marketplace, and it runs only in your CI.";
+  "A GitHub Action that comments on each pull request with how it changes the repo's score for each AI coding agent. Opt-in, and it runs only in your CI.";
 
 const PAGE_KEYWORDS = [
   ...APP_KEYWORDS,
@@ -58,7 +58,7 @@ const FAQ = [
   },
   {
     q: "Does it contact this website?",
-    a: "No. The scoring code and weights are packed into the action itself (its dist folder, built with @vercel/ncc). If this site goes offline, the action keeps working the same way. Once weights are based on real tests (version 1.0.0), a later version may optionally download fresh weights from /api/weights.",
+    a: "No. The scoring code and weights are packed into the action itself (its dist folder, built with @vercel/ncc). If this site goes offline, the action keeps working the same way.",
   },
   {
     q: "Does it work on private repos?",
@@ -101,7 +101,7 @@ const APPLICATION_JSON_LD = {
       publisher: { "@id": `${APP_URL}/#org` },
       applicationCategory: "DeveloperApplication",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      softwareRequirements: "GitHub Actions, Node.js 20",
+      softwareRequirements: "GitHub Actions, Node.js 24",
       license: "https://opensource.org/licenses/MIT",
     },
   ],
@@ -174,8 +174,8 @@ export default function ActionPage() {
 
           <p className="mt-3 text-[13px] text-muted">
             GitHub&apos;s guide:{" "}
-            <ExternalLink href="https://docs.github.com/en/actions/security-guides/encrypted-secrets">
-              docs.github.com — encrypted secrets
+            <ExternalLink href="https://docs.github.com/en/actions/how-tos/write-workflows/choose-what-workflows-do/use-secrets">
+              docs.github.com — using secrets
             </ExternalLink>
             .
           </p>
@@ -224,13 +224,8 @@ export default function ActionPage() {
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               @vercel/ncc
             </code>
-            . If {APP_NAME} goes offline tomorrow, the action keeps working the same way. Downloading fresh weights from
-            a future{" "}
-            <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
-              /api/weights
-            </code>{" "}
-            endpoint waits until v1.0.0, when weights will be based on real tests. Until then, both versions are scored
-            with the same weights, so the comparison stays fair.
+            . If {APP_NAME} goes offline tomorrow, the action keeps working the same way. Both versions are scored with
+            the same weights, so the comparison stays fair.
           </p>
         </Panel>
       </div>
@@ -258,8 +253,11 @@ export default function ActionPage() {
             <ExternalLink href={ACTION_REPO_URL} iconSize={12}>
               {ACTION_REPO_URL.replace(/^https:\/\//, "")}
             </ExternalLink>{" "}
-            — MIT-licensed, with version tags. Listed on the GitHub Marketplace under Code Quality / Continuous
-            Integration.
+            — MIT-licensed, with version tags. Listed on the{" "}
+            <ExternalLink href="https://github.com/marketplace/actions/agent-friendly-score-diff">
+              GitHub Marketplace
+            </ExternalLink>{" "}
+            under Code Quality / Continuous Integration.
           </p>
         </Panel>
       </div>

@@ -2,6 +2,7 @@ import { topImprovements } from "@/lib/scoring/scorer";
 import type { SignalResult } from "@/lib/scoring/signals";
 import { MODELS, type ModelProfile } from "@/lib/scoring/weights";
 import type { LeaderboardRow, ModelScoreRow, RepoRow } from "@/lib/types/db";
+import { groupByLanguage, languageSlug } from "@/lib/utils/language";
 
 const KEY_SIGNALS_PER_MODEL = 3;
 
@@ -35,7 +36,9 @@ export function summarizeRepo(
     return null;
   }
 
-  const sameLanguage = repo.language ? leaderboard.filter((r) => r.language === repo.language) : [];
+  // Compared by slug because hosts disagree on casing ("Java", "java"); the hubs group the same way.
+  const slug = repo.language ? languageSlug(repo.language) : "";
+  const sameLanguage = slug ? leaderboard.filter((r) => r.language && languageSlug(r.language) === slug) : [];
 
   const fits = MODELS.flatMap((model) => {
     const score = modelScores.find((s) => s.modelId === model.id)?.score;
@@ -53,7 +56,11 @@ export function summarizeRepo(
     // A language with only this repo in it makes "#1 of 1", which reads as a boast, not a fact.
     languageRank:
       repo.language && sameLanguage.length > 1
-        ? { rank: positionOf(repo.id, sameLanguage), total: sameLanguage.length, language: repo.language }
+        ? {
+            rank: positionOf(repo.id, sameLanguage),
+            total: sameLanguage.length,
+            language: groupByLanguage(sameLanguage)[0].label,
+          }
         : null,
     passing: signals.filter((s) => s.pass >= 1).length,
     signalCount: signals.length,
@@ -84,7 +91,7 @@ export function summaryDescription(slug: string, summary: RepoSummary | null, ov
     `${slug} scores ${overall.toFixed(1)} out of 100 for AI coding agents, #${summary.rank} of ${summary.total}.`,
   ];
   if (summary.best && summary.best.tiedWith === 0) {
-    parts.push(`Works best with ${summary.best.model.label}.`);
+    parts.push(`Scores highest for ${summary.best.model.label}.`);
   }
   if (summary.worst && summary.worstGap) {
     parts.push(`Biggest fix for ${summary.worst.model.label}: ${summary.worstGap.label}.`);

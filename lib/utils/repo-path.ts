@@ -22,3 +22,11 @@ export function repoIdentity(slug: string[] | undefined): RepoIdentity | null {
   // so the page can spot a non-canonical spelling and redirect it.
   return isHost(host?.toLowerCase()) && owner && name ? { host, owner, name } : null;
 }
+
+// Same split as repoIdentity, for a bare `owner/name`.
+export function ownerAndName(path: string): { owner: string; name: string } | null {
+  const parts = path.split("/");
+  const name = parts.pop();
+
+  return name && parts.length > 0 && parts.every(Boolean) ? { owner: parts.join("/"), name } : null;
+}

@@ -24,6 +24,7 @@ const DESTINATIONS = [
     label: "Packages",
     blurb: "Look up the same scores by npm, PyPI or Cargo package name.",
   },
+  { href: "/language", label: "Languages", blurb: "The same ranking, split by programming language." },
   { href: "/skill", label: "Agent Skill", blurb: "Score the repo on your computer, offline." },
   {
     href: "/action",

@@ -13,8 +13,6 @@ export const CONTENT_CANDIDATES = [
   "AGENTS.md",
   "CLAUDE.md",
   "AGENT.md",
-  ".cursorrules",
-  ".cursor/rules",
   "GEMINI.md",
   ".openhands/setup.sh",
   "package.json",

@@ -6,20 +6,23 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, CONTACT_EMAIL, DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
-const LAST_UPDATED = "May 19, 2026";
+const LAST_UPDATED = "October 10, 2026";
+
+const DESCRIPTION = `Terms of Use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`;
 
 export const metadata: Metadata = {
   title: "Terms of Use",
+  description: DESCRIPTION,
   alternates: { canonical: "/terms" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: `Terms of Use — ${APP_NAME}` },
+  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Terms of Use", description: DESCRIPTION },
   openGraph: {
     ...OG_DEFAULTS,
     images: [DEFAULT_OG_IMAGE],
-    title: `Terms of Use — ${APP_NAME}`,
+    title: "Terms of Use",
+    description: DESCRIPTION,
     url: "/terms",
     type: "article",
   },
-  description: `Terms of Use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`,
 };
 
 export default function TermsPage() {
@@ -47,9 +50,9 @@ export default function TermsPage() {
         <Panel>
           <PanelHeading>What we offer</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The Service is a free, public, read-only dashboard that ranks publicly accessible source-code repositories
-            on GitHub, GitLab, and Bitbucket by static &ldquo;agent-friendliness&rdquo; signals — file-existence and
-            content-length checks against a shallow clone of each repository&apos;s default branch. The Service is an
+            The Service is a free, public service that scores and ranks publicly accessible source-code repositories on
+            GitHub, GitLab, and Bitbucket by static &ldquo;agent-friendliness&rdquo; signals — file-existence and
+            content-length checks against the files on each repository&apos;s default branch. The Service is an
             informational tool, provided as-is, on an as-available basis.
           </p>
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">

@@ -19,7 +19,7 @@ describe("content candidates", () => {
 
     const readers: Record<string, string[]> = {
       "readme.ts": ["README.md", "README.rst", "README.txt", "README"],
-      "agents-md.ts": ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".cursor/rules", ".cursorrules"],
+      "agents-md.ts": ["AGENTS.md", "CLAUDE.md", "AGENT.md"],
       "gemini-md.ts": ["GEMINI.md"],
       "openhands-setup.ts": [".openhands/setup.sh"],
       "dev-env.ts": ["package.json"],

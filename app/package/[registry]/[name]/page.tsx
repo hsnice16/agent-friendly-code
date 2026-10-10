@@ -3,13 +3,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { HostPill } from "@/components/HostPill";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { isRegistry, type Registry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
 import { repoPath } from "@/lib/utils/repo-path";
-import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const cachedLookup = cache((registry: Registry, name: string) => lookupPackage(registry, name));
 
@@ -32,9 +33,16 @@ export async function generateMetadata({
   return {
     title,
     description,
-    twitter: { ...TWITTER_DEFAULTS, title, description },
+    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
     alternates: { canonical: `/package/${registry}/${name}` },
-    openGraph: { ...OG_DEFAULTS, title, description, url: `/package/${registry}/${name}`, type: "article" },
+    openGraph: {
+      ...OG_DEFAULTS,
+      images: [DEFAULT_OG_IMAGE],
+      title,
+      description,
+      url: `/package/${registry}/${name}`,
+      type: "article",
+    },
     ...(isThin ? { robots: { index: false, follow: true } } : {}),
   };
 }
@@ -48,33 +56,11 @@ export default async function Page({ params }: { params: Promise<{ registry: str
 
   const result = await cachedLookup(registry, name);
 
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      {
-        "@type": "ListItem",
-        position: 1,
-        name: "Packages",
-        item: `${APP_URL}/package`,
-      },
-      {
-        "@type": "ListItem",
-        position: 2,
-        name: `${registry}/${name}`,
-        item: `${APP_URL}/package/${registry}/${name}`,
-      },
-    ],
-  };
-
   return (
     <>
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw script content; payload is server-controlled and `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
+      <BreadcrumbJsonLd
+        parent={{ name: "Packages", path: "/package" }}
+        current={{ name: `${registry}/${name}`, path: `/package/${registry}/${name}` }}
       />
       <Link
         href="/package"

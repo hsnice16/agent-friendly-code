@@ -8,15 +8,29 @@ export type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.8.0",
+    date: "2026-10-10",
+    title: "Browse repos by language",
+    highlights: [
+      "Language hubs — `/language` lists every language, and `/language/<slug>` ranks that language's repos and shows the checks they most often miss. Similar repos on a repo page are now the ones scoring closest to it, not the language's top three.",
+      "Readable repo URLs — a repo page now lives at `/repo/<host>/<owner>/<name>` instead of `/repo/:id`. Old numeric links redirect, and the address works in any letter case.",
+      "Renamed repos keep their page — when a tracked repo is renamed or moves to another owner, its old page address redirects to the new one, and old badge and `/api/score` URLs keep answering.",
+      "The AGENTS.md / CLAUDE.md check no longer passes on Cursor rule files. `.cursor/rules` and `.cursorrules` count only under the Cursor rules check, as `/methodology` describes.",
+      "Repos dropped from the tracked list leave the leaderboard at the next rescore, and a weekly check flags tracked repos that were renamed, archived, deleted or made private.",
+      "The pull-request workflow shown on a repo page targets that repo's default branch, and only appears for GitHub repos.",
+    ],
+  },
+  {
     label: "0.7.0",
     date: "2026-08-25",
     title: "Score any repo on the fly",
     highlights: [
-      "On-demand scoring at `/score` — paste any public GitHub repository URL and get its full score in about a second, even if the leaderboard has never indexed it. Same signals, same per-model breakdown, same suggestions as an indexed repo page. Already-indexed repos redirect to their canonical `/repo/:id` page.",
+      "On-demand scoring at `/score` — paste any public GitHub repository URL and get its full score in about a second, even if the leaderboard has never indexed it. Same signals, same per-model breakdown, same suggestions as an indexed repo page. Already-indexed repos redirect to their canonical repo page.",
       "Scored without cloning — the repo is reconstructed from GitHub's tree API rather than `git clone`, so a score costs one API call and a handful of small file fetches. Results are cached for an hour, and nothing about a scored repo is stored.",
       "Recent scores on `/score` — the repos you have scored are kept in your own browser and listed for one-click return. They are never sent anywhere.",
       "Every live score carries the commit it was computed from, so a cached result says exactly what it reflects.",
       "The home page now tells you once, on your first visit after a release, what that release shipped — then stays quiet until the next one.",
+      "Kimi CLI is the ninth scored agent — its own weight profile on `/methodology`, leaderboard view, and `?model=kimi-cli` badge.",
     ],
   },
   {
@@ -57,7 +71,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     date: "2026-04-25",
     title: "Embeddable scores + broader coverage",
     highlights: [
-      "Embeddable score badges — `/badge/<host>/<owner>/<name>.svg` returns an SVG you can drop into a README; per-model variants via `?model=<id>`. Repo detail pages show a copy-paste markdown snippet.",
+      "Embeddable score badges — `/api/badge/<host>/<owner>/<name>.svg` returns an SVG you can drop into a README; per-model variants via `?model=<id>`. Repo detail pages show a copy-paste markdown snippet.",
       "Package lookup — `/package` page (registry dropdown + name input) and `/api/package/<registry>/<name>` JSON resolve npm / PyPI / Cargo packages to their source repo's score; unscored ones get a pre-filled GitHub-issue link to request scoring.",
       "Same-language alternatives — repo detail pages show up to 3 alternative repos (same host + same language) ranked for the selected model.",
       "Broader agent coverage — Gemini CLI, Aider, OpenHands, and Pi added to the per-model leaderboard with illustrative weights, flagged as such on `/methodology`.",

@@ -39,6 +39,12 @@ const config: NextConfig = {
     ];
   },
 
+  // Crawlers and some clients request /favicon.ico without reading the page's
+  // <link rel="icon">, which points at /icon.svg.
+  async redirects() {
+    return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: true }];
+  },
+
   // `/repo/:id` was the original repo URL. Turning an id back into its slug
   // needs a database read, which a static redirect rule can't do, so the
   // request is handed to a route that looks it up and answers 308.

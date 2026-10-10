@@ -1,0 +1,73 @@
+name: Seed audit
+
+on:
+  schedule:
+    - cron: "0 7 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: seed-audit
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.2.16
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: "22"
+
+      - name: Install
+        run: bun install --frozen-lockfile
+
+      # Exit 1 means findings, 2 means the audit itself broke. Only findings
+      # become an issue; anything else fails the job below without one.
+      - name: Audit seeds
+        id: audit
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          set +e
+          bun run audit-seeds --report "$RUNNER_TEMP/seed-audit.md"
+          echo "code=$?" >> "$GITHUB_OUTPUT"
+
+      # One issue, edited in place: a new issue per week would bury the list
+      # under its own duplicates.
+      - name: Open or update the findings issue
+        if: steps.audit.outputs.code == '1'
+        run: |
+          gh label create seed-audit --description "Findings from the weekly seed audit" --color D93F0B --force
+          existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue edit "$existing" --body-file "$RUNNER_TEMP/seed-audit.md"
+          else
+            gh issue create --title "Seed audit: findings need a decision" --label seed-audit --body-file "$RUNNER_TEMP/seed-audit.md"
+          fi
+
+      - name: Close the findings issue once clean
+        if: steps.audit.outputs.code == '0'
+        run: |
+          existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
+          if [ -n "$existing" ]; then
+            gh issue close "$existing" --comment "The seed audit is clean."
+          fi
+
+      - name: Fail on findings or a broken audit
+        if: steps.audit.outputs.code != '0'
+        run: exit 1
