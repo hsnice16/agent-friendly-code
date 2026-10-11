@@ -22,6 +22,7 @@ import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { hostLabel } from "@/lib/utils/format";
 import { nearestByScore } from "@/lib/utils/language";
+import { isModelId } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -143,7 +144,7 @@ export default async function LiveScorePage({
     return <Unavailable reason="We couldn't find a public repo with that name. Check the owner and repo name." />;
   }
 
-  const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
+  const selected: ModelId = isModelId(model) ? model : "claude-code";
   const suggestions = topImprovements(selected, score.signals);
   const strengths = score.signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
   const gaps = score.signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);

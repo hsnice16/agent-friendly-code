@@ -1,6 +1,7 @@
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { MODELS } from "@/lib/scoring/weights";
+import { modelPath } from "@/lib/utils/leaderboard-href";
 import {
   ACTION_REPO_URL,
   APP_DESCRIPTION,
@@ -42,7 +43,7 @@ The scoring engine evaluates sixteen static signals per repository — twelve cr
 
 ## Agents scored for
 
-${MODELS.map((m) => `- ${m.label} — ${m.rationale}`).join("\n")}
+${MODELS.map((m) => `- [${m.label}](${APP_URL}${modelPath(m.id)}): ${m.rationale}`).join("\n")}
 
 ## Key pages
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 
 import { HOST_LABELS, HOSTS, type Host } from "@/lib/constants/hosts";
@@ -13,6 +13,7 @@ const OPTIONS: SelectMenuOption[] = [
 
 export function HostSelect({ value }: { value: Host | "all" }) {
   const router = useRouter();
+  const pathname = usePathname();
   const params = useSearchParams();
   const paramsRef = useRef(params);
 
@@ -30,7 +31,7 @@ export function HostSelect({ value }: { value: Host | "all" }) {
     next.delete("page");
     const qs = next.toString();
 
-    router.replace(qs ? `/?${qs}` : "/", { scroll: false });
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
   return <SelectMenu value={value} options={OPTIONS} onChange={onChange} label="Filter by platform" />;

@@ -26,6 +26,7 @@ import { topImprovements } from "@/lib/scoring/scorer";
 import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { groupByLanguage, hubPath, isHub, languageSlug, nearestByScore } from "@/lib/utils/language";
+import { isModelId } from "@/lib/utils/leaderboard-href";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
 import { summarizeRepo, summaryDescription } from "@/lib/utils/repo-summary";
 import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
@@ -112,7 +113,7 @@ export default async function Page({
     permanentRedirect(model ? `${path}?model=${encodeURIComponent(model)}` : path);
   }
 
-  const selected: ModelId = model && model in MODEL_BY_ID ? (model as ModelId) : "claude-code";
+  const selected: ModelId = isModelId(model) ? model : "claude-code";
 
   const signals = getSignalResults(id);
   const modelScores = getModelScores(id);

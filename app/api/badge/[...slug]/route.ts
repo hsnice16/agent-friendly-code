@@ -1,6 +1,7 @@
 import { getModelScores, getRepoByHostOwnerName } from "@/lib/db";
-import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
+import { MODEL_BY_ID } from "@/lib/scoring/weights";
 import { badgeSvg } from "@/lib/utils/badge";
+import { isModelId } from "@/lib/utils/leaderboard-href";
 import { repoIdentity } from "@/lib/utils/repo-path";
 
 export const dynamic = "force-dynamic";
@@ -26,12 +27,11 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] 
   let label = "agent friendly";
   let score = repo.overall_score;
 
-  if (modelParam && modelParam in MODEL_BY_ID) {
-    const m = modelParam as ModelId;
-    const ms = getModelScores(repo.id).find((s) => s.modelId === m);
+  if (isModelId(modelParam)) {
+    const ms = getModelScores(repo.id).find((s) => s.modelId === modelParam);
 
     score = ms ? ms.score : null;
-    label = `agent friendly · ${MODEL_BY_ID[m].label.toLowerCase()}`;
+    label = `agent friendly · ${MODEL_BY_ID[modelParam].label.toLowerCase()}`;
   }
 
   const value = score == null ? "—" : score.toFixed(1);
