@@ -7,9 +7,9 @@ import { RecentScores } from "@/components/RecentScores";
 import { listLeaderboardOverall } from "@/lib/db";
 import { APP_KEYWORDS, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const PAGE_TITLE = "Live Score: check any GitHub repo";
+const PAGE_TITLE = "Which AI coding agents is your repo set up for?";
 const PAGE_DESCRIPTION =
-  "Paste a public GitHub repo URL to see how ready it is for AI coding agents: an overall score, a score per agent, and what to fix first. No sign-up.";
+  "Paste a public GitHub repo URL to see which AI coding agents it is set up for: a score per agent, the one it fits best, and what to fix first. No sign-up.";
 
 const PAGE_KEYWORDS = [
   ...APP_KEYWORDS,
@@ -20,6 +20,8 @@ const PAGE_KEYWORDS = [
   "agent friendliness checker",
   "is my repo agent friendly",
   "repo agent readiness test",
+  "which ai coding agent for my codebase",
+  "which ai agent is my repo ready for",
 ];
 
 export const metadata: Metadata = {
@@ -39,6 +41,10 @@ type FaqEntry = {
 };
 
 const FAQ: FaqEntry[] = [
+  {
+    q: "Which AI coding agent should I use for my codebase?",
+    a: "This page tells you which agent your repo is best set up for, not which agent writes the best code. Each agent reads different files: Claude Code loads CLAUDE.md, Cursor reads its rules files, and so on. The result gives a score for each agent, names the one your repo is most ready for, and lists what to add for the others. If you have already picked an agent, the fixes listed for it are the part to use.",
+  },
   {
     q: "Does the repo have to be on the leaderboard?",
     a: "No. That is what this page is for. Paste a link to any public GitHub repo and we score it right away, even if we have never seen it before. If the repo is already on the leaderboard, we send you to its own page instead. It has the same numbers, plus how the score changed since the previous rescore.",
@@ -140,11 +146,13 @@ export default function ScoreIndexPage() {
       />
 
       <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Live Score</h1>
+        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
+          Which AI coding agents is your repo set up for?
+        </h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Paste a link to a public GitHub repo. You get a score based on what an AI agent can find, read, and run in it,
-          using the same numbers as the leaderboard. We score the latest commit right away. The result is not saved to
-          our database; it is cached for up to an hour.
+          Live Score: paste a link to a public GitHub repo. You get a score for each agent, based on what it can find,
+          read, and run in the repo, and the agent the repo fits best. The numbers are the same as the leaderboard's. We
+          score the latest commit right away. The result is not saved to our database; it is cached for up to an hour.
         </p>
 
         <LiveScoreForm />

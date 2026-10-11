@@ -26,7 +26,10 @@ const AI_CRAWLERS = [
 // leaderboard views are deduped with `noindex, follow` instead of a Disallow:
 // every repo page links out under `?model=`, and a blocked URL is one whose
 // canonical and noindex a crawler is never allowed to read.
-const DISALLOW = ["/api/", "/score/"];
+//
+// `_rsc` is the payload Next.js fetches when it prefetches a link. Googlebot
+// follows those too: they were 94% of its requests here, against 5% for HTML.
+const DISALLOW = ["/api/", "/score/", "/*?_rsc=", "/*&_rsc="];
 
 export default function robots(): MetadataRoute.Robots {
   return {

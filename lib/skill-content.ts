@@ -34,6 +34,10 @@ export const SKILL_FAQ = [
     a: "Nine: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi, the same ones this site scores. It doesn't matter which agent runs the skill: you always get all 9 scores. The same one-line install works in any agent that supports vercel-labs/skills (Cline, Copilot, Continue, Roo Code, Windsurf, Amp, and others).",
   },
   {
+    q: "Can it tell me which agent to use for my codebase?",
+    a: "It tells you which agent your repo is best set up for, and what to add for the others. It does not test how well each agent writes code, so read it as a readiness check, not a ranking of agents.",
+  },
+  {
     q: "How does it pick a model to suggest?",
     a: "After scoring, the skill puts the overall score in a band (high, mid, or low) and suggests a type of model. A high-scoring repo is set up well enough to get real value from a top model (Opus, GPT-5, Gemini 2.5 Pro). A low-scoring repo can't make use of the extra power, so a smaller, faster model is the better choice. The suggestion doesn't favor any provider, and the rules are in SKILL.md.",
   },

@@ -58,7 +58,8 @@ app/
   privacy/page.tsx        # privacy policy (footer-linked, GDPR/CCPA)
   terms/page.tsx          # terms of use (footer-linked)
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
-                          # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive
+                          # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive.
+                          # Next.js `_rsc` prefetch requests are disallowed: they were most of Googlebot's crawl
   sitemap.ts              # /sitemap.xml — static routes, agent boards, language hubs, every repo (priority scaled by score), top packages
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
@@ -104,7 +105,7 @@ lib/
     badge.ts              # SVG badge renderer (used by /api/badge)
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
     repo-path.ts          # repoPath / repoIdentity / ownerAndName — the one place a repo URL is built or parsed
-    repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo pages
+    repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo and Live Score pages
     language.ts           # language slugs + grouping (casing varies in the data) + nearest-score peers for "Similar repos"
     leaderboard-href.ts   # leaderboardHref / modelPath / isModelId — the one place a leaderboard URL is built
   scoring/

@@ -8,16 +8,40 @@ const KEY_SIGNALS_PER_MODEL = 3;
 
 type ModelFit = { model: ModelProfile; score: number };
 
-export type RepoSummary = {
-  rank: number;
-  total: number;
-  languageRank: { rank: number; total: number; language: string } | null;
+/** What a score says on its own, with no leaderboard to place it on — all a Live Score has. */
+export type ScoreSummary = {
   passing: number;
   signalCount: number;
   best: (ModelFit & { tiedWith: number }) | null;
   worst: ModelFit | null;
   worstGap: { label: string; scoreGain: number } | null;
 };
+
+export type RepoSummary = ScoreSummary & {
+  rank: number;
+  total: number;
+  languageRank: { rank: number; total: number; language: string } | null;
+};
+
+export function summarizeScore(modelScores: ModelScoreRow[], signals: SignalResult[]): ScoreSummary {
+  const fits = MODELS.flatMap((model) => {
+    const score = modelScores.find((s) => s.modelId === model.id)?.score;
+    return score == null ? [] : [{ model, score }];
+  }).sort((a, b) => b.score - a.score);
+
+  const top = fits[0];
+  const last = fits[fits.length - 1];
+  const worst = top && last && last.score < top.score ? last : null;
+  const gap = worst ? topImprovements(worst.model.id, signals, 1)[0] : undefined;
+
+  return {
+    passing: signals.filter((s) => s.pass >= 1).length,
+    signalCount: signals.length,
+    best: top ? { ...top, tiedWith: fits.filter((f) => f.score === top.score).length - 1 } : null,
+    worst,
+    worstGap: gap ? { label: gap.label, scoreGain: gap.scoreGain } : null,
+  };
+}
 
 // Position, not "count of higher scores + 1": the leaderboard numbers rows by
 // position (ties broken by stars), and the two must show the same rank.
@@ -40,17 +64,8 @@ export function summarizeRepo(
   const slug = repo.language ? languageSlug(repo.language) : "";
   const sameLanguage = slug ? leaderboard.filter((r) => r.language && languageSlug(r.language) === slug) : [];
 
-  const fits = MODELS.flatMap((model) => {
-    const score = modelScores.find((s) => s.modelId === model.id)?.score;
-    return score == null ? [] : [{ model, score }];
-  }).sort((a, b) => b.score - a.score);
-
-  const top = fits[0];
-  const last = fits[fits.length - 1];
-  const worst = top && last && last.score < top.score ? last : null;
-  const gap = worst ? topImprovements(worst.model.id, signals, 1)[0] : undefined;
-
   return {
+    ...summarizeScore(modelScores, signals),
     rank,
     total: leaderboard.length,
     // A language with only this repo in it makes "#1 of 1", which reads as a boast, not a fact.
@@ -62,11 +77,6 @@ export function summarizeRepo(
             language: groupByLanguage(sameLanguage)[0].label,
           }
         : null,
-    passing: signals.filter((s) => s.pass >= 1).length,
-    signalCount: signals.length,
-    best: top ? { ...top, tiedWith: fits.filter((f) => f.score === top.score).length - 1 } : null,
-    worst,
-    worstGap: gap ? { label: gap.label, scoreGain: gap.scoreGain } : null,
   };
 }
 
@@ -91,7 +101,7 @@ export function summaryDescription(slug: string, summary: RepoSummary | null, ov
     `${slug} scores ${overall.toFixed(1)} out of 100 for AI coding agents, #${summary.rank} of ${summary.total}.`,
   ];
   if (summary.best && summary.best.tiedWith === 0) {
-    parts.push(`Scores highest for ${summary.best.model.label}.`);
+    parts.push(`Best set up for ${summary.best.model.label}.`);
   }
   if (summary.worst && summary.worstGap) {
     parts.push(`Biggest fix for ${summary.worst.model.label}: ${summary.worstGap.label}.`);

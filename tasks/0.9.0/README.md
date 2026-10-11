@@ -12,3 +12,4 @@ Two heavier items that depend on real surface-area additions: an OAuth flow with
 ## Already shipped
 
 - **Agent leaderboards** — `/model/<id>` ranks every repo for one agent, indexed and in the sitemap; `/?model=<id>` redirects there. Owed a changelog line when this version is cut.
+- **Live Score names the best-fit agent** — a `/score` result has the same "At a glance" cards as a repo page (checks passed, best set up for, needs most work for), and `/score` is titled for the question it answers. Owed a changelog line when this version is cut.

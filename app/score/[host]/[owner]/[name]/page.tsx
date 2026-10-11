@@ -8,6 +8,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RecordScore } from "@/components/RecordScore";
 import { RepoHero } from "@/components/RepoHero";
+import { RepoSummary } from "@/components/RepoSummary";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 import { type ParsedRepo, parseRepoUrl } from "@/lib/clients/github";
@@ -24,6 +25,7 @@ import { hostLabel } from "@/lib/utils/format";
 import { nearestByScore } from "@/lib/utils/language";
 import { isModelId } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
+import { summarizeScore } from "@/lib/utils/repo-summary";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
@@ -183,6 +185,10 @@ export default async function LiveScorePage({
       <RecordScore host={host} owner={owner} name={name} score={score.overall} />
 
       <RepoHero repo={repo} commitSha={score.sha} />
+
+      <div className="mt-3.5">
+        <RepoSummary summary={summarizeScore(score.modelScores, score.signals)} />
+      </div>
 
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <SignalListCard

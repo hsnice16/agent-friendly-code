@@ -1,4 +1,4 @@
-import { type RepoSummary as Summary, topPercent } from "@/lib/utils/repo-summary";
+import { type ScoreSummary, type RepoSummary as Summary, topPercent } from "@/lib/utils/repo-summary";
 
 import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
@@ -27,18 +27,24 @@ function OutOf({ n, total }: { n: string | number; total: number }) {
   );
 }
 
-export function RepoSummary({ summary }: { summary: Summary }) {
-  const { rank, total, languageRank, passing, signalCount, best, worst, worstGap } = summary;
+function RankStat({ summary }: { summary: Summary }) {
+  const { rank, total, languageRank } = summary;
   const top = topPercent(summary);
-  const rankNote = [
+  const note = [
     top != null ? `Top ${top}%` : null,
     languageRank ? `#${languageRank.rank} of ${languageRank.total} ${languageRank.language} repos` : null,
   ]
     .filter(Boolean)
     .join(" · ");
 
+  return <Stat label="Rank" value={<OutOf n={`#${rank}`} total={total} />} note={note || undefined} />;
+}
+
+export function RepoSummary({ summary }: { summary: Summary | ScoreSummary }) {
+  const { passing, signalCount, best, worst, worstGap } = summary;
+
   const cards = [
-    <Stat key="rank" label="Rank" value={<OutOf n={`#${rank}`} total={total} />} note={rankNote || undefined} />,
+    "rank" in summary && <RankStat key="rank" summary={summary} />,
     <Stat
       key="checks"
       label="Checks passed"
@@ -48,7 +54,7 @@ export function RepoSummary({ summary }: { summary: Summary }) {
     best && (
       <Stat
         key="best"
-        label="Scores highest for"
+        label="Best set up for"
         value={best.tiedWith > 0 ? `${best.model.label} + ${best.tiedWith} more` : best.model.label}
         note={
           <>

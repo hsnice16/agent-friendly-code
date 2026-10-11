@@ -157,7 +157,7 @@ app/          Next.js App Router — pages + API + SEO
   language/        per-language hubs — /language, /language/<slug>
   model/           per-agent leaderboards — /model/<id>
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
-  robots.ts        /robots.txt — allows "/", blocks "/api/" and "/score/" (unbounded URL space)
+  robots.ts        /robots.txt — allows "/", blocks "/api/", "/score/" (unbounded URL space) and Next.js `_rsc` prefetch requests
   sitemap.ts       /sitemap.xml — static routes, agent boards, language hubs, every repo, top packages
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
