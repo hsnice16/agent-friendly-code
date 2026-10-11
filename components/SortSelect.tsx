@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 
 import { DEFAULT_DIR, DEFAULT_SORT, type SortDir, type SortKey } from "@/lib/constants/sort";
@@ -33,6 +33,7 @@ const OPTIONS: SelectMenuOption[] = [
 
 export function SortSelect({ sort, dir }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const params = useSearchParams();
   const paramsRef = useRef(params);
 
@@ -58,7 +59,7 @@ export function SortSelect({ sort, dir }: Props) {
     next.delete("page");
     const qs = next.toString();
 
-    router.replace(qs ? `/?${qs}` : "/", { scroll: false });
+    router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
   };
 
   return <SelectMenu value={value} options={OPTIONS} label="Sort order" onChange={onChange} />;

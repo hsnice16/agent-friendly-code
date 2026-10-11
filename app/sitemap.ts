@@ -3,7 +3,9 @@ import type { MetadataRoute } from "next";
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall } from "@/lib/db";
 import { getLanguageGroups } from "@/lib/language-hubs";
+import { MODELS } from "@/lib/scoring/weights";
 import { hubPath, isHub } from "@/lib/utils/language";
+import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
@@ -110,6 +112,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       };
     });
 
+  const modelRoutes: MetadataRoute.Sitemap = MODELS.map((m) => ({
+    priority: 0.8,
+    changeFrequency: "daily",
+    lastModified: contentChanged,
+    url: `${APP_URL}${modelPath(m.id)}`,
+  }));
+
   const packageRoutes: MetadataRoute.Sitemap = REGISTRIES.flatMap((registry) =>
     getTopPackagesByRegistry(registry, SITEMAP_PACKAGE_LIMIT_PER_REGISTRY).map((p) => ({
       lastModified: p.contentChangedAt != null ? new Date(p.contentChangedAt * 1000) : undefined,
@@ -119,5 +128,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     })),
   );
 
-  return [...staticRoutes, ...hubRoutes, ...repoRoutes, ...packageRoutes];
+  return [...staticRoutes, ...modelRoutes, ...hubRoutes, ...repoRoutes, ...packageRoutes];
 }

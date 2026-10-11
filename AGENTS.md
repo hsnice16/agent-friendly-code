@@ -42,7 +42,8 @@ bun run test           # unit tests (node --test + tsx) — requires Node ≥22
 ```text
 app/
   layout.tsx              # root layout (nav + footer) — defines root metadata + OG / Twitter cards
-  page.tsx                # leaderboard
+  page.tsx                # leaderboard (overall). The old `/?model=<id>` 308s to /model/<id>
+  model/[slug]/page.tsx   # one agent's leaderboard — indexed, in the sitemap; host / search / sort re-cuts stay noindex
   not-found.tsx           # 404 — every unmatched path and every notFound() from the repo / score / package routes
   repo/[...slug]/page.tsx # repo detail with per-model suggestions (includes generateMetadata). Catch-all because a
                           # GitLab owner can be a nested group: host first, repo name last, owner is the rest.
@@ -58,7 +59,7 @@ app/
   terms/page.tsx          # terms of use (footer-linked)
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
                           # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive
-  sitemap.ts              # /sitemap.xml — static routes, language hubs, every repo (priority scaled by score), top packages
+  sitemap.ts              # /sitemap.xml — static routes, agent boards, language hubs, every repo (priority scaled by score), top packages
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
@@ -91,7 +92,7 @@ components/               # Tailwind-styled React components
   CopySnippet.tsx, PackageLookupForm.tsx,
   BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx,
   LiveScoreForm.tsx, RecentScores.tsx, RecordScore.tsx, ReleaseAnnouncement.tsx,
-  LeaderboardTable.tsx
+  LeaderboardTable.tsx, LeaderboardBoard.tsx
 lib/
   constants/
     scoring.ts            # score thresholds, visible limits
@@ -105,6 +106,7 @@ lib/
     repo-path.ts          # repoPath / repoIdentity / ownerAndName — the one place a repo URL is built or parsed
     repo-summary.ts       # per-repo rank, best/worst agent, key signals — the repo-specific text on repo pages
     language.ts           # language slugs + grouping (casing varies in the data) + nearest-score peers for "Similar repos"
+    leaderboard-href.ts   # leaderboardHref / modelPath / isModelId — the one place a leaderboard URL is built
   scoring/
     signals/              # one file per signal + helpers + types + index
     weights.ts            # per-model weight tables
@@ -122,6 +124,7 @@ lib/
     score.ts              # liveScore(): commit resolve + metadata + materialize + scoreRepo
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts                    # language groups + hub stats (used by /language pages, sitemap)
+  leaderboard-view.ts                 # search params → the rows, page and filters one board shows (used by / and /model/<id>)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 connection + queries (RANK_DB_PATH overrides the file)
   db-schema.ts            # table definitions + migrations, applied by db.ts on open; repo_alias is created by the seed run instead
@@ -150,6 +153,7 @@ tests/
   repo-path.test.ts       # repoPath / repoIdentity / ownerAndName
   repo-summary.test.ts    # summarizeRepo / keySignals — ranks, ties, best/worst agent
   language.test.ts        # languageSlug / groupByLanguage / nearestByScore
+  leaderboard-href.test.ts # leaderboardHref / isModelId
   path-resolution.test.ts # firstExisting / resolveRelative / resolveAllRelative — case-insensitive lookup
   seeds.test.ts           # seedTargets guards, host-API finding classification, staleness, accept
   seed-reconcile.test.ts  # reconcileSeeds against a temp DB — prune, rename in place, former-name lookup
@@ -231,9 +235,9 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 ## Adding a model
 
 1. Add a `ModelProfile` to `MODELS` in `lib/scoring/weights.ts` — weights for every signal.
-2. Appears automatically in the leaderboard model pills, methodology weight-profile panel, and repo-page suggestions.
+2. Appears automatically in the leaderboard model pills, its own `/model/<id>` board (sitemap and `llms.txt` included), the methodology weight-profile panel, and repo-page suggestions.
 3. Update the hard-coded agent lists/counts that **don't** derive from `MODELS`: `APP_KEYWORDS` in `lib/version.ts`, `lib/skill-content.ts`, the "Which agents" FAQ in `app/methodology/page.tsx`, `app/skill/page.tsx`, `app/terms/page.tsx`, `app/opengraph-image.tsx`, the footer strip in `app/og/repo/[...slug]/route.tsx`, the Dataset description in `components/HomeJsonLd.tsx`, and `README.md`. Grep the current count as a word and a digit (e.g. `nine`, `9`) and the trailing `OpenHands, Pi` to find them all — `tasks/` and `lib/changelog.ts` are historical records and stay as-shipped, and `.claude/skills/agent-friendly/SKILL.md` is an install artifact pinned by `skills-lock.json` (it refreshes via `npx skills add`, never by hand).
-4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/?model=<new-id>`) and `getLanguagePeers` (the Similar repos strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
+4. Existing repos keep their old per-model rows until rescored. `PerModelScores` renders the missing model as "—" (not 0), but **everything that reads `model_score` via a JOIN degrades silently to empty** until the backfill lands: the leaderboard (`listLeaderboard`, i.e. `/model/<new-id>`) and `getLanguagePeers` (the Similar repos strip under `?model=<new-id>`) both inner-join `model_score` and return **zero rows** for a model with no rows yet — no error, just an empty page. Reweighting an existing model has the same staleness problem in reverse: stored scores stay at the old weights until rescored. Either trigger `scheduled-rescore.yml` via `workflow_dispatch` at deploy time, or accept up to 6 hours of the empty/stale state until the cron runs.
 5. **Mirror to both siblings**: copy the weights change into `../agent-friendly-action/src/scoring/weights.ts` **and** `../agent-friendly-skill/src/scoring/weights.ts`, and log under "Unreleased" in each sibling's `CHANGELOG.md`.
 
 ## Adding a host
@@ -279,7 +283,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
 - `data/rank.db` is committed to a public repo, freed pages included. `bun run check-db-leaks` must pass before any commit of it; the rescore workflow runs it before pushing.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Changelog / Languages / Methodology / Packages (index and result) / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Agent boards / Changelog / Languages / Methodology / Packages (index and result) / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet. The only write a request can trigger is a package lookup caching its package → repo alias. When auth lands (`tasks/0.9.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 

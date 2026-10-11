@@ -1,7 +1,7 @@
 "use client";
 
 import { MagnifyingGlass } from "@phosphor-icons/react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 
@@ -13,8 +13,9 @@ const DEBOUNCE_MS = 350;
 
 export function SearchBar({ placeholder = "Search repos by owner/name" }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
   const params = useSearchParams();
-  // Capped like the server reads it (app/page.tsx): a hand-typed long `q`
+  // Capped like the server reads it (lib/leaderboard-view.ts): a hand-typed long `q`
   // would otherwise sit in the box while the board filtered on the slice.
   // The push below then rewrites the URL down to it.
   const currentQ = (params.get("q") ?? "").slice(0, MAX_SEARCH_LENGTH);
@@ -45,11 +46,12 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
       }
 
       next.delete("page");
-      router.replace(`/?${next.toString()}`, { scroll: false });
+      const qs = next.toString();
+      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
     }, DEBOUNCE_MS);
 
     return () => clearTimeout(t);
-  }, [value, router]);
+  }, [value, router, pathname]);
 
   return (
     <search className="relative min-w-0 flex-1">
