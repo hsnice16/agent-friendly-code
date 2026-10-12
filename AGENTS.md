@@ -35,6 +35,7 @@ bun run score <url>    # score a single repo
 bun run audit-seeds    # check every seed is public, original, still there, and still being rescored
 bun run parity-check   # clone-vs-live-path scores must match (add --pr for the PR subset)
 bun run test           # unit tests (node --test + tsx) — requires Node ≥22
+bun run indexnow       # submit sitemap URLs to IndexNow (--since <ISO time> for changed pages only, --dry-run to list them)
 ```
 
 ## Layout
@@ -52,6 +53,8 @@ app/
   methodology/page.tsx    # how the static scoring works
   language/page.tsx       # every language: hub cards, plus the repos of languages too small for a hub
   language/[slug]/page.tsx # language hub — that language's ranked repos and its most-missed cross-agent checks
+  check/page.tsx          # every check with its pass rate across the leaderboard
+  check/[slug]/page.tsx   # one check — prose from lib/check-content, pass rates and example repos from lib/check-stats
   about/page.tsx          # who built this and why (footer-linked, E-E-A-T)
   roadmap/page.tsx        # upcoming versions (from lib/roadmap.ts)
   changelog/page.tsx      # what's in this build (from lib/changelog.ts)
@@ -60,7 +63,7 @@ app/
   robots.ts               # /robots.txt — wildcard + explicit AI-crawler allows. Filtered leaderboard views are deduped
                           # with noindex+follow in page.tsx, not a Disallow — a blocked URL hides that directive.
                           # Next.js `_rsc` prefetch requests are disallowed: they were most of Googlebot's crawl
-  sitemap.ts              # /sitemap.xml — static routes, agent boards, language hubs, every repo (priority scaled by score), top packages
+  sitemap.ts              # /sitemap.xml — static routes, check pages, agent boards, language hubs, every repo (priority scaled by score), top packages
   llms.txt/route.ts       # /llms.txt — markdown manifest for LLM crawlers (Perplexity, Claude, ChatGPT search)
   api/repos/route.ts
   api/repo/[id]/route.ts
@@ -89,6 +92,7 @@ components/               # Tailwind-styled React components
   SignalRow.tsx, SuggestionItem.tsx, VersionPill.tsx,
   RepoHero.tsx, RepoSummary.tsx, ScoreDeltaPopover.tsx, SignalListCard.tsx, ModelSuggestions.tsx, PerModelScores.tsx,
   AlternativesStrip.tsx, BreadcrumbJsonLd.tsx, HomeJsonLd.tsx, ExternalLink.tsx,
+  CheckRepoList.tsx, CodeText.tsx,
   BadgeEmbed.tsx, ActionEmbed.tsx, PeerlistBadge.tsx, ProductHuntBadge.tsx,
   CopySnippet.tsx, PackageLookupForm.tsx,
   BadgeAdoptedTag.tsx, BackToTop.tsx, GoogleAnalytics.tsx,
@@ -100,7 +104,8 @@ lib/
     hosts.ts              # host label map
     sort.ts               # leaderboard sort keys
   utils/
-    format.ts             # compactStars, relativeTime, hostLabel
+    format.ts             # compactStars, relativeTime, hostLabel, percent
+    check-path.ts         # checkSlug / checkPath / signalIdFromSlug — the one place a check URL is built or parsed
     score.ts              # scoreTier + Tailwind class maps
     badge.ts              # SVG badge renderer (used by /api/badge)
     contact.ts            # packageRequestIssueUrl — pre-filled GitHub issue link for unscored packages
@@ -125,6 +130,8 @@ lib/
     score.ts              # liveScore(): commit resolve + metadata + materialize + scoreRepo
   package-lookup.ts                   # shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts                    # language groups + hub stats (used by /language pages, sitemap)
+  check-content/                      # hand-written prose for each /check/<slug> page, keyed by signal id
+  check-stats.ts                      # per-check pass counts, by-language rates, example repos (used by /check pages)
   leaderboard-view.ts                 # search params → the rows, page and filters one board shows (used by / and /model/<id>)
   badge-adoption.ts                   # detectBadgeEmbed — reads the cloned README for an embedded AFC badge (dashboard metadata, NOT a scored signal; never vendored to siblings)
   db.ts                   # better-sqlite3 connection + queries (RANK_DB_PATH overrides the file)
@@ -141,12 +148,14 @@ scripts/
   seed.ts               # reconciles the DB with seed-list.ts (rename in place, then prune), then scores every seed
   check-db-leaks.ts     # findLeaks gate — lefthook, ci.yml, and the rescore workflow before it pushes
   parity-check.ts       # asserts the live-score path equals `bun run score`. CI gate: .github/workflows/parity.yml
+  indexnow.ts           # submits sitemap URLs to IndexNow; the key is public/<key>.txt
   audit-seeds.ts        # flags seeds that are forks / mirrors / archived / renamed / gone / no longer rescored.
                         # Needs a valid GITHUB_TOKEN — unauthenticated it covers ~60 repos/hr.
                         # Weekly via .github/workflows/seed-audit.yml, which files the findings as an issue.
 tests/
   _helpers.ts             # makeFixture / removeFixture build synthetic trees under os.tmpdir()
   format.test.ts          # compactStars, relativeTime, hostLabel
+  check-content.test.ts   # every signal has check-page prose; check slugs round-trip
   parse-repo-url.test.ts  # GH / GL / BB parsing + edge cases
   scorer.test.ts          # scoreRepo, topImprovements
   badge-adoption.test.ts  # detectBadgeEmbed — README badge-embed detection
@@ -230,6 +239,7 @@ If either sibling isn't present locally, flag it; never silently skip the propag
 1. New file at `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (including `improveSuggestion`). Use the `helpers.ts` resolvers for every path lookup (see Conventions).
 2. Import and add to the `SIGNALS` array in `lib/scoring/signals/index.ts`.
 3. Add a weight entry to **every** model in `lib/scoring/weights.ts` — missing weights default to 0, decide deliberately.
+   Then write its `/check/<slug>` page in `lib/check-content/`. The `scoring` lines there restate the signal's `check` outcomes by hand, so change them whenever a threshold changes.
 4. Re-score: `bun run seed` is idempotent.
 5. **Mirror to both siblings** (per "Sibling repos" above): for each of `../agent-friendly-action/` and `../agent-friendly-skill/`, copy the new signal file into `src/scoring/signals/`, add the import + array entry to that repo's `signals/index.ts`, copy the weights changes to its `weights.ts`, and log the addition in its `CHANGELOG.md` under "Unreleased".
 
@@ -284,7 +294,7 @@ Hooks docs: <https://docs.claude.com/en/docs/claude-code/hooks.html>.
 - `/score/[host]/[owner]/[name]` turns a visitor-supplied slug into host API calls and a `/tmp` directory. Two guards carry that: the `SLUG` regex on the route (host slug alphabet — everything else is a probe, and each miss costs a tree-API call), and `safeAbsolute` in `lib/live-score/materialize.ts`, which is the only thing between an attacker-chosen tree path and the filesystem. Both are load-bearing; `tests/live-score.test.ts` covers the traversal cases. Fetched bytes are written to disk and read back by the scorer — never executed.
 - SQL: all queries parameterised. No interpolation.
 - `data/rank.db` is committed to a public repo, freed pages included. `bun run check-db-leaks` must pass before any commit of it; the rescore workflow runs it before pushing.
-- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Agent boards / Changelog / Languages / Methodology / Packages (index and result) / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
+- HTML: React auto-escapes. The only `dangerouslySetInnerHTML` is server-built JSON-LD with `<` escaped to `\u003c` (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, plus the `HomeJsonLd` component on the leaderboard and the `BreadcrumbJsonLd` component used by About / Agent boards / Changelog / Checks / Languages / Methodology / Packages (index and result) / Privacy / Roadmap / Terms); never feed user-controlled strings into it.
 - Local-path mode reads files; never writes outside `data/` and the clone workspace passed to `shallowClone`.
 - No auth yet. The only write a request can trigger is a package lookup caching its package → repo alias. When auth lands (`tasks/0.9.0/01-opt-out-claim-flow.md`), do it via OAuth and gate DB writes per user.
 

@@ -115,6 +115,7 @@ const FOOTER_LINKS_PRIMARY = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
+  { href: "/check", label: "Checks" },
   { href: "/language", label: "Languages" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },

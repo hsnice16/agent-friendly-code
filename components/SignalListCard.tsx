@@ -1,3 +1,7 @@
+import Link from "next/link";
+
+import { checkPath } from "@/lib/utils/check-path";
+
 import { Panel, PanelHeading } from "./Panel";
 
 type Variant = "strength" | "gap";
@@ -44,7 +48,9 @@ export function SignalListCard({ variant, items, empty }: Props) {
               >
                 <span aria-hidden="true">{v.glyph}</span>
               </span>
-              <span>{s.label}</span>
+              <Link href={checkPath(s.id)} className="text-ink hover:text-ink-soft">
+                {s.label}
+              </Link>
             </li>
           ))
         )}

@@ -1,4 +1,7 @@
+import Link from "next/link";
+
 import type { SignalResult } from "@/lib/scoring/signals/types";
+import { checkPath } from "@/lib/utils/check-path";
 
 const MARK_CLASSES = {
   ok: { cls: "bg-ok/15 text-ok", label: "Pass" },
@@ -34,7 +37,9 @@ export function SignalRow({ signal }: { signal: SignalResult }) {
 
       <div className="flex-1">
         <div className="text-[14.5px] font-medium">
-          {signal.label}
+          <Link href={checkPath(signal.id)} className="text-ink hover:text-ink-soft">
+            {signal.label}
+          </Link>
           <span className="ml-1.5 text-xs font-normal tabular-nums text-muted">
             · {(signal.pass * 100).toFixed(0)}% pass
           </span>

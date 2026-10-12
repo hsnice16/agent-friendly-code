@@ -1,6 +1,9 @@
+import { CHECK_CONTENT } from "@/lib/check-content";
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getTopPackagesByRegistry } from "@/lib/db";
+import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { checkPath } from "@/lib/utils/check-path";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import {
   ACTION_REPO_URL,
@@ -45,12 +48,17 @@ The scoring engine evaluates sixteen static signals per repository — twelve cr
 
 ${MODELS.map((m) => `- [${m.label}](${APP_URL}${modelPath(m.id)}): ${m.rationale}`).join("\n")}
 
+## Checks
+
+${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONTENT[s.id].description}`).join("\n")}
+
 ## Key pages
 
 - [Leaderboard](${APP_URL}/): Public repos ranked overall and per agent, across GitHub, GitLab, and Bitbucket
 - [About](${APP_URL}/about): Who built this, why, and the project's independence statement
 - [Action](${APP_URL}/action): GitHub Action that comments on each pull request with the score change — install snippet, FAQ
 - [Changelog](${APP_URL}/changelog): What shipped per release
+- [Checks](${APP_URL}/check): Every check, with what it looks for, how to pass it and how many leaderboard repos do
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
 - [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score

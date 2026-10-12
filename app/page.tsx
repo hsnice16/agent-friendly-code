@@ -8,6 +8,8 @@ import { CHANGELOG } from "@/lib/changelog";
 import { LEADERBOARD_PAGE_SIZE } from "@/lib/constants/scoring";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { type LeaderboardSearchParams, resolveLeaderboardView } from "@/lib/leaderboard-view";
+import { SIGNALS } from "@/lib/scoring/signals";
+import { checkPath } from "@/lib/utils/check-path";
 import { groupByLanguage, hubPath, isHub } from "@/lib/utils/language";
 import { isModelId, leaderboardHref } from "@/lib/utils/leaderboard-href";
 import { APP_NAME, APP_VERSION, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
@@ -138,6 +140,21 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
           </Link>
         </nav>
       )}
+
+      <nav
+        aria-label="Browse by check"
+        className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-muted"
+      >
+        <span>What we check:</span>
+        {SIGNALS.map((s) => (
+          <Link key={s.id} href={checkPath(s.id)} className="text-ink-dim hover:text-ink-soft">
+            {s.label}
+          </Link>
+        ))}
+        <Link href="/check" className="text-ink-dim hover:text-ink-soft">
+          All checks →
+        </Link>
+      </nav>
     </>
   );
 }

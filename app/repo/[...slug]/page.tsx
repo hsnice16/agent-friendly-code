@@ -55,9 +55,12 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const slug = `${repo.owner}/${repo.name}`;
   const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${slug} — agent-friendliness score` };
 
-  const score = repo.overall_score != null ? repo.overall_score.toFixed(1) : "unranked";
-
-  const title = `${slug} — ${score} / 100`;
+  // Says what the number measures: a bare "83.8 / 100" earned impressions for
+  // score-string and "<repo> github" searches, and no clicks from either.
+  const title =
+    repo.overall_score != null
+      ? `${slug}: AI agent readiness score ${repo.overall_score.toFixed(1)}/100`
+      : `${slug}: AI agent readiness`;
   const summary = loadSummary(repo);
   const description = summaryDescription(slug, summary, repo.overall_score);
 
