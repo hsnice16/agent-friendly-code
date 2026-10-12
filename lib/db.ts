@@ -285,6 +285,11 @@ export function getSignalPassRates(repoIds: number[]): SignalPassRate[] {
     .all(...repoIds) as SignalPassRate[];
 }
 
+export function listSignalPasses(signalId: string): { repoId: number; pass: number }[] {
+  const sql = "SELECT repo_id AS repoId, pass FROM signal_result WHERE signal_id = ?";
+  return db.prepare(sql).all(signalId) as { repoId: number; pass: number }[];
+}
+
 export function getLeaderboardStats(): LeaderboardStats {
   return db
     .prepare(

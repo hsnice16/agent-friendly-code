@@ -39,12 +39,17 @@ jobs:
       - name: Snapshot pre-rescore state
         run: sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-before.txt
 
+      - name: Note when the rescore started
+        id: started
+        run: echo "at=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_OUTPUT"
+
       - name: Rescore curated seeds
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run seed
 
       - name: Commit and push if the repo set, a score or badge adoption changed
+        id: publish
         run: |
           sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-after.txt
           if diff -q /tmp/state-before.txt /tmp/state-after.txt > /dev/null; then
@@ -57,3 +62,13 @@ jobs:
           git add data/rank.db
           git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
           git push
+          echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      # The push only starts the deploy. A crawler told about a page before the
+      # new build serves it re-reads the old one and has no reason to come back.
+      - name: Tell IndexNow which pages changed
+        if: steps.publish.outputs.pushed == 'true'
+        continue-on-error: true
+        run: |
+          sleep 300
+          bun run indexnow --since "${{ steps.started.outputs.at }}"

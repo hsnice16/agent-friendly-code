@@ -155,10 +155,11 @@ app/          Next.js App Router — pages + API + SEO
   skill/           agent-skill explainer + install command
   package/         registry → repo lookup (form + per-package state pages)
   language/        per-language hubs — /language, /language/<slug>
+  check/           one page per check — /check, /check/<slug>
   model/           per-agent leaderboards — /model/<id>
   api/             /repos, /repo/[id], /score, /badge/<host>/<owner>/<name>, /package/<registry>/<name>
   robots.ts        /robots.txt — allows "/", blocks "/api/", "/score/" (unbounded URL space) and Next.js `_rsc` prefetch requests
-  sitemap.ts       /sitemap.xml — static routes, agent boards, language hubs, every repo, top packages
+  sitemap.ts       /sitemap.xml — static routes, check pages, agent boards, language hubs, every repo, top packages
   llms.txt/        markdown manifest for LLM crawlers
   globals.css      Tailwind import + @theme tokens
 components/   React components (Tailwind-styled)
@@ -174,11 +175,13 @@ lib/
   db-leaks.ts  local-path / token scan of the raw DB bytes before it is committed
   package-lookup.ts  shared registry → repo lookup (used by /api/package + /package page)
   language-hubs.ts   language groups + hub stats (used by /language pages, sitemap)
+  check-content/     prose for the /check pages, keyed by signal id
+  check-stats.ts     per-check pass rates and example repos (used by /check pages)
   version.ts  app + sibling URLs, install snippets (ACTION_USES, SKILL_INSTALL_CMD), SIBLING_VERSION pin
   badge-adoption.ts  detectBadgeEmbed — dashboard metadata, not a scored signal
   release-notice.ts  localStorage "seen" marker for the home-page release announcement
   changelog.ts / roadmap.ts / skill-content.ts
-scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check, check-db-leaks
+scripts/      CLI entries run via `tsx` (Node) — score, seed, init-db, audit-seeds, parity-check, check-db-leaks, indexnow
 tests/        `node --test` unit tests — scorer, signals, URL parser, formatters
 tasks/        Per-version task breakdown (agent-readable)
 public/       Static assets — demo/ screenshots used by the README, IndexNow key (<key>.txt)

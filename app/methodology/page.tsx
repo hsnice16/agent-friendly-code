@@ -6,6 +6,7 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { checkPath } from "@/lib/utils/check-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const DESCRIPTION =
@@ -154,7 +155,9 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                 className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0 sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
               >
                 <div>
-                  <div className="text-[14.5px] font-medium">{s.label}</div>
+                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium text-ink hover:text-ink-soft">
+                    {s.label}
+                  </Link>
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
                 </div>
 

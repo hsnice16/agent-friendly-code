@@ -10,10 +10,13 @@ export const MAX_SEARCH_LENGTH = 120;
 export const LEADERBOARD_PAGE_SIZE = 32;
 
 export const DEFAULT_SUGGESTION_LIMIT = 3;
-export const ALTERNATIVES_LIMIT = 3;
+export const ALTERNATIVES_LIMIT = 6;
 
 // Below this a hub is a near-empty list, which reads to search engines as a
 // thin page; those languages are listed on /language instead.
 export const LANGUAGE_HUB_MIN_REPOS = 5;
 export const HUB_GAPS_LIMIT = 3;
 export const STRENGTHS_GAPS_VISIBLE_LIMIT = 5;
+
+export const CHECK_EXAMPLES_LIMIT = 12;
+export const CHECK_MISSING_LIMIT = 8;

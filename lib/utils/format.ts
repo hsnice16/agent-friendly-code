@@ -36,3 +36,9 @@ export function relativeTime(epochSec: number): string {
 export function hostLabel(host: string): string {
   return HOST_LABELS[host] ?? host;
 }
+
+// One decimal under 1%: rounding "1 of 371" to "0%" would read as "none".
+export function percent(part: number, total: number): string {
+  const value = total === 0 ? 0 : (part / total) * 100;
+  return `${value > 0 && value < 1 ? value.toFixed(1) : Math.round(value)}%`;
+}

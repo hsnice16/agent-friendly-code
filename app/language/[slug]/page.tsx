@@ -6,6 +6,7 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
+import { checkPath } from "@/lib/utils/check-path";
 import { hubPath, isHub } from "@/lib/utils/language";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
@@ -85,7 +86,10 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
               {hub.gaps.map((g) => (
                 <li key={g.id}>
-                  <strong className="font-medium text-ink">{g.label}</strong>: {Math.round(g.rate * 100)}% pass rate
+                  <Link href={checkPath(g.id)} className="font-medium text-ink hover:text-ink-soft">
+                    {g.label}
+                  </Link>
+                  : {Math.round(g.rate * 100)}% pass rate
                 </li>
               ))}
             </ul>
