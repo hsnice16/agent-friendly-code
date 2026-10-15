@@ -1,4 +1,5 @@
 import { LANGUAGE_HUB_MIN_REPOS } from "@/lib/constants/scoring";
+import { MAX_TITLE_LENGTH } from "@/lib/utils/page-title";
 
 export type LanguageGroup<T> = { slug: string; label: string; rows: T[] };
 
@@ -9,8 +10,8 @@ export function languageSlug(language: string): string {
   return SLUG_OVERRIDES[lower] ?? lower.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-// Hosts disagree on casing ("Java", "java"), so one language arrives as two
-// values. Group by slug; label with the most common spelling.
+// Rows scored before canonicalLanguage keep the host's casing ("Java", "java").
+// Group by slug; label with the most common spelling.
 export function groupByLanguage<T extends { language: string | null }>(rows: T[]): LanguageGroup<T>[] {
   const groups = new Map<string, { rows: T[]; spellings: Map<string, number> }>();
 
@@ -38,6 +39,7 @@ export function isHub(group: { rows: unknown[] }): boolean {
 }
 
 export function averageScore(rows: { score: number | null }[]): number {
+  if (rows.length === 0) return 0;
   return rows.reduce((sum, r) => sum + (r.score ?? 0), 0) / rows.length;
 }
 
@@ -45,13 +47,19 @@ export function hubPath(slug: string): string {
   return `/language/${slug}`;
 }
 
-// Peers around this score, not the top of the language: picking the top made
-// every page link the same few repos and left the rest with no inbound links.
-// `peers` must be sorted by score, highest first.
-export function nearestByScore<T extends { score: number | null }>(peers: T[], score: number, limit: number): T[] {
-  if (peers.length <= limit) return peers;
-  const below = peers.findIndex((p) => (p.score ?? 0) < score);
-  const pivot = below === -1 ? peers.length : below;
-  const start = Math.min(Math.max(0, pivot - Math.floor(limit / 2)), peers.length - limit);
-  return peers.slice(start, start + limit);
+export const OTHER_LANGUAGES_PATH = "/language/other";
+export const UNKNOWN_LANGUAGE = { slug: "unknown", label: "Language not detected" } as const;
+
+/** Languages too small for a hub, then the repos with no language, so every repo is on some hub page. */
+export function otherLanguageGroups<T extends { language: string | null }>(rows: T[]): LanguageGroup<T>[] {
+  const small = groupByLanguage(rows).filter((g) => !isHub(g));
+  const unknown = rows.filter((r) => !r.language || !languageSlug(r.language));
+  return unknown.length > 0 ? [...small, { ...UNKNOWN_LANGUAGE, rows: unknown }] : small;
+}
+
+/** Falls back to shorter wordings, then a cut label, so a long language name cannot push a title past the limit. */
+export function hubTitle(label: string, max = MAX_TITLE_LENGTH): string {
+  const options = [`Most agent-friendly ${label} repos`, `Agent-friendly ${label} repos`, `${label} repos`];
+  const fit = options.find((t) => t.length <= max);
+  return fit ?? `${label.slice(0, max - " repos".length - 1).trimEnd()}… repos`;
 }

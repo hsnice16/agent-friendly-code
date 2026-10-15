@@ -10,8 +10,18 @@ type Props = {
 export function PeerlistBadge({ className }: Props) {
   return (
     <a target="_blank" href={PEERLIST_PROJECT_URL} className={className} rel="noopener noreferrer">
-      {/* Remote Peerlist embed — plain <img> like ProductHuntBadge; no next/image remote config needed. */}
-      <img className="h-[72px] w-auto" alt={PEERLIST_BADGE_ALT} src={PEERLIST_BADGE_SRC} />
+      {/* Remote Peerlist embed — plain <img> like ProductHuntBadge; no next/image remote config needed.
+          Lazy: React preloads every eager <img> in the head, which put this footer badge ahead of the page's own requests. */}
+      <img
+        width={240}
+        height={72}
+        alt={PEERLIST_BADGE_ALT}
+        src={PEERLIST_BADGE_SRC}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+        className="h-[72px] w-auto"
+      />
     </a>
   );
 }

@@ -4,6 +4,7 @@
 // impact and the rejected alternatives: tasks/0.7.0/01-tree-materializer.md.
 
 import type { RepoHost } from "../clients/github";
+import { pooled, timedFetch } from "./http";
 
 export type EntryKind = "dir" | "file" | "symlink";
 
@@ -21,10 +22,14 @@ const SYMLINK_MODE = "120000";
 /** Deepest level any signal inspects is `size`'s MAX_DEPTH; 10 leaves headroom. */
 const BITBUCKET_MAX_DEPTH = 10;
 
-// Refuse rather than hang. Sits above the largest repo we score today
-// (JetBrains/kotlin, ~97k entries); it exists for the pathological tail, and
+// Refuse rather than hang. Above the largest seed (JetBrains/kotlin, ~97k
+// entries); it exists for the pathological tail, and
 // bites hardest on GitLab, which paginates at 100 entries per call.
 export const MAX_ENTRIES = 150_000;
+
+// Each is one API call against the shared token on a truncated tree. Far above
+// any fixture (kotlin has ~30); only a tree built to burn the quota gets here.
+const MAX_SUBTREES = 500;
 
 export class TooLargeError extends Error {
   constructor(host: RepoHost) {
@@ -51,11 +56,17 @@ function assertNotRateLimited(host: RepoHost, res: Response): void {
 
 export function requestHeaders(host: RepoHost, token?: string): Record<string, string> {
   const base: Record<string, string> = { "User-Agent": USER_AGENT };
-  if (!token) return base;
-  if (host === "gitlab") base["PRIVATE-TOKEN"] = token;
-  if (host === "github") base.Authorization = `Bearer ${token}`;
+  // Bearer for GitLab too, not PRIVATE-TOKEN: fetch drops Authorization on a
+  // cross-origin redirect but forwards a custom header to the new host.
+  if (token && host !== "bitbucket") base.Authorization = `Bearer ${token}`;
   return base;
 }
+
+// The route's SLUG regex already limits the alphabet; this keeps any other caller
+// from smuggling a `/` or `?` into the API path.
+const repoSegment = (owner: string, name: string) => `${encodeURIComponent(owner)}/${encodeURIComponent(name)}`;
+
+const pathSegments = (path: string) => path.split("/").map(encodeURIComponent).join("/");
 
 function gitlabProjectId(owner: string, name: string): string {
   // Subgroups arrive in `owner` as a nested path, so the whole slug is encoded.
@@ -67,13 +78,14 @@ async function paginate(
   first: string,
   init: RequestInit,
   nextUrl: (body: unknown, res: Response) => string | null,
+  deadline?: AbortSignal,
 ): Promise<unknown[]> {
   const bodies: unknown[] = [];
   let url: string | null = first;
   let fetched = 0;
 
   while (url) {
-    const res: Response = await fetch(url, init);
+    const res: Response = await timedFetch(url, init, deadline);
     if (!res.ok) {
       assertNotRateLimited(host, res);
       throw new Error(`${res.status} listing tree`);
@@ -92,11 +104,17 @@ async function paginate(
 
 type GitHubNode = { path: string; type: string; mode: string; sha: string };
 
-async function listGitHub(owner: string, name: string, ref: string, token?: string): Promise<TreeEntry[]> {
+async function listGitHub(
+  owner: string,
+  name: string,
+  ref: string,
+  token?: string,
+  deadline?: AbortSignal,
+): Promise<TreeEntry[]> {
   const init = { headers: requestHeaders("github", token) };
-  const api = `https://api.github.com/repos/${owner}/${name}/git/trees`;
+  const api = `https://api.github.com/repos/${repoSegment(owner, name)}/git/trees`;
 
-  const res = await fetch(`${api}/${ref}?recursive=1`, init);
+  const res = await timedFetch(`${api}/${ref}?recursive=1`, init, deadline);
   if (!res.ok) {
     assertNotRateLimited("github", res);
     throw new Error(`${res.status} listing tree`);
@@ -110,23 +128,22 @@ async function listGitHub(owner: string, name: string, ref: string, token?: stri
   // would still lose entries; none of the fixtures reach that, so it is not
   // recursed further.
   if (truncated) {
-    const rootRes = await fetch(`${api}/${ref}`, init);
+    const rootRes = await timedFetch(`${api}/${ref}`, init, deadline);
     if (rootRes.ok) {
       const root = (await rootRes.json()) as { tree: GitHubNode[] };
       const merged = new Map<string, GitHubNode>(root.tree.map((e) => [e.path, e]));
+      const dirs = root.tree.filter((e) => e.type === "tree");
+      if (dirs.length > MAX_SUBTREES) throw new TooLargeError("github");
 
-      await Promise.all(
-        root.tree
-          .filter((e) => e.type === "tree")
-          .map(async (dir) => {
-            const sub = await fetch(`${api}/${dir.sha}?recursive=1`, init);
-            if (!sub.ok) return;
-            for (const e of ((await sub.json()) as { tree: GitHubNode[] }).tree) {
-              const path = `${dir.path}/${e.path}`;
-              merged.set(path, { ...e, path });
-            }
-          }),
-      );
+      await pooled(dirs, async (dir) => {
+        const sub = await timedFetch(`${api}/${dir.sha}?recursive=1`, init, deadline);
+        if (!sub.ok) return;
+        for (const e of ((await sub.json()) as { tree: GitHubNode[] }).tree) {
+          const path = `${dir.path}/${e.path}`;
+          merged.set(path, { ...e, path });
+        }
+        if (merged.size > MAX_ENTRIES) throw new TooLargeError("github");
+      });
 
       tree = [...merged.values()];
     }
@@ -145,13 +162,25 @@ async function listGitHub(owner: string, name: string, ref: string, token?: stri
 
 type GitLabNode = { path: string; type: string; mode: string; id: string };
 
-async function listGitLab(owner: string, name: string, ref: string, token?: string): Promise<TreeEntry[]> {
+async function listGitLab(
+  owner: string,
+  name: string,
+  ref: string,
+  token?: string,
+  deadline?: AbortSignal,
+): Promise<TreeEntry[]> {
   const base = `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/tree?recursive=true&per_page=100&ref=${ref}`;
 
-  const bodies = await paginate("gitlab", base, { headers: requestHeaders("gitlab", token) }, (_body, res) => {
-    const page = res.headers.get("x-next-page");
-    return page ? `${base}&page=${page}` : null;
-  });
+  const bodies = await paginate(
+    "gitlab",
+    base,
+    { headers: requestHeaders("gitlab", token) },
+    (_body, res) => {
+      const page = res.headers.get("x-next-page");
+      return page ? `${base}&page=${encodeURIComponent(page)}` : null;
+    },
+    deadline,
+  );
 
   return (bodies as GitLabNode[][]).flat().map((e) => ({
     path: e.path,
@@ -162,12 +191,20 @@ async function listGitLab(owner: string, name: string, ref: string, token?: stri
 
 type BitbucketNode = { path: string; type: string; attributes?: string[] };
 
-async function listBitbucket(owner: string, name: string, ref: string): Promise<TreeEntry[]> {
-  const base = `https://api.bitbucket.org/2.0/repositories/${owner}/${name}/src/${ref}/?max_depth=${BITBUCKET_MAX_DEPTH}&pagelen=100`;
+async function listBitbucket(owner: string, name: string, ref: string, deadline?: AbortSignal): Promise<TreeEntry[]> {
+  const base = `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${ref}/?max_depth=${BITBUCKET_MAX_DEPTH}&pagelen=100`;
 
-  const bodies = await paginate("bitbucket", base, { headers: requestHeaders("bitbucket") }, (body) => {
-    return (body as { next?: string }).next ?? null;
-  });
+  const bodies = await paginate(
+    "bitbucket",
+    base,
+    { headers: requestHeaders("bitbucket") },
+    (body) => {
+      const next = (body as { next?: string }).next;
+      // A body-supplied URL must not steer the server off the API host.
+      return next?.startsWith("https://api.bitbucket.org/") ? next : null;
+    },
+    deadline,
+  );
 
   return (bodies as { values: BitbucketNode[] }[])
     .flatMap((b) => b.values)
@@ -189,10 +226,11 @@ export function listTree(
   name: string,
   ref: string,
   token?: string,
+  deadline?: AbortSignal,
 ): Promise<TreeEntry[]> {
-  if (host === "gitlab") return listGitLab(owner, name, ref, token);
-  if (host === "bitbucket") return listBitbucket(owner, name, ref);
-  return listGitHub(owner, name, ref, token);
+  if (host === "gitlab") return listGitLab(owner, name, ref, token, deadline);
+  if (host === "bitbucket") return listBitbucket(owner, name, ref, deadline);
+  return listGitHub(owner, name, ref, token, deadline);
 }
 
 export function rawUrl(host: RepoHost, owner: string, name: string, ref: string, path: string): string {
@@ -200,15 +238,15 @@ export function rawUrl(host: RepoHost, owner: string, name: string, ref: string,
     return `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/files/${encodeURIComponent(path)}/raw?ref=${ref}`;
   }
   if (host === "bitbucket") {
-    return `https://api.bitbucket.org/2.0/repositories/${owner}/${name}/src/${ref}/${path}`;
+    return `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${ref}/${pathSegments(path)}`;
   }
-  return `https://raw.githubusercontent.com/${owner}/${name}/${ref}/${path}`;
+  return `https://raw.githubusercontent.com/${repoSegment(owner, name)}/${ref}/${pathSegments(path)}`;
 }
 
 // A dangling symlink 404s on the raw endpoint because the target doesn't
 // resolve, but the blob still holds the stored target path.
 export function blobUrl(host: RepoHost, owner: string, name: string, sha: string): string | null {
-  if (host === "github") return `https://api.github.com/repos/${owner}/${name}/git/blobs/${sha}`;
+  if (host === "github") return `https://api.github.com/repos/${repoSegment(owner, name)}/git/blobs/${sha}`;
   if (host === "gitlab") {
     return `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/blobs/${sha}/raw`;
   }
@@ -226,15 +264,16 @@ export async function resolveCommit(
   name: string,
   ref: string,
   token?: string,
+  deadline?: AbortSignal,
 ): Promise<string | null> {
   const url =
     host === "github"
-      ? `https://api.github.com/repos/${owner}/${name}/commits/${ref}`
+      ? `https://api.github.com/repos/${repoSegment(owner, name)}/commits/${ref}`
       : host === "gitlab"
         ? `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/commits/${ref}`
-        : `https://api.bitbucket.org/2.0/repositories/${owner}/${name}/commit/${ref}`;
+        : `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/commit/${ref}`;
 
-  const res = await fetch(url, { headers: requestHeaders(host, token) });
+  const res = await timedFetch(url, { headers: requestHeaders(host, token) }, deadline);
 
   // Null is cached as "no such repo" for an hour, so only answers that really
   // mean that may produce it: 404, and GitHub's 409 for an empty repo. A 401

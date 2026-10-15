@@ -1,4 +1,6 @@
 import { strict as assert } from "node:assert";
+import { symlinkSync, writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { afterEach, describe, test } from "node:test";
 
 import { detectBadgeEmbed } from "../lib/badge-adoption";
@@ -59,5 +61,28 @@ describe("detectBadgeEmbed", () => {
     });
 
     assert.equal(detectBadgeEmbed(fixture, SLUG), true);
+  });
+
+  test("matches the badge URL whatever the owner's casing", () => {
+    fixture = makeFixture({ "README.md": "![b](https://agentfriendlycode.com/api/badge/github/HonoJS/Hono.svg)" });
+    assert.equal(detectBadgeEmbed(fixture, SLUG), true);
+  });
+
+  test("another repo's badge with this name as a prefix doesn't count", () => {
+    fixture = makeFixture({ "README.md": `![b](https://agentfriendlycode.com/api/badge/${SLUG}-extra.svg)` });
+    assert.equal(detectBadgeEmbed(fixture, SLUG), false);
+  });
+
+  test("does not follow a README symlink out of the repo", () => {
+    const outside = makeFixture({});
+    fixture = makeFixture({});
+    try {
+      writeFileSync(join(outside, "README.md"), `![b](https://x.dev/api/badge/${SLUG}.svg)`);
+      symlinkSync(join(outside, "README.md"), join(fixture, "README.md"));
+
+      assert.equal(detectBadgeEmbed(fixture, SLUG), false);
+    } finally {
+      removeFixture(outside);
+    }
   });
 });

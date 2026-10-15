@@ -20,6 +20,13 @@ function escapeXml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 }
 
+export const BADGE_HEIGHT = 20;
+
+/** The rendered width, so an <img> of the badge can reserve its space. */
+export function badgeWidth(label: string, value: string): number {
+  return textWidth(label) + textWidth(value) + SEG_PAD * 4;
+}
+
 export function badgeSvg(label: string, value: string, score: number | null): string {
   const fill = score == null ? MISSING_COLOR : TIER_COLOR[scoreTier(score)];
 

@@ -23,10 +23,35 @@ export function repoIdentity(slug: string[] | undefined): RepoIdentity | null {
   return isHost(host?.toLowerCase()) && owner && name ? { host, owner, name } : null;
 }
 
+// Old repo links carry `?model=`, which the repo page's agent switch reads, so
+// a redirect has to pass the query on.
+export function withQuery(path: string, sp: Record<string, string | string[] | undefined>): string {
+  const query = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(sp)) {
+    for (const v of Array.isArray(value) ? value : [value]) {
+      if (v != null) query.append(key, v);
+    }
+  }
+
+  const s = query.toString();
+  return s ? `${path}?${s}` : path;
+}
+
 // Same split as repoIdentity, for a bare `owner/name`.
 export function ownerAndName(path: string): { owner: string; name: string } | null {
   const parts = path.split("/");
   const name = parts.pop();
 
   return name && parts.length > 0 && parts.every(Boolean) ? { owner: parts.join("/"), name } : null;
+}
+
+/**
+ * Where a looked-up path should 308 to, or null when it already is the stored
+ * path: a stored row the repo page didn't prerender would otherwise redirect
+ * to itself.
+ */
+export function redirectTarget(identity: RepoIdentity, repo: RepoIdentity): string | null {
+  const path = repoPath(repo);
+  return path === repoPath(identity) ? null : path;
 }

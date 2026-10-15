@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -14,18 +14,19 @@ import { SignalRow } from "@/components/SignalRow";
 import { type ParsedRepo, parseRepoUrl } from "@/lib/clients/github";
 import { HOST_DOMAINS, isHost } from "@/lib/constants/hosts";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import { getLanguagePeers, getRepoByHostOwnerName } from "@/lib/db";
+import { getRepoByHostOwnerName, listLeaderboardOverall } from "@/lib/db";
 import { TooLargeError } from "@/lib/live-score/hosts";
 import { liveScore } from "@/lib/live-score/score";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { topImprovements } from "@/lib/scoring/scorer";
-import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
+import type { ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { hostLabel } from "@/lib/utils/format";
-import { nearestByScore } from "@/lib/utils/language";
 import { isModelId } from "@/lib/utils/leaderboard-href";
-import { repoPath } from "@/lib/utils/repo-path";
+import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/repo-about";
+import { repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
+import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
@@ -41,17 +42,18 @@ type Params = { host: string; owner: string; name: string };
 // keyed by repo and not by model: the score is the same for all of them, and
 // the result is deterministic given (commit, weights), so an hour of staleness
 // costs nothing. A throw is not cached, which is what keeps a transient host
-// failure from being pinned here for the hour.
+// failure from being pinned here for the hour. Lowercased because every host
+// matches names case-insensitively: one repo, one entry, one scoring.
 function cachedLiveScore(parsed: ParsedRepo) {
-  return unstable_cache(() => liveScore(parsed), ["live-score", parsed.host, parsed.owner, parsed.name], {
-    revalidate: CACHE_SECONDS,
-  })();
+  const key = ["live-score", parsed.host, parsed.owner.toLowerCase(), parsed.name.toLowerCase()];
+  return unstable_cache(() => liveScore(parsed), key, { revalidate: CACHE_SECONDS })();
 }
 
 // Every miss here is a tree-API call and a cold function, and the route is
 // crawler-reachable regardless of robots.txt. GitHub, GitLab and Bitbucket all
-// restrict slugs to this alphabet, so anything else is a probe.
-const SLUG = /^[A-Za-z0-9._-]+$/;
+// restrict slugs to this alphabet, so anything else is a probe. `.` and `..`
+// fit it but would walk the API path upwards.
+const SLUG = /^(?!\.+$)[A-Za-z0-9._-]+$/;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { host, owner, name } = await params;
@@ -109,10 +111,11 @@ export default async function LiveScorePage({
   searchParams,
 }: {
   params: Promise<Params>;
-  searchParams: Promise<{ model?: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const { host, owner, name } = await params;
-  const { model } = await searchParams;
+  const query = await searchParams;
+  const model = typeof query.model === "string" ? query.model : undefined;
 
   if (!isHost(host) || !SLUG.test(owner) || !SLUG.test(name)) notFound();
 
@@ -122,7 +125,7 @@ export default async function LiveScorePage({
   // Indexed repos get the canonical page: better SEO, and it absorbs the popular
   // repos that are also the most expensive to score cold.
   const indexed = getRepoByHostOwnerName(host, owner, name);
-  if (indexed) redirect(repoPath(indexed));
+  if (indexed) permanentRedirect(withQuery(repoPath(indexed), query));
 
   if (!SUPPORTED_HOSTS.includes(parsed.host)) return <Unsupported host={host} />;
 
@@ -150,12 +153,6 @@ export default async function LiveScorePage({
   const suggestions = topImprovements(selected, score.signals);
   const strengths = score.signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
   const gaps = score.signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
-  const selectedScore = score.modelScores.find((m) => m.modelId === selected)?.score ?? score.overall;
-  const alternatives = nearestByScore(
-    getLanguagePeers(host, score.language, selected),
-    selectedScore,
-    ALTERNATIVES_LIMIT,
-  );
 
   const repo: RepoRow = {
     id: -1,
@@ -171,7 +168,11 @@ export default async function LiveScorePage({
     previous_overall_score: null,
     default_branch: score.defaultBranch,
     badge_embedded: score.badgeEmbedded ? 1 : 0,
+    // Re-sanitised: an hour-cached result may predate these fields or their rules.
+    description: sanitizeDescription(score.description),
+    topics: topicsColumn(sanitizeTopics(score.topics)),
   };
+  const alternatives = similarRepos({ ...repo, score: score.overall }, listLeaderboardOverall(), ALTERNATIVES_LIMIT);
 
   return (
     <>
@@ -211,7 +212,7 @@ export default async function LiveScorePage({
         <AlternativesStrip
           language={score.language}
           alternatives={alternatives}
-          selectedModelLabel={MODEL_BY_ID[selected].label}
+          note={similarNote(repo, alternatives)}
         />
       </div>
 

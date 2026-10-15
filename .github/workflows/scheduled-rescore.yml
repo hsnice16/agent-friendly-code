@@ -15,29 +15,37 @@ permissions:
 jobs:
   rescore:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # Runs take ~45 min for ~400 repos; the margin keeps a slow host from
+    # killing the run, which would throw away every score it had made.
+    timeout-minutes: 75
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
         with:
           bun-version: 1.2.16
 
       - name: Setup Node
-        uses: actions/setup-node@v7
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: "22"
 
       - name: Install
         run: bun install --frozen-lockfile
 
+      # Adds any columns the snapshot below names, so it can't fail on a DB
+      # committed before they existed.
+      - name: Migrate the database
+        run: bun run init-db
+
       # badge_embedded is here despite not being a score: adoption leaves every
       # overall_score identical, so a scores-only diff reads the run as a no-op
-      # and discards the flag with the runner, every run, forever. url is what
-      # makes a pruned or renamed seed count as a change.
+      # and discards the flag with the runner, every run, forever. language,
+      # description and topics are here for the same reason. url is what makes
+      # a pruned or renamed seed count as a change.
       - name: Snapshot pre-rescore state
-        run: sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-before.txt
+        run: sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded, language, description, topics FROM repo ORDER BY url;" > /tmp/state-before.txt
 
       - name: Note when the rescore started
         id: started
@@ -48,12 +56,12 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: bun run seed
 
-      - name: Commit and push if the repo set, a score or badge adoption changed
+      - name: Commit and push if the repo set, a score, badge adoption or repo metadata changed
         id: publish
         run: |
-          sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded FROM repo ORDER BY url;" > /tmp/state-after.txt
+          sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded, language, description, topics FROM repo ORDER BY url;" > /tmp/state-after.txt
           if diff -q /tmp/state-before.txt /tmp/state-after.txt > /dev/null; then
-            echo "No repo, score or badge-adoption changes — skipping commit (last_scored_at churn ignored)."
+            echo "No repo, score, badge-adoption or metadata changes — skipping commit (last_scored_at churn ignored)."
             exit 0
           fi
           bun run check-db-leaks

@@ -1,37 +1,24 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { CheckChecklist } from "@/components/CheckChecklist";
+import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreForm } from "@/components/LiveScoreForm";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { RecentScores } from "@/components/RecentScores";
+import { getCheckStats } from "@/lib/check-stats";
 import { listLeaderboardOverall } from "@/lib/db";
-import { APP_KEYWORDS, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
+import { SIGNALS } from "@/lib/scoring/signals";
+import { APP_NAME, APP_URL, OG_IMAGE_SIZE } from "@/lib/version";
 
-const PAGE_TITLE = "Which AI coding agents is your repo set up for?";
-const PAGE_DESCRIPTION =
-  "Paste a public GitHub repo URL to see which AI coding agents it is set up for: a score per agent, the one it fits best, and what to fix first. No sign-up.";
-
-const PAGE_KEYWORDS = [
-  ...APP_KEYWORDS,
-  "score a repo",
-  "live repo score",
-  "score any github repo",
-  "check repo ai readiness",
-  "agent friendliness checker",
-  "is my repo agent friendly",
-  "repo agent readiness test",
-  "which ai coding agent for my codebase",
-  "which ai agent is my repo ready for",
-];
-
-export const metadata: Metadata = {
-  title: PAGE_TITLE,
-  keywords: PAGE_KEYWORDS,
-  description: PAGE_DESCRIPTION,
-  alternates: { canonical: "/score" },
-  twitter: { ...TWITTER_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION },
-  openGraph: { ...OG_DEFAULTS, title: PAGE_TITLE, description: PAGE_DESCRIPTION, url: "/score", type: "website" },
+const OG_IMAGE = {
+  url: "/og/score",
+  ...OG_IMAGE_SIZE,
+  alt: `${APP_NAME} — Live Score: any public GitHub repo, on demand`,
 };
+
+export const metadata: Metadata = staticPageMetadata("/score", OG_IMAGE);
 
 type FaqEntry = {
   q: string;
@@ -43,38 +30,37 @@ type FaqEntry = {
 const FAQ: FaqEntry[] = [
   {
     q: "Which AI coding agent should I use for my codebase?",
-    a: "This page tells you which agent your repo is best set up for, not which agent writes the best code. Each agent reads different files: Claude Code loads CLAUDE.md, Cursor reads its rules files, and so on. The result gives a score for each agent, names the one your repo is most ready for, and lists what to add for the others. If you have already picked an agent, the fixes listed for it are the part to use.",
+    a: "This page tells you which agent your repo is best set up for, not which one writes the best code. Each agent reads different files: Claude Code loads CLAUDE.md, Cursor its rules files, and so on. You get a score for each agent and what to add for each.",
   },
   {
     q: "Does the repo have to be on the leaderboard?",
-    a: "No. That is what this page is for. Paste a link to any public GitHub repo and we score it right away, even if we have never seen it before. If the repo is already on the leaderboard, we send you to its own page instead. It has the same numbers, plus how the score changed since the previous rescore.",
+    a: "No. Paste any public GitHub repo and it is scored right away. If it is already on the leaderboard, you are sent to its page, which also shows how the score changed since the last rescore.",
   },
   {
     q: "Is this score different from the leaderboard score?",
-    a: "No. Both use the same checks and the same weights. Only the way we get the files is different. The leaderboard downloads each repo every six hours. This page rebuilds the repo from GitHub's file list when you ask. An automated test checks that both ways give the same numbers, using sample repos picked to catch any difference.",
+    a: "No. Same checks, same weights. The leaderboard clones each repo every six hours; this page rebuilds it from GitHub's file list. An automated test checks that both give the same numbers.",
   },
   {
     q: "Do you save or list my repo anywhere?",
-    a: "No. We work out the score and show it. The result is kept for up to an hour so a repeat visit is fast, then dropped. Nothing about the repo goes into our database, and scoring a repo never adds it to the public leaderboard. Search engines are told not to show the result page. The list of repos you scored stays in your own browser and is never sent anywhere.",
+    a: "No. The result is cached for up to an hour, then dropped. Nothing goes into our database, the repo is never added to the leaderboard, and search engines are told not to index the result. Your list of scored repos stays in your browser.",
   },
   {
     q: "How up to date is the score?",
-    a: "It uses the repo's latest commit, and the page shows which commit it used. We keep each result for an hour, so a change you pushed a few minutes ago may not show up until that hour is over.",
+    a: "It uses the latest commit and shows which one. Results are cached for an hour, so a change pushed a few minutes ago may not show yet.",
   },
   {
     q: "Does it work on private repos, GitLab, or Bitbucket?",
-    a: "Only public GitHub repos for now. Private repos would need access we choose not to ask for. GitLab and Bitbucket already work and give the same scores, but we are holding them back until we can stay within their limits: GitLab returns only 100 items per request, and Bitbucket allows 60 requests an hour without a login. To score a private repo today, run the agent skill on your own computer.",
+    a: "Only public GitHub repos for now. Private repos would need access we choose not to ask for. GitLab and Bitbucket work but are held back by their API limits: GitLab returns 100 items per request, and Bitbucket allows 60 requests an hour without a login. For a private repo, run the agent skill locally.",
     link: { phrase: "the agent skill", href: "/skill" },
   },
   {
     q: "Why won't a very large repo get a score?",
-    a: "Rebuilding a repo with more than 150,000 files and folders takes longer than a page is allowed to run. So above a set size, we stop and say so, rather than time out or give a half-finished score. The agent skill can score these on your own computer, with no size limit.",
+    a: "A repo with more than 150,000 files and folders takes longer to rebuild than a page may run, so we stop and say so instead of giving a partial score. The agent skill scores it locally, with no size limit.",
     link: { phrase: "The agent skill", href: "/skill" },
   },
 ];
 
 const JSON_LD = {
-  "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "BreadcrumbList",
@@ -89,7 +75,7 @@ const JSON_LD = {
       url: `${APP_URL}/score`,
       name: "Live Score",
       isAccessibleForFree: true,
-      description: PAGE_DESCRIPTION,
+      description: PAGE_COPY["/score"].description,
       publisher: { "@id": `${APP_URL}/#org` },
       operatingSystem: "Any",
       applicationCategory: "DeveloperApplication",
@@ -137,22 +123,15 @@ export default function ScoreIndexPage() {
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={JSON_LD} />
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Which AI coding agents is your repo set up for?
+          Is your repo ready for AI coding agents?
         </h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Live Score: paste a link to a public GitHub repo. You get a score for each agent, based on what it can find,
-          read, and run in the repo, and the agent the repo fits best. The numbers are the same as the leaderboard's. We
-          score the latest commit right away. The result is not saved to our database; it is cached for up to an hour.
+          Paste a public GitHub repo link. You get a score for each agent and the one the repo is best set up for, with
+          the same checks and weights as the leaderboard. Nothing is saved; results are cached for an hour.
         </p>
 
         <LiveScoreForm />
@@ -163,6 +142,10 @@ export default function ScoreIndexPage() {
       <RecentScores
         past={examples.map((r) => ({ id: r.id, host: r.host, owner: r.owner, name: r.name, score: r.score ?? 0 }))}
       />
+
+      <div className="mt-3.5">
+        <CheckChecklist rows={SIGNALS.map((s) => ({ id: s.id, label: s.label, ...getCheckStats(s.id) }))} />
+      </div>
 
       <div className="mt-3.5">
         <Panel>

@@ -57,7 +57,7 @@ const PYPROJECT_RE = /\[tool\.(ruff|black|flake8|pylint|mypy)/;
 export const linter: Signal = {
   id: "linter",
   label: "Linter / formatter config",
-  description: "Agents get immediate feedback on style rather than ambiguous drift.",
+  description: "A linter, so the agent gets style feedback right away instead of guessing.",
   improveSuggestion:
     "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint) and commit the config.",
   check: (repo) => {
@@ -74,7 +74,7 @@ export const linter: Signal = {
     }
 
     const pyproject = resolveRelative(repo, "pyproject.toml");
-    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject)))) {
+    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject), repo))) {
       return {
         pass: 1,
         id: "linter",

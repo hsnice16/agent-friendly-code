@@ -60,7 +60,7 @@ export function summarizeRepo(
     return null;
   }
 
-  // Compared by slug because hosts disagree on casing ("Java", "java"); the hubs group the same way.
+  // By slug: rows scored before canonicalLanguage keep the host's casing ("Java", "java").
   const slug = repo.language ? languageSlug(repo.language) : "";
   const sameLanguage = slug ? leaderboard.filter((r) => r.language && languageSlug(r.language) === slug) : [];
 
@@ -90,23 +90,4 @@ export function keySignals(model: ModelProfile, signals: SignalResult[]): Signal
 export function topPercent(summary: RepoSummary): number | null {
   const pct = Math.max(1, Math.round((summary.rank / summary.total) * 100));
   return pct <= 50 ? pct : null;
-}
-
-export function summaryDescription(slug: string, summary: RepoSummary | null, overall: number | null): string {
-  if (!summary || overall == null) {
-    return `How ready ${slug} is for ${MODELS.length} AI coding agents, and the changes that would help most.`;
-  }
-
-  const parts = [
-    `${slug} scores ${overall.toFixed(1)} out of 100 for AI coding agents, #${summary.rank} of ${summary.total}.`,
-  ];
-  if (summary.best && summary.best.tiedWith === 0) {
-    parts.push(`Best set up for ${summary.best.model.label}.`);
-  }
-  if (summary.worst && summary.worstGap) {
-    parts.push(`Biggest fix for ${summary.worst.model.label}: ${summary.worstGap.label}.`);
-  }
-  parts.push("See what to fix first.");
-
-  return parts.join(" ");
 }

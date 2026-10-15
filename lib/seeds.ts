@@ -1,5 +1,6 @@
 import { type ParsedRepo, parseRepoUrl } from "./clients/github";
 import type { RepoName, ScoreTime, SeedTarget } from "./types/db";
+import { obj, str } from "./utils/json";
 
 export const FINDING_KINDS = [
   "unparseable",
@@ -22,7 +23,7 @@ export const FINDING_KINDS = [
   "rescore-stalled",
 ] as const;
 
-export type FindingKind = (typeof FINDING_KINDS)[number];
+type FindingKind = (typeof FINDING_KINDS)[number];
 
 export type Flag = { kind: FindingKind; detail?: string };
 export type Finding = Flag & { url: string };
@@ -35,6 +36,10 @@ export type Seed = {
   /** Audit findings that are known and intended for this seed, e.g. an archived repo kept on purpose. */
   accept?: FindingKind[];
 };
+
+// `bun run score` exits with this for a private repo, so the seed run can tell
+// a refusal from a failure.
+export const PRIVATE_EXIT_CODE = 3;
 
 export const STALE_AFTER_SECONDS = 7 * 24 * 60 * 60;
 
@@ -109,37 +114,41 @@ function renamed(p: RepoName, actual: unknown): Flag[] {
     : [];
 }
 
-export function githubFlags(p: RepoName, status: number, j: any): Flag[] {
+export function githubFlags(p: RepoName, status: number, body: unknown): Flag[] {
   if (status !== 200) return unreachable(status);
 
+  const j = obj(body);
   const flags: Flag[] = renamed(p, j.full_name);
-  if (j.fork) flags.push({ kind: "fork", detail: `of ${j.parent?.full_name ?? "?"}` });
+  if (j.fork) flags.push({ kind: "fork", detail: `of ${str(obj(j.parent).full_name) ?? "?"}` });
   if (j.mirror_url) flags.push({ kind: "mirror", detail: `of ${j.mirror_url}` });
   else if (saysMirror(j.description)) flags.push({ kind: "mirror", detail: "description says mirror" });
   if (j.archived) flags.push({ kind: "archived" });
   if (j.disabled) flags.push({ kind: "disabled" });
   if (j.private) flags.push({ kind: "private" });
-  if ((j.size ?? 0) === 0) flags.push({ kind: "empty" });
+  if (!j.size) flags.push({ kind: "empty" });
   return flags;
 }
 
-export function gitlabFlags(p: RepoName, status: number, j: any): Flag[] {
+export function gitlabFlags(p: RepoName, status: number, body: unknown): Flag[] {
   if (status !== 200) return unreachable(status);
 
+  const j = obj(body);
   const flags: Flag[] = renamed(p, j.path_with_namespace);
-  if (j.forked_from_project) flags.push({ kind: "fork", detail: `of ${j.forked_from_project.path_with_namespace}` });
+  if (j.forked_from_project)
+    flags.push({ kind: "fork", detail: `of ${str(obj(j.forked_from_project).path_with_namespace) ?? "?"}` });
   if (saysMirror(j.description)) flags.push({ kind: "mirror", detail: "description says mirror" });
   if (j.archived) flags.push({ kind: "archived" });
-  if (j.visibility !== "public") flags.push({ kind: "private", detail: `visibility=${j.visibility}` });
+  if (j.visibility !== "public") flags.push({ kind: "private", detail: `visibility=${String(j.visibility)}` });
   if (j.empty_repo) flags.push({ kind: "empty" });
   return flags;
 }
 
-export function bitbucketFlags(p: RepoName, status: number, j: any): Flag[] {
+export function bitbucketFlags(p: RepoName, status: number, body: unknown): Flag[] {
   if (status !== 200) return unreachable(status);
 
+  const j = obj(body);
   const flags: Flag[] = renamed(p, j.full_name);
-  if (j.parent) flags.push({ kind: "fork", detail: `of ${j.parent.full_name}` });
+  if (j.parent) flags.push({ kind: "fork", detail: `of ${str(obj(j.parent).full_name) ?? "?"}` });
   if (saysMirror(j.description)) flags.push({ kind: "mirror", detail: "description says mirror" });
   if (j.is_private) flags.push({ kind: "private" });
   return flags;

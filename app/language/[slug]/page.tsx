@@ -7,7 +7,8 @@ import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
 import { checkPath } from "@/lib/utils/check-path";
-import { hubPath, isHub } from "@/lib/utils/language";
+import { hubPath, hubTitle, isHub } from "@/lib/utils/language";
+import { fitDescription, pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -19,13 +20,13 @@ export function generateStaticParams(): Params[] {
     .map((g) => ({ slug: g.slug }));
 }
 
-function hubTitle(hub: Hub): string {
-  return `Most agent-friendly ${hub.label} repos`;
-}
-
 function hubDescription(hub: Hub): string {
   const top = `${hub.top.owner}/${hub.top.name}`;
-  return `${hub.rows.length} ${hub.label} repos ranked by how easy they are for AI coding agents like Claude Code, Cursor and Codex to work in. Average score ${hub.average.toFixed(1)}; ${top} leads with ${(hub.top.score ?? 0).toFixed(1)}.`;
+  return fitDescription(
+    `${hub.rows.length} ${hub.label} repos ranked by how ready they are for AI coding agents like Claude Code and Cursor.`,
+    `Average score ${hub.average.toFixed(1)}.`,
+    `${top} leads with ${(hub.top.score ?? 0).toFixed(1)}.`,
+  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -35,11 +36,11 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   }
 
   const path = hubPath(hub.slug);
-  const title = hubTitle(hub);
+  const title = hubTitle(hub.label);
   const description = hubDescription(hub);
 
   return {
-    title,
+    title: pageTitle(title),
     description,
     alternates: { canonical: path },
     twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
@@ -67,7 +68,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
       </Link>
 
       <section className="mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{hubTitle(hub)}</h1>
+        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{hubTitle(hub.label)}</h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
           {hub.rows.length} {hub.label} repos, ranked by their overall score: the average across every agent we score.

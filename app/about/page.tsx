@@ -3,28 +3,17 @@ import Link from "next/link";
 
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
+import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
+import { getLeaderboardStats } from "@/lib/db";
+import { staticPageMetadata } from "@/lib/page-meta";
+import { OWN_REPO } from "@/lib/utils/own-repo";
+import { repoPath } from "@/lib/utils/repo-path";
+import { APP_NAME, APP_URL, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
 
-const DESCRIPTION = `Who built ${APP_NAME}, why, and what it is not. Independent, MIT-licensed, and not tied to any AI agent company.`;
-
-export const metadata: Metadata = {
-  title: "About",
-  description: DESCRIPTION,
-  alternates: { canonical: "/about" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "About", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "About",
-    description: DESCRIPTION,
-    url: "/about",
-    type: "article",
-  },
-};
+export const metadata: Metadata = staticPageMetadata("/about");
 
 const ABOUT_JSON_LD = {
-  "@context": "https://schema.org",
   "@graph": [
     {
       "@id": `${APP_URL}/about#author`,
@@ -32,8 +21,12 @@ const ABOUT_JSON_LD = {
       name: "Himanshu Singh",
       jobTitle: "Software Engineer",
       url: "https://github.com/hsnice16",
-      worksFor: { "@id": `${APP_URL}/#org` },
-      sameAs: ["https://github.com/hsnice16", "https://github.com/sponsors/hsnice16"],
+      sameAs: [
+        "https://github.com/hsnice16",
+        "https://x.com/hsnice16",
+        "https://personallogs.vercel.app",
+        "https://github.com/sponsors/hsnice16",
+      ],
     },
     {
       "@id": `${APP_URL}/about#page`,
@@ -48,29 +41,29 @@ const ABOUT_JSON_LD = {
 };
 
 export default function AboutPage() {
+  const { count } = getLeaderboardStats();
+
   return (
     <>
       <BreadcrumbJsonLd current={{ name: "About", path: "/about" }} />
 
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(ABOUT_JSON_LD).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={ABOUT_JSON_LD} />
 
       <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">About</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">Who built {APP_NAME}, why, and what it is not.</p>
+        <h1 className="m-0 text-[30px] font-bold leading-[1.18] tracking-tight">Who builds {APP_NAME}, and why</h1>
       </section>
 
       <Panel>
         <PanelHeading>Who</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>. It is
-          an independent project, not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other company
-          whose agent is scored for here.
+          Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>, a
+          software engineer working remotely who builds side projects in the open. Blog:{" "}
+          <ExternalLink href="https://personallogs.vercel.app">personallogs.vercel.app</ExternalLink>. X:{" "}
+          <ExternalLink href="https://x.com/hsnice16">@hsnice16</ExternalLink>.
+        </p>
+        <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
+          It is an independent project, not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other
+          company whose agent is scored here.
         </p>
       </Panel>
 
@@ -78,12 +71,10 @@ export default function AboutPage() {
         <Panel tone="warn">
           <PanelHeading tone="warn">Why it exists</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            A repo that has a README is not the same as a repo that really helps an AI coding agent get work done. That
-            gap keeps growing, and there is no public way to see which repos have done the work. {APP_NAME} tries to
-            show it, for each agent separately, because the agents are not the same. Claude Code wants an AGENTS.md and
-            fast tests. Cursor reads its own rules in .cursor/rules, and AGENTS.md too. Devin wants a dev setup it can
-            run, with its dependencies and tests listed. One repo can score very differently for each of them. A single
-            number would hide that.
+            Having a README is not the same as helping an AI coding agent get work done, and there is no public way to
+            see which repos have done that work. {APP_NAME} shows it for each agent separately, because they read
+            different files: Claude Code loads CLAUDE.md, Cursor its own rules and AGENTS.md, and Devin needs a dev
+            setup it can run. One repo can suit one agent and not another.
           </p>
         </Panel>
       </div>
@@ -92,17 +83,52 @@ export default function AboutPage() {
         <Panel>
           <PanelHeading>What it is not</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            It is not a test of how well agents perform. Every score comes from{" "}
-            <strong className="text-ink">simple file checks</strong>: does a file exist, and how long is it. No agent is
-            actually run. The reasons behind each agent&apos;s weights come from that agent&apos;s own docs (linked on
-            the methodology page). But the weight numbers are not yet tested against how agents really perform. Read the{" "}
+            Not a test of how well agents perform. Scores come from <strong className="text-ink">file checks</strong>,
+            and no agent is run. Weights follow each agent&apos;s docs but are not yet measured against real runs; the{" "}
             <Link
               href="/methodology"
               className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
               methodology
             </Link>{" "}
-            for the details, including the plan to replace these weights with measured ones.
+            has the details and the plan to measure them.
+          </p>
+        </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <Panel>
+          <PanelHeading>How repos are chosen</PanelHeading>
+          <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
+            The leaderboard is a curated list of {count} public repos on GitHub, GitLab and Bitbucket, kept in{" "}
+            <ExternalLink href={`${REPO_URL}/blob/main/scripts/seed-list.ts`}>scripts/seed-list.ts</ExternalLink> and
+            grouped by ecosystem: JavaScript and TypeScript, Python, Rust, Go, the JVM, other languages, and AI coding
+            agents, models and SDKs. Every repo on it is scored again every six hours, and a repo taken off the list
+            leaves the leaderboard at the next rescore.
+          </p>
+          <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
+            A weekly audit flags repos on the list that were renamed, archived, deleted or made private, that are forks
+            or mirrors, or whose score has stopped refreshing. Each finding is fixed in the list or accepted on purpose.
+            Scoring a repo with{" "}
+            <Link
+              href="/score"
+              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+            >
+              Live Score
+            </Link>{" "}
+            never adds it. To suggest a repo, open an issue or a pull request that edits the list.
+          </p>
+          <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
+            This site&apos;s own repo,{" "}
+            <Link
+              href={repoPath(OWN_REPO)}
+              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+            >
+              {OWN_REPO.owner}/{OWN_REPO.name}
+            </Link>
+            , is on the list and scored by the same rules as every other repo, and so are the author&apos;s other repos.
+            Wherever repos are listed, it is marked &ldquo;this site&apos;s own repo&rdquo; and they are marked
+            &ldquo;by this site&apos;s author&rdquo;.
           </p>
         </Panel>
       </div>
@@ -124,7 +150,15 @@ export default function AboutPage() {
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             The best way to reach me: open an issue or discussion on{" "}
-            <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>.
+            <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>. For anything that should not be public,
+            email{" "}
+            <a
+              href={`mailto:${CONTACT_EMAIL}`}
+              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+            >
+              {CONTACT_EMAIL}
+            </a>
+            .
           </p>
         </Panel>
       </div>

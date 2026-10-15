@@ -5,15 +5,18 @@ import { notFound } from "next/navigation";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
+import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
+import { getLeaderboardStats } from "@/lib/db";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { checkPath, checkSlug, signalIdFromSlug } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { pageTitle } from "@/lib/utils/page-title";
+import { APP_NAME, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
 
@@ -30,15 +33,17 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     return {};
   }
 
-  const { title, description } = CHECK_CONTENT[id];
+  const { title: heading, metaTitle, description } = CHECK_CONTENT[id];
+  const title = metaTitle ?? heading;
   const path = checkPath(id);
+  const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: SIGNAL_BY_ID[id].label };
 
   return {
-    title,
+    title: pageTitle(title),
     description,
     alternates: { canonical: path },
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
-    openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description, url: path, type: "article" },
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
+    openGraph: { ...OG_DEFAULTS, images: [image], title, description, url: path, type: "article" },
   };
 }
 
@@ -52,12 +57,27 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
   const content = CHECK_CONTENT[id];
   const stats = getCheckStats(id);
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
+  const { contentChangedAt } = getLeaderboardStats();
 
   return (
     <>
       <BreadcrumbJsonLd
         parent={{ name: "Checks", path: "/check" }}
         current={{ name: signal.label, path: checkPath(id) }}
+      />
+      {/* dateModified is when the pass counts last moved; the prose has no tracked edit history, so no datePublished. */}
+      <JsonLd
+        data={{
+          "@type": "TechArticle",
+          headline: content.metaTitle ?? content.title,
+          description: content.description,
+          url: `${APP_URL}${checkPath(id)}`,
+          image: `${APP_URL}/og${checkPath(id)}`,
+          about: { "@type": "Thing", name: signal.label },
+          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          author: { "@id": `${APP_URL}/about#author` },
+          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+        }}
       />
 
       <Link
@@ -155,6 +175,15 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           </Panel>
         )}
       </div>
+
+      {id === "agents_md" && (
+        <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
+          <Link href={`${checkPath(id)}/examples`} className={LINK}>
+            AGENTS.md examples
+          </Link>
+          : every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file on its host.
+        </p>
+      )}
 
       {stats.examples.length > 0 && (
         <div className="mt-3.5">

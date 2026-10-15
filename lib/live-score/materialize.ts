@@ -1,23 +1,22 @@
-import { mkdirSync, realpathSync, rmSync, statSync, symlinkSync, writeFileSync } from "node:fs";
-import { dirname, join, relative, resolve, sep } from "node:path";
+import { mkdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "node:fs";
+import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import type { RepoHost } from "../clients/github";
-import { resolveRelative } from "../scoring/signals/helpers";
+import { entryKind, MAX_READ_BYTES, resolveRelative } from "../scoring/signals/helpers";
 import { CONTENT_CANDIDATES } from "./content-files";
 import { blobUrl, hostToken, listTree, rawUrl, requestHeaders, type TreeEntry } from "./hosts";
+import { pooled, readCapped, timedFetch } from "./http";
 
-const CONCURRENCY = 8;
+// A tree can hold up to MAX_ENTRIES links, and each request or blob lookup is a
+// call against the shared token. Past these caps a link keeps its placeholder,
+// which the scorer reads exactly like a link it would not follow.
+const MAX_LINK_LOOKUPS = 1000;
+const MAX_BLOB_LOOKUPS = 200;
 
-export type Materialized = { sha: string; entries: number };
+// One past PATH_MAX, so an over-long target still fails to link as it did uncapped.
+const MAX_LINK_TARGET_BYTES = 4097;
 
-async function pooled<T>(items: T[], fn: (item: T) => Promise<void>): Promise<void> {
-  const queue = [...items];
-  await Promise.all(
-    Array.from({ length: Math.min(CONCURRENCY, queue.length) }, async () => {
-      for (let next = queue.shift(); next !== undefined; next = queue.shift()) await fn(next);
-    }),
-  );
-}
+type Materialized = { sha: string; entries: number };
 
 // The only thing standing between an attacker-chosen path and the filesystem.
 export function safeAbsolute(dest: string, path: string): string | null {
@@ -34,40 +33,54 @@ async function linkTargets(
   dest: string,
   symlinks: TreeEntry[],
   headers: Record<string, string>,
-): Promise<void> {
-  await pooled(symlinks, async (entry) => {
+  deadline?: AbortSignal,
+): Promise<Set<string>> {
+  const placeholders = new Set(symlinks.slice(MAX_LINK_LOOKUPS).map((e) => e.path));
+  let blobLookups = 0;
+
+  const text = async (res: Response) => new TextDecoder().decode(await readCapped(res, MAX_LINK_TARGET_BYTES));
+
+  await pooled(symlinks.slice(0, MAX_LINK_LOOKUPS), async (entry) => {
     // Never trim the target: vercel/ai commits "packages/ai/README.md\n", so git
     // leaves the link dangling. Trimming would repair it and invent a README the
     // real pipeline never sees.
     let target: string | null = null;
 
-    const res = await fetch(rawUrl(host, owner, name, ref, entry.path), { headers });
+    const res = await timedFetch(rawUrl(host, owner, name, ref, entry.path), { headers }, deadline);
     if (res.ok) {
-      target = await res.text();
-    } else if (entry.sha) {
+      target = await text(res);
+    } else if (entry.sha && blobLookups < MAX_BLOB_LOOKUPS) {
       const blob = blobUrl(host, owner, name, entry.sha);
       if (blob) {
-        const blobRes = await fetch(blob, { headers: { ...headers, Accept: "application/vnd.github.raw+json" } });
-        if (blobRes.ok) target = await blobRes.text();
+        blobLookups++;
+        const blobHeaders = { ...headers, Accept: "application/vnd.github.raw+json" };
+        const blobRes = await timedFetch(blob, { headers: blobHeaders }, deadline);
+        if (blobRes.ok) target = await text(blobRes);
       }
     }
 
-    // No target, or an empty one: keep the placeholder. Removing it would drop
-    // the entry from `size`'s file count, which a clone still counts.
-    if (!target) return;
-
     const abs = safeAbsolute(dest, entry.path);
-    if (!abs) return;
+
+    // No target, an empty one, or one leading out of the tree (an absolute path,
+    // ../, the root itself): keep the placeholder. Removing it would drop the
+    // entry from `size`'s file count, which a clone still counts.
+    if (!target || !abs || !resolve(dirname(abs), target).startsWith(resolve(dest) + sep)) {
+      placeholders.add(entry.path);
+      return;
+    }
 
     try {
       rmSync(abs, { force: true });
       symlinkSync(target, abs);
     } catch {
+      placeholders.add(entry.path);
       try {
         writeFileSync(abs, "");
       } catch {}
     }
   });
+
+  return placeholders;
 }
 
 async function fetchContent(
@@ -77,6 +90,8 @@ async function fetchContent(
   ref: string,
   dest: string,
   headers: Record<string, string>,
+  placeholders: Set<string>,
+  deadline?: AbortSignal,
 ): Promise<void> {
   // realpathSync resolves symlinks in the *base* path too, so a /tmp dest comes
   // back as /private/tmp on macOS; relativising against `dest` would emit
@@ -88,18 +103,20 @@ async function fetchContent(
     // The scorer's own case-insensitive lookup, then the OS follows any symlink:
     // whichever file scoring will actually read is the one we fetch.
     const hit = resolveRelative(dest, candidate);
-    if (!hit) continue;
+    if (!hit || entryKind(dest, join(dest, hit)) !== "file") continue;
     try {
-      const real = realpathSync(join(dest, hit));
-      if (statSync(real).isDirectory()) continue;
-      wanted.add(relative(root, real));
+      const rel = relative(root, realpathSync(join(dest, hit)));
+      // A placeholder's raw URL would serve a link the scorer never follows.
+      if (!rel || rel.startsWith("..") || isAbsolute(rel) || placeholders.has(rel)) continue;
+      wanted.add(rel);
     } catch {}
   }
 
   await pooled([...wanted], async (path) => {
-    const res = await fetch(rawUrl(host, owner, name, ref, path), { headers });
+    const res = await timedFetch(rawUrl(host, owner, name, ref, path), { headers }, deadline);
     if (!res.ok) return;
-    writeFileSync(join(root, path), await res.text());
+    // The scorer reads no further than MAX_READ_BYTES either.
+    writeFileSync(join(root, path), await readCapped(res, MAX_READ_BYTES));
   });
 }
 
@@ -115,10 +132,11 @@ export async function materialize(
   name: string,
   ref: string,
   dest: string,
+  deadline?: AbortSignal,
 ): Promise<Materialized> {
   const token = hostToken(host);
   const headers = requestHeaders(host, token);
-  const entries = await listTree(host, owner, name, ref, token);
+  const entries = await listTree(host, owner, name, ref, token, deadline);
 
   mkdirSync(dest, { recursive: true });
 
@@ -141,8 +159,8 @@ export async function materialize(
     if (entry.kind === "symlink") symlinks.push(entry);
   }
 
-  await linkTargets(host, owner, name, ref, dest, symlinks, headers);
-  await fetchContent(host, owner, name, ref, dest, headers);
+  const placeholders = await linkTargets(host, owner, name, ref, dest, symlinks, headers, deadline);
+  await fetchContent(host, owner, name, ref, dest, headers, placeholders, deadline);
 
   return { sha: ref, entries: entries.length };
 }

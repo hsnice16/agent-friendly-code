@@ -1,7 +1,7 @@
 import { strict as assert } from "node:assert";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
-import { compactStars, hostLabel, relativeTime } from "../lib/utils/format";
+import { compactStars, formatDate, hostLabel, relativeTime } from "../lib/utils/format";
 
 describe("compactStars", () => {
   test("returns em-dash for null", () => {
@@ -57,6 +57,12 @@ describe("relativeTime", () => {
     assert.equal(relativeTime(NOW - 86400), "1d ago");
     assert.equal(relativeTime(NOW - 7 * 86400), "7d ago");
   });
+
+  test("never rounds up into the next unit's limit, nor below zero", () => {
+    assert.equal(relativeTime(NOW - 59.6), "59s ago");
+    assert.equal(relativeTime(NOW - 3599), "59m ago");
+    assert.equal(relativeTime(NOW + 5), "0s ago");
+  });
 });
 
 describe("hostLabel", () => {
@@ -66,5 +72,13 @@ describe("hostLabel", () => {
 
   test("falls back to the input for unknown hosts", () => {
     assert.equal(hostLabel("sourcehut"), "sourcehut");
+  });
+});
+
+describe("formatDate", () => {
+  test("formats in UTC whatever the process zone", () => {
+    const t = Date.UTC(2026, 9, 14, 23, 30) / 1000;
+    assert.equal(formatDate(t), "14 Oct 2026");
+    assert.equal(formatDate(t, { time: true }), "14 Oct 2026, 23:30 UTC");
   });
 });

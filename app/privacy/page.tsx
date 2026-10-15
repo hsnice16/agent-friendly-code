@@ -4,26 +4,12 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, CONTACT_EMAIL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { staticPageMetadata } from "@/lib/page-meta";
+import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
 
-const LAST_UPDATED = "October 10, 2026";
+const LAST_UPDATED = "October 16, 2026";
 
-const DESCRIPTION = `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`;
-
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: DESCRIPTION,
-  alternates: { canonical: "/privacy" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Privacy Policy", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "Privacy Policy",
-    description: DESCRIPTION,
-    url: "/privacy",
-    type: "article",
-  },
-};
+export const metadata: Metadata = staticPageMetadata("/privacy");
 
 export default function PrivacyPage() {
   return (
@@ -55,9 +41,9 @@ export default function PrivacyPage() {
 
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             <li>
-              <strong className="text-ink">Analytics.</strong> We use Google Analytics with IP anonymization enabled to
-              measure aggregate traffic patterns — page views, referrers, approximate location, device and browser type,
-              and time on page. This data is not used to identify individual visitors.
+              <strong className="text-ink">Analytics.</strong> We use Google Analytics 4, which does not log or store IP
+              addresses, to measure aggregate traffic patterns — page views, referrers, approximate location, device and
+              browser type, and time on page. This data is not used to identify individual visitors.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard

@@ -1,0 +1,8 @@
+{
+  "full_name": "axios/axios",
+  "description": "Promise based HTTP client for the browser and node.js",
+  "topics": ["hacktoberfest", "http-client", "javascript", "nodejs", "promise"],
+  "stargazers_count": 109301,
+  "language": "JavaScript",
+  "default_branch": "v1.x"
+}

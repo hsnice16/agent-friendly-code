@@ -1,4 +1,6 @@
 import { db } from "../lib/db";
+import { ensureIndexes, ensureRepoAbout } from "../lib/db-schema";
 
-db.exec("SELECT 1");
-console.log("DB initialized at", `${process.cwd()}/data/rank.db`);
+ensureRepoAbout(db);
+ensureIndexes(db);
+console.log("DB initialized at", db.name);

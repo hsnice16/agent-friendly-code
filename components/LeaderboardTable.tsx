@@ -3,10 +3,12 @@ import Link from "next/link";
 import type { Host } from "@/lib/constants/hosts";
 import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
+import { sanitizeDescription } from "@/lib/utils/repo-about";
 import { repoPath } from "@/lib/utils/repo-path";
 import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
 import { Medal } from "./Medal";
+import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreCell } from "./ScoreCell";
 
 type Props = {
@@ -39,13 +41,13 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
             <th scope="col" className="text-left">
               Repo
             </th>
-            <th scope="col" className="text-right">
+            <th scope="col" className="hidden text-right sm:table-cell">
               Stars
             </th>
             <th scope="col" className="text-right">
               Score
             </th>
-            <th scope="col" className="w-[90px] text-left">
+            <th scope="col" className="hidden w-[90px] text-left sm:table-cell">
               <span className="sr-only">External link</span>
             </th>
           </tr>
@@ -74,6 +76,7 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
           ) : (
             rows.map((r, i) => {
               const rank = startIdx + i + 1;
+              const description = sanitizeDescription(r.description);
               return (
                 <tr
                   // biome-ignore lint/suspicious/noArrayIndexKey: stable position keeps ScoreBar mounted so width transitions animate across re-renders
@@ -91,14 +94,22 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                     >
                       {r.owner}/{r.name}
                     </Link>
+                    <OwnRepoTag repo={r} />
                     <HostPill host={r.host} />
                     {r.badge_embedded ? <BadgeAdoptedTag /> : null}
+                    {/* No title tooltip: the row's link overlay covers it, and the repo page has the full text. */}
+                    {description && (
+                      <p className="m-0 mt-0.5 hidden max-w-[60ch] text-[12.5px] leading-snug text-muted sm:line-clamp-1">
+                        {description}
+                      </p>
+                    )}
                   </td>
-                  <td className="text-right tabular-nums text-ink-dim">{compactStars(r.stars)}</td>
+                  <td className="hidden text-right tabular-nums text-ink-dim sm:table-cell">{compactStars(r.stars)}</td>
                   <td className="text-right">
                     <ScoreCell score={r.score} />
                   </td>
-                  <td>
+                  {/* Below `sm` the table would scroll sideways; the repo page links the host anyway. */}
+                  <td className="hidden sm:table-cell">
                     <a
                       href={r.url}
                       rel="noopener noreferrer"

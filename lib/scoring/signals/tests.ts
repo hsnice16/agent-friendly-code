@@ -1,7 +1,6 @@
-import { statSync } from "node:fs";
 import { join } from "node:path";
 
-import { resolveRelative, walkFind } from "./helpers";
+import { entryKind, resolveRelative, walkFind } from "./helpers";
 import type { Signal } from "./types";
 
 const DIRS = ["tests", "test", "__tests__", "spec", "specs", "src/test"];
@@ -11,7 +10,7 @@ const FILE_RE =
 export const tests: Signal = {
   id: "tests",
   label: "Test suite",
-  description: "Detectable tests — agents rely on feedback loops.",
+  description: "Tests the agent can run to check its changes.",
   improveSuggestion:
     "Add a tests/ (or test/, __tests__/, spec/) directory with runnable tests. Document how to run them in AGENTS.md.",
   check: (repo) => {
@@ -22,17 +21,15 @@ export const tests: Signal = {
         continue;
       }
 
-      try {
-        if (statSync(join(repo, rel)).isDirectory()) {
-          return {
-            pass: 1,
-            id: "tests",
-            matchedPath: rel,
-            label: "Test suite",
-            detail: `Found /${rel}`,
-          };
-        }
-      } catch {}
+      if (entryKind(repo, join(repo, rel)) === "dir") {
+        return {
+          pass: 1,
+          id: "tests",
+          matchedPath: rel,
+          label: "Test suite",
+          detail: `Found /${rel}`,
+        };
+      }
     }
 
     const hits = walkFind(repo, (rel) => FILE_RE.test(rel), 3, 1);

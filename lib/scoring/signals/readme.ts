@@ -1,4 +1,4 @@
-import { firstExisting, readSafe } from "./helpers";
+import { characters, firstExisting, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
@@ -6,7 +6,7 @@ const CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
 export const readme: Signal = {
   id: "readme",
   label: "README",
-  description: "Non-trivial README so the agent can learn the project quickly.",
+  description: "A README with enough detail for the agent to learn the project.",
   improveSuggestion:
     "Expand your README to cover what the project does, how to install, the common commands, and the high-level layout.",
   check: (repo) => {
@@ -21,13 +21,13 @@ export const readme: Signal = {
       };
     }
 
-    const len = readSafe(p).trim().length;
+    const len = readSafe(p, repo).trim().length;
     if (len < 200) {
       return {
         id: "readme",
         label: "README",
         pass: 0.3,
-        detail: `README thin (${len} chars)`,
+        detail: `README thin (${characters(len)})`,
         matchedPath: p,
       };
     }
@@ -38,7 +38,7 @@ export const readme: Signal = {
         id: "readme",
         matchedPath: p,
         label: "README",
-        detail: `README present (${len} chars)`,
+        detail: `README present (${characters(len)})`,
       };
     }
 
@@ -47,7 +47,7 @@ export const readme: Signal = {
       id: "readme",
       matchedPath: p,
       label: "README",
-      detail: `README detailed (${len} chars)`,
+      detail: `README detailed (${characters(len)})`,
     };
   },
 };

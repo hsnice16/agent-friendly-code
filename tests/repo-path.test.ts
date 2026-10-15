@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { ownerAndName, repoIdentity, repoPath } from "../lib/utils/repo-path";
+import { ownerAndName, redirectTarget, repoIdentity, repoPath, withQuery } from "../lib/utils/repo-path";
 
 describe("repoPath", () => {
   it("puts the host first and the repo name last", () => {
@@ -66,5 +66,39 @@ describe("ownerAndName", () => {
     for (const bad of ["", "name", "/name", "owner/", "a//b"]) {
       assert.equal(ownerAndName(bad), null, bad);
     }
+  });
+});
+
+describe("redirectTarget", () => {
+  const stored = { host: "github", owner: "honojs", name: "hono" };
+
+  it("is null for the stored path itself, so it never redirects to itself", () => {
+    assert.equal(redirectTarget({ ...stored }, stored), null);
+  });
+
+  it("sends another casing to the stored path", () => {
+    assert.equal(redirectTarget({ host: "GitHub", owner: "HonoJS", name: "Hono" }, stored), "/repo/github/honojs/hono");
+  });
+
+  it("sends a former name to the new one", () => {
+    assert.equal(
+      redirectTarget({ host: "github", owner: "yusukebe", name: "hono" }, stored),
+      "/repo/github/honojs/hono",
+    );
+  });
+});
+
+describe("withQuery", () => {
+  it("gives the bare path for an empty query", () => {
+    assert.equal(withQuery("/repo/github/o/r", {}), "/repo/github/o/r");
+    assert.equal(withQuery("/repo/github/o/r", { model: undefined }), "/repo/github/o/r");
+  });
+
+  it("repeats a key for an array value and drops undefined", () => {
+    assert.equal(withQuery("/p", { a: ["1", "2"], b: undefined, c: "3" }), "/p?a=1&a=2&c=3");
+  });
+
+  it("encodes keys and values", () => {
+    assert.equal(withQuery("/p", { "a b": "c&d=e" }), "/p?a+b=c%26d%3De");
   });
 });

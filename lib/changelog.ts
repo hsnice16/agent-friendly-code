@@ -1,12 +1,28 @@
-export type ChangelogEntry = {
+type ChangelogEntry = {
   date: string;
   label: string;
   title: string;
   /** User-facing capabilities shipped in this release, newest-first. */
   highlights: string[];
+  /** Set when the release changed a number in lib/scoring/weights.ts; /methodology dates the weights from it. */
+  weightChange?: string;
 };
 
 export const CHANGELOG: ChangelogEntry[] = [
+  {
+    label: "0.9.0",
+    date: "2026-10-16",
+    title: "Repo pages that answer for every agent",
+    highlights: [
+      "Agent boards — `/model/<id>` ranks every repo for one agent and opens with what that agent reads: its four weightiest checks, their pass rates, and how many repos have its own file.",
+      "Repo pages show the repo's description and topics, which agent files it has (linked to the file), each agent's score with the repo's rank on that agent's board, and how it compares with the leaderboard and its language.",
+      "AGENTS.md examples — `/check/agents-md/examples` lists every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with its length, stars and score.",
+      "Topic pages — `/topic/<slug>` ranks repos sharing a topic once enough of them do; `/topics` lists them. Every repo is on a language page too, with small languages under `/language/other`.",
+      "Score your repo from the home page — the Live Score form sits in the home hero, and a result names the agent the repo is best set up for.",
+      'Check details read the same everywhere: "14,688 characters", "2 GitHub Actions workflows", and check descriptions in plain language. Scores are unchanged.',
+      'Pages fit a phone screen without sideways scrolling, and an unexpected error offers "Try again" instead of a bare error page.',
+    ],
+  },
   {
     label: "0.8.0",
     date: "2026-10-10",
@@ -24,6 +40,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     label: "0.7.0",
     date: "2026-08-25",
     title: "Score any repo on the fly",
+    weightChange: "Kimi CLI weight profile added",
     highlights: [
       "On-demand scoring at `/score` — paste any public GitHub repository URL and get its full score in about a second, even if the leaderboard has never indexed it. Same signals, same per-model breakdown, same suggestions as an indexed repo page. Already-indexed repos redirect to their canonical repo page.",
       "Scored without cloning — the repo is reconstructed from GitHub's tree API rather than `git clone`, so a score costs one API call and a handful of small file fetches. Results are cached for an hour, and nothing about a scored repo is stored.",
@@ -58,6 +75,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     label: "0.4.0",
     date: "2026-04-27",
     title: "Credible scores + better discoverability",
+    weightChange: "Devin, GPT-5 Codex and Cursor reweighted; four agent-specific checks added",
     highlights: [
       "Per-model rationales now cite each agent's official documentation — `/methodology` renders a Sources panel under every model, and the 'illustrative weights' framing is gone. Reweights: Devin CI 1.0 → 0.7, Codex AGENTS.md 0.7 → 0.9, Cursor AGENTS.md 0.6 → 0.8.",
       "Four new agent-specific instruction-file signals — `.cursor/rules/*.mdc` (Cursor), `GEMINI.md` (Gemini CLI), `.openhands/setup.sh` (OpenHands), `.aider.conf.yml` (Aider). Each is a per-agent boost on the model that reads it.",
@@ -70,6 +88,7 @@ export const CHANGELOG: ChangelogEntry[] = [
     label: "0.3.0",
     date: "2026-04-25",
     title: "Embeddable scores + broader coverage",
+    weightChange: "Gemini CLI, Aider, OpenHands and Pi weight profiles added",
     highlights: [
       "Embeddable score badges — `/api/badge/<host>/<owner>/<name>.svg` returns an SVG you can drop into a README; per-model variants via `?model=<id>`. Repo detail pages show a copy-paste markdown snippet.",
       "Package lookup — `/package` page (registry dropdown + name input) and `/api/package/<registry>/<name>` JSON resolve npm / PyPI / Cargo packages to their source repo's score; unscored ones get a pre-filled GitHub-issue link to request scoring.",
@@ -107,3 +126,12 @@ export const CHANGELOG: ChangelogEntry[] = [
     ],
   },
 ];
+
+export const LATEST_RELEASE_DATE = CHANGELOG[0].date;
+
+export function weightsChangedText(): string {
+  const last = CHANGELOG.find((e) => e.weightChange);
+  return last
+    ? `Weights last changed: ${last.date} (v${last.label}, ${last.weightChange}).`
+    : `No weight changes recorded since the first release; latest release ${CHANGELOG[0].date} (v${CHANGELOG[0].label}).`;
+}

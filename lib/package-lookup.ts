@@ -4,7 +4,7 @@ import { getModelScores, getPackageAlias, getRepoByHostOwnerName, putPackageAlia
 import type { RepoRow } from "./types/db";
 import { packageRequestIssueUrl } from "./utils/contact";
 
-export type PackageLookup =
+type PackageLookup =
   | {
       repo: RepoRow;
       package: string;
@@ -26,7 +26,23 @@ export type PackageLookup =
       status: "unresolved";
     };
 
+// Each registry's own naming rule and length cap (npm 214, crates.io 64; PyPI
+// sets none, so npm's). Anything else can't exist, so it costs no registry call.
+const VALID_NAME: Record<Registry, RegExp> = {
+  npm: /^(?=.{1,214}$)(?:@[a-z0-9~-][a-z0-9._~-]*\/)?[a-z0-9~-][a-z0-9._~-]*$/i,
+  pypi: /^(?=.{1,214}$)[a-z0-9](?:[a-z0-9._-]*[a-z0-9])?$/i,
+  cargo: /^[a-z][a-z0-9_-]{0,63}$/i,
+};
+
+export function isValidPackageName(registry: Registry, pkg: string): boolean {
+  return VALID_NAME[registry].test(pkg);
+}
+
 export async function lookupPackage(registry: Registry, pkg: string): Promise<PackageLookup> {
+  if (!isValidPackageName(registry, pkg)) {
+    return { registry, package: pkg, status: "unresolved", contact_url: packageRequestIssueUrl({ registry, pkg }) };
+  }
+
   const cachedUrl = getPackageAlias(registry, pkg);
   let parsed = cachedUrl ? parseRepoUrl(cachedUrl) : null;
 
@@ -48,8 +64,10 @@ export async function lookupPackage(registry: Registry, pkg: string): Promise<Pa
   const repo = getRepoByHostOwnerName(parsed.host, parsed.owner, parsed.name);
 
   // The stored repo's URL when there is one: the sitemap joins aliases to repos
-  // by URL, which the registry's old name would miss.
-  if (isFresh) {
+  // by URL, which the registry's old name would miss. Not on Vercel: the DB is
+  // a per-instance /tmp copy there, so the write is lost anyway, and it is the
+  // one write an unauthenticated GET could trigger.
+  if (isFresh && !process.env.VERCEL) {
     putPackageAlias(registry, pkg, repo?.url ?? parsed.canonicalUrl);
   }
 

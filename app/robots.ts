@@ -24,19 +24,22 @@ const AI_CRAWLERS = [
 
 // /score/* is unbounded — one URL per repo that exists anywhere. Filtered
 // leaderboard views are deduped with `noindex, follow` instead of a Disallow:
-// every repo page links out under `?model=`, and a blocked URL is one whose
-// canonical and noindex a crawler is never allowed to read.
+// a blocked URL is one whose canonical and noindex a crawler is never allowed
+// to read.
 //
 // `_rsc` is the payload Next.js fetches when it prefetches a link. Googlebot
 // follows those too: they were 94% of its requests here, against 5% for HTML.
 const DISALLOW = ["/api/", "/score/", "/*?_rsc=", "/*&_rsc="];
 
+// The home Dataset's `distribution.contentUrl`; the longer rule beats `/api/`.
+const ALLOW = ["/", "/api/repos"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     sitemap: `${APP_URL}/sitemap.xml`,
     rules: [
-      { userAgent: "*", allow: "/", disallow: DISALLOW },
-      { userAgent: AI_CRAWLERS, allow: "/", disallow: DISALLOW },
+      { userAgent: "*", allow: ALLOW, disallow: DISALLOW },
+      { userAgent: AI_CRAWLERS, allow: ALLOW, disallow: DISALLOW },
     ],
   };
 }

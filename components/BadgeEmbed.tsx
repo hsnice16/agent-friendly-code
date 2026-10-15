@@ -1,3 +1,5 @@
+import { BADGE_HEIGHT, badgeWidth } from "@/lib/utils/badge";
+
 import { CopySnippet, type SnippetTone } from "./CopySnippet";
 import { Panel, PanelHeading } from "./Panel";
 
@@ -7,10 +9,12 @@ type Props = {
   owner: string;
   appUrl: string;
   repoPagePath: string;
+  /** What the badge prints, so the preview reserves its real width. */
+  score: number | null;
   highlight?: SnippetTone;
 };
 
-export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, highlight = false }: Props) {
+export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, score, highlight = false }: Props) {
   const slug = `${host}/${owner}/${name}`;
   const previewSrc = `/api/badge/${slug}.svg`;
   const absoluteBadgeUrl = `${appUrl}/api/badge/${slug}.svg`;
@@ -28,7 +32,12 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, highlight 
       </p>
 
       <div className="mb-3">
-        <img height={20} src={previewSrc} alt={`Agent friendly score for ${slug}`} />
+        <img
+          width={badgeWidth("agent friendly", score == null ? "—" : score.toFixed(1))}
+          height={BADGE_HEIGHT}
+          src={previewSrc}
+          alt={`Agent friendly score for ${slug}`}
+        />
       </div>
 
       <CopySnippet text={markdown} highlight={highlight} />

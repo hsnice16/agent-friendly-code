@@ -4,9 +4,10 @@ import { join } from "node:path";
 
 import { detectBadgeEmbed } from "../lib/badge-adoption";
 import { shallowClone } from "../lib/clients/git";
-import { fetchRepoMeta, parseRepoUrl } from "../lib/clients/github";
+import { fetchRepoMetaOrPrivate, parseRepoUrl } from "../lib/clients/github";
 import { saveScoredRepo } from "../lib/db";
 import { scoreRepo } from "../lib/scoring/scorer";
+import { PRIVATE_EXIT_CODE } from "../lib/seeds";
 
 try {
   process.loadEnvFile();
@@ -32,6 +33,7 @@ async function scoreCommand(target: string): Promise<void> {
   let stars: number | undefined;
   let defaultBranch: string | undefined;
   let language: string | null | undefined;
+  let about: { description: string | null; topics: string[] } | undefined;
 
   if (existsSync(target) && statSync(target).isDirectory()) {
     repoPath = target;
@@ -52,6 +54,15 @@ async function scoreCommand(target: string): Promise<void> {
     name = parsed.name;
     owner = parsed.owner;
     url = parsed.canonicalUrl;
+
+    // A token that can read private repos would otherwise score and publish them.
+    const meta = await fetchRepoMetaOrPrivate(parsed);
+    if (meta === "private") {
+      console.log(`[skip] ${url} is private — not scored or saved`);
+      process.exitCode = PRIVATE_EXIT_CODE;
+      return;
+    }
+
     mkdirSync(CLONE_ROOT, { recursive: true });
 
     repoPath = join(CLONE_ROOT, `${parsed.host}__${parsed.owner.replace(/\//g, "_")}__${parsed.name}`);
@@ -60,12 +71,11 @@ async function scoreCommand(target: string): Promise<void> {
     await shallowClone(parsed.cloneUrl, repoPath);
     cloned = repoPath;
 
-    const meta = await fetchRepoMeta(parsed);
-
     if (meta) {
       defaultBranch = meta.defaultBranch;
       stars = meta.stars;
       language = meta.language;
+      about = { description: meta.description, topics: meta.topics };
     }
   }
 
@@ -96,6 +106,7 @@ async function scoreCommand(target: string): Promise<void> {
     language: language ?? null,
     modelScores: result.modelScores,
     defaultBranch: defaultBranch ?? null,
+    about,
   });
 
   console.log(`\n═══ ${owner}/${name} ═══`);

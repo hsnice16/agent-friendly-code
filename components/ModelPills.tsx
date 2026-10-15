@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { MODELS, type ModelId } from "@/lib/scoring/weights";
 
+import { pillClass } from "./pill-class";
+
 type Props = {
   label?: string;
   scroll?: boolean;
@@ -8,11 +10,6 @@ type Props = {
   selected: ModelId | "overall";
   hrefFor: (id: ModelId | "overall") => string;
 };
-
-const BASE =
-  "inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[13px] font-medium transition-colors";
-const INACTIVE = "border-line bg-transparent text-ink-dim hover:bg-surface-hover hover:text-ink";
-const ACTIVE = "border-line-strong bg-surface-hover text-ink";
 
 export function ModelPills({
   hrefFor,
@@ -28,7 +25,7 @@ export function ModelPills({
           scroll={scroll}
           href={hrefFor("overall")}
           aria-pressed={selected === "overall"}
-          className={`${BASE} ${selected === "overall" ? ACTIVE : INACTIVE}`}
+          className={pillClass(selected === "overall")}
         >
           Overall
         </Link>
@@ -40,7 +37,7 @@ export function ModelPills({
           scroll={scroll}
           href={hrefFor(m.id)}
           aria-pressed={selected === m.id}
-          className={`${BASE} ${selected === m.id ? ACTIVE : INACTIVE}`}
+          className={pillClass(selected === m.id)}
         >
           {m.label}
         </Link>

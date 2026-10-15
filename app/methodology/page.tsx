@@ -2,74 +2,24 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
+import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { weightsChangedText } from "@/lib/changelog";
+import { sourceLabel } from "@/lib/leaderboard-model-panel";
+import { staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { checkPath } from "@/lib/utils/check-path";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME } from "@/lib/version";
+import { METHODOLOGY_FAQ } from "./faq";
 
-const DESCRIPTION =
-  "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.";
-
-export const metadata: Metadata = {
-  title: "Methodology",
-  description: DESCRIPTION,
-  alternates: { canonical: "/methodology" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Methodology", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "Methodology",
-    description: DESCRIPTION,
-    url: "/methodology",
-    type: "article",
-  },
-};
-
-const FAQ = [
-  {
-    q: "How is the score worked out?",
-    a: "We download a copy of each repo (latest version only, no history) and run sixteen checks on it. Twelve matter to every agent: AGENTS.md / CLAUDE.md, CI, tests, README, linter, type config, license, contributing guide, a reproducible dev setup, pre-commit hooks, a dependency list, and codebase size. Four are files only one agent reads: `.cursor/rules/*.mdc`, `GEMINI.md`, `.openhands/setup.sh`, and `.aider.conf.yml`. File names can be any case, so `readme.md` and `README.MD` count the same as `README.md`. Score for one agent = Σ(signal.pass × model.weight[signal]) / Σ(model.weight) × 100. The overall score is the average of the agent scores.",
-  },
-  {
-    q: "Why give each agent its own score?",
-    a: "Each agent relies on different things in a repo, and each one's docs say which. Claude Code reads CLAUDE.md at the start of every chat, so AGENTS.md and tests count the most. GPT-5 Codex reads AGENTS.md before it does any work, so that file counts most for it. Devin works inside its own sandboxed machine and needs clear setup steps (dependencies, secrets, lint and test commands), so a dev setup counts more than CI. Cursor's docs name `.cursor/rules/` and AGENTS.md as the files it reads for instructions. One repo can score very differently for different agents. A single number would hide that.",
-  },
-  {
-    q: "Which AI coding agents do you score for?",
-    a: "Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each has its own set of weights, in lib/scoring/weights.ts.",
-  },
-  {
-    q: "Does this test how well agents actually work?",
-    a: "No. Every score comes from simple file checks: does a file exist, and how long is it. No agent is actually run. The reasons behind each agent's weights come from that agent's own docs (see the Sources links below). But the weight numbers are not yet tested against how agents really perform. Use the scores as a rough guide, not a final verdict.",
-  },
-  {
-    q: "How can I raise my repo's score?",
-    a: "Add an AGENTS.md or CLAUDE.md file that explains the project to agents. Set up CI, make sure tests run, and write a detailed README. Add a linter and type config, a license, and a CONTRIBUTING guide. Add a reproducible dev setup (for example a devcontainer, Dockerfile, or Makefile). Each repo's page lists the fixes that help each agent most.",
-  },
-  {
-    q: "How do I stop pull requests from lowering my score?",
-    a: "Install the agent-friendly-action GitHub Action (hsnice16/agent-friendly-action). It scores the pull request and the branch it targets, inside your own CI, and posts one comment showing how the score changed and which checks changed. Turn it on by adding an AGENTS_BADGE_TOKEN secret. Without the secret, it does nothing. Each repo's page has a ready-to-copy workflow under 'Check the score on every pull request'.",
-  },
-  {
-    q: "What is AGENTS.md or CLAUDE.md?",
-    a: "A markdown file at the top of a repo that gives an AI coding agent a quick tour: what the project is, how to build and test it, the main rules to follow, and where to look. It is the check that counts most for Pi and Kimi CLI. For Claude Code it ties with tests as the top check. It helps every other agent too.",
-  },
-  {
-    q: "How often are scores updated?",
-    a: "Every six hours. A scheduled GitHub Actions job scores every repo on our list again and saves the new results, and the site updates on its own. We also score repos again whenever the list or the scoring rules change.",
-  },
-  {
-    q: "Which code hosts are supported?",
-    a: "GitHub, GitLab, and Bitbucket. All three go through the same download and scoring steps, so the leaderboard can compare repos no matter where they live.",
-  },
-];
+export const metadata: Metadata = staticPageMetadata("/methodology");
 
 const FAQ_JSON_LD = {
-  "@context": "https://schema.org",
   "@type": "FAQPage",
-  mainEntity: FAQ.map((entry) => ({
+  mainEntity: METHODOLOGY_FAQ.map((entry) => ({
     "@type": "Question",
     name: entry.q,
     acceptedAnswer: { "@type": "Answer", text: entry.a },
@@ -80,43 +30,29 @@ export default function MethodologyPage() {
   return (
     <>
       <BreadcrumbJsonLd current={{ name: "Methodology", path: "/methodology" }} />
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(FAQ_JSON_LD).replace(/</g, "\\u003c"),
-        }}
-      />
+      <JsonLd data={FAQ_JSON_LD} />
 
       <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Methodology</h1>
+        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">How {APP_NAME} scores repos</h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
           How we work out each score, what we check, and what we can&apos;t check yet.
         </p>
+        <p className="mt-2 mb-0 text-[13px] text-muted">{weightsChangedText()}</p>
       </section>
 
       <Panel tone="warn">
-        <PanelHeading tone="warn">Where things stand: reasons from docs, weights not yet tested</PanelHeading>
+        <PanelHeading tone="warn">Weights from docs, not yet tested</PanelHeading>
 
-        <p className="text-[14.5px] leading-relaxed text-ink-dim">
-          Every score comes from <strong className="text-ink">simple file checks</strong>: does a file exist, and how
-          long is it. No agent is actually run. The reasons behind each agent&apos;s weights{" "}
-          <strong className="text-ink">come from that agent&apos;s own docs</strong>. See the Sources links under each
-          agent below. The weight numbers are not yet tested against how agents really perform. That is enough to rank
-          repos in clearly different ways for each agent, but it is not a test of agent performance.
-        </p>
-
-        <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
-          Replacing these weights with measured ones is planned for v1.0.0 on the{" "}
+        <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
+          Every score comes from <strong className="text-ink">file checks</strong>: does a file exist, and how long is
+          it. No agent is run. Each agent&apos;s weights follow <strong className="text-ink">its own docs</strong> (see
+          Sources under each agent), but the numbers are not yet measured against real agent runs. That is planned for
+          v1.0.0 on the{" "}
           <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
             roadmap
-          </Link>{" "}
-          (
-          <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
-            tasks/1.0.0/03-benchmark-harness.md
-          </code>
-          ). Until then, use the scores as a rough guide, not a final verdict.
+          </Link>
+          ; until then, treat scores as a guide, not a verdict.
         </p>
       </Panel>
 
@@ -124,13 +60,13 @@ export default function MethodologyPage() {
         <Panel>
           <PanelHeading>Score formula</PanelHeading>
           <pre className="m-0 overflow-x-auto rounded-lg border border-line bg-surface-2 px-4 py-3.5 font-mono text-[13px] leading-relaxed text-ink-dim">
-            {`per-agent score = Σ(signal.pass × agent.weight[signal]) / Σ(agent.weight) × 100
+            {`per-agent score = Σ(check.pass × agent.weight[check]) / Σ(agent.weight) × 100
 overall         = mean(per-agent scores)
 improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100  points`}
           </pre>
 
           <p className="mt-3 text-[13.5px] leading-relaxed text-ink-dim">
-            <code className="font-mono text-[12.5px] text-ink">signal.pass</code> is a number from{" "}
+            <code className="font-mono text-[12.5px] text-ink">check.pass</code> is a number from{" "}
             <code className="font-mono text-[12.5px] text-ink">0</code> to{" "}
             <code className="font-mono text-[12.5px] text-ink">1</code>, so a check can pass in part. For example, a
             short README gets <code className="font-mono text-[12.5px] text-ink">0.3</code> and a long one gets{" "}
@@ -173,9 +109,21 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
         </Panel>
       </div>
 
-      <div className="mt-3.5">
+      <div id="agents" className="mt-3.5 scroll-mt-20">
         <Panel>
           <PanelHeading>AI agents and their weights ({MODELS.length})</PanelHeading>
+
+          <nav aria-label="Agents" className="mt-2 mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[13px]">
+            {MODELS.map((m) => (
+              <a
+                key={m.id}
+                href={`#model-${m.id}`}
+                className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
+              >
+                {m.label}
+              </a>
+            ))}
+          </nav>
 
           <ul className="m-0 list-none p-0">
             {MODELS.map((m) => (
@@ -187,18 +135,11 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                   <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[12.5px] text-muted">
                     <span>Sources:</span>
 
-                    {m.sources.map((url) => {
-                      const parsed = new URL(url);
-                      const lastSeg = parsed.pathname.replace(/\/+$/, "").split("/").filter(Boolean).pop() ?? "";
-                      const host = parsed.hostname.replace(/^www\./, "");
-                      const label = lastSeg ? `${host}/${lastSeg}` : host;
-
-                      return (
-                        <ExternalLink key={url} href={url} title={url}>
-                          {label}
-                        </ExternalLink>
-                      );
-                    })}
+                    {m.sources.map((url) => (
+                      <ExternalLink key={url} href={url} title={url}>
+                        {sourceLabel(url)}
+                      </ExternalLink>
+                    ))}
                   </div>
                 )}
 
@@ -207,6 +148,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
                   <pre className="mt-2 overflow-x-auto rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs leading-relaxed">
                     {Object.entries(m.weights)
+                      .sort(([, a], [, b]) => b - a)
                       .map(([k, v]) => `${k.padEnd(16)} ${v.toFixed(2)}`)
                       .join("\n")}
                   </pre>
@@ -227,17 +169,31 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
             <li>Whether the dev setup (Makefile, Dockerfile) really works from start to finish.</li>
 
             <li>
-              Anything from commit history: how often code changes, how often people commit, how many people contribute.
-              We use
-              <code className="mx-1 rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
+              Anything from commit history, such as activity or contributor count. Clones are{" "}
+              <code className="rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
                 --depth 1 --single-branch
               </code>
-              which downloads every file in the latest version of the main branch, but no history. These say more about
-              a repo&apos;s health than about how agents work with it, so we leave them out for now.
+              , and history says more about a repo&apos;s health than about how agents work in it.
             </li>
 
             <li>How well agents actually do on the repo. That comes with the v1.0.0 benchmark.</li>
           </ul>
+        </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <Panel>
+          <PanelHeading>Questions</PanelHeading>
+          <dl className="m-0">
+            {METHODOLOGY_FAQ.map((entry) => (
+              <div key={entry.q} className="border-b border-line py-3.5 first:pt-0 last:border-b-0 last:pb-0">
+                <dt className="m-0 text-[14.5px] font-semibold text-ink">{entry.q}</dt>
+                <dd className="m-0 mt-1.5 text-[14px] leading-relaxed text-ink-dim">
+                  <CodeText text={entry.a} />
+                </dd>
+              </div>
+            ))}
+          </dl>
         </Panel>
       </div>
     </>

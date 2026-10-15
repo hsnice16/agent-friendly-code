@@ -9,12 +9,12 @@ import { ScoreNumber } from "./ScoreNumber";
 
 type Props = {
   language: string | null;
-  selectedModelLabel: string;
   alternatives: AlternativeRow[];
+  note: string;
   hubHref?: string;
 };
 
-export function AlternativesStrip({ language, alternatives, selectedModelLabel, hubHref }: Props) {
+export function AlternativesStrip({ language, alternatives, note, hubHref }: Props) {
   if (alternatives.length === 0) {
     return null;
   }
@@ -23,10 +23,7 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel, 
     <Panel>
       <PanelHeading>Similar repos</PanelHeading>
 
-      <p className="m-0 mb-3 text-[13px] text-muted">
-        Scored for <strong className="text-ink-dim">{selectedModelLabel}</strong>. Same language and host as this repo,
-        scoring near it.
-      </p>
+      <p className="m-0 mb-3 text-[13px] text-muted">{note}</p>
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-3">
         {alternatives.map((a) => (
@@ -46,7 +43,7 @@ export function AlternativesStrip({ language, alternatives, selectedModelLabel, 
             </div>
 
             <div className="mt-1 text-[12px] text-muted">
-              {language ?? "—"}
+              {(a.language === undefined ? language : a.language) ?? "—"}
               {a.stars != null ? ` · ${compactStars(a.stars)}` : ""}
             </div>
           </li>

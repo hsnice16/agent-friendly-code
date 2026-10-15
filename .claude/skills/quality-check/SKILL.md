@@ -32,22 +32,19 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 - **Server components by default.** Client components only when necessary.
 - **Third-party scripts** loaded via `next/script` with `strategy="afterInteractive"` — see `GoogleAnalytics.tsx`.
 - **No client-side data fetching** for rendering — use the DB in a Server Component or API route.
-- **Image optimisation** via `<Image>` when we add images; no `<img>` unless the src is dynamic and unknown at build.
+- **Images**: `next/image` for local images; plain `<img loading="lazy">` only for remote badge SVGs.
 - **Bundle weight**: flag any new dep > 50 KB gzipped. Justify or use a smaller alternative.
 - **Database queries** are `prepare`d once and reused where hot.
 
 ## Security
 
 - **SQL parameterisation**: every query uses `?` placeholders. No string concatenation.
-- **`dangerouslySetInnerHTML`** is allowed only for server-built JSON-LD (`app/layout.tsx`, `app/about/page.tsx`, `app/action/page.tsx`, `app/skill/page.tsx`, `app/score/page.tsx`, `app/methodology/page.tsx`, `app/repo/[...slug]/page.tsx`, `app/package/[registry]/[name]/page.tsx`, plus the `HomeJsonLd` and `BreadcrumbJsonLd` components) and must keep the `<` → `\u003c` escape. Keep this list in step with `AGENTS.md` and the `code-review` skill. Any other use must be rejected.
+- **`dangerouslySetInnerHTML`** only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped). Reject any other use.
 - **External URLs** in `<a target="_blank">` always include `rel="noopener noreferrer"`.
 - **User input at every boundary** is validated: `parseRepoUrl` for repo URLs, `Number.isFinite` for numeric params, length caps on search strings.
 - **Clone safety**: `git clone --depth 1 --single-branch`; never execute code from a clone (no `bun install`, no `npm install`, no post-clone scripts).
 - **Secrets never in code**. `.env.example` documents required vars; `.env.local` is gitignored.
-- **Operational concerns** (flag for ops review, not code):
-  - Disk cap on the clone workspace.
-  - Rate limit on the public API before launch.
-  - Sandbox the cloner in a container for production.
+- **Operational gaps** (flag, don't block): no rate limit on the public API or `/score/*`; the cloner isn't sandboxed.
 
 ## Response format
 

@@ -1,6 +1,6 @@
 {
   "name": "agent-friendly-code",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "description": "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.",
   "private": true,
   "license": "MIT",
@@ -27,7 +27,7 @@
     "@phosphor-icons/react": "2.1.10",
     "better-sqlite3": "12.9.0",
     "ignore": "7.0.5",
-    "next": "16.2.4",
+    "next": "16.3.8",
     "react": "19.2.5",
     "react-dom": "19.2.5"
   },
@@ -35,14 +35,19 @@
     "@biomejs/biome": "2.4.12",
     "@tailwindcss/postcss": "4.2.4",
     "@types/better-sqlite3": "7.6.13",
-    "@types/bun": "1.3.12",
     "@types/node": "25.6.0",
     "@types/react": "19.2.14",
     "@types/react-dom": "19.2.3",
     "lefthook": "2.1.6",
-    "postcss": "8.5.10",
+    "postcss": "8.5.28",
     "tailwindcss": "4.2.4",
-    "tsx": "4.21.0",
+    "tsx": "4.23.15",
     "typescript": "6.0.3"
+  },
+  "overrides": {
+    "baseline-browser-mapping": "2.11.26",
+    "nanoid": "3.3.19",
+    "postcss": "8.5.28",
+    "source-map-js": "1.2.2"
   }
 }

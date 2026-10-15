@@ -2,17 +2,14 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { cache } from "react";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { HostPill } from "@/components/HostPill";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
-import { isRegistry, type Registry } from "@/lib/clients/registries";
+import { isRegistry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
-
-const cachedLookup = cache((registry: Registry, name: string) => lookupPackage(registry, name));
 
 export async function generateMetadata({
   params,
@@ -27,10 +24,11 @@ export async function generateMetadata({
     return { title, description, robots: { index: false, follow: true } };
   }
 
-  const result = await cachedLookup(registry, name);
-  const isThin = result.status !== "scored";
-
+  // Never indexed, scored or not: the page is a pointer to the source repo's
+  // page, and filling it with that repo's numbers would only make a near-copy
+  // competing with it in search. `follow` still passes the link on.
   return {
+    robots: { index: false, follow: true },
     title,
     description,
     twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
@@ -43,7 +41,6 @@ export async function generateMetadata({
       url: `/package/${registry}/${name}`,
       type: "article",
     },
-    ...(isThin ? { robots: { index: false, follow: true } } : {}),
   };
 }
 
@@ -54,7 +51,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
     notFound();
   }
 
-  const result = await cachedLookup(registry, name);
+  const result = await lookupPackage(registry, name);
 
   return (
     <>
@@ -70,9 +67,8 @@ export default async function Page({ params }: { params: Promise<{ registry: str
       </Link>
 
       <Panel>
-        <PanelHeading>
-          <span className="text-muted">Package</span>
-        </PanelHeading>
+        {/* Not a heading: it would come before the h1. */}
+        <p className="m-0 mb-3.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted">Package</p>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-mono text-[13px] text-muted">{registry}</span>

@@ -21,8 +21,6 @@ const SHARED_SIGNALS = new Set(
 
 export const getLanguageGroups = cache(() => groupByLanguage(listLeaderboardOverall()));
 
-export const getReposWithoutLanguage = cache(() => listLeaderboardOverall().filter((r) => !r.language));
-
 export const getHub = cache((slug: string): Hub | null => {
   const group = getLanguageGroups().find((g) => g.slug === slug);
   if (!group || !isHub(group)) return null;

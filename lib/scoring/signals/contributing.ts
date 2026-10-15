@@ -16,7 +16,7 @@ const CANDIDATES = [
 export const contributing: Signal = {
   id: "contributing",
   label: "CONTRIBUTING guide",
-  description: "Explicit contribution workflow an agent can follow.",
+  description: "A contribution workflow the agent can follow.",
   improveSuggestion: "Add CONTRIBUTING.md describing branch naming, commit style, test commands, and the PR process.",
   check: (repo) => {
     const m = firstExisting(repo, CANDIDATES);

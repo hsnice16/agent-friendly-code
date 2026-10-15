@@ -1,11 +1,11 @@
-export const APP_VERSION = "0.8.0";
+export const APP_VERSION = "0.9.0";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");
 export const REPO_URL = "https://github.com/hsnice16/agent-friendly-code";
 export const CONTACT_EMAIL = "hsnice16@gmail.com";
 
-export const SIBLING_VERSION = "v0";
+const SIBLING_VERSION = "v0";
 
 export const ACTION_REPO_URL = "https://github.com/hsnice16/agent-friendly-action";
 export const ACTION_USES = `hsnice16/agent-friendly-action@${SIBLING_VERSION}`;
@@ -16,7 +16,9 @@ export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#$
 // Falling back to the apex, never the *.vercel.app alias: next.config.ts
 // serves `X-Robots-Tag: noindex` there, so a missing env var would point
 // every canonical and sitemap URL at a host this app tells Google to drop.
-export const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://agentfriendlycode.com";
+// `||`, not `??`: an empty value is set but unusable, and `new URL("")` throws.
+export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://agentfriendlycode.com";
+export const APP_HOST = new URL(APP_URL).host;
 export const APP_DESCRIPTION =
   "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.";
 
@@ -32,109 +34,3 @@ export const DEFAULT_OG_IMAGE = {
   ...OG_IMAGE_SIZE,
   alt: `${APP_NAME} — how ready a repo is for AI coding agents`,
 } as const;
-
-export const APP_KEYWORDS = [
-  "ai",
-  "code",
-  "agent",
-  "codex",
-  "devin",
-  "claude",
-  "cursor",
-  "devin ai",
-  "friendly",
-  "cursor ai",
-  "claude code",
-  "gpt-5 codex",
-  "openai codex",
-  "ai code agent",
-  "agent friendly",
-  "ai code agents",
-  "ai coding agent",
-  "ai coding agents",
-  "ai friendly code",
-  "coding assistant",
-  "agent friendly code",
-  "agent friendly repo",
-  "ai pair programming",
-  "ai software engineer",
-  "pi",
-  "aider",
-  "gemini",
-  "github",
-  "gitlab",
-  "bitbucket",
-  "AGENTS.md",
-  "CLAUDE.md",
-  "openhands",
-  "gemini cli",
-  "kimi",
-  "kimi cli",
-  "kimi code",
-  "open source",
-  "repo ranking",
-  "agent readiness",
-  "developer tools",
-  "agent ready repo",
-  "agent-ready codebase",
-  "agent readiness score",
-  "MCP",
-  "spec kit",
-  "claude agent sdk",
-  "model context protocol",
-  "spec-driven development",
-  "agentic",
-  "agentic ai",
-  "agentic ide",
-  "agentic coding",
-  "ai code editor",
-  "ai code review",
-  "ai code generation",
-  "ai developer tools",
-  "ai pair programmer",
-  "swe agent",
-  "vibe coding",
-  "background agent",
-  "ai software development",
-  "autonomous coding agent",
-  "autonomous developer agent",
-  "ai readiness",
-  "ai ready repo",
-  "agent leaderboard",
-  "ai ready codebase",
-  "agent friendliness",
-  "agent compatibility",
-  "ai agent leaderboard",
-  "pr score check",
-  "agents.md ci check",
-  "agent friendly action",
-  "ai readiness github action",
-  "agent skill",
-  "codex skill",
-  "cursor skill",
-  "vercel skills",
-  "claude code skill",
-  "agent friendly skill",
-  "GEMINI.md",
-  ".cursor/rules",
-  ".aider.conf.yml",
-  ".openhands/setup.sh",
-  "ai ide",
-  "OpenAI",
-  "Anthropic",
-  "Anysphere",
-  "Cognition",
-  "code agent ranking",
-  "context engineering",
-  "ai coding leaderboard",
-  "ai friendly repository",
-  "claude code leaderboard",
-  "agent compatibility score",
-  "devin leaderboard",
-  "codex leaderboard",
-  "agent ready check",
-  "ai readiness check",
-  "cursor leaderboard",
-  "make repo ai friendly",
-  "ai pair programmer leaderboard",
-];

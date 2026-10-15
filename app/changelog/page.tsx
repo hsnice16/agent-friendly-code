@@ -4,25 +4,9 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { Panel } from "@/components/Panel";
 import { CHANGELOG } from "@/lib/changelog";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { staticPageMetadata } from "@/lib/page-meta";
 
-const DESCRIPTION =
-  "What's shipped in each release of Agent Friendly Code — user-facing capabilities, not internal churn. Every bullet corresponds to a roadmap item that landed.";
-
-export const metadata: Metadata = {
-  title: "Changelog",
-  description: DESCRIPTION,
-  alternates: { canonical: "/changelog" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Changelog", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "Changelog",
-    description: DESCRIPTION,
-    url: "/changelog",
-    type: "article",
-  },
-};
+export const metadata: Metadata = staticPageMetadata("/changelog");
 
 export default function ChangelogPage() {
   return (
@@ -33,11 +17,11 @@ export default function ChangelogPage() {
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Changelog</h1>
 
         <p className="m-0 max-w-[70ch] text-[15.5px] text-ink-dim">
-          What&apos;s shipped from the{" "}
+          What each release shipped from the{" "}
           <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
             roadmap
           </Link>
-          , not a dev log. Every bullet corresponds to a roadmap item that landed.
+          .
         </p>
       </section>
 

@@ -4,28 +4,23 @@ import "./globals.css";
 
 import { BackToTop } from "@/components/BackToTop";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { JsonLd } from "@/components/JsonLd";
 import { MobileNav } from "@/components/MobileNav";
 import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { VersionPill } from "@/components/VersionPill";
-import {
-  APP_DESCRIPTION,
-  APP_KEYWORDS,
-  APP_NAME,
-  APP_URL,
-  OG_DEFAULTS,
-  REPO_URL,
-  TWITTER_DEFAULTS,
-} from "@/lib/version";
+import { getTopicGroups } from "@/lib/topic-pages";
+import { TOPICS_PATH } from "@/lib/topics";
+import { BRAND_SUFFIX } from "@/lib/utils/page-title";
+import { APP_DESCRIPTION, APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
 export const metadata: Metadata = {
-  keywords: APP_KEYWORDS,
   applicationName: APP_NAME,
   creator: "Himanshu Singh",
   description: APP_DESCRIPTION,
   metadataBase: new URL(APP_URL),
   authors: [{ name: "Himanshu Singh", url: REPO_URL }],
-  title: { default: APP_NAME, template: `%s · ${APP_NAME}` },
+  title: { default: APP_NAME, template: `%s${BRAND_SUFFIX}` },
   openGraph: {
     ...OG_DEFAULTS,
     url: "/",
@@ -53,7 +48,6 @@ export const metadata: Metadata = {
 };
 
 const JSON_LD = {
-  "@context": "https://schema.org",
   "@graph": [
     {
       "@type": "Organization",
@@ -70,14 +64,6 @@ const JSON_LD = {
       name: APP_NAME,
       description: APP_DESCRIPTION,
       publisher: { "@id": `${APP_URL}/#org` },
-      potentialAction: {
-        "@type": "SearchAction",
-        target: {
-          "@type": "EntryPoint",
-          urlTemplate: `${APP_URL}/?q={search_term_string}`,
-        },
-        "query-input": "required name=search_term_string",
-      },
     },
     {
       "@type": "WebApplication",
@@ -116,7 +102,11 @@ const FOOTER_LINKS_PRIMARY = [
   { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
   { href: "/check", label: "Checks" },
+  { href: "/check/agents-md/examples", label: "AGENTS.md examples" },
   { href: "/language", label: "Languages" },
+  // Hidden until the data has topic pages: before the first rescore fills
+  // repo topics, /topics is an empty, noindex page.
+  { href: TOPICS_PATH, label: "Topics" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },
 ];
@@ -137,13 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body>
-        <script
-          type="application/ld+json"
-          // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw script content; payload is server-controlled and `<` is escaped
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(JSON_LD).replace(/</g, "\\u003c"),
-          }}
-        />
+        <JsonLd data={JSON_LD} />
         <GoogleAnalytics />
 
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
@@ -229,15 +213,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">
                 <div className="flex flex-col items-start gap-1">
-                  {FOOTER_LINKS_PRIMARY.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                    >
-                      {l.label}
-                    </Link>
-                  ))}
+                  {FOOTER_LINKS_PRIMARY.filter((l) => l.href !== TOPICS_PATH || getTopicGroups().length > 0).map(
+                    (l) => (
+                      <Link
+                        key={l.href}
+                        href={l.href}
+                        className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                      >
+                        {l.label}
+                      </Link>
+                    ),
+                  )}
                 </div>
 
                 <div className="flex flex-col items-start gap-1">

@@ -1,0 +1,8 @@
+{
+  "path_with_namespace": "inkscape/inkscape",
+  "description": "Inkscape vector image editor",
+  "topics": ["C++", "GTK4", "gtkmm", "hacktoberfest", "svg", "vectorgraphics"],
+  "tag_list": ["C++", "GTK4", "gtkmm", "hacktoberfest", "svg", "vectorgraphics"],
+  "star_count": 4011,
+  "default_branch": "master"
+}

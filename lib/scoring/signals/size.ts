@@ -1,7 +1,8 @@
-import { readdirSync, readFileSync, type Stats, statSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 import ignore from "ignore";
+import { entryKind, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 const BASELINE_IGNORE = ["node_modules", ".git", "vendor", "target", "dist", "build", ".next"];
@@ -11,17 +12,13 @@ const MAX_DEPTH = 8;
 export const size: Signal = {
   id: "size",
   label: "Manageable size",
-  description: "Very large repos strain an agent's context window.",
+  description: "Very large repos strain the agent's context window.",
   improveSuggestion:
     "If possible, split into smaller modules or carve out a focused entry path. Document where to start in AGENTS.md.",
   check: (repo) => {
     const ig = ignore().add(BASELINE_IGNORE);
 
-    try {
-      ig.add(readFileSync(join(repo, ".gitignore"), "utf8"));
-    } catch {
-      // no .gitignore — baseline still applies
-    }
+    ig.add(readSafe(join(repo, ".gitignore"), repo));
 
     let count = 0;
 
@@ -43,20 +40,18 @@ export const size: Signal = {
         }
 
         const abs = join(dir, e);
-        let st: Stats;
+        const kind = entryKind(repo, abs);
 
-        try {
-          st = statSync(abs);
-        } catch {
+        if (!kind) {
           continue;
         }
 
         const rel = relative(repo, abs).split(sep).join("/");
-        if (ig.ignores(st.isDirectory() ? `${rel}/` : rel)) {
+        if (ig.ignores(kind === "dir" ? `${rel}/` : rel)) {
           continue;
         }
 
-        if (st.isDirectory()) {
+        if (kind === "dir") {
           visit(abs, depth + 1);
         } else {
           count++;

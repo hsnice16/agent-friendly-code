@@ -1,144 +1,59 @@
 # Contributing
 
-Thanks for considering a contribution. This guide covers the day-to-day: setup, how we name branches and commits, what goes in a PR description, and the review bar.
+Read [AGENTS.md](./AGENTS.md) first: stack, conventions, the I/O boundary and security rules. People and AI agents follow the same rules.
 
-Read [AGENTS.md](./AGENTS.md) first — it's the source of truth for stack, conventions, and the I/O boundary. AI coding agents and humans are held to the same rules.
-
-## Getting started
+## Setup
 
 ```bash
 bun install
-bun run prepare-hooks   # once — installs lefthook pre-commit (Biome + tsc + test + db-leaks + file-length)
-bun run seed            # optional: populate the DB with the curated set
+bun run prepare-hooks   # once
 bun run dev             # http://localhost:3000
-bun run test            # unit tests (node --test + tsx) — requires Node ≥22
+bun run test            # Node ≥ 22
 ```
 
-> **About `data/rank.db`** — a GitHub Actions cron (`.github/workflows/scheduled-rescore.yml`) re-runs `bun run seed` every six hours and commits the refreshed database to `main`. If your branch touches `scripts/seed-list.ts` and you also commit a re-seeded `rank.db`, you may hit a merge conflict against a cron commit. Easiest resolution: rebase, `git checkout --theirs -- data/rank.db`, and re-run `bun run seed` before pushing.
+`data/rank.db` is committed and rewritten on `main` every six hours by `.github/workflows/scheduled-rescore.yml`. Don't commit a local re-seed unless the change needs it; on a conflict, take `main`'s copy (`git checkout --theirs -- data/rank.db`) and re-seed.
 
 ## Changing the seed list
 
-`scripts/seed-list.ts` is the whole set of tracked repos. `bun run seed` makes `data/rank.db` match it before it scores anything, so an edit there is all a change needs — the next scheduled rescore applies it.
+`scripts/seed-list.ts` is the full set of ranked repos. `bun run seed` makes the database match it, so editing the list is the whole change; the next rescore applies it.
 
 - **Add** — append `{ url, note }`.
-- **Remove** — delete the entry. The seed run deletes its row and its scores. It refuses to delete more than 10 rows in one run, because a broken list looks the same as a large removal; set `SEED_MAX_PRUNE` for a deliberate bulk removal.
-- **Rename or transfer** — change `url` to the new address and add the old one to `was: [...]`. The row is renamed in place, keeping its id and score history, and the old page, badge and API URLs keep resolving. Never drop a `was` entry: READMEs embed the old badge path. Deleting the entry and adding a new one instead breaks all of those.
-- **Keep despite a finding** — add the finding's kind to `accept`, e.g. `accept: ["archived"]`.
+- **Remove** — delete the entry; its row and scores go. One run deletes at most 10 rows, since a broken list looks like a mass removal; set `SEED_MAX_PRUNE` for a deliberate bulk removal.
+- **Rename or transfer** — set `url` to the new address and add the old one to `was: [...]`. The row keeps its id and history, and old page, badge and API URLs keep working. Never drop a `was` entry: READMEs embed the old badge URL.
+- **Keep despite an audit finding** — add its kind to `accept`, e.g. `accept: ["archived"]`.
 
-`.github/workflows/seed-audit.yml` runs `bun run audit-seeds` every Monday. Findings — renamed, archived, gone or private, forks, mirrors, seeds whose score has stopped refreshing — go into one GitHub issue labelled `seed-audit`, and the job fails until each is fixed or accepted.
+`bun run audit-seeds` runs weekly (`.github/workflows/seed-audit.yml`) and files its findings in one issue labelled `seed-audit`; the job fails until each is fixed or accepted.
 
-## Branch naming
+## Branches and commits
 
-Lowercase, kebab-case, prefixed by intent:
+- Branches: `feat/`, `fix/`, `chore/`, `docs/` or `refactor/` plus a short kebab-case name.
+- Commits: one logical change, imperative subject ≤ 72 characters, a body only when the why isn't obvious.
+- Never skip hooks (`--no-verify`) or rewrite published commits.
 
-- `feat/<short-name>` — new capability (new signal, page, CLI flag).
-- `fix/<short-name>` — bug fix.
-- `chore/<short-name>` — tooling, deps, infra (no behaviour change for users).
-- `docs/<short-name>` — docs-only.
-- `refactor/<short-name>` — internal restructure; no observable change.
+## Checks
 
-Keep it short. `feat/postgres-migration` is better than `feat/add-postgres-migration-for-concurrent-writers`.
+Pre-commit (`lefthook.yml`): Biome (fixes and re-stages), `tsc --noEmit`, the test suite, the database leak scan when `data/*.db` is staged, and a 300-line cap on `.ts` / `.tsx` under `app/`, `components/` and `lib/`.
 
-## Commit style
+CI (`.github/workflows/ci.yml`) repeats Biome, tsc, tests and the leak scan, and runs a production build. `parity.yml` runs `bun run parity-check --pr` when a PR touches the scorer, Live Score or cloning code: it scores real repos both ways and fails if Live Score and the leaderboard disagree. Fix the drift rather than re-running.
 
-One logical change per commit. Short imperative subject (≤72 chars), body only if the change needs explanation.
+## Pull requests
 
-```text
-Add license signal — scores repos by SPDX ID presence
+Open against `main` and keep the branch rebased. The description follows [the PR template](./.github/PULL_REQUEST_TEMPLATE.md); UI changes need screenshots at mobile and desktop widths, light and dark. Aim for under ~300 changed lines; split larger work by layer (scoring → DB → UI).
 
-Reads LICENSE, LICENSE.md, or COPYING at repo root. If `license:` is
-present in package.json, count that too. Falls back to 0 on missing.
-```
+A change earns a `lib/changelog.ts` line only if a visitor, API caller or listed maintainer can see it, and then the matching `lib/roadmap.ts` item is removed in the same PR. Details: [AGENTS.md → Versions, changelog, roadmap](./AGENTS.md#versions-changelog-roadmap).
 
-Don't squash-amend published commits. Don't skip hooks (`--no-verify`); if a hook fails, fix the underlying issue.
+Ready to merge when CI is green, a reviewer has approved, no comments are open, and the description is complete.
 
-## Pre-commit hook
+## Issues
 
-`lefthook` runs five jobs on every commit:
-
-1. **Biome** — `check --write` on staged JS/TS/JSON/CSS. Fixes and re-stages.
-2. **tsc** — `--noEmit` on `*.{ts,tsx}`. Blocks commits that don't typecheck.
-3. **test** — `bun run test` when any `*.{ts,tsx}` file is staged. Runs the full `node --test` suite; blocks on regressions.
-4. **db-leaks** — when `data/*.db` is staged, scans its raw bytes (freed pages too) for local paths and tokens. The DB is public once pushed.
-5. **file-length** — blocks staged `.ts`/`.tsx` under `app/`, `components/`, `lib/` that exceed 300 lines. Split into subcomponents or pull helpers into `lib/utils/`. `scripts/` is exempt.
-
-Run `bun run prepare-hooks` once after cloning. CI (`.github/workflows/ci.yml`) runs Biome, tsc, the tests and the DB leak scan again on every PR, plus a production build. It does not run the file-length check.
-
-One extra workflow fires only when it has to: `.github/workflows/parity.yml` runs `bun run parity-check --pr` when a PR touches `lib/scoring/`, `lib/live-score/`, `lib/clients/git.ts`, `lib/badge-adoption.ts` or `scripts/parity-check.ts`. It clones a handful of real repos and asserts the live-score path produces the same numbers as `bun run score`, so it takes minutes rather than seconds — the full fixture set runs nightly. If it reports a diff, the score shown on `/score/…` and the score on the leaderboard have drifted apart; fix that before merging rather than re-running.
-
-## PR workflow
-
-Open against `main`. Keep the branch rebased; avoid merge commits from `main` into your branch.
-
-### PR description — required sections
-
-New PRs auto-populate from [`.github/PULL_REQUEST_TEMPLATE.md`](./.github/PULL_REQUEST_TEMPLATE.md). The template mirrors the sections below; keep the two in sync when either changes. Every PR description must include:
-
-```markdown
-## Summary
-
-<1–3 bullets. What changed, in product/capability terms — not a log of work done.>
-
-## Motivation
-
-<Why this change. Link to the roadmap item or `tasks/<file>.md`. If it's a roadmap item, quote the task's Goal line.>
-
-## Changes
-
-<Bulleted list of what this PR modifies. Keep it scoped to the summary.>
-
-## Testing
-
-<How you verified this. Commands run (`bun run test`, `bun run score <url>`, `bun x tsc --noEmit`, manual pass of specific pages). For UI changes: mobile + desktop, light + dark.>
-
-## Screenshots / screencasts
-
-<Required for any UI change. Drag-and-drop into the GitHub description.>
-
-## Docs + roadmap sync
-
-<Confirm one of:
-
-- "Ships a roadmap item — removed from `lib/roadmap.ts`, added to `lib/changelog.ts` under the current release bucket."
-- "N/A — internal refactor / polish; no changelog entry."
-  Plus: "AGENTS.md / README.md updated if structure or conventions changed.">
-
-## Risks / rollback
-
-<What could break? How do we roll back? Leave blank if genuinely trivial.>
-```
-
-### When to update the changelog
-
-Only when the PR **ships a user-facing capability** — something a dashboard visitor, API caller, or maintainer of a listed repo can observe (new page, new control, new API response field, new signal surfaced in the breakdown, new supported host). It must also map to an item in `lib/roadmap.ts` or to a `tasks/` file flipping to `done`.
-
-Not in the changelog: codebase hygiene (CI, linters, pre-commit, tests), contributor docs, dep bumps, internal refactors, or pure UI polish. Those belong in the task file and this PR description.
-
-When the PR qualifies, move the item atomically: append a one-line capability bullet under the current release bucket in `lib/changelog.ts`, **and** remove the matching entry from `lib/roadmap.ts` in the same PR. If you're in Claude Code, the `post-change-check` skill orchestrates this at the end of your turn — just say "update the changelog" or let it run automatically via the Stop hook.
-
-### Size
-
-PRs under ~300 lines of diff review fastest — the same cap the `file-length` pre-commit job enforces per file. If your change is larger, split by feature or by layer (scoring → DB → UI) so each PR is independently reviewable.
-
-## Review bar
-
-A PR is ready to merge when:
-
-1. CI is green (`.github/workflows/`).
-2. At least one review with an explicit `LGTM` or equivalent.
-3. No unresolved review comments.
-4. PR description has all required sections.
-5. If the PR ships a roadmap item, the roadmap↔changelog move has happened in the same diff.
-
-## Reporting bugs + requesting features
-
-- **Bugs**: open an issue with repro steps, expected vs actual, and the `bun --version` / Node version you're on.
-- **Features**: if it's on the roadmap, say which version. If it's not, propose it in an issue first — we may want to add it to `lib/roadmap.ts` before the PR lands.
+- **Bugs**: steps to reproduce, expected vs actual, Node version.
+- **Features**: propose in an issue first; say which roadmap version it fits, if any.
+- **Remove my repo**: open an issue with the repo URL.
 
 ## Security
 
-See the "Security / threat surface" section of [AGENTS.md](./AGENTS.md). For vulnerability reports that shouldn't be public, email <hsnice16@gmail.com> rather than opening an issue.
+See [SECURITY.md](./SECURITY.md). Don't report vulnerabilities in public issues.
 
-## Code of conduct
+## Conduct
 
-Be decent. Technical disagreement is fine; personal attacks, harassment, and dismissiveness are not. If you wouldn't say it in a work 1:1, don't write it in a review.
+Be decent. Disagree about code, not people.

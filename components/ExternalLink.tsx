@@ -1,6 +1,6 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 
-export type ExternalLinkTone = "dim" | "ink";
+type ExternalLinkTone = "dim" | "ink";
 
 const TONE_TEXT: Record<ExternalLinkTone, string> = {
   ink: "text-ink",

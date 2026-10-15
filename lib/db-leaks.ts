@@ -14,7 +14,7 @@ const PATTERNS: { label: string; re: RegExp }[] = [
 
 const printable = (s: string) => s.replace(/[^\x20-\x7e]/g, "?");
 
-export type Leak = { label: string; match: string; offset: number };
+type Leak = { label: string; match: string; offset: number };
 
 export function findLeaks(bytes: Uint8Array): Leak[] {
   const text = Buffer.from(bytes).toString("latin1");

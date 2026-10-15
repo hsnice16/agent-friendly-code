@@ -40,7 +40,7 @@ const GLOB_MANIFESTS: RegExp[] = [/\.(csproj|fsproj|vbproj|sln)$/i, /\.cabal$/i,
 
 function findGlobManifest(repo: string): string | null {
   try {
-    const entries = readdirSync(repo);
+    const entries = readdirSync(repo).sort();
     for (const re of GLOB_MANIFESTS) {
       const hit = entries.find((f) => re.test(f));
       if (hit) {
@@ -55,7 +55,7 @@ function findGlobManifest(repo: string): string | null {
 export const depsManifest: Signal = {
   id: "deps_manifest",
   label: "Dependency manifest",
-  description: "Machine-readable dependency list so the agent can reproduce the env.",
+  description: "A dependency manifest, so the agent can reproduce the environment.",
   improveSuggestion:
     "Commit a proper manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) plus a lockfile.",
   check: (repo) => {

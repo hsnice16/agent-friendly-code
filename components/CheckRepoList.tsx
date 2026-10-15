@@ -4,6 +4,7 @@ import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
 import { repoPath } from "@/lib/utils/repo-path";
 
+import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreNumber } from "./ScoreNumber";
 
 export function CheckRepoList({ rows }: { rows: LeaderboardRow[] }) {
@@ -27,6 +28,7 @@ export function CheckRepoList({ rows }: { rows: LeaderboardRow[] }) {
           <div className="mt-1 text-[12px] text-muted">
             {r.language ?? "—"}
             {r.stars != null ? ` · ${compactStars(r.stars)}` : ""}
+            <OwnRepoTag repo={r} />
           </div>
         </li>
       ))}

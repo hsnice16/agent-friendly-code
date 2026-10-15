@@ -1,3 +1,6 @@
+import type { Host } from "../constants/hosts";
+import type { ModelId } from "../scoring/weights";
+
 export type RepoRow = {
   id: number;
   url: string;
@@ -12,6 +15,10 @@ export type RepoRow = {
   last_scored_at: number | null;
   content_changed_at: number | null;
   previous_overall_score: number | null;
+  /** Absent on a DB that predates the column. */
+  description?: string | null;
+  /** JSON array of strings; absent on a DB that predates the column. */
+  topics?: string | null;
 };
 
 export type LeaderboardRow = RepoRow & { score: number | null };
@@ -19,18 +26,16 @@ export type LeaderboardRow = RepoRow & { score: number | null };
 export type LeaderboardOptions = {
   dir?: "asc" | "desc";
   sort?: "score" | "stars";
-  /** Restrict to a single host — "github" / "gitlab" / "bitbucket". */
-  host?: string;
-  /** "overall" or a specific model id — determines which score column is returned. */
-  model: string;
+  host?: Host;
+  model: ModelId | "overall";
 };
 
 export type TopPackageRow = {
   name: string;
   score: number;
+  host: string;
   owner: string;
   repoName: string;
-  contentChangedAt: number | null;
 };
 
 export type ModelScoreRow = { modelId: string; score: number };
@@ -42,9 +47,16 @@ export type AlternativeRow = {
   owner: string;
   score: number | null;
   stars: number | null;
+  /** Set when the row may be in another language than the repo it is shown beside. */
+  language?: string | null;
 };
 
+/** A signal_result row; matched_path is NULL where SignalResult has no matchedPath. */
+export type SignalResultRow = { id: string; label: string; pass: number; detail: string; matchedPath: string | null };
+
 export type SignalPassRate = { id: string; label: string; rate: number };
+
+export type SignalFile = { repoId: number; pass: number; detail: string | null; matchedPath: string | null };
 
 export type LeaderboardStats = {
   count: number;

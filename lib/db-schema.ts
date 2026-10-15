@@ -1,6 +1,5 @@
 import type Database from "better-sqlite3";
 
-// Split from lib/db.ts for the file-length cap only; queries stay there.
 export function applySchema(db: Database.Database): void {
   db.exec(`
     CREATE TABLE IF NOT EXISTS repo (
@@ -68,5 +67,27 @@ export function ensureRepoAlias(db: Database.Database): void {
       repo_id INTEGER NOT NULL REFERENCES repo(id) ON DELETE CASCADE,
       PRIMARY KEY (host, owner, name)
     );
+  `);
+}
+
+// Added by the write paths (scoring, init-db), not on open, for the same reason
+// as repo_alias. Until then reads get rows without the columns, which
+// repoAbout treats as empty.
+export function ensureRepoAbout(db: Database.Database): void {
+  db.transaction(() => {
+    const has = db.prepare("SELECT 1 FROM pragma_table_info('repo') WHERE name = ?");
+    if (!has.get("description")) db.exec("ALTER TABLE repo ADD COLUMN description TEXT");
+    if (!has.get("topics")) db.exec("ALTER TABLE repo ADD COLUMN topics TEXT");
+  }).immediate();
+}
+
+// On the write paths and init-db, for the same reason as repo_alias.
+// The NOCASE index serves name lookups, which UNIQUE(host, owner, name) cannot:
+// its index compares with BINARY.
+export function ensureIndexes(db: Database.Database): void {
+  db.exec(`
+    CREATE INDEX IF NOT EXISTS idx_repo_name_nocase
+      ON repo(host COLLATE NOCASE, owner COLLATE NOCASE, name COLLATE NOCASE);
+    CREATE INDEX IF NOT EXISTS idx_signal_result_signal ON signal_result(signal_id);
   `);
 }

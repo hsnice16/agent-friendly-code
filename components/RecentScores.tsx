@@ -7,6 +7,7 @@ import { type RecentScore, readRecents } from "@/lib/live-score/recents";
 import { repoPath } from "@/lib/utils/repo-path";
 
 import { HostPill } from "./HostPill";
+import { OwnRepoTag } from "./OwnRepoTag";
 import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
 
@@ -33,8 +34,9 @@ function ScoreList({ rows }: { rows: Row[] }) {
             href={hrefFor(row)}
             className="flex items-center justify-between gap-3 py-3 no-underline hover:no-underline"
           >
-            <span className="min-w-0 truncate text-[14.5px] text-ink">
+            <span className="min-w-0 text-[14.5px] text-ink [overflow-wrap:anywhere]">
               {row.owner}/{row.name}
+              <OwnRepoTag repo={row} />
               <HostPill host={row.host} />
             </span>
             <ScoreNumber score={row.score} />

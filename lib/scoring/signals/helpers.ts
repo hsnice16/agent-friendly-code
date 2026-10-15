@@ -1,5 +1,58 @@
-import { readdirSync, readFileSync, type Stats, statSync } from "node:fs";
-import { join } from "node:path";
+import {
+  closeSync,
+  fstatSync,
+  lstatSync,
+  openSync,
+  readdirSync,
+  readlinkSync,
+  readSync,
+  realpathSync,
+  statSync,
+} from "node:fs";
+import { dirname, join, resolve, sep } from "node:path";
+
+// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
+// are never followed out of it, and no read is unbounded: a README linked to
+// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
+/** The site parses this count back out of stored details (fileLength), so keep the shape. */
+export function characters(n: number): string {
+  return `${n.toLocaleString("en-US")} characters`;
+}
+
+export const MAX_READ_BYTES = 1024 * 1024;
+
+// "escaped" is a link that leaves the repo, or lands on its root: never followed,
+// but still the one file git stores. The live-score materializer stands an empty
+// placeholder in for it, which every caller here treats the same way.
+export type EntryKind = "dir" | "file" | "escaped";
+
+const inside = (root: string, p: string) => p.startsWith(root + sep);
+
+export function entryKind(repo: string, abs: string): EntryKind | null {
+  try {
+    const own = lstatSync(abs);
+    if (!own.isSymbolicLink()) {
+      return own.isDirectory() ? "dir" : own.isFile() ? "file" : null;
+    }
+
+    // Lexical first, as the materializer decides: a dangling link that points out
+    // must read the same on a clone as its placeholder does on the live path.
+    if (!inside(resolve(repo), resolve(dirname(abs), readlinkSync(abs)))) {
+      return "escaped";
+    }
+
+    const real = realpathSync(abs);
+    if (!inside(realpathSync(repo), real)) {
+      return "escaped";
+    }
+
+    const target = statSync(real);
+    return target.isDirectory() ? "dir" : target.isFile() ? "file" : null;
+  } catch {
+    // Dangling, or unreadable.
+    return null;
+  }
+}
 
 // Path lookups are case-insensitive: README / LICENSE / CONTRIBUTING casing
 // varies in the wild (`readme.md`, `Readme.md`, `README.MD`), and exact
@@ -47,6 +100,10 @@ function resolveWith(repo: string, rel: string, cache: DirCache): string | null 
 
   for (const segment of rel.split("/")) {
     if (!segment) {
+      return null;
+    }
+
+    if (current !== repo && entryKind(repo, current) !== "dir") {
       return null;
     }
 
@@ -108,9 +165,30 @@ export function firstExisting(repo: string, candidates: string[]): string | null
   return null;
 }
 
-export function readSafe(p: string): string {
+// Truncated rather than refused past the cap, so a long README keeps its score.
+// Without `repo` there is no root to hold links to; pass it wherever one exists.
+export function readSafe(p: string, repo?: string): string {
   try {
-    return readFileSync(p, "utf8");
+    if (repo ? entryKind(repo, p) !== "file" : !statSync(p).isFile()) {
+      return "";
+    }
+
+    const fd = openSync(p, "r");
+    try {
+      const buf = Buffer.alloc(Math.min(fstatSync(fd).size, MAX_READ_BYTES));
+      let n = 0;
+      while (n < buf.length) {
+        const got = readSync(fd, buf, n, buf.length - n, n);
+        if (got === 0) {
+          break;
+        }
+        n += got;
+      }
+
+      return buf.toString("utf8", 0, n);
+    } finally {
+      closeSync(fd);
+    }
   } catch {
     return "";
   }
@@ -126,7 +204,8 @@ export function walkFind(root: string, match: (rel: string) => boolean, maxDepth
 
     let entries: string[] = [];
     try {
-      entries = readdirSync(dir);
+      // readdir order is filesystem-dependent, and the first hit becomes matchedPath.
+      entries = readdirSync(dir).sort();
     } catch {
       return;
     }
@@ -139,14 +218,12 @@ export function walkFind(root: string, match: (rel: string) => boolean, maxDepth
       const abs = join(dir, e);
       const relNext = rel ? `${rel}/${e}` : e;
 
-      let st: Stats;
-      try {
-        st = statSync(abs);
-      } catch {
+      const kind = entryKind(root, abs);
+      if (!kind) {
         continue;
       }
 
-      if (st.isDirectory()) {
+      if (kind === "dir") {
         visit(abs, depth + 1, relNext);
       } else if (match(relNext)) {
         hits.push(relNext);

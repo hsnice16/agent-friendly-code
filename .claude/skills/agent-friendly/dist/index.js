@@ -793,6 +793,31 @@ define(module.exports, Symbol.for('setupWindows'), setupWindows)
 
 /***/ }),
 
+/***/ 970:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.parseArgs = parseArgs;
+// One dash, not two: `-h` must reach the help check, not be scored as a path.
+function parseArgs(args) {
+    const flags = new Set();
+    const positional = [];
+    for (const a of args) {
+        if (a.startsWith("-")) {
+            flags.add(a);
+        }
+        else {
+            positional.push(a);
+        }
+    }
+    return { flags, positional };
+}
+
+
+/***/ }),
+
 /***/ 792:
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -872,10 +897,8 @@ function scoreOneModel(profile, signals) {
         score: Math.round(score * 10) / 10,
     };
 }
-// Strip the absolute repo-root prefix so persisted/rendered paths never leak
-// the scanner's local filesystem layout. Signals are written individually —
-// some already return relative paths, some don't — normalising once here is
-// the reliable belt-and-braces.
+// Some signals return absolute paths. Relativised once here so no stored or
+// rendered path carries the scanner's filesystem layout.
 function toRelative(repoPath, p) {
     if (!p) {
         return p;
@@ -934,7 +957,7 @@ const LABEL = "AGENTS.md / CLAUDE.md";
 exports.agentsMd = {
     label: LABEL,
     id: "agents_md",
-    description: "Presence of an agent-oriented instructions file, with substantive content.",
+    description: "An instructions file for agents, with real content.",
     improveSuggestion: "Add an AGENTS.md covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
     check: (repo) => {
         const matched = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -946,7 +969,7 @@ exports.agentsMd = {
                 detail: "No agent instructions file found",
             };
         }
-        const len = (0, helpers_1.readSafe)(matched).trim().length;
+        const len = (0, helpers_1.readSafe)(matched, repo).trim().length;
         if (len === 0) {
             return {
                 pass: 0.2,
@@ -962,7 +985,7 @@ exports.agentsMd = {
                 label: LABEL,
                 id: "agents_md",
                 matchedPath: matched,
-                detail: `File exists (${len} chars) — thin`,
+                detail: `File exists (${(0, helpers_1.characters)(len)}) — thin`,
             };
         }
         if (len < 800) {
@@ -971,7 +994,7 @@ exports.agentsMd = {
                 label: LABEL,
                 id: "agents_md",
                 matchedPath: matched,
-                detail: `File exists (${len} chars)`,
+                detail: `File exists (${(0, helpers_1.characters)(len)})`,
             };
         }
         return {
@@ -979,7 +1002,7 @@ exports.agentsMd = {
             label: LABEL,
             id: "agents_md",
             matchedPath: matched,
-            detail: `Substantive (${len} chars)`,
+            detail: `Substantive (${(0, helpers_1.characters)(len)})`,
         };
     },
 };
@@ -1000,7 +1023,7 @@ const CANDIDATES = [".aider.conf.yml", ".aider.conf.yaml"];
 exports.aiderConf = {
     label: LABEL,
     id: "aider_conf",
-    description: "Aider reads `.aider.conf.yml` (or `.yaml`) for repo-level config — model, lint command, test command.",
+    description: "`.aider.conf.yml` (or `.yaml`): Aider's repo config — model, lint and test commands.",
     improveSuggestion: "Add a `.aider.conf.yml` at the repo root pinning Aider's `test-cmd` and `lint-cmd` so it auto-runs them after edits.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1046,14 +1069,14 @@ const OTHER_CI = [
 exports.ci = {
     id: "ci",
     label: "CI configuration",
-    description: "Defined pipeline the agent can reason about / emulate locally.",
+    description: "A CI pipeline the agent can read and run locally.",
     improveSuggestion: "Add a CI workflow (e.g. .github/workflows/ci.yml or .gitlab-ci.yml) that runs tests + linter on every PR.",
     check: (repo) => {
         const ghWf = (0, helpers_1.resolveRelative)(repo, ".github/workflows");
         if (ghWf) {
             const abs = (0, node_path_1.join)(repo, ghWf);
             try {
-                if ((0, node_fs_1.statSync)(abs).isDirectory()) {
+                if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
                     const files = (0, node_fs_1.readdirSync)(abs).filter((f) => /\.ya?ml$/i.test(f));
                     if (files.length > 0) {
                         return {
@@ -1061,7 +1084,7 @@ exports.ci = {
                             id: "ci",
                             matchedPath: ghWf,
                             label: "CI configuration",
-                            detail: `${files.length} GitHub Actions workflow(s)`,
+                            detail: `${files.length} GitHub Actions workflow${files.length === 1 ? "" : "s"}`,
                         };
                     }
                 }
@@ -1112,7 +1135,7 @@ const CANDIDATES = [
 exports.contributing = {
     id: "contributing",
     label: "CONTRIBUTING guide",
-    description: "Explicit contribution workflow an agent can follow.",
+    description: "A contribution workflow the agent can follow.",
     improveSuggestion: "Add CONTRIBUTING.md describing branch naming, commit style, test commands, and the PR process.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1151,15 +1174,17 @@ const LABEL = "Cursor rules (.cursor/rules)";
 exports.cursorRules = {
     label: LABEL,
     id: "cursor_rules",
-    description: "Cursor's canonical instruction surface — `.cursor/rules/*.mdc` (modern) or `.cursorrules` (legacy).",
+    description: "Cursor's instructions: `.cursor/rules/*.mdc`, or the legacy `.cursorrules`.",
     improveSuggestion: "Add `.cursor/rules/*.mdc` files describing how Cursor should work in this repo (architecture, conventions, naming). The legacy `.cursorrules` file is still read but is deprecated.",
     check: (repo) => {
         const dir = (0, helpers_1.resolveRelative)(repo, ".cursor/rules");
         if (dir) {
             const abs = (0, node_path_1.join)(repo, dir);
             try {
-                if ((0, node_fs_1.statSync)(abs).isDirectory()) {
-                    const mdc = (0, node_fs_1.readdirSync)(abs).filter((f) => f.toLowerCase().endsWith(".mdc"));
+                if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
+                    const mdc = (0, node_fs_1.readdirSync)(abs)
+                        .filter((f) => f.toLowerCase().endsWith(".mdc"))
+                        .sort();
                     if (mdc.length > 0) {
                         return {
                             pass: 1,
@@ -1180,7 +1205,7 @@ exports.cursorRules = {
                 label: LABEL,
                 id: "cursor_rules",
                 matchedPath: legacy,
-                detail: "Legacy .cursorrules — Cursor still reads it, but `.cursor/rules/*.mdc` is preferred",
+                detail: "Legacy .cursorrules — Cursor still reads it, but .cursor/rules/*.mdc is preferred",
             };
         }
         return {
@@ -1239,7 +1264,7 @@ const CANDIDATES = [
 const GLOB_MANIFESTS = [/\.(csproj|fsproj|vbproj|sln)$/i, /\.cabal$/i, /\.nimble$/i];
 function findGlobManifest(repo) {
     try {
-        const entries = (0, node_fs_1.readdirSync)(repo);
+        const entries = (0, node_fs_1.readdirSync)(repo).sort();
         for (const re of GLOB_MANIFESTS) {
             const hit = entries.find((f) => re.test(f));
             if (hit) {
@@ -1253,7 +1278,7 @@ function findGlobManifest(repo) {
 exports.depsManifest = {
     id: "deps_manifest",
     label: "Dependency manifest",
-    description: "Machine-readable dependency list so the agent can reproduce the env.",
+    description: "A dependency manifest, so the agent can reproduce the environment.",
     improveSuggestion: "Commit a proper manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) plus a lockfile.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1318,7 +1343,7 @@ const ARTIFACTS = [
 exports.devEnv = {
     id: "dev_env",
     label: "Reproducible dev env",
-    description: "One-command setup the agent can run (Makefile / devcontainer / Nix / Docker).",
+    description: "One-command setup the agent can run: Makefile, devcontainer, Nix or Docker.",
     improveSuggestion: "Add a Makefile or devcontainer or Dockerfile so the agent can set up the project in one command.",
     check: (repo) => {
         const matches = (0, helpers_1.resolveAllRelative)(repo, ARTIFACTS);
@@ -1343,7 +1368,7 @@ exports.devEnv = {
         const pkg = (0, helpers_1.resolveRelative)(repo, "package.json");
         if (pkg) {
             try {
-                const j = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg)));
+                const j = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo));
                 if (j.scripts && Object.keys(j.scripts).length >= 3) {
                     return {
                         pass: 0.6,
@@ -1381,7 +1406,7 @@ const LABEL = "GEMINI.md";
 exports.geminiMd = {
     label: LABEL,
     id: "gemini_md",
-    description: "Gemini CLI's canonical hierarchical instructions file — read at every prompt.",
+    description: "Gemini CLI's instructions file, read on every prompt.",
     improveSuggestion: "Add a GEMINI.md at the repo root covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
     check: (repo) => {
         const matched = (0, helpers_1.resolveRelative)(repo, "GEMINI.md");
@@ -1393,7 +1418,7 @@ exports.geminiMd = {
                 detail: "No GEMINI.md at repo root",
             };
         }
-        const len = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, matched)).trim().length;
+        const len = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, matched), repo).trim().length;
         if (len === 0) {
             return {
                 pass: 0.2,
@@ -1409,7 +1434,7 @@ exports.geminiMd = {
                 label: LABEL,
                 id: "gemini_md",
                 matchedPath: matched,
-                detail: `GEMINI.md exists (${len} chars) — thin`,
+                detail: `GEMINI.md exists (${(0, helpers_1.characters)(len)}) — thin`,
             };
         }
         if (len < 800) {
@@ -1418,7 +1443,7 @@ exports.geminiMd = {
                 label: LABEL,
                 id: "gemini_md",
                 matchedPath: matched,
-                detail: `GEMINI.md exists (${len} chars)`,
+                detail: `GEMINI.md exists (${(0, helpers_1.characters)(len)})`,
             };
         }
         return {
@@ -1426,7 +1451,7 @@ exports.geminiMd = {
             label: LABEL,
             id: "gemini_md",
             matchedPath: matched,
-            detail: `Substantive GEMINI.md (${len} chars)`,
+            detail: `Substantive GEMINI.md (${(0, helpers_1.characters)(len)})`,
         };
     },
 };
@@ -1440,6 +1465,9 @@ exports.geminiMd = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MAX_READ_BYTES = void 0;
+exports.characters = characters;
+exports.entryKind = entryKind;
 exports.resolveRelative = resolveRelative;
 exports.resolveAllRelative = resolveAllRelative;
 exports.firstExisting = firstExisting;
@@ -1447,6 +1475,38 @@ exports.readSafe = readSafe;
 exports.walkFind = walkFind;
 const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
+// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
+// are never followed out of it, and no read is unbounded: a README linked to
+// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
+/** The site parses this count back out of stored details (fileLength), so keep the shape. */
+function characters(n) {
+    return `${n.toLocaleString("en-US")} characters`;
+}
+exports.MAX_READ_BYTES = 1024 * 1024;
+const inside = (root, p) => p.startsWith(root + node_path_1.sep);
+function entryKind(repo, abs) {
+    try {
+        const own = (0, node_fs_1.lstatSync)(abs);
+        if (!own.isSymbolicLink()) {
+            return own.isDirectory() ? "dir" : own.isFile() ? "file" : null;
+        }
+        // Lexical first, as the materializer decides: a dangling link that points out
+        // must read the same on a clone as its placeholder does on the live path.
+        if (!inside((0, node_path_1.resolve)(repo), (0, node_path_1.resolve)((0, node_path_1.dirname)(abs), (0, node_fs_1.readlinkSync)(abs)))) {
+            return "escaped";
+        }
+        const real = (0, node_fs_1.realpathSync)(abs);
+        if (!inside((0, node_fs_1.realpathSync)(repo), real)) {
+            return "escaped";
+        }
+        const target = (0, node_fs_1.statSync)(real);
+        return target.isDirectory() ? "dir" : target.isFile() ? "file" : null;
+    }
+    catch {
+        // Dangling, or unreadable.
+        return null;
+    }
+}
 function indexDir(dir, cache) {
     const cached = cache.get(dir);
     if (cached !== undefined) {
@@ -1475,6 +1535,9 @@ function resolveWith(repo, rel, cache) {
     let current = repo;
     for (const segment of rel.split("/")) {
         if (!segment) {
+            return null;
+        }
+        if (current !== repo && entryKind(repo, current) !== "dir") {
             return null;
         }
         const index = indexDir(current, cache);
@@ -1522,9 +1585,29 @@ function firstExisting(repo, candidates) {
     }
     return null;
 }
-function readSafe(p) {
+// Truncated rather than refused past the cap, so a long README keeps its score.
+// Without `repo` there is no root to hold links to; pass it wherever one exists.
+function readSafe(p, repo) {
     try {
-        return (0, node_fs_1.readFileSync)(p, "utf8");
+        if (repo ? entryKind(repo, p) !== "file" : !(0, node_fs_1.statSync)(p).isFile()) {
+            return "";
+        }
+        const fd = (0, node_fs_1.openSync)(p, "r");
+        try {
+            const buf = Buffer.alloc(Math.min((0, node_fs_1.fstatSync)(fd).size, exports.MAX_READ_BYTES));
+            let n = 0;
+            while (n < buf.length) {
+                const got = (0, node_fs_1.readSync)(fd, buf, n, buf.length - n, n);
+                if (got === 0) {
+                    break;
+                }
+                n += got;
+            }
+            return buf.toString("utf8", 0, n);
+        }
+        finally {
+            (0, node_fs_1.closeSync)(fd);
+        }
     }
     catch {
         return "";
@@ -1538,7 +1621,8 @@ function walkFind(root, match, maxDepth = 3, maxHits = 1) {
         }
         let entries = [];
         try {
-            entries = (0, node_fs_1.readdirSync)(dir);
+            // readdir order is filesystem-dependent, and the first hit becomes matchedPath.
+            entries = (0, node_fs_1.readdirSync)(dir).sort();
         }
         catch {
             return;
@@ -1549,14 +1633,11 @@ function walkFind(root, match, maxDepth = 3, maxHits = 1) {
             }
             const abs = (0, node_path_1.join)(dir, e);
             const relNext = rel ? `${rel}/${e}` : e;
-            let st;
-            try {
-                st = (0, node_fs_1.statSync)(abs);
-            }
-            catch {
+            const kind = entryKind(root, abs);
+            if (!kind) {
                 continue;
             }
-            if (st.isDirectory()) {
+            if (kind === "dir") {
                 visit(abs, depth + 1, relNext);
             }
             else if (match(relNext)) {
@@ -1648,7 +1729,7 @@ const CANDIDATES = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.
 exports.license = {
     id: "license",
     label: "License file",
-    description: "Clarity on what an agent is allowed to do with the code.",
+    description: "A license, so it's clear what may be done with the code.",
     improveSuggestion: "Add a LICENSE (or COPYING) file — MIT, Apache-2.0, BSD, GPL, etc. — at the repo root.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1734,7 +1815,7 @@ const PYPROJECT_RE = /\[tool\.(ruff|black|flake8|pylint|mypy)/;
 exports.linter = {
     id: "linter",
     label: "Linter / formatter config",
-    description: "Agents get immediate feedback on style rather than ambiguous drift.",
+    description: "A linter, so the agent gets style feedback right away instead of guessing.",
     improveSuggestion: "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint) and commit the config.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1748,7 +1829,7 @@ exports.linter = {
             };
         }
         const pyproject = (0, helpers_1.resolveRelative)(repo, "pyproject.toml");
-        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject)))) {
+        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject), repo))) {
             return {
                 pass: 1,
                 id: "linter",
@@ -1783,7 +1864,7 @@ const REL = ".openhands/setup.sh";
 exports.openhandsSetup = {
     label: LABEL,
     id: "openhands_setup",
-    description: "OpenHands runs `.openhands/setup.sh` at session start to bootstrap the repo's dev environment.",
+    description: "`.openhands/setup.sh`, which OpenHands runs at session start to set up the dev environment.",
     improveSuggestion: "Add a `.openhands/setup.sh` that installs dependencies and prepares the project so OpenHands can run tests and lints out of the box.",
     check: (repo) => {
         const rel = (0, helpers_1.resolveRelative)(repo, REL);
@@ -1795,7 +1876,7 @@ exports.openhandsSetup = {
                 detail: "No .openhands/setup.sh",
             };
         }
-        const len = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel)).trim().length;
+        const len = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo).trim().length;
         if (len === 0) {
             return {
                 pass: 0.2,
@@ -1810,7 +1891,7 @@ exports.openhandsSetup = {
             label: LABEL,
             matchedPath: rel,
             id: "openhands_setup",
-            detail: `Setup script present (${len} chars)`,
+            detail: `Setup script present (${(0, helpers_1.characters)(len)})`,
         };
     },
 };
@@ -1830,7 +1911,7 @@ const CANDIDATES = [".pre-commit-config.yaml", ".husky", "lefthook.yml", "leftho
 exports.preCommit = {
     id: "pre_commit",
     label: "Pre-commit / git hooks",
-    description: "Catches problems locally before the agent wastes a CI cycle.",
+    description: "Pre-commit hooks catch problems before the agent waits on CI.",
     improveSuggestion: "Set up pre-commit (.pre-commit-config.yaml), husky, or lefthook to run format+lint on every commit.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1867,7 +1948,7 @@ const CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
 exports.readme = {
     id: "readme",
     label: "README",
-    description: "Non-trivial README so the agent can learn the project quickly.",
+    description: "A README with enough detail for the agent to learn the project.",
     improveSuggestion: "Expand your README to cover what the project does, how to install, the common commands, and the high-level layout.",
     check: (repo) => {
         const p = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -1879,13 +1960,13 @@ exports.readme = {
                 detail: "No README found",
             };
         }
-        const len = (0, helpers_1.readSafe)(p).trim().length;
+        const len = (0, helpers_1.readSafe)(p, repo).trim().length;
         if (len < 200) {
             return {
                 id: "readme",
                 label: "README",
                 pass: 0.3,
-                detail: `README thin (${len} chars)`,
+                detail: `README thin (${(0, helpers_1.characters)(len)})`,
                 matchedPath: p,
             };
         }
@@ -1895,7 +1976,7 @@ exports.readme = {
                 id: "readme",
                 matchedPath: p,
                 label: "README",
-                detail: `README present (${len} chars)`,
+                detail: `README present (${(0, helpers_1.characters)(len)})`,
             };
         }
         return {
@@ -1903,7 +1984,7 @@ exports.readme = {
             id: "readme",
             matchedPath: p,
             label: "README",
-            detail: `README detailed (${len} chars)`,
+            detail: `README detailed (${(0, helpers_1.characters)(len)})`,
         };
     },
 };
@@ -1924,22 +2005,18 @@ exports.size = void 0;
 const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const ignore_1 = __importDefault(__nccwpck_require__(298));
+const helpers_1 = __nccwpck_require__(742);
 const BASELINE_IGNORE = ["node_modules", ".git", "vendor", "target", "dist", "build", ".next"];
 const CAP = 10000;
 const MAX_DEPTH = 8;
 exports.size = {
     id: "size",
     label: "Manageable size",
-    description: "Very large repos strain an agent's context window.",
+    description: "Very large repos strain the agent's context window.",
     improveSuggestion: "If possible, split into smaller modules or carve out a focused entry path. Document where to start in AGENTS.md.",
     check: (repo) => {
         const ig = (0, ignore_1.default)().add(BASELINE_IGNORE);
-        try {
-            ig.add((0, node_fs_1.readFileSync)((0, node_path_1.join)(repo, ".gitignore"), "utf8"));
-        }
-        catch {
-            // no .gitignore — baseline still applies
-        }
+        ig.add((0, helpers_1.readSafe)((0, node_path_1.join)(repo, ".gitignore"), repo));
         let count = 0;
         const visit = (dir, depth) => {
             if (count > CAP || depth > MAX_DEPTH) {
@@ -1957,18 +2034,15 @@ exports.size = {
                     continue;
                 }
                 const abs = (0, node_path_1.join)(dir, e);
-                let st;
-                try {
-                    st = (0, node_fs_1.statSync)(abs);
-                }
-                catch {
+                const kind = (0, helpers_1.entryKind)(repo, abs);
+                if (!kind) {
                     continue;
                 }
                 const rel = (0, node_path_1.relative)(repo, abs).split(node_path_1.sep).join("/");
-                if (ig.ignores(st.isDirectory() ? `${rel}/` : rel)) {
+                if (ig.ignores(kind === "dir" ? `${rel}/` : rel)) {
                     continue;
                 }
-                if (st.isDirectory()) {
+                if (kind === "dir") {
                     visit(abs, depth + 1);
                 }
                 else {
@@ -2031,7 +2105,6 @@ exports.size = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.tests = void 0;
-const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const DIRS = ["tests", "test", "__tests__", "spec", "specs", "src/test"];
@@ -2039,7 +2112,7 @@ const FILE_RE = /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\
 exports.tests = {
     id: "tests",
     label: "Test suite",
-    description: "Detectable tests — agents rely on feedback loops.",
+    description: "Tests the agent can run to check its changes.",
     improveSuggestion: "Add a tests/ (or test/, __tests__/, spec/) directory with runnable tests. Document how to run them in AGENTS.md.",
     check: (repo) => {
         for (const d of DIRS) {
@@ -2047,18 +2120,15 @@ exports.tests = {
             if (!rel) {
                 continue;
             }
-            try {
-                if ((0, node_fs_1.statSync)((0, node_path_1.join)(repo, rel)).isDirectory()) {
-                    return {
-                        pass: 1,
-                        id: "tests",
-                        matchedPath: rel,
-                        label: "Test suite",
-                        detail: `Found /${rel}`,
-                    };
-                }
+            if ((0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, rel)) === "dir") {
+                return {
+                    pass: 1,
+                    id: "tests",
+                    matchedPath: rel,
+                    label: "Test suite",
+                    detail: `Found /${rel}`,
+                };
             }
-            catch { }
         }
         const hits = (0, helpers_1.walkFind)(repo, (rel) => FILE_RE.test(rel), 3, 1);
         if (hits.length > 0) {
@@ -2131,7 +2201,7 @@ function detectTypedLang(repo) {
 exports.typeConfig = {
     id: "type_config",
     label: "Type configuration",
-    description: "Static types help agents reason about call sites without running code.",
+    description: "Static types let the agent check call sites without running code.",
     improveSuggestion: "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python). Rust/Go/JVM/Scala/Swift/C#/OCaml/Haskell/Zig are typed by default.",
     check: (repo) => {
         const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
@@ -2145,7 +2215,7 @@ exports.typeConfig = {
             };
         }
         const pyproject = (0, helpers_1.resolveRelative)(repo, "pyproject.toml");
-        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject)))) {
+        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject), repo))) {
             return {
                 pass: 1,
                 id: "type_config",
@@ -2482,6 +2552,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const node_process_1 = __nccwpck_require__(708);
+const args_1 = __nccwpck_require__(970);
 const format_1 = __nccwpck_require__(264);
 const scorer_1 = __nccwpck_require__(789);
 const PROJECT_ROOT_MARKERS = [
@@ -2496,19 +2567,6 @@ const PROJECT_ROOT_MARKERS = [
     "package.json",
     "pyproject.toml",
 ];
-function parseArgs(args) {
-    const flags = new Set();
-    const positional = [];
-    for (const a of args) {
-        if (a.startsWith("--")) {
-            flags.add(a);
-        }
-        else {
-            positional.push(a);
-        }
-    }
-    return { flags, positional };
-}
 function bestModelId(scores) {
     const sorted = scores.slice().sort((a, b) => b.score - a.score);
     return sorted[0]?.modelId;
@@ -2522,24 +2580,32 @@ function buildWarnings(target) {
         `${target} doesn't look like a project root (no package.json, README.md, AGENTS.md, .git, or other project marker found at this path). The score will be low. Run from your project root, or pass the project root path explicitly.`,
     ];
 }
+const KNOWN_FLAGS = new Set(["--summary", "--json", "--help", "-h"]);
+const USAGE = [
+    "Usage: agent-friendly-skill [path] [--summary] [--json]",
+    "",
+    "Scores the repo at <path> (default: cwd) and prints the result.",
+    "",
+    "  --summary   one-line human summary (for SessionStart hooks)",
+    "  --json      JSON output (the default)",
+    "  -h, --help  print this help",
+    "",
+].join("\n");
 function main() {
-    const { flags, positional } = parseArgs(node_process_1.argv.slice(2));
+    const { flags, positional } = (0, args_1.parseArgs)(node_process_1.argv.slice(2));
     if (flags.has("--help") || flags.has("-h")) {
-        node_process_1.stdout.write([
-            "Usage: agent-friendly-skill [path] [--summary] [--json]",
-            "",
-            "Scores the repo at <path> (default: cwd) and prints the result.",
-            "",
-            "  --summary   one-line human summary (for SessionStart hooks)",
-            "  --json      explicit JSON output (default when no flags given)",
-            "  -h, --help  print this help",
-            "",
-        ].join("\n"));
+        node_process_1.stdout.write(USAGE);
         (0, node_process_1.exit)(0);
     }
+    // A mistyped `--summary` would otherwise print JSON into a hook that expects one line.
+    const unknown = [...flags].filter((f) => !KNOWN_FLAGS.has(f));
+    if (unknown.length > 0) {
+        node_process_1.stderr.write(`agent-friendly: unknown option ${unknown.join(", ")}\n\n${USAGE}`);
+        (0, node_process_1.exit)(2);
+    }
     const target = (0, node_path_1.resolve)(positional[0] ?? process.cwd());
-    if (!(0, node_fs_1.existsSync)(target)) {
-        node_process_1.stderr.write(`agent-friendly: path does not exist: ${target}\n`);
+    if (!(0, node_fs_1.existsSync)(target) || !(0, node_fs_1.statSync)(target).isDirectory()) {
+        node_process_1.stderr.write(`agent-friendly: not a directory: ${target}\n`);
         (0, node_process_1.exit)(2);
     }
     const score = (0, scorer_1.scoreRepo)(target);

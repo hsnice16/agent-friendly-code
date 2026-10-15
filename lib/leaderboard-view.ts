@@ -7,13 +7,12 @@ import { listLeaderboard } from "@/lib/db";
 import type { ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 
-export type LeaderboardSearchParams = {
-  q?: string;
-  dir?: string;
-  host?: string;
-  page?: string;
-  sort?: string;
-};
+type Param = string | string[] | undefined;
+
+// A repeated key (?q=a&q=b) arrives as an array.
+export type LeaderboardSearchParams = { q?: Param; dir?: Param; host?: Param; page?: Param; sort?: Param };
+
+const first = (v: Param): string | undefined => (Array.isArray(v) ? v[0] : v);
 
 export type LeaderboardView = {
   q: string;
@@ -29,17 +28,20 @@ export type LeaderboardView = {
 };
 
 function matchesQuery(row: LeaderboardRow, q: string): boolean {
-  return `${row.owner}/${row.name}`.toLowerCase().includes(q.trim().toLowerCase());
+  return `${row.owner}/${row.name}`.toLowerCase().includes(q.toLowerCase());
 }
 
 // Shared by generateMetadata and the page body, which run in one request
 // scope — without this the whole board is queried and filtered twice.
 export const resolveLeaderboardView = cache(
   (model: ModelId | "overall", sp: LeaderboardSearchParams): LeaderboardView => {
-    const q = (sp.q ?? "").slice(0, MAX_SEARCH_LENGTH);
-    const host: Host | "all" = isHost(sp.host) ? sp.host : "all";
-    const dir: SortDir = isSortDir(sp.dir) ? sp.dir : DEFAULT_DIR;
-    const sort: SortKey = isSortKey(sp.sort) ? sp.sort : DEFAULT_SORT;
+    const q = (first(sp.q) ?? "").trim().slice(0, MAX_SEARCH_LENGTH);
+    const spHost = first(sp.host);
+    const spDir = first(sp.dir);
+    const spSort = first(sp.sort);
+    const host: Host | "all" = isHost(spHost) ? spHost : "all";
+    const dir: SortDir = isSortDir(spDir) ? spDir : DEFAULT_DIR;
+    const sort: SortKey = isSortKey(spSort) ? spSort : DEFAULT_SORT;
 
     const baseRows = listLeaderboard({
       dir,
@@ -53,7 +55,7 @@ export const resolveLeaderboardView = cache(
 
     // Out-of-range clamps rather than 404s, so a stale or hand-typed page number
     // still lands on rows; the canonical folds it onto the page it shows.
-    const parsedPage = Number(sp.page);
+    const parsedPage = Number(first(sp.page));
     const page = Number.isFinite(parsedPage) ? Math.min(totalPages, Math.max(1, Math.floor(parsedPage))) : 1;
 
     const filtered = host !== "all" || q !== "" || sort !== DEFAULT_SORT || dir !== DEFAULT_DIR;

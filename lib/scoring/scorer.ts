@@ -49,10 +49,8 @@ function scoreOneModel(profile: ModelProfile, signals: SignalResult[]): ModelSco
   };
 }
 
-// Strip the absolute repo-root prefix so persisted/rendered paths never leak
-// the scanner's local filesystem layout. Signals are written individually —
-// some already return relative paths, some don't — normalising once here is
-// the reliable belt-and-braces.
+// Some signals return absolute paths. Relativised once here so no stored or
+// rendered path carries the scanner's filesystem layout.
 function toRelative(repoPath: string, p: string | undefined): string | undefined {
   if (!p) {
     return p;

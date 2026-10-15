@@ -1,25 +1,33 @@
 import Link from "next/link";
 
 import type { RepoRow } from "@/lib/types/db";
-import { compactStars, relativeTime } from "@/lib/utils/format";
+import { compactStars, formatDate } from "@/lib/utils/format";
+import { type RepoAboutData, repoAbout } from "@/lib/utils/repo-about";
 import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
 
 import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
+import { OwnRepoTag } from "./OwnRepoTag";
 import { Panel } from "./Panel";
+import { RepoAbout } from "./RepoAbout";
 import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
 
 // `commitSha` is the live-score path: there is no "last scored" when the page
 // render *is* the scoring, so the commit is the only honest freshness fact.
 export function RepoHero({
   repo,
+  about,
   commitSha,
   language,
+  topicLinks,
 }: {
   repo: RepoRow;
+  /** Parsed from `repo` when not passed; the repo page passes the copy it already has. */
+  about?: RepoAboutData;
   commitSha?: string;
   /** The hub to link, when the repo's language has one. */
   language?: { label: string; href: string };
+  topicLinks?: Record<string, string>;
 }) {
   const overall = repo.overall_score ?? 0;
   const overallTier = scoreTier(overall);
@@ -31,11 +39,16 @@ export function RepoHero({
     <Panel padding={false}>
       <div className="flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-6 sm:py-6">
         <div className="min-w-0 flex-1">
-          <h1 className="m-0 break-words text-[20px] font-semibold tracking-tight sm:text-[22px]">
-            {repo.owner}/{repo.name}
+          {/* The pills sit beside the h1, not in it: inside, its text read "owner/nameGitHub".
+              `[&>span]:ml-0`: the pills' own ml-2 indents them when they wrap under the h1. */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 [&>span]:ml-0">
+            <h1 className="m-0 min-w-0 break-words text-[20px] font-semibold tracking-tight sm:text-[22px]">
+              {repo.owner}/{repo.name}
+            </h1>
             <HostPill host={repo.host} />
             {repo.badge_embedded ? <BadgeAdoptedTag /> : null}
-          </h1>
+            <OwnRepoTag repo={repo} />
+          </div>
 
           <a
             target="_blank"
@@ -46,6 +59,8 @@ export function RepoHero({
           >
             {repo.url}
           </a>
+
+          <RepoAbout about={about ?? repoAbout(repo)} topicLinks={topicLinks} />
 
           <dl className="mt-3.5 flex flex-wrap gap-x-6 gap-y-1 text-[13.5px] text-muted">
             <div>
@@ -85,8 +100,16 @@ export function RepoHero({
               ) : (
                 <>
                   <dt className="inline">Last scored: </dt>
+                  {/* A date, not "3h ago": the page is rendered once per deploy, and a
+                      relative time would freeze at whatever it said then. */}
                   <dd className="inline font-medium text-ink">
-                    {repo.last_scored_at ? relativeTime(repo.last_scored_at) : "—"}
+                    {repo.last_scored_at ? (
+                      <time dateTime={new Date(repo.last_scored_at * 1000).toISOString()}>
+                        {formatDate(repo.last_scored_at)}
+                      </time>
+                    ) : (
+                      "—"
+                    )}
                   </dd>
                 </>
               )}
@@ -103,7 +126,11 @@ export function RepoHero({
             {overall.toFixed(1)}
           </div>
           {hasDelta && prev != null && repo.overall_score != null && (
-            <ScoreDeltaPopover current={repo.overall_score} previous={prev} lastScoredAt={repo.last_scored_at} />
+            <ScoreDeltaPopover
+              current={repo.overall_score}
+              previous={prev}
+              scoredAt={repo.last_scored_at ? formatDate(repo.last_scored_at, { time: true }) : null}
+            />
           )}
           <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Overall</div>
         </div>

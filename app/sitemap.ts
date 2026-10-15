@@ -1,24 +1,33 @@
 import type { MetadataRoute } from "next";
 
-import { REGISTRIES } from "@/lib/clients/registries";
-import { getLeaderboardStats, getTopPackagesByRegistry, listLeaderboardOverall } from "@/lib/db";
+import { LATEST_RELEASE_DATE } from "@/lib/changelog";
+import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { getTopicGroups } from "@/lib/topic-pages";
+import { TOPICS_PATH, topicPath } from "@/lib/topics";
 import { checkPath } from "@/lib/utils/check-path";
-import { hubPath, isHub } from "@/lib/utils/language";
+import { hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
-const SITEMAP_PACKAGE_LIMIT_PER_REGISTRY = 10000;
 const LEGAL_LAST_UPDATED = new Date("2026-10-10");
+
+function newest(rows: { content_changed_at: number | null }[]): Date | undefined {
+  const changed = Math.max(0, ...rows.map((r) => r.content_changed_at ?? 0));
+  return changed > 0 ? new Date(changed * 1000) : undefined;
+}
 
 export default function sitemap(): MetadataRoute.Sitemap {
   // Only a score or badge change moves lastmod: a date that moves on every crawl
   // or rescore teaches Google to ignore it.
   const stats = getLeaderboardStats();
   const contentChanged = stats.contentChangedAt != null ? new Date(stats.contentChangedAt * 1000) : undefined;
+  // Methodology and changelog change only in a release; no other static page has a dated source.
+  const released = new Date(LATEST_RELEASE_DATE);
+  const board = listLeaderboardOverall();
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -53,6 +62,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.7,
       changeFrequency: "monthly",
       url: `${APP_URL}/methodology`,
+      lastModified: released,
     },
     {
       priority: 0.7,
@@ -92,16 +102,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       changeFrequency: "weekly",
       url: `${APP_URL}/changelog`,
+      lastModified: released,
     },
     {
-      priority: 0.4,
-      lastModified: contentChanged,
+      priority: 0.8,
       changeFrequency: "weekly",
-      url: `${APP_URL}/llms.txt`,
+      url: `${APP_URL}${checkPath("agents_md")}/examples`,
+      lastModified: contentChanged,
+    },
+    {
+      priority: 0.6,
+      changeFrequency: "weekly",
+      url: `${APP_URL}${OTHER_LANGUAGES_PATH}`,
+      lastModified: newest(otherLanguageGroups(board).flatMap((g) => g.rows)),
     },
   ];
 
-  const repoRoutes: MetadataRoute.Sitemap = listLeaderboardOverall().map((r) => ({
+  const repoRoutes: MetadataRoute.Sitemap = board.map((r) => ({
     changeFrequency: "weekly",
     url: `${APP_URL}${repoPath(r)}`,
     lastModified: r.content_changed_at != null ? new Date(r.content_changed_at * 1000) : undefined,
@@ -110,15 +127,32 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const hubRoutes: MetadataRoute.Sitemap = getLanguageGroups()
     .filter(isHub)
-    .map((g) => {
-      const changed = Math.max(...g.rows.map((r) => r.content_changed_at ?? 0));
-      return {
-        priority: 0.8,
-        changeFrequency: "weekly",
-        url: `${APP_URL}${hubPath(g.slug)}`,
-        lastModified: changed > 0 ? new Date(changed * 1000) : undefined,
-      };
-    });
+    .map((g) => ({
+      priority: 0.8,
+      changeFrequency: "weekly",
+      url: `${APP_URL}${hubPath(g.slug)}`,
+      lastModified: newest(g.rows),
+    }));
+
+  const topics = getTopicGroups();
+  // Empty until a rescore stores topics; /topics is noindex until then.
+  const topicRoutes: MetadataRoute.Sitemap =
+    topics.length === 0
+      ? []
+      : [
+          {
+            priority: 0.6,
+            changeFrequency: "weekly",
+            url: `${APP_URL}${TOPICS_PATH}`,
+            lastModified: newest(topics.flatMap((t) => t.rows)),
+          },
+          ...topics.map((t) => ({
+            priority: 0.7,
+            changeFrequency: "weekly" as const,
+            url: `${APP_URL}${topicPath(t.slug)}`,
+            lastModified: newest(t.rows),
+          })),
+        ];
 
   const modelRoutes: MetadataRoute.Sitemap = MODELS.map((m) => ({
     priority: 0.8,
@@ -134,14 +168,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${APP_URL}${checkPath(s.id)}`,
   }));
 
-  const packageRoutes: MetadataRoute.Sitemap = REGISTRIES.flatMap((registry) =>
-    getTopPackagesByRegistry(registry, SITEMAP_PACKAGE_LIMIT_PER_REGISTRY).map((p) => ({
-      lastModified: p.contentChangedAt != null ? new Date(p.contentChangedAt * 1000) : undefined,
-      changeFrequency: "weekly",
-      url: `${APP_URL}/package/${registry}/${p.name}`,
-      priority: Math.round((0.4 + (p.score / 100) * 0.4) * 10) / 10,
-    })),
-  );
-
-  return [...staticRoutes, ...checkRoutes, ...modelRoutes, ...hubRoutes, ...repoRoutes, ...packageRoutes];
+  // No /package/<registry>/<name>: those pages are noindex (see their page.tsx).
+  return [...staticRoutes, ...checkRoutes, ...modelRoutes, ...hubRoutes, ...topicRoutes, ...repoRoutes];
 }

@@ -30,6 +30,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   ci: {
     title: "CI configuration: what AI coding agents learn from your pipeline",
+    metaTitle: "CI config: what AI coding agents learn from your pipeline",
     description:
       "Why a CI pipeline helps AI coding agents, which CI systems we detect, and how many popular open source repos have one.",
     what: "This check looks for a continuous integration pipeline defined in the repo: GitHub Actions workflows, or a config file for another CI system.",
@@ -43,6 +44,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   linter: {
     title: "Linter and formatter config: instant feedback for AI coding agents",
+    metaTitle: "Linters and formatters: instant feedback for AI agents",
     description:
       "Why a committed linter or formatter config helps AI coding agents, which tools we detect, and how many popular open source repos have one.",
     what: "This check looks for a committed linter or formatter config: ESLint, Prettier, Biome, Ruff, rustfmt, Clippy, golangci-lint, RuboCop, clang-format and about twenty others.",
@@ -55,6 +57,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   deps_manifest: {
     title: "Dependency manifests: letting AI coding agents rebuild your environment",
+    metaTitle: "Dependency manifests: how AI agents rebuild your setup",
     description:
       "Why AI coding agents need a dependency manifest, which manifest files we detect, and how many popular open source repos have one.",
     what: "This check looks for a file that lists the project's dependencies in a form a package manager can read: `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `pom.xml` and the equivalents for other languages.",
@@ -67,6 +70,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   dev_env: {
     title: "Reproducible dev environments: one-command setup for AI coding agents",
+    metaTitle: "Reproducible dev environments: one-command agent setup",
     description:
       "Why AI coding agents need a reproducible dev environment, which setup files we detect, and how many popular open source repos have them.",
     what: "This check looks for files that set up the project with one command: a Makefile, a devcontainer, a Dockerfile or compose file, Nix files, a justfile, a Taskfile, `tox.ini`, `noxfile.py`, the Maven or Gradle wrapper, or `bin/setup`.",
@@ -81,6 +85,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   type_config: {
     title: "Type configuration: static types help AI coding agents read code",
+    metaTitle: "Type config: static types help AI coding agents read code",
     description:
       "Why static types help AI coding agents, how we detect type checking in a repo, and how many popular open source repos have it.",
     what: "This check asks whether the code is statically typed: a type-checker config for JavaScript, TypeScript or Python, or a language that is typed by design.",
@@ -115,6 +120,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   pre_commit: {
     title: "Pre-commit hooks: catching AI coding agent mistakes before CI",
+    metaTitle: "Pre-commit hooks: catch AI agent mistakes before CI",
     description:
       "Why git hooks help AI coding agents, which hook frameworks we detect, and how many popular open source repos use one.",
     what: "This check looks for a git hook framework configured in the repo: pre-commit (`.pre-commit-config.yaml`), Husky (`.husky/`) or Lefthook (`lefthook.yml`).",

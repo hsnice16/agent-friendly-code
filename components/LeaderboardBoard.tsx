@@ -1,7 +1,7 @@
-import { LEADERBOARD_PAGE_SIZE } from "@/lib/constants/scoring";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { MODEL_BY_ID } from "@/lib/scoring/weights";
 import type { LeaderboardStats } from "@/lib/types/db";
+import { boardPage } from "@/lib/utils/board-item-list";
 import { relativeTime } from "@/lib/utils/format";
 import { leaderboardHref } from "@/lib/utils/leaderboard-href";
 import { HostSelect } from "./HostSelect";
@@ -12,13 +12,12 @@ import { SearchBar } from "./SearchBar";
 import { SortSelect } from "./SortSelect";
 
 export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats: LeaderboardStats }) {
-  const { q, page, totalPages, dir, sort, host, model, filteredRows } = view;
+  const { q, page, totalPages, dir, sort, host, model } = view;
 
-  const startIdx = (page - 1) * LEADERBOARD_PAGE_SIZE;
-  const rows = filteredRows.slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE);
+  const { startIdx, rows } = boardPage(view);
 
-  const activeLabel = model === "overall" ? "Overall (average of all agents)" : MODEL_BY_ID[model].label;
-  const rationale = model === "overall" ? "The average of every agent's score." : MODEL_BY_ID[model].rationale;
+  const activeLabel = model === "overall" ? "Overall" : MODEL_BY_ID[model].label;
+  const rationale = model === "overall" ? "the average of every agent's score." : MODEL_BY_ID[model].rationale;
 
   return (
     <>

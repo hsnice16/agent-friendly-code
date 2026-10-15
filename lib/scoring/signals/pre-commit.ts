@@ -6,7 +6,7 @@ const CANDIDATES = [".pre-commit-config.yaml", ".husky", "lefthook.yml", "leftho
 export const preCommit: Signal = {
   id: "pre_commit",
   label: "Pre-commit / git hooks",
-  description: "Catches problems locally before the agent wastes a CI cycle.",
+  description: "Pre-commit hooks catch problems before the agent waits on CI.",
   improveSuggestion:
     "Set up pre-commit (.pre-commit-config.yaml), husky, or lefthook to run format+lint on every commit.",
   check: (repo) => {

@@ -444,6 +444,19 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/quarkusio/quarkus", note: "Quarkus — Kubernetes-native Java" },
 
+  { url: "https://github.com/ktorio/ktor", note: "Ktor — Kotlin web framework" },
+  { url: "https://github.com/Kotlin/kotlinx.coroutines", note: "kotlinx.coroutines — Kotlin coroutines library" },
+  { url: "https://github.com/detekt/detekt", note: "detekt — Kotlin static analysis" },
+  { url: "https://github.com/square/leakcanary", note: "LeakCanary — Android memory leak detection (Kotlin)" },
+  { url: "https://github.com/coil-kt/coil", note: "Coil — image loading for Android and Compose (Kotlin)" },
+  { url: "https://github.com/JetBrains/compose-multiplatform", note: "Compose Multiplatform — Kotlin UI framework" },
+  { url: "https://github.com/JetBrains/Exposed", note: "Exposed — Kotlin SQL framework" },
+  { url: "https://github.com/mockk/mockk", note: "MockK — mocking library for Kotlin" },
+  { url: "https://github.com/scala/scala3", note: "Scala 3 compiler (Dotty)" },
+  { url: "https://github.com/zio/zio", note: "ZIO — async and concurrent programming for Scala" },
+  { url: "https://github.com/playframework/playframework", note: "Play Framework — web framework for Java and Scala" },
+  { url: "https://github.com/gatling/gatling", note: "Gatling — load testing as code (Scala)" },
+
   // --- GitHub, Swift ---
   { url: "https://github.com/swiftlang/swift", note: "Swift language", was: ["https://github.com/apple/swift"] },
   {
@@ -458,6 +471,8 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/apple/swift-nio", note: "SwiftNIO — async event-driven network framework" },
   { url: "https://github.com/ReactiveX/RxSwift", note: "RxSwift — reactive extensions" },
   { url: "https://github.com/apple/swift-argument-parser", note: "swift-argument-parser — CLI parsing" },
+
+  { url: "https://github.com/swiftlang/swift-format", note: "swift-format — Swift source formatter" },
 
   // --- GitHub, Ruby ---
   {
@@ -516,6 +531,8 @@ export const SEEDS: Seed[] = [
     note: ".NET MAUI — cross-platform native app framework",
   },
 
+  { url: "https://github.com/files-community/Files", note: "Files — modern Windows file manager (C#)" },
+
   // --- GitHub, PHP ---
   { url: "https://github.com/laravel/laravel", note: "Laravel — PHP web framework starter" },
   { url: "https://github.com/symfony/symfony", note: "Symfony — PHP component framework" },
@@ -532,6 +549,9 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/nikic/PHP-Parser", note: "PHP-Parser — PHP parser written in PHP" },
   { url: "https://github.com/api-platform/core", note: "API Platform — PHP API framework" },
   { url: "https://github.com/phpstan/phpstan", note: "PHPStan — static analysis" },
+
+  { url: "https://github.com/laravel/framework", note: "Laravel framework core (PHP)" },
+  { url: "https://github.com/nextcloud/server", note: "Nextcloud server — self-hosted file sync (PHP)" },
 
   // --- GitHub, Elixir / Phoenix ---
   {
@@ -578,6 +598,27 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/nim-lang/Nim", note: "Nim — statically typed compiled systems language" },
   { url: "https://github.com/JuliaLang/julia", note: "Julia — scientific computing language" },
   { url: "https://github.com/gleam-lang/gleam", note: "Gleam — typed language on the BEAM" },
+
+  { url: "https://github.com/koalaman/shellcheck", note: "ShellCheck — shell script static analysis (Haskell)" },
+  { url: "https://github.com/PostgREST/postgrest", note: "PostgREST — REST API for any Postgres database (Haskell)" },
+  { url: "https://github.com/hadolint/hadolint", note: "hadolint — Dockerfile linter (Haskell)" },
+  { url: "https://github.com/simplex-chat/simplex-chat", note: "SimpleX Chat — private messaging (Haskell)" },
+  {
+    url: "https://github.com/purescript/purescript",
+    note: "PureScript — typed language compiling to JavaScript (Haskell)",
+  },
+  { url: "https://github.com/tigerbeetle/tigerbeetle", note: "TigerBeetle — financial transactions database (Zig)" },
+  { url: "https://github.com/zigtools/zls", note: "ZLS — Zig language server" },
+  {
+    url: "https://github.com/lightpanda-io/browser",
+    note: "Lightpanda — headless browser for AI and automation (Zig)",
+  },
+  { url: "https://github.com/roc-lang/roc", note: "Roc — fast, friendly functional language (Zig)" },
+  { url: "https://github.com/penpot/penpot", note: "Penpot — open-source design platform (Clojure)" },
+  { url: "https://github.com/logseq/logseq", note: "Logseq — knowledge management platform (Clojure)" },
+  { url: "https://github.com/clj-kondo/clj-kondo", note: "clj-kondo — Clojure linter" },
+  { url: "https://github.com/facebook/infer", note: "Infer — static analyzer for Java, C and C++ (OCaml)" },
+  { url: "https://github.com/ocaml/opam", note: "opam — OCaml package manager" },
 
   // --- AI-native: coding agents ---
   {

@@ -39,8 +39,7 @@ jobs:
       <PanelHeading tone={tone}>Check the score on every pull request</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Add this file to your repo. On each pull request, it posts one comment showing how the score changed and why. It
-        runs in your own CI, with no outside server involved.
+        Add this file to your repo. On each pull request it posts one comment with how the score changed and why.
       </p>
 
       <CopySnippet text={yaml} highlight={highlight} />

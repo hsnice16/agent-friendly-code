@@ -1,107 +1,85 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { notFound, permanentRedirect } from "next/navigation";
-import { cache } from "react";
+import { notFound } from "next/navigation";
 
 import { ActionEmbed } from "@/components/ActionEmbed";
+import { ActionEmbedReveal } from "@/components/ActionEmbedReveal";
+import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { BadgeEmbed } from "@/components/BadgeEmbed";
-import { ModelSuggestions } from "@/components/ModelSuggestions";
-import { Panel, PanelHeading } from "@/components/Panel";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { HashDetails } from "@/components/HashDetails";
+import { JsonLd } from "@/components/JsonLd";
+import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RepoHero } from "@/components/RepoHero";
+import { RepoReport } from "@/components/RepoReport";
 import { RepoSummary } from "@/components/RepoSummary";
+import { FloatingSectionMenu, type NavSection, SectionNav } from "@/components/SectionNav";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
+import { checkRates } from "@/lib/check-rates";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
-import {
-  getLanguagePeers,
-  getModelScores,
-  getRepoByHostOwnerName,
-  getSignalResults,
-  listLeaderboardOverall,
-} from "@/lib/db";
+import { getModelScores } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
-import { MODEL_BY_ID, MODELS, type ModelId } from "@/lib/scoring/weights";
-import type { RepoRow } from "@/lib/types/db";
-import { groupByLanguage, hubPath, isHub, languageSlug, nearestByScore } from "@/lib/utils/language";
-import { isModelId } from "@/lib/utils/leaderboard-href";
+import { MODELS } from "@/lib/scoring/weights";
+import { getTopicGroups } from "@/lib/topic-pages";
+import { topicLinks } from "@/lib/topics";
+import { agentInstructions } from "@/lib/utils/agent-instructions";
+import { groupByLanguage, hubPath, isHub, languageSlug } from "@/lib/utils/language";
+import {
+  agentFileShare,
+  boardRanks,
+  loadAbout,
+  loadBoard,
+  loadRepo,
+  loadSignals,
+  loadSummary,
+} from "@/lib/utils/repo-page-data";
+import { repoJsonLd, repoMetadata } from "@/lib/utils/repo-page-meta";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
-import { summarizeRepo, summaryDescription } from "@/lib/utils/repo-summary";
-import { ACTION_USES, APP_KEYWORDS, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
+import { buildRepoReport } from "@/lib/utils/repo-report";
+import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
+import { ACTION_USES, APP_URL } from "@/lib/version";
 
 type Params = { slug: string[] };
 
-// generateMetadata and the page both need the summary; cache() keeps it to one
-// leaderboard read per request.
-const loadBoard = cache(listLeaderboardOverall);
-const loadSummary = cache((repo: RepoRow) =>
-  summarizeRepo(repo, loadBoard(), getModelScores(repo.id), getSignalResults(repo.id)),
-);
+// Every repo is rendered at build: data/rank.db only changes with a deploy.
+// Reading `searchParams` (`?model=`) would make every visit a fresh render.
+export function generateStaticParams(): Params[] {
+  return loadBoard().map((r) => ({ slug: [r.host, ...r.owner.split("/"), r.name] }));
+}
+
+// Other casings and former names fall through to app/repo-redirect/slug
+// (see next.config.ts). Redirecting from here instead, the first visit came
+// back as a 200 copy and later ones as a 308 without a Location.
+export const dynamicParams = false;
+
+async function load(params: Promise<Params>) {
+  const identity = repoIdentity((await params).slug);
+  return identity ? loadRepo(identity.host, identity.owner, identity.name) : null;
+}
+
+// scroll-mt clears the sticky header when a nav link jumps here.
+function Section({ id, className = "", children }: { id: string; className?: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className={`mt-3.5 scroll-mt-20 ${className}`}>
+      {children}
+    </section>
+  );
+}
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const identity = repoIdentity((await params).slug);
-  if (!identity) {
-    return {};
-  }
-
-  const repo = getRepoByHostOwnerName(identity.host, identity.owner, identity.name);
+  const repo = await load(params);
   if (!repo) {
     return {};
   }
 
-  const path = repoPath(repo);
-  const slug = `${repo.owner}/${repo.name}`;
-  const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${slug} — agent-friendliness score` };
-
-  // Says what the number measures: a bare "83.8 / 100" earned impressions for
-  // score-string and "<repo> github" searches, and no clicks from either.
-  const title =
-    repo.overall_score != null
-      ? `${slug}: AI agent readiness score ${repo.overall_score.toFixed(1)}/100`
-      : `${slug}: AI agent readiness`;
-  const summary = loadSummary(repo);
-  const description = summaryDescription(slug, summary, repo.overall_score);
-
-  const repoKeywords = [
-    slug,
-    repo.name,
-    repo.owner,
-    repo.language,
-    `${repo.name} ai agent`,
-    `${repo.name} agents.md`,
-    `${repo.name} ai coding agent`,
-    ...MODELS.map((m) => `${repo.name} ${m.label.toLowerCase()}`),
-    ...MODELS.map((m) => m.label),
-    ...APP_KEYWORDS,
-  ].filter((k): k is string => Boolean(k));
-
-  return {
-    title,
-    description,
-    keywords: repoKeywords,
-    alternates: { canonical: path },
-    twitter: { ...TWITTER_DEFAULTS, title, description, images: [image] },
-    openGraph: { ...OG_DEFAULTS, title, description, url: path, type: "article", images: [image] },
-  };
+  return repoMetadata(repo, { signals: loadSignals(repo.id), summary: loadSummary(repo), about: loadAbout(repo) });
 }
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: Promise<Params>;
-  searchParams: Promise<{ model?: string }>;
-}) {
-  const identity = repoIdentity((await params).slug);
-  const { model } = await searchParams;
-
-  if (!identity) {
-    notFound();
-  }
-
-  const repo = getRepoByHostOwnerName(identity.host, identity.owner, identity.name);
+export default async function Page({ params }: { params: Promise<Params> }) {
+  const repo = await load(params);
   if (!repo) {
     notFound();
   }
@@ -109,184 +87,158 @@ export default async function Page({
   const id = repo.id;
   const path = repoPath(repo);
 
-  // The lookup ignores case and follows former names, so one repo answers to
-  // several addresses. Serve the stored one and redirect the rest, rather than
-  // duplicating the page.
-  if (identity.host !== repo.host || identity.owner !== repo.owner || identity.name !== repo.name) {
-    permanentRedirect(model ? `${path}?model=${encodeURIComponent(model)}` : path);
-  }
-
-  const selected: ModelId = isModelId(model) ? model : "claude-code";
-
-  const signals = getSignalResults(id);
+  const signals = loadSignals(id);
   const modelScores = getModelScores(id);
   const summary = loadSummary(repo);
-  const selectedScore = modelScores.find((m) => m.modelId === selected)?.score ?? repo.overall_score ?? 0;
-  const alternatives = nearestByScore(
-    getLanguagePeers(repo.host, repo.language, selected, id),
-    selectedScore,
-    ALTERNATIVES_LIMIT,
-  );
+  const about = loadAbout(repo);
+  const board = loadBoard();
+  const alternatives = similarRepos({ ...repo, score: repo.overall_score }, board, ALTERNATIVES_LIMIT);
+  const report = summary
+    ? buildRepoReport({ repo, summary, board, signals, rates: checkRates(signals, repo.language) })
+    : null;
+  const instructions = agentInstructions(signals, agentFileShare(repo.language));
 
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
-  const hub = groupByLanguage(loadBoard()).find((g) => g.slug === slugOfLanguage && isHub(g));
+  const hubs = groupByLanguage(board).filter(isHub);
+  const hub = hubs.find((g) => g.slug === slugOfLanguage);
   const hubHref = hub ? hubPath(hub.slug) : undefined;
+  const topicHrefs = topicLinks(
+    about.topics,
+    getTopicGroups(),
+    hubs.map((g) => ({ slug: g.slug, href: hubPath(g.slug) })),
+  );
   // The Action is a GitHub workflow; it cannot run on other hosts.
   const onGitHub = repo.host === "github";
 
-  const suggestions = topImprovements(selected, signals);
+  const agents = MODELS.map((m) => ({ id: m.id, label: m.label, suggestions: topImprovements(m.id, signals) }));
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
   const gaps = signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
   const slug = `${repo.owner}/${repo.name}`;
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "BreadcrumbList",
-        itemListElement: [
-          {
-            "@type": "ListItem",
-            position: 1,
-            item: `${APP_URL}/`,
-            name: "Home",
-          },
-          ...(hub && hubHref
-            ? [{ "@type": "ListItem", position: 2, name: hub.label, item: `${APP_URL}${hubHref}` }]
-            : []),
-          {
-            "@type": "ListItem",
-            name: slug,
-            position: hub ? 3 : 2,
-            item: `${APP_URL}${path}`,
-          },
-        ],
-      },
-      {
-        "@type": "SoftwareSourceCode",
-        name: slug,
-        codeRepository: repo.url,
-        url: `${APP_URL}${path}`,
-        ...(repo.language ? { programmingLanguage: repo.language } : {}),
-        ...(repo.content_changed_at != null
-          ? { dateModified: new Date(repo.content_changed_at * 1000).toISOString() }
-          : {}),
-        keywords: [slug, repo.name, repo.owner, repo.language, "AGENTS.md", "AI coding agent"]
-          .filter(Boolean)
-          .join(", "),
-        description: summaryDescription(slug, summary, repo.overall_score),
-        additionalProperty: signals.map((s) => ({
-          "@type": "PropertyValue",
-          name: s.label,
-          value: s.pass,
-          ...(s.detail ? { description: s.detail } : {}),
-        })),
-      },
-    ],
-  };
+  // Page order: this repo's own results first, then how it sits among others,
+  // then the tools to add to it.
+  const sections: NavSection[] = [
+    summary && { id: "overview", label: "At a glance" },
+    { id: "has-missing", label: "What it has and misses" },
+    { id: "fix-first", label: "What to fix first" },
+    { id: "agent-scores", label: "Score for each agent" },
+    instructions && { id: "agent-instructions", label: "Agent instructions" },
+    { id: "all-checks", label: "All checks" },
+    report && { id: "compare", label: "How it compares" },
+    { id: "similar", label: "Similar repos" },
+    { id: "embed-badge", label: "Add a badge" },
+    onGitHub && { id: "pr-action", label: "Check every PR" },
+  ].filter((x): x is NavSection => Boolean(x));
+
+  const jsonLd = repoJsonLd(repo, { signals, summary, about });
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: JSON-LD requires raw script content; payload is server-controlled and `<` is escaped
-        dangerouslySetInnerHTML={{
-          __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c"),
-        }}
+      <JsonLd data={jsonLd} />
+      <Breadcrumbs
+        parents={hub && hubHref ? [{ name: hub.label, path: hubHref }] : []}
+        current={{ name: slug, path }}
       />
-      <Link
-        href="/"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
-      >
-        ← back to leaderboard
-      </Link>
 
-      <RepoHero repo={repo} language={hub && hubHref ? { label: hub.label, href: hubHref } : undefined} />
+      {/* Starts at the hero so the rail's top lines up with the first card. */}
+      <div className="relative">
+        <RepoHero
+          repo={repo}
+          about={about}
+          topicLinks={topicHrefs}
+          language={hub && hubHref ? { label: hub.label, href: hubHref } : undefined}
+        />
 
-      <aside
-        aria-label="Tools you can add to this repo"
-        className="mt-3.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-lg border border-warn/40 bg-surface px-4 py-2.5 text-[12.5px]"
-      >
-        <span className="text-warn">Use on your repo:</span>
-        <a href="#embed-badge" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Add a badge ↓
-        </a>
-        {onGitHub && (
-          <>
-            <span aria-hidden="true" className="text-line">
-              ·
-            </span>
-            <a href="#pr-action" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-              Check every pull request ↓
-            </a>
-          </>
+        {summary && (
+          <Section id="overview">
+            <RepoSummary summary={summary} />
+          </Section>
         )}
-        <span aria-hidden="true" className="text-line">
-          ·
-        </span>
-        <Link href="/skill" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
-          Get the agent skill →
-        </Link>
-      </aside>
 
-      {summary && (
-        <div className="mt-3.5">
-          <RepoSummary summary={summary} />
+        <Section id="has-missing" className="grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
+          <SignalListCard
+            items={strengths}
+            variant="strength"
+            empty={{ chip: "bad", text: "Nothing passes fully yet." }}
+          />
+          <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
+        </Section>
+
+        <Section id="fix-first">
+          <ModelSuggestionsSwitch agents={agents} />
+        </Section>
+
+        <Section id="agent-scores">
+          <PerModelScores modelScores={modelScores} signals={signals} ranks={boardRanks(id)} />
+        </Section>
+
+        {instructions && (
+          <Section id="agent-instructions">
+            <AgentInstructions data={instructions} slug={slug} repo={repo} />
+          </Section>
+        )}
+
+        <Section id="all-checks">
+          {/* Collapsed: "What it has and misses" already shows the headline checks. */}
+          <HashDetails
+            id="all-checks"
+            summary={
+              <h2 className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+                All {signals.length} checks · {signals.filter((s) => s.pass >= 1).length} passed
+              </h2>
+            }
+          >
+            {signals.map((s) => (
+              <SignalRow key={s.id} signal={s} repo={repo} />
+            ))}
+          </HashDetails>
+        </Section>
+
+        {report && (
+          <Section id="compare">
+            <RepoReport slug={slug} report={report} />
+          </Section>
+        )}
+
+        <Section id="similar">
+          <AlternativesStrip
+            language={hub?.label ?? repo.language}
+            hubHref={hubHref}
+            alternatives={alternatives}
+            note={similarNote(repo, alternatives)}
+          />
+        </Section>
+
+        <Section id="embed-badge">
+          <BadgeEmbed
+            highlight="tip"
+            appUrl={APP_URL}
+            name={repo.name}
+            host={repo.host}
+            owner={repo.owner}
+            repoPagePath={path}
+            score={repo.overall_score}
+          />
+        </Section>
+
+        {onGitHub && (
+          <Section id="pr-action">
+            <ActionEmbedReveal>
+              <ActionEmbed actionUses={ACTION_USES} branch={repo.default_branch} showSecretLink highlight="info" />
+            </ActionEmbedReveal>
+          </Section>
+        )}
+
+        {/* In the page margin, beside the content rather than taking width from
+          it; below that width the margin is too narrow, so the menu floats. */}
+        <div className="absolute inset-y-0 left-full ml-10 hidden w-44 min-[1500px]:block">
+          <SectionNav sections={sections} />
         </div>
-      )}
-
-      <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
-        <SignalListCard
-          items={strengths}
-          variant="strength"
-          empty={{ chip: "bad", text: "Nothing passes fully yet." }}
-        />
-        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
-      </div>
-
-      <div className="mt-3.5">
-        <ModelSuggestions basePath={path} selected={selected} suggestions={suggestions} />
-      </div>
-
-      <div className="mt-3.5">
-        <PerModelScores modelScores={modelScores} signals={signals} />
-      </div>
-
-      <div className="mt-3.5">
-        <AlternativesStrip
-          language={hub?.label ?? repo.language}
-          hubHref={hubHref}
-          alternatives={alternatives}
-          selectedModelLabel={MODEL_BY_ID[selected].label}
-        />
-      </div>
-
-      <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>All checks</PanelHeading>
-          {signals.map((s) => (
-            <SignalRow key={s.id} signal={s} />
-          ))}
-        </Panel>
-      </div>
-
-      <div id="embed-badge" className="mt-3.5 scroll-mt-20">
-        <BadgeEmbed
-          highlight="tip"
-          appUrl={APP_URL}
-          name={repo.name}
-          host={repo.host}
-          owner={repo.owner}
-          repoPagePath={path}
-        />
-      </div>
-
-      {onGitHub && (
-        <div id="pr-action" className="mt-3.5 scroll-mt-20">
-          <ActionEmbed actionUses={ACTION_USES} branch={repo.default_branch} showSecretLink highlight="info" />
+        <div className="min-[1500px]:hidden">
+          <FloatingSectionMenu sections={sections} />
         </div>
-      )}
+      </div>
     </>
   );
 }

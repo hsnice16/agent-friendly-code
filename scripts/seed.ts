@@ -1,7 +1,8 @@
 import { spawnSync } from "node:child_process";
+import { join } from "node:path";
 
 import { reconcileSeeds } from "../lib/db";
-import { seedTargets } from "../lib/seeds";
+import { PRIVATE_EXIT_CODE, seedTargets } from "../lib/seeds";
 import { SEEDS } from "./seed-list";
 import { seedPackages } from "./seed-packages";
 
@@ -18,21 +19,34 @@ async function main() {
   for (const url of pruned) console.log(`pruned ${url} — not in the seed list`);
 
   const failed: string[] = [];
+  const skipped: string[] = [];
 
   for (const s of SEEDS) {
     console.log(`\n━━━ seeding ${s.url}${s.note ? ` — ${s.note}` : ""} ━━━`);
 
-    const r = spawnSync("bun", ["run", "score", s.url], {
+    // This runtime and its loader flags (tsx's under Node), so the seed run needs no second toolchain.
+    const r = spawnSync(process.execPath, [...process.execArgv, join(__dirname, "score.ts"), "score", s.url], {
       stdio: "inherit",
     });
 
-    if (r.status !== 0) {
+    if (r.status === PRIVATE_EXIT_CODE) {
+      skipped.push(s.url);
+    } else if (r.status !== 0) {
       failed.push(s.url);
       console.error(`  (failed with status ${r.status}, continuing)`);
     }
   }
 
-  console.log(`\nseed done — ${SEEDS.length - failed.length} ok / ${failed.length} failed.`);
+  const ok = SEEDS.length - failed.length - skipped.length;
+  console.log(`\nseed done — ${ok} ok / ${failed.length} failed / ${skipped.length} private.`);
+
+  if (skipped.length > 0) {
+    console.error("\nPrivate, not rescored — remove these from the seed list:");
+    for (const url of skipped) {
+      console.error(`  ✗ ${url}`);
+      if (process.env.GITHUB_ACTIONS) console.log(`::warning title=Seed is private::${url}`);
+    }
+  }
 
   if (failed.length > 0) {
     console.error("\nNot rescored — these keep their previous score until a run succeeds:");

@@ -4,7 +4,7 @@ import { describe, test } from "node:test";
 import type { SignalResult } from "../lib/scoring/signals";
 import { MODEL_BY_ID } from "../lib/scoring/weights";
 import type { LeaderboardRow } from "../lib/types/db";
-import { keySignals, summarizeRepo, summarizeScore, summaryDescription, topPercent } from "../lib/utils/repo-summary";
+import { keySignals, summarizeRepo, summarizeScore, topPercent } from "../lib/utils/repo-summary";
 
 function row(id: number, score: number | null, language: string | null): LeaderboardRow {
   return {
@@ -83,7 +83,6 @@ describe("summarizeRepo", () => {
     const s = summarizeRepo(board[0], board, scores, signals);
     assert.equal(s?.worst, null);
     assert.equal(s?.best?.tiedWith, 1);
-    assert.doesNotMatch(summaryDescription("o/r1", s, 90), /Best set up/);
   });
 });
 
@@ -101,13 +100,6 @@ describe("keySignals", () => {
   test("skips signals the model does not weigh", () => {
     const ids = keySignals(MODEL_BY_ID["claude-code"], signals).map((s) => s.id);
     assert.deepEqual(ids, ["agents_md", "tests"]);
-  });
-});
-
-describe("summaryDescription", () => {
-  test("is repo-specific when a summary exists", () => {
-    const s = summarizeRepo(board[0], board, [], signals);
-    assert.match(summaryDescription("o/r1", s, 90), /^o\/r1 scores 90\.0 out of 100 .* #1 of 4\./);
   });
 });
 

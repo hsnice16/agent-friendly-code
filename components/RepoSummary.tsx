@@ -9,7 +9,7 @@ const GRID_COLS: Record<number, string> = {
   4: "sm:grid-cols-2 lg:grid-cols-4",
 };
 
-function Stat({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
+export function Stat({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
   return (
     <div className="rounded-lg border border-line bg-surface-2 px-3.5 py-3">
       <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</dt>

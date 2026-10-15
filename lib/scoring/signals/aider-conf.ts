@@ -7,7 +7,7 @@ const CANDIDATES = [".aider.conf.yml", ".aider.conf.yaml"];
 export const aiderConf: Signal = {
   label: LABEL,
   id: "aider_conf",
-  description: "Aider reads `.aider.conf.yml` (or `.yaml`) for repo-level config — model, lint command, test command.",
+  description: "`.aider.conf.yml` (or `.yaml`): Aider's repo config — model, lint and test commands.",
   improveSuggestion:
     "Add a `.aider.conf.yml` at the repo root pinning Aider's `test-cmd` and `lint-cmd` so it auto-runs them after edits.",
   check: (repo) => {

@@ -7,7 +7,7 @@ export type RecentScore = {
 
 const KEY = "afc:recent-scores";
 
-export const RECENTS_LIMIT = 10;
+const RECENTS_LIMIT = 10;
 
 // Per-visitor and client-only on purpose. A shared list would be the one
 // uncacheable read *and* write on the hot path, and it would publicly broadcast

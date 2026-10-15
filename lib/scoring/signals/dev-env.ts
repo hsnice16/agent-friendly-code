@@ -25,7 +25,7 @@ const ARTIFACTS = [
 export const devEnv: Signal = {
   id: "dev_env",
   label: "Reproducible dev env",
-  description: "One-command setup the agent can run (Makefile / devcontainer / Nix / Docker).",
+  description: "One-command setup the agent can run: Makefile, devcontainer, Nix or Docker.",
   improveSuggestion: "Add a Makefile or devcontainer or Dockerfile so the agent can set up the project in one command.",
   check: (repo) => {
     const matches = resolveAllRelative(repo, ARTIFACTS);
@@ -53,7 +53,7 @@ export const devEnv: Signal = {
     const pkg = resolveRelative(repo, "package.json");
     if (pkg) {
       try {
-        const j = JSON.parse(readSafe(join(repo, pkg)));
+        const j = JSON.parse(readSafe(join(repo, pkg), repo));
 
         if (j.scripts && Object.keys(j.scripts).length >= 3) {
           return {

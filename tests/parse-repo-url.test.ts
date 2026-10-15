@@ -69,6 +69,18 @@ describe("parseRepoUrl — GitLab", () => {
   test("strips trailing .git", () => {
     assert.equal(parseRepoUrl("https://gitlab.com/gitlab-org/gitlab.git")?.name, "gitlab");
   });
+
+  test("a trailing slash, query or fragment doesn't fold the project into the group", () => {
+    for (const url of [
+      "https://gitlab.com/gitlab-org/gitlab/",
+      "https://gitlab.com/gitlab-org/gitlab?tab=readme",
+      "https://gitlab.com/gitlab-org/gitlab#readme",
+      "https://gitlab.com/gitlab-org/gitlab.git/",
+    ]) {
+      const p = parseRepoUrl(url);
+      assert.deepEqual([p?.owner, p?.name], ["gitlab-org", "gitlab"], url);
+    }
+  });
 });
 
 describe("parseRepoUrl — Bitbucket", () => {
@@ -90,6 +102,18 @@ describe("parseRepoUrl — Bitbucket", () => {
 describe("parseRepoUrl — rejects", () => {
   test("returns null for unsupported hosts", () => {
     assert.equal(parseRepoUrl("https://sourcehut.org/~foo/bar"), null);
+  });
+
+  test("returns null for dot segments and characters no host allows", () => {
+    for (const url of [
+      "https://github.com/../..",
+      "https://github.com/a/.",
+      "https://github.com/a/.git",
+      "https://github.com/a/b%2F..",
+      "https://gitlab.com/a/../b",
+    ]) {
+      assert.equal(parseRepoUrl(url), null, url);
+    }
   });
 
   test("returns null for empty or garbage input", () => {

@@ -43,14 +43,14 @@ For each category below, decide **yes / no / N/A**, then act on the yeses:
 - **`AGENTS.md`**
   - Yes if stack, directory layout, conventions, or I/O boundary changed.
   - Specifics:
-    - Stack changes (Next.js / React / Tailwind / Bun / DB driver) → update the **Stack** bullets + cross-check with `README.md`'s Stack & rationale table.
-    - New top-level folder → update the **Layout** tree.
-    - New page in `app/` → mention in the **Layout** tree and link from the nav in `app/layout.tsx`.
+    - Stack changes (Next.js / React / Tailwind / DB driver) → update **Stack**.
+    - New top-level folder or `lib/` area → update the **Layout** tree (it lists directories, not every file).
+    - New page in `app/` → reachable from the nav, footer or a parent page, and in `app/sitemap.ts` unless noindex.
     - New signal / model / host → ensure the matching "Adding a …" section in `AGENTS.md` is still accurate.
     - New convention or constraint → add a bullet under **Conventions**.
 - **`README.md`**
   - Yes if a product-facing behaviour, command, or screenshot changed.
-  - Specifics: stack changes must match the `AGENTS.md` stack list; quickstart commands must actually work (`bun install`, `bun run prepare-hooks`, `bun run dev`, `bun run score <url>`); prior-art table updated if we've encountered new competitors since last sync.
+  - Specifics: "Run locally" commands must work; the agent list, signal count and Public API section must match the code.
 - **`CONTRIBUTING.md`**
   - Yes if the branch/commit/PR flow or review bar changed, or if the security-contact email moved.
 - **`.env.example`**
@@ -68,7 +68,7 @@ Invoke the `code-review` skill on the diff. Its checklist:
 
 - Tailwind-first (utilities > custom classes, `@theme` tokens > hex, no `@apply` in `globals.css`).
 - Constants / utils extracted when the rule-of-three is hit.
-- I/O boundary held — `lib/scoring/` stays pure, all SQL in `lib/db.ts`.
+- I/O boundary held — `lib/scoring/` stays pure, all SQL in `lib/db*.ts`.
 - Server components default, client only when interactivity demands it.
 - Components presentational — no data fetching, no effects.
 - Phosphor icons only.

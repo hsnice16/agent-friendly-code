@@ -1,4 +1,4 @@
-import { firstExisting, readSafe } from "./helpers";
+import { characters, firstExisting, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
@@ -7,7 +7,7 @@ const LABEL = "AGENTS.md / CLAUDE.md";
 export const agentsMd: Signal = {
   label: LABEL,
   id: "agents_md",
-  description: "Presence of an agent-oriented instructions file, with substantive content.",
+  description: "An instructions file for agents, with real content.",
   improveSuggestion:
     "Add an AGENTS.md covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
   check: (repo) => {
@@ -22,7 +22,7 @@ export const agentsMd: Signal = {
       };
     }
 
-    const len = readSafe(matched).trim().length;
+    const len = readSafe(matched, repo).trim().length;
     if (len === 0) {
       return {
         pass: 0.2,
@@ -39,7 +39,7 @@ export const agentsMd: Signal = {
         label: LABEL,
         id: "agents_md",
         matchedPath: matched,
-        detail: `File exists (${len} chars) — thin`,
+        detail: `File exists (${characters(len)}) — thin`,
       };
     }
 
@@ -49,7 +49,7 @@ export const agentsMd: Signal = {
         label: LABEL,
         id: "agents_md",
         matchedPath: matched,
-        detail: `File exists (${len} chars)`,
+        detail: `File exists (${characters(len)})`,
       };
     }
 
@@ -58,7 +58,7 @@ export const agentsMd: Signal = {
       label: LABEL,
       id: "agents_md",
       matchedPath: matched,
-      detail: `Substantive (${len} chars)`,
+      detail: `Substantive (${characters(len)})`,
     };
   },
 };

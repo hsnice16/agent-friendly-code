@@ -27,6 +27,12 @@ describe("ci signal", () => {
 
     assert.equal(r.pass, 1);
     assert.equal(r.matchedPath, ".github/workflows");
+    assert.equal(r.detail, "1 GitHub Actions workflow");
+  });
+
+  test("pluralises the workflow count", () => {
+    fixture = makeFixture({ ".github/workflows/ci.yml": "a: 1", ".github/workflows/release.yaml": "a: 1" });
+    assert.equal(ci.check(fixture).detail, "2 GitHub Actions workflows");
   });
 
   test("ignores empty .github/workflows directory via non-yaml content", () => {

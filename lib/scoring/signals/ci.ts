@@ -1,7 +1,7 @@
-import { readdirSync, statSync } from "node:fs";
+import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { firstExisting, resolveRelative } from "./helpers";
+import { entryKind, firstExisting, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const OTHER_CI = [
@@ -16,7 +16,7 @@ const OTHER_CI = [
 export const ci: Signal = {
   id: "ci",
   label: "CI configuration",
-  description: "Defined pipeline the agent can reason about / emulate locally.",
+  description: "A CI pipeline the agent can read and run locally.",
   improveSuggestion:
     "Add a CI workflow (e.g. .github/workflows/ci.yml or .gitlab-ci.yml) that runs tests + linter on every PR.",
   check: (repo) => {
@@ -26,7 +26,7 @@ export const ci: Signal = {
       const abs = join(repo, ghWf);
 
       try {
-        if (statSync(abs).isDirectory()) {
+        if (entryKind(repo, abs) === "dir") {
           const files = readdirSync(abs).filter((f) => /\.ya?ml$/i.test(f));
 
           if (files.length > 0) {
@@ -35,7 +35,7 @@ export const ci: Signal = {
               id: "ci",
               matchedPath: ghWf,
               label: "CI configuration",
-              detail: `${files.length} GitHub Actions workflow(s)`,
+              detail: `${files.length} GitHub Actions workflow${files.length === 1 ? "" : "s"}`,
             };
           }
         }

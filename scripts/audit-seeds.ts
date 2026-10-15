@@ -52,7 +52,7 @@ async function checkGithub(p: ParsedRepo): Promise<Flag[] | "rate-limited"> {
 
 async function checkGitlab(p: ParsedRepo): Promise<Flag[]> {
   const headers: Record<string, string> = { ...UA };
-  if (process.env.GITLAB_TOKEN) headers["PRIVATE-TOKEN"] = process.env.GITLAB_TOKEN;
+  if (process.env.GITLAB_TOKEN) headers.Authorization = `Bearer ${process.env.GITLAB_TOKEN}`;
 
   const slug = encodeURIComponent(`${p.owner}/${p.name}`);
   const res = await fetch(`https://gitlab.com/api/v4/projects/${slug}`, { headers });

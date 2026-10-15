@@ -1,69 +1,60 @@
-import type { LeaderboardRow } from "@/lib/types/db";
-import { repoPath } from "@/lib/utils/repo-path";
-import { APP_URL } from "@/lib/version";
+import type { LeaderboardView } from "@/lib/leaderboard-view";
+import { SIGNALS } from "@/lib/scoring/signals";
+import { agentList } from "@/lib/utils/agent-list";
+import { boardItemList } from "@/lib/utils/board-item-list";
+import { APP_NAME, APP_URL, APP_VERSION } from "@/lib/version";
+
+import { JsonLd } from "./JsonLd";
 
 type HomeJsonLdProps = {
-  allOverall: LeaderboardRow[];
+  view: Pick<LeaderboardView, "page" | "filtered" | "filteredRows">;
   contentChangedAt: number | null;
 };
 
-export function HomeJsonLd({ allOverall, contentChangedAt }: HomeJsonLdProps) {
-  const json = {
-    "@context": "https://schema.org",
-    "@graph": [
-      {
-        "@type": "ItemList",
-        "@id": `${APP_URL}/#leaderboard`,
-        numberOfItems: allOverall.length,
-        name: "Agent-friendliness leaderboard",
-        itemListElement: allOverall.map((row, idx) => ({
-          "@type": "ListItem",
-          position: idx + 1,
-          name: `${row.owner}/${row.name}`,
-          url: `${APP_URL}${repoPath(row)}`,
-        })),
+/**
+ * The Dataset is the whole leaderboard (its download is /api/repos), so only
+ * the canonical home carries it: on page 2+ or a re-cut it would be a second
+ * copy of one dataset at a URL that shows a slice of it. Organization, WebSite
+ * and WebApplication are site-wide and live in app/layout.tsx. No mainEntity:
+ * the page's ItemList is one page of rows, not the dataset.
+ */
+export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Record<string, unknown>[] {
+  const itemList = boardItemList(view, "Agent-friendliness leaderboard");
+  if (!itemList) {
+    return [];
+  }
+  if (view.page > 1) {
+    return [itemList];
+  }
+  return [
+    itemList,
+    {
+      "@type": "Dataset",
+      "@id": `${APP_URL}/#dataset`,
+      name: `${APP_NAME} — public repository scoring dataset`,
+      description: `Scores for public GitHub, GitLab, and Bitbucket repos showing how easy each one is for AI coding agents to work in, with a separate score for ${agentList()}. Each repo gets ${SIGNALS.length} file checks: ${SIGNALS.map((s) => s.label).join(", ")}.`,
+      url: APP_URL,
+      version: APP_VERSION,
+      keywords: ["AI coding agents", "AGENTS.md", "CLAUDE.md", "agent readiness", "open source repositories"],
+      isAccessibleForFree: true,
+      ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+      creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+      license: "https://opensource.org/licenses/MIT",
+      distribution: {
+        "@type": "DataDownload",
+        encodingFormat: "application/json",
+        contentUrl: `${APP_URL}/api/repos`,
       },
-      {
-        "@type": "Dataset",
-        "@id": `${APP_URL}/#dataset`,
-        name: "Agent Friendly Code — public repository scoring dataset",
-        description:
-          "Scores for public GitHub, GitLab, and Bitbucket repos showing how easy each one is for AI coding agents to work in, with a separate score for Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi. Each repo gets sixteen file checks: twelve that matter to every agent (AGENTS.md, CI, tests, README, linter, type config, license, contributing guide, dev setup, pre-commit, dependency list, size) and four agent-specific instruction files (.cursor/rules/, GEMINI.md, .openhands/setup.sh, .aider.conf.yml).",
-        url: APP_URL,
-        isAccessibleForFree: true,
-        ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
-        creator: { "@id": `${APP_URL}/#org` },
-        license: "https://opensource.org/licenses/MIT",
-        mainEntity: { "@id": `${APP_URL}/#leaderboard` },
-        variableMeasured: [
-          "License",
-          "Test suite",
-          "Codebase size",
-          "README quality",
-          "CI configuration",
-          "Contributing guide",
-          "Type configuration",
-          "Dependency manifest",
-          "Pre-commit / git hooks",
-          "Linter / formatter config",
-          "Reproducible dev environment",
-          "AGENTS.md / CLAUDE.md presence",
-          "Aider config (.aider.conf.yml)",
-          "Cursor rules (.cursor/rules/*.mdc)",
-          "Gemini CLI instructions (GEMINI.md)",
-          "OpenHands setup script (.openhands/setup.sh)",
-        ],
-      },
-    ],
-  };
+      variableMeasured: SIGNALS.map((s) => s.label),
+    },
+  ];
+}
 
-  return (
-    <script
-      type="application/ld+json"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(json).replace(/</g, "\\u003c"),
-      }}
-    />
-  );
+export function HomeJsonLd(props: HomeJsonLdProps) {
+  const graph = homeJsonLdGraph(props);
+  if (graph.length === 0) {
+    return null;
+  }
+
+  return <JsonLd data={{ "@graph": graph }} />;
 }

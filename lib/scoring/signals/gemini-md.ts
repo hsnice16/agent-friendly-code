@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { readSafe, resolveRelative } from "./helpers";
+import { characters, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "GEMINI.md";
@@ -8,7 +8,7 @@ const LABEL = "GEMINI.md";
 export const geminiMd: Signal = {
   label: LABEL,
   id: "gemini_md",
-  description: "Gemini CLI's canonical hierarchical instructions file — read at every prompt.",
+  description: "Gemini CLI's instructions file, read on every prompt.",
   improveSuggestion:
     "Add a GEMINI.md at the repo root covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
   check: (repo) => {
@@ -23,7 +23,7 @@ export const geminiMd: Signal = {
       };
     }
 
-    const len = readSafe(join(repo, matched)).trim().length;
+    const len = readSafe(join(repo, matched), repo).trim().length;
     if (len === 0) {
       return {
         pass: 0.2,
@@ -40,7 +40,7 @@ export const geminiMd: Signal = {
         label: LABEL,
         id: "gemini_md",
         matchedPath: matched,
-        detail: `GEMINI.md exists (${len} chars) — thin`,
+        detail: `GEMINI.md exists (${characters(len)}) — thin`,
       };
     }
 
@@ -50,7 +50,7 @@ export const geminiMd: Signal = {
         label: LABEL,
         id: "gemini_md",
         matchedPath: matched,
-        detail: `GEMINI.md exists (${len} chars)`,
+        detail: `GEMINI.md exists (${characters(len)})`,
       };
     }
 
@@ -59,7 +59,7 @@ export const geminiMd: Signal = {
       label: LABEL,
       id: "gemini_md",
       matchedPath: matched,
-      detail: `Substantive GEMINI.md (${len} chars)`,
+      detail: `Substantive GEMINI.md (${characters(len)})`,
     };
   },
 };

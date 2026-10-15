@@ -37,9 +37,10 @@ export function CopySnippet({ text, highlight = false }: { text: string; highlig
   return (
     <div className="relative">
       <pre
+        // A one-line command wraps instead of scrolling, so none of it hides under the copy button on a phone.
         className={`m-0 overflow-x-auto rounded-md border bg-surface-2 px-3 py-2 pr-11 text-[12px] leading-relaxed ${
-          highlight ? PRE_TONE[highlight] : "border-line"
-        }`}
+          isMultiLine ? "" : "whitespace-pre-wrap break-all"
+        } ${highlight ? PRE_TONE[highlight] : "border-line"}`}
       >
         <code>{text}</code>
       </pre>

@@ -48,7 +48,7 @@ function detectTypedLang(repo: string): string | null {
 export const typeConfig: Signal = {
   id: "type_config",
   label: "Type configuration",
-  description: "Static types help agents reason about call sites without running code.",
+  description: "Static types let the agent check call sites without running code.",
   improveSuggestion:
     "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python). Rust/Go/JVM/Scala/Swift/C#/OCaml/Haskell/Zig are typed by default.",
   check: (repo) => {
@@ -65,7 +65,7 @@ export const typeConfig: Signal = {
     }
 
     const pyproject = resolveRelative(repo, "pyproject.toml");
-    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject)))) {
+    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject), repo))) {
       return {
         pass: 1,
         id: "type_config",

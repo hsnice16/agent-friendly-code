@@ -8,5 +8,8 @@ export function detectBadgeEmbed(repoPath: string, slug: string): boolean {
     return false;
   }
 
-  return readSafe(p).includes(`/api/badge/${slug}`);
+  // Case-insensitive like the badge route's lookup. Bounded at the end, so the
+  // badge of repo "hono-extra" isn't read as one for "hono".
+  const escaped = slug.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  return new RegExp(`/api/badge/${escaped}(?:\\.svg)?(?![\\w.-])`, "i").test(readSafe(p, repoPath));
 }

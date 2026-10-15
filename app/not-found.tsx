@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   // Next tags this route noindex itself; the layout's `index, follow` is
   // emitted beside it, so it is restated here and the two tags agree.
   robots: { index: false, follow: true },
+  // The layout's canonical is "/", which would tell crawlers every 404 is the home page.
+  alternates: { canonical: null },
   description: `There is no page at this address on ${APP_NAME}.`,
 };
 

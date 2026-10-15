@@ -2,6 +2,7 @@ import Link from "next/link";
 
 import type { SignalResult } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { modelPath } from "@/lib/utils/leaderboard-href";
 import { keySignals } from "@/lib/utils/repo-summary";
 
 import { Panel, PanelHeading } from "./Panel";
@@ -20,14 +21,27 @@ function mark(pass: number) {
   return pass >= 1 ? MARK.ok : pass > 0 ? MARK.partial : MARK.bad;
 }
 
-export function PerModelScores({ modelScores, signals }: { modelScores: ModelScoreRow[]; signals: SignalResult[] }) {
+type Props = {
+  modelScores: ModelScoreRow[];
+  signals: SignalResult[];
+  /** The repo's place on each agent's board; absent for a repo that isn't on the boards. */
+  ranks?: Record<string, { rank: number; total: number }>;
+};
+
+export function PerModelScores({ modelScores, signals, ranks }: Props) {
   return (
     <Panel>
       <PanelHeading>Score for each AI agent</PanelHeading>
 
       <p className="m-0 mb-1 text-[13.5px] text-muted">
         Each agent looks for different things in a repo, based on its own docs. Under each score are the three checks it
-        cares about most.
+        cares about most; the agent&apos;s name links to its leaderboard.{" "}
+        <Link
+          href="/methodology#agents"
+          className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
+        >
+          How each agent is scored →
+        </Link>
       </p>
 
       {[...MODELS]
@@ -38,7 +52,20 @@ export function PerModelScores({ modelScores, signals }: { modelScores: ModelSco
             key={m.id}
             className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 border-b border-line py-3 last:border-b-0 sm:grid-cols-[150px_1fr_auto]"
           >
-            <div className="text-[14.5px] font-medium">{m.label}</div>
+            <div className="text-[14.5px] font-medium">
+              <Link
+                href={modelPath(m.id)}
+                aria-label={`${m.label} leaderboard`}
+                className="text-ink underline-offset-4 hover:text-ink-soft hover:underline"
+              >
+                {m.label}
+              </Link>
+              {ranks?.[m.id] && (
+                <div className="mt-0.5 text-[12px] font-normal text-muted">
+                  #{ranks[m.id].rank} of {ranks[m.id].total}
+                </div>
+              )}
+            </div>
 
             <div className="order-3 col-span-2 sm:order-none sm:col-span-1">
               {s === null ? (
@@ -74,14 +101,6 @@ export function PerModelScores({ modelScores, signals }: { modelScores: ModelSco
                   </li>
                 );
               })}
-              <li className="sm:ml-auto">
-                <Link
-                  href={`/methodology#model-${m.id}`}
-                  className="text-[13px] text-muted underline-offset-4 hover:text-ink-soft hover:underline"
-                >
-                  How {m.label} is scored →
-                </Link>
-              </li>
             </ul>
           </div>
         ))}

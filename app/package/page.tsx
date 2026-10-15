@@ -5,24 +5,9 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { PackageLookupForm } from "@/components/PackageLookupForm";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { staticPageMetadata } from "@/lib/page-meta";
 
-const DESCRIPTION = "Look up an npm, PyPI, or Cargo package to see how ready its source repo is for AI coding agents.";
-
-export const metadata: Metadata = {
-  title: "Packages",
-  description: DESCRIPTION,
-  alternates: { canonical: "/package" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Packages", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "Packages",
-    description: DESCRIPTION,
-    url: "/package",
-    type: "website",
-  },
-};
+export const metadata: Metadata = staticPageMetadata("/package");
 
 const EXAMPLES = [
   { registry: "npm", name: "axios" },

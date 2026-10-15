@@ -6,7 +6,7 @@ const CANDIDATES = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.
 export const license: Signal = {
   id: "license",
   label: "License file",
-  description: "Clarity on what an agent is allowed to do with the code.",
+  description: "A license, so it's clear what may be done with the code.",
   improveSuggestion: "Add a LICENSE (or COPYING) file — MIT, Apache-2.0, BSD, GPL, etc. — at the repo root.",
   check: (repo) => {
     const m = firstExisting(repo, CANDIDATES);

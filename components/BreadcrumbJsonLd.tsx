@@ -1,26 +1,26 @@
 import { APP_URL } from "@/lib/version";
 
-type Crumb = { name: string; path: string };
+import { JsonLd } from "./JsonLd";
 
-export function BreadcrumbJsonLd({ current, parent }: { current: Crumb; parent?: Crumb }) {
-  const trail = [{ name: "Home", path: "/" }, ...(parent ? [parent] : []), current];
-  const json = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: trail.map((c, i) => ({
-      "@type": "ListItem",
-      position: i + 1,
-      name: c.name,
-      item: `${APP_URL}${c.path}`,
-    })),
-  };
+export type Crumb = { name: string; path: string };
+
+export function breadcrumbTrail(current: Crumb, parents: Crumb[] = []): Crumb[] {
+  return [{ name: "Home", path: "/" }, ...parents, current];
+}
+
+export function BreadcrumbJsonLd({ current, parent }: { current: Crumb; parent?: Crumb | Crumb[] }) {
+  const trail = breadcrumbTrail(current, parent == null ? [] : [parent].flat());
 
   return (
-    <script
-      type="application/ld+json"
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: server-built JSON-LD; `<` is escaped
-      dangerouslySetInnerHTML={{
-        __html: JSON.stringify(json).replace(/</g, "\\u003c"),
+    <JsonLd
+      data={{
+        "@type": "BreadcrumbList",
+        itemListElement: trail.map((c, i) => ({
+          "@type": "ListItem",
+          position: i + 1,
+          name: c.name,
+          item: `${APP_URL}${c.path}`,
+        })),
       }}
     />
   );

@@ -1,7 +1,7 @@
-export const SORT_KEYS = ["score", "stars"] as const;
+const SORT_KEYS = ["score", "stars"] as const;
 export type SortKey = (typeof SORT_KEYS)[number];
 
-export const SORT_DIRS = ["desc", "asc"] as const;
+const SORT_DIRS = ["desc", "asc"] as const;
 export type SortDir = (typeof SORT_DIRS)[number];
 
 export const DEFAULT_SORT: SortKey = "score";

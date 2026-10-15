@@ -3,6 +3,7 @@ import type { CheckContent } from "./types";
 export const AGENT_FILE_CHECKS: Record<string, CheckContent> = {
   agents_md: {
     title: "AGENTS.md and CLAUDE.md: what they are and how many repos have one",
+    metaTitle: "AGENTS.md and CLAUDE.md: how many repos have one",
     description:
       "What an AGENTS.md or CLAUDE.md file is, which AI coding agents read it, how we score it, and how many popular open source repos already have one.",
     what: "AGENTS.md is a markdown file at the top of a repo, written for AI coding agents instead of people. It says what the project is, how it is laid out, which commands build and test it, and which rules to follow. CLAUDE.md is the same idea under the name Claude Code looks for.",
@@ -18,6 +19,7 @@ export const AGENT_FILE_CHECKS: Record<string, CheckContent> = {
   },
   cursor_rules: {
     title: "Cursor rules: .cursor/rules and .cursorrules in open source repos",
+    metaTitle: "Cursor rules: .cursor/rules in open source repos",
     description:
       "What Cursor rule files are, the difference between .cursor/rules/*.mdc and the legacy .cursorrules file, how we score them, and which repos ship them.",
     what: "Cursor rules are instruction files that Cursor reads from the repo. The current form is a `.cursor/rules/` folder of `.mdc` files, each covering one topic such as architecture or naming. The older form is a single `.cursorrules` file at the repo root.",

@@ -1,4 +1,4 @@
-export type PanelTone = "warn" | "info" | "tip";
+type PanelTone = "warn" | "info" | "tip";
 
 const TONE_BORDER: Record<PanelTone, string> = {
   tip: "border-tip/40",

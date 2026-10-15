@@ -47,5 +47,11 @@
       "jsxQuoteStyle": "double"
     }
   },
+  "overrides": [
+    {
+      "includes": ["components/BadgeEmbed.tsx", "components/PeerlistBadge.tsx", "components/ProductHuntBadge.tsx"],
+      "linter": { "rules": { "performance": { "noImgElement": "off" } } }
+    }
+  ],
   "assist": { "actions": { "source": { "organizeImports": "on" } } }
 }

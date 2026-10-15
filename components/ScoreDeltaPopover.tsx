@@ -6,10 +6,11 @@ import { useEffect, useId, useRef, useState } from "react";
 type Props = {
   current: number;
   previous: number;
-  lastScoredAt: number | null;
+  /** Formatted on the server: ICU output differs between Node and browsers. */
+  scoredAt: string | null;
 };
 
-export function ScoreDeltaPopover({ current, previous, lastScoredAt }: Props) {
+export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
   const dialogId = useId();
   const [open, setOpen] = useState(false);
   const btnRef = useRef<HTMLButtonElement>(null);
@@ -17,16 +18,6 @@ export function ScoreDeltaPopover({ current, previous, lastScoredAt }: Props) {
 
   const diff = Math.round((current - previous) * 10) / 10;
   const down = diff < 0;
-
-  const absDate = lastScoredAt
-    ? new Date(lastScoredAt * 1000).toLocaleString(undefined, {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        hour: "numeric",
-        minute: "2-digit",
-      })
-    : null;
 
   const cancelClose = () => {
     if (closeTimerRef.current) {
@@ -122,10 +113,10 @@ export function ScoreDeltaPopover({ current, previous, lastScoredAt }: Props) {
             </dd>
           </div>
 
-          {absDate && (
+          {scoredAt && (
             <div className="flex justify-between gap-2 border-t border-line pt-1.5">
               <dt className="text-muted">Scored</dt>
-              <dd className="font-medium text-ink-soft">{absDate}</dd>
+              <dd className="font-medium text-ink-soft">{scoredAt}</dd>
             </div>
           )}
         </dl>

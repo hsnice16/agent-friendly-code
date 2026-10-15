@@ -1,10 +1,10 @@
-export type RoadmapItem = {
+type RoadmapItem = {
   title: string;
   summary: string;
   taskFile?: string;
 };
 
-export type RoadmapVersion = {
+type RoadmapVersion = {
   theme: string;
   version: string;
   items: RoadmapItem[];
@@ -13,18 +13,18 @@ export type RoadmapVersion = {
 
 export const ROADMAP: RoadmapVersion[] = [
   {
-    version: "0.9.0",
+    version: "0.10.0",
     status: "planned",
     theme: "Maintainer ownership + at-scale discovery",
     items: [
       {
         title: "Opt-out / claim flow",
-        taskFile: "tasks/0.9.0/01-opt-out-claim-flow.md",
+        taskFile: "tasks/0.10.0/01-opt-out-claim-flow.md",
         summary: "OAuth so maintainers control their listing.",
       },
       {
         title: "Package-registry overlay (at scale)",
-        taskFile: "tasks/0.9.0/02-package-registry-overlay.md",
+        taskFile: "tasks/0.10.0/02-package-registry-overlay.md",
         summary: "Per-registry leaderboards + browser userscript for inline badges on npmjs.com / PyPI / crates.io.",
       },
     ],

@@ -1,0 +1,8 @@
+{
+  "full_name": "snakeyaml/snakeyaml",
+  "description": "a complete YAML 1.1 processor for JVM",
+  "language": "java",
+  "mainbranch": {
+    "name": "master"
+  }
+}

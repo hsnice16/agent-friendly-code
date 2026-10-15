@@ -11,8 +11,17 @@ type Props = {
 export function ProductHuntBadge({ className }: Props) {
   return (
     <a target="_blank" href={PH_POST_URL} className={className} rel="noopener noreferrer">
-      {/* Remote PH badge SVG — plain <img> like BadgeEmbed; no next/image remote config needed. */}
-      <img width={250} height={54} alt={PH_BADGE_ALT} src={PH_BADGE_SRC} />
+      {/* Remote PH badge SVG — plain <img> like BadgeEmbed; no next/image remote config needed.
+          Lazy: React preloads every eager <img> in the head, which put this footer badge ahead of the page's own requests. */}
+      <img
+        width={250}
+        height={54}
+        alt={PH_BADGE_ALT}
+        src={PH_BADGE_SRC}
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+      />
     </a>
   );
 }

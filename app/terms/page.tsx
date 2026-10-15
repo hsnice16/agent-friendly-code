@@ -4,26 +4,12 @@ import Link from "next/link";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { APP_NAME, CONTACT_EMAIL, DEFAULT_OG_IMAGE, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
+import { staticPageMetadata } from "@/lib/page-meta";
+import { APP_NAME, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
 
 const LAST_UPDATED = "October 10, 2026";
 
-const DESCRIPTION = `Terms of Use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`;
-
-export const metadata: Metadata = {
-  title: "Terms of Use",
-  description: DESCRIPTION,
-  alternates: { canonical: "/terms" },
-  twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title: "Terms of Use", description: DESCRIPTION },
-  openGraph: {
-    ...OG_DEFAULTS,
-    images: [DEFAULT_OG_IMAGE],
-    title: "Terms of Use",
-    description: DESCRIPTION,
-    url: "/terms",
-    type: "article",
-  },
-};
+export const metadata: Metadata = staticPageMetadata("/terms");
 
 export default function TermsPage() {
   return (

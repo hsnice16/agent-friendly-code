@@ -40,8 +40,7 @@ export async function seedPackages() {
   console.log(`package seed done — ${scored} scored / ${other} other`);
 }
 
-// Run when invoked as a top-level script (e.g. `bun run seed-packages`),
-// but stay inert when imported by scripts/seed.ts so we don't double-execute.
+// Inert when scripts/seed.ts imports it, which runs it itself.
 if (process.argv[1]?.endsWith("seed-packages.ts")) {
   void seedPackages();
 }

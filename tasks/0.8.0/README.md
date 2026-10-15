@@ -4,7 +4,7 @@
 
 Search Console showed most repo pages known to Google but never crawled: they were reachable only through deep leaderboard pagination, at numeric URLs that said nothing about the repo. This version gives every repo more ways in and an address that survives a rename, and stops the tracked set rotting quietly.
 
-The two heavier items first planned here, the opt-out / claim flow and the at-scale package overlay, moved to [0.9.0](../0.9.0/README.md): they need auth and a browser extension, and nothing in this version depends on them.
+The two heavier items first planned here, the opt-out / claim flow and the at-scale package overlay, moved to [0.10.0](../0.10.0/README.md): they need auth and a browser extension, and nothing in this version depends on them.
 
 ## Tasks
 

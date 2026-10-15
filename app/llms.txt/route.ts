@@ -3,8 +3,12 @@ import { REGISTRIES } from "@/lib/clients/registries";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { getTopicGroups } from "@/lib/topic-pages";
+import { TOPICS_PATH } from "@/lib/topics";
 import { checkPath } from "@/lib/utils/check-path";
+import { OTHER_LANGUAGES_PATH } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
+import { repoPath } from "@/lib/utils/repo-path";
 import {
   ACTION_REPO_URL,
   APP_DESCRIPTION,
@@ -30,19 +34,24 @@ export function GET(): Response {
     if (rows.length === 0) {
       return "";
     }
+    // The repo page, not /package/…: package pages are noindex pointers to it.
+    // The query only returns packages whose source repo is scored, so each has one.
     const lines = rows.map(
-      (p) => `- [${registry}/${p.name}](${APP_URL}/package/${registry}/${p.name}): ${p.score.toFixed(1)} / 100`,
+      (p) =>
+        `- [${registry}/${p.name}](${APP_URL}${repoPath({ host: p.host, owner: p.owner, name: p.repoName })}): source repo ${p.owner}/${p.repoName}, ${p.score.toFixed(1)} / 100`,
     );
     return `### ${registry}\n\n${lines.join("\n")}`;
   })
     .filter(Boolean)
     .join("\n\n");
 
+  const hasTopics = getTopicGroups().length > 0;
+
   const body = `# ${APP_NAME}
 
 > ${APP_DESCRIPTION}
 
-The scoring engine evaluates sixteen static signals per repository — twelve cross-agent (AGENTS.md / CLAUDE.md, CI configuration, test suite, README, linter / formatter, type config, license, contributing guide, reproducible dev environment, pre-commit hooks, dependency manifest, codebase size) plus four agent-specific instruction files (\`.cursor/rules/*.mdc\` for Cursor, \`GEMINI.md\` for Gemini CLI, \`.openhands/setup.sh\` for OpenHands, \`.aider.conf.yml\` for Aider). Each AI coding agent has its own weight profile across those signals, so the same repository can score differently for different agents.
+Every score comes from ${SIGNALS.length} file checks, listed below; no agent is run. Each AI coding agent weighs the checks by what its own docs say it reads, so the same repository can score differently for different agents.
 
 ## Agents scored for
 
@@ -58,13 +67,15 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 - [About](${APP_URL}/about): Who built this, why, and the project's independence statement
 - [Action](${APP_URL}/action): GitHub Action that comments on each pull request with the score change — install snippet, FAQ
 - [Changelog](${APP_URL}/changelog): What shipped per release
-- [Checks](${APP_URL}/check): Every check, with what it looks for, how to pass it and how many leaderboard repos do
+- [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check, with what it looks for, how to pass it and how many leaderboard repos do
+- [AGENTS.md examples](${APP_URL}${checkPath("agents_md")}/examples): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
-- [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
+- [Other languages](${APP_URL}${OTHER_LANGUAGES_PATH}): Repos in languages too small for their own hub, grouped by language
+${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
 - [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, including repos the leaderboard has not indexed
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
-- [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, best-fit agent, score → model class, optional SessionStart hooks for Claude Code / Codex
+- [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, the agent your repo is best set up for, score → model class, optional SessionStart hooks for Claude Code / Codex
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL
 
 ## Public API
@@ -81,6 +92,8 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 - [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the user's current repo locally, no service dependency
 
 ## Top scored packages
+
+Each links to the score page of the package's source repo.
 
 ${topPackagesSection || "_No packages indexed yet._"}
 

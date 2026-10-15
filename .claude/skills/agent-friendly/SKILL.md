@@ -82,7 +82,7 @@ Example output:
 Agent-friendliness: 87.4 (high) — well-prepped for AI coding agents.
 Best for: Claude Code (89.2). Cursor close behind at 86.1.
 Why: strong AGENTS.md, tests in place, reproducible dev env.
-Recommendation: frontier model (Opus / GPT-5 / Gemini 2.5 Pro). Switch via /model (or your agent's equivalent) if you want to — your call.
+Recommendation: frontier model (Opus, GPT-5, Gemini Pro). Switch via /model (or your agent's equivalent) if you want to — your call.
 Top improvements:
   • Add a contributing guide (+2.1 pts)
   • Add pre-commit hooks (+1.4 pts)
@@ -93,27 +93,27 @@ Top improvements:
 
 Provider-neutral. Recommend a model **class** — let the user pick the actual ID for their agent.
 
-| Band | Score   | Recommendation                                                                                            |
-| ---- | ------- | --------------------------------------------------------------------------------------------------------- |
-| High | ≥ 80    | Frontier — Opus / GPT-5 / Gemini 2.5 Pro. Repo is well-prepped, the model can leverage it.                |
-| Mid  | 60 – 79 | Standard — Sonnet / GPT-5 Codex / Gemini 2.5 Flash. Solid baseline; frontier optional.                    |
-| Low  | < 60    | Small / fast — Haiku / GPT-4o-mini / Gemini 2.5 Flash-Lite. Repo lacks scaffolding for a frontier run.    |
+| Band | Score      | Recommendation                                        |
+| ---- | ---------- | ----------------------------------------------------- |
+| High | ≥ 80       | Frontier (Opus, GPT-5, Gemini Pro)                    |
+| Mid  | ≥ 60, < 80 | Standard (Sonnet, GPT-5 mini, Gemini Flash)           |
+| Low  | < 60       | Small and fast (Haiku, GPT-5 nano, Gemini Flash-Lite) |
 
-The reasoning: a high-scoring repo has the scaffolding (AGENTS.md, fast tests, clear dev env) that lets a frontier model actually deliver. A low-scoring repo lacks those affordances; a frontier model's extra reasoning has nothing to grip on, so a smaller / faster model is the better trade.
+The reasoning: a high-scoring repo has the scaffolding (AGENTS.md, fast tests, clear dev env) that lets a frontier model actually deliver. A low-scoring repo lacks those affordances; a frontier model's extra reasoning has little to work with, so a smaller, faster model is the better trade.
 
 ## On first invocation
 
 After the first successful run, mention to the user that they can wire the skill into a `SessionStart` hook so it fires automatically each session — pointing at the website's `/skill` page for copy-paste snippets:
 
-- **Claude Code** → `.claude/settings.json` `SessionStart` matcher.
-- **Codex CLI** → `.codex/hooks.json` `SessionStart` matcher.
-- **Cursor / Cline / Copilot** → no `SessionStart` event today; paste the same `node ... --summary` command into `.cursorrules` / `.clinerules` as a static instruction, or invoke this skill manually.
+- **Claude Code** → `.claude/settings.json`: a `SessionStart` entry with `"matcher": "startup"` and a `hooks` list of `{ "type": "command" }` handlers.
+- **Codex CLI** → `.codex/hooks.json`: the same matcher-group shape. A bare `command` on the event is ignored.
+- **Other agents** → run `/agent-friendly` whenever you want a fresh score.
 
 Snippets live at <https://agentfriendlycode.com/skill>.
 
 ## Failure modes
 
-- **Bundle missing.** If `dist/index.js` doesn't exist next to this `SKILL.md`, the install was incomplete or the user is on an older skill version. Tell them to re-run `npx skills add hsnice16/agent-friendly-skill`.
+- **Bundle missing.** If `dist/index.js` doesn't exist next to this `SKILL.md`, the install was incomplete or the user is on an older skill version. Tell them to re-run `npx skills add hsnice16/agent-friendly-skill#v0`.
 - **Low score because cwd is a subdirectory.** The scorer reads the path you pass it (default: cwd). If the user is in a subdirectory of their project (e.g. `src/`), 16 signals will mostly fail because root-level files like `AGENTS.md`, `README.md`, `package.json` aren't there. If the score looks unexpectedly low, mention this and ask the user to invoke from the project root (or pass the root path explicitly).
 - **Node not on PATH.** Tell the user to install Node ≥ 20.9.0 (matches the bundle's runtime requirement).
 
