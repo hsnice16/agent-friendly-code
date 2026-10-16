@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { CHECK_CONTENT } from "../lib/check-content";
+import { CHECK_CONTENT, CHECK_QUESTIONS } from "../lib/check-content";
 import { SIGNALS } from "../lib/scoring/signals";
 import { checkSlug, signalIdFromSlug } from "../lib/utils/check-path";
 import { percent } from "../lib/utils/format";
@@ -9,6 +9,10 @@ import { percent } from "../lib/utils/format";
 describe("check pages", () => {
   it("has content for every signal and for nothing else", () => {
     assert.deepEqual(Object.keys(CHECK_CONTENT).sort(), SIGNALS.map((s) => s.id).sort());
+  });
+
+  it("has panel questions for every signal and for nothing else", () => {
+    assert.deepEqual(Object.keys(CHECK_QUESTIONS).sort(), SIGNALS.map((s) => s.id).sort());
   });
 
   it("round-trips every signal id through its slug", () => {

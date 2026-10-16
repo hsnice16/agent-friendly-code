@@ -91,7 +91,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 
 1. Add `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (with `improveSuggestion`), using the `helpers.ts` resolvers.
 2. Register it in `SIGNALS` (`signals/index.ts`) and give it a weight in **every** model in `weights.ts` (missing means 0).
-3. Write its `/check/<slug>` prose in `lib/check-content/`. Its `scoring` lines restate the signal's thresholds by hand; keep them in step.
+3. Write its `/check/<slug>` prose in `lib/check-content/`, and its panel headings in `questions.ts` there. Its `scoring` lines restate the signal's thresholds by hand; keep them in step.
 4. Update the hard-coded signal count in `README.md` and the count and list in `app/llms.txt/route.ts`.
 5. Mirror to both siblings (above), then `bun run seed`.
 

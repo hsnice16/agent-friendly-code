@@ -10,3 +10,6 @@ export type CheckContent = {
   scoring: string[];
   fix: string;
 };
+
+/** A /check page's panel headings, one per panel. */
+export type CheckQuestions = { pass: string; why: string; scoring: string; fix: string; agents: string };

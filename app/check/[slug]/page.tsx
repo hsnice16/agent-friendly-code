@@ -7,7 +7,7 @@ import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { CHECK_CONTENT } from "@/lib/check-content";
+import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
@@ -55,6 +55,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
   const signal = SIGNAL_BY_ID[id];
   const content = CHECK_CONTENT[id];
+  const questions = CHECK_QUESTIONS[id];
   const stats = getCheckStats(id);
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
   const { contentChangedAt } = getLeaderboardStats();
@@ -95,7 +96,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
       </section>
 
       <Panel>
-        <PanelHeading>How many repos pass</PanelHeading>
+        <PanelHeading>{questions.pass}</PanelHeading>
         <p className={PROSE}>
           Of the {stats.total} repos on the leaderboard,{" "}
           <strong className="text-ink">
@@ -108,7 +109,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>Why agents need it</PanelHeading>
+          <PanelHeading>{questions.why}</PanelHeading>
           <p className={PROSE}>
             <CodeText text={content.why} />
           </p>
@@ -117,7 +118,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <Panel className="h-full">
-          <PanelHeading>How we score it</PanelHeading>
+          <PanelHeading>{questions.scoring}</PanelHeading>
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             {content.scoring.map((line) => (
               <li key={line}>
@@ -135,7 +136,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         </Panel>
 
         <Panel className="h-full">
-          <PanelHeading>How to pass</PanelHeading>
+          <PanelHeading>{questions.fix}</PanelHeading>
           <p className={PROSE}>
             <CodeText text={content.fix} />
           </p>
@@ -144,7 +145,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <Panel className="h-full">
-          <PanelHeading>Which agents count it most</PanelHeading>
+          <PanelHeading>{questions.agents}</PanelHeading>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
             {stats.agents.map(({ model, share }) => (
               <li key={model.id} className="flex items-baseline justify-between gap-3">
