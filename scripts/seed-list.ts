@@ -391,7 +391,11 @@ export const SEEDS: Seed[] = [
     note: "ClickHouse — columnar OLAP database",
     url: "https://github.com/ClickHouse/ClickHouse",
   },
-  { url: "https://github.com/postgres/postgres", note: "PostgreSQL — relational database (mirror)" },
+  {
+    url: "https://github.com/postgres/postgres",
+    note: "PostgreSQL — relational database (mirror)",
+    accept: ["mirror"],
+  },
   { url: "https://github.com/duckdb/duckdb", note: "DuckDB — in-process analytical database" },
   { url: "https://github.com/ml-explore/mlx", note: "MLX — Apple's array framework for ML on Apple silicon" },
   { url: "https://github.com/fmtlib/fmt", note: "fmt — modern C++ formatting library" },
@@ -403,7 +407,7 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/llvm/llvm-project", note: "LLVM — compiler infrastructure + Clang" },
   { url: "https://github.com/openssl/openssl", note: "OpenSSL — TLS / cryptography library" },
-  { url: "https://github.com/git/git", note: "Git — the version control system itself" },
+  { url: "https://github.com/git/git", note: "Git — the version control system itself (mirror)", accept: ["mirror"] },
   { url: "https://github.com/ocornut/imgui", note: "Dear ImGui — immediate-mode GUI" },
 
   // --- GitHub, JVM (Java / Kotlin) ---
