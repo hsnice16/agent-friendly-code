@@ -3,14 +3,16 @@ import Link from "next/link";
 import "./globals.css";
 
 import { BackToTop } from "@/components/BackToTop";
+import { FooterDirectory } from "@/components/FooterDirectory";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { JsonLd } from "@/components/JsonLd";
 import { MobileNav } from "@/components/MobileNav";
 import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { VersionPill } from "@/components/VersionPill";
+import { getLanguageGroups } from "@/lib/language-hubs";
 import { getTopicGroups } from "@/lib/topic-pages";
-import { TOPICS_PATH } from "@/lib/topics";
+import { isHub } from "@/lib/utils/language";
 import { BRAND_SUFFIX } from "@/lib/utils/page-title";
 import { APP_DESCRIPTION, APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -101,12 +103,7 @@ const FOOTER_LINKS_PRIMARY = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
-  { href: "/check", label: "Checks" },
   { href: "/check/agents-md/examples", label: "AGENTS.md examples" },
-  { href: "/language", label: "Languages" },
-  // Hidden until the data has topic pages: before the first rescore fills
-  // repo topics, /topics is an empty, noindex page.
-  { href: TOPICS_PATH, label: "Topics" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },
 ];
@@ -163,7 +160,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main id="main" className="min-h-[60vh]">
             {children}
           </main>
-          <footer className="mt-12 border-t border-line pt-5 text-[13px] leading-[1.7] text-muted">
+          <footer className="mt-12 border-t border-line pt-8 text-[13px] leading-[1.7] text-muted">
+            <FooterDirectory hubs={getLanguageGroups().filter(isHub)} topics={getTopicGroups()} />
+
             <p className="m-0">
               Scores come from checking files in each repo. No agent is actually run. What each agent looks for comes
               from its own docs, but how much each check counts is still our best guess, not yet tested.
@@ -213,17 +212,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
               <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">
                 <div className="flex flex-col items-start gap-1">
-                  {FOOTER_LINKS_PRIMARY.filter((l) => l.href !== TOPICS_PATH || getTopicGroups().length > 0).map(
-                    (l) => (
-                      <Link
-                        key={l.href}
-                        href={l.href}
-                        className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                      >
-                        {l.label}
-                      </Link>
-                    ),
-                  )}
+                  {FOOTER_LINKS_PRIMARY.map((l) => (
+                    <Link
+                      key={l.href}
+                      href={l.href}
+                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
                 </div>
 
                 <div className="flex flex-col items-start gap-1">

@@ -2,35 +2,22 @@ import Link from "next/link";
 
 import { CHANGELOG } from "@/lib/changelog";
 import { hostsText } from "@/lib/leaderboard-meta";
-import { checksBySummedWeight } from "@/lib/leaderboard-model-panel";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
-import { SIGNALS } from "@/lib/scoring/signals";
-import { TOPICS_PATH, topicPath } from "@/lib/topics";
 import type { LeaderboardStats } from "@/lib/types/db";
-import { checkPath } from "@/lib/utils/check-path";
-import { hubPath } from "@/lib/utils/language";
 import { APP_VERSION } from "@/lib/version";
-import { ExploreCards } from "./ExploreCards";
 import { HomeJsonLd } from "./HomeJsonLd";
 import { LeaderboardBoard } from "./LeaderboardBoard";
 import { LiveScoreForm } from "./LiveScoreForm";
 import { ReleaseAnnouncement } from "./ReleaseAnnouncement";
-
-// The full lists are one click away on /language, /topics and /check; listing
-// them all here made a wall of links under the board.
-const EXPLORE_PREVIEW = 3;
 
 const CTA = "border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn";
 
 type Props = {
   view: LeaderboardView;
   stats: LeaderboardStats;
-  hubs: { slug: string; label: string }[];
-  /** Every topic page, largest first. */
-  topics: { slug: string; label: string }[];
 };
 
-export function HomeLeaderboard({ view, stats, hubs, topics }: Props) {
+export function HomeLeaderboard({ view, stats }: Props) {
   return (
     <>
       <HomeJsonLd view={view} contentChangedAt={stats.contentChangedAt} />
@@ -81,33 +68,6 @@ export function HomeLeaderboard({ view, stats, hubs, topics }: Props) {
       {CHANGELOG[0]?.label === APP_VERSION && <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} />}
 
       <LeaderboardBoard view={view} stats={stats} />
-
-      <ExploreCards
-        cards={[
-          hubs.length > 0 && {
-            title: "Languages",
-            count: hubs.length,
-            href: "/language",
-            items: hubs.slice(0, EXPLORE_PREVIEW).map((g) => ({ label: g.label, href: hubPath(g.slug) })),
-          },
-          topics.length > 0 && {
-            title: "Topics",
-            count: topics.length,
-            href: TOPICS_PATH,
-            items: topics.slice(0, EXPLORE_PREVIEW).map((t) => ({ label: t.label, href: topicPath(t.slug) })),
-          },
-          {
-            title: "Checks",
-            count: SIGNALS.length,
-            href: "/check",
-            // The ones that count most across agents, as /check's "Start with these".
-            items: checksBySummedWeight(EXPLORE_PREVIEW).map((c) => ({
-              label: SIGNALS.find((s) => s.id === c.id)?.label ?? c.id,
-              href: checkPath(c.id),
-            })),
-          },
-        ]}
-      />
     </>
   );
 }

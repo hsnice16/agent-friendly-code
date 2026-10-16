@@ -14,3 +14,4 @@ Planned for 0.9.0; moved here when 0.9.0 was cut from the discovery and repo-pag
 ## Shipped since 0.9.0, owed a changelog line
 
 - Live Score pages get the repo page's section nav, agent instructions panel, collapsed "All checks" with file links, and the PR Action embed.
+- Every page's footer lists every agent board, language, check and topic; the home page's preview cards are gone.

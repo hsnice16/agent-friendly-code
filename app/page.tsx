@@ -2,11 +2,9 @@ import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
 
 import { HomeLeaderboard } from "@/components/HomeLeaderboard";
-import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
+import { getLeaderboardStats } from "@/lib/db";
 import { leaderboardMetadata } from "@/lib/leaderboard-meta";
 import { type LeaderboardSearchParams, resolveLeaderboardView } from "@/lib/leaderboard-view";
-import { getTopicGroups } from "@/lib/topic-pages";
-import { groupByLanguage, isHub } from "@/lib/utils/language";
 import { isModelId, leaderboardHref } from "@/lib/utils/leaderboard-href";
 
 type SearchParams = LeaderboardSearchParams & { model?: string | string[] };
@@ -24,14 +22,5 @@ export default async function Page({ searchParams }: { searchParams: Promise<Sea
     permanentRedirect(leaderboardHref(resolveLeaderboardView(model, sp)));
   }
 
-  const allOverall = listLeaderboardOverall();
-
-  return (
-    <HomeLeaderboard
-      stats={getLeaderboardStats()}
-      hubs={groupByLanguage(allOverall).filter(isHub)}
-      topics={getTopicGroups()}
-      view={resolveLeaderboardView("overall", sp)}
-    />
-  );
+  return <HomeLeaderboard stats={getLeaderboardStats()} view={resolveLeaderboardView("overall", sp)} />;
 }
