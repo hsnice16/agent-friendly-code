@@ -21,12 +21,7 @@ const ABOUT_JSON_LD = {
       name: "Himanshu Singh",
       jobTitle: "Software Engineer",
       url: "https://github.com/hsnice16",
-      sameAs: [
-        "https://github.com/hsnice16",
-        "https://x.com/hsnice16",
-        "https://personallogs.vercel.app",
-        "https://github.com/sponsors/hsnice16",
-      ],
+      sameAs: ["https://github.com/hsnice16", "https://x.com/hsnice16", "https://github.com/sponsors/hsnice16"],
     },
     {
       "@id": `${APP_URL}/about#page`,
@@ -57,8 +52,7 @@ export default function AboutPage() {
         <PanelHeading>Who</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>, a
-          software engineer working remotely who builds side projects in the open. Blog:{" "}
-          <ExternalLink href="https://personallogs.vercel.app">personallogs.vercel.app</ExternalLink>. X:{" "}
+          software engineer working remotely who builds side projects in the open. X:{" "}
           <ExternalLink href="https://x.com/hsnice16">@hsnice16</ExternalLink>.
         </p>
         <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">

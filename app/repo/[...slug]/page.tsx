@@ -13,8 +13,9 @@ import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RepoHero } from "@/components/RepoHero";
 import { RepoReport } from "@/components/RepoReport";
+import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
-import { FloatingSectionMenu, type NavSection, SectionNav } from "@/components/SectionNav";
+import type { NavSection } from "@/components/SectionNav";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
@@ -58,15 +59,6 @@ export const dynamicParams = false;
 async function load(params: Promise<Params>) {
   const identity = repoIdentity((await params).slug);
   return identity ? loadRepo(identity.host, identity.owner, identity.name) : null;
-}
-
-// scroll-mt clears the sticky header when a nav link jumps here.
-function Section({ id, className = "", children }: { id: string; className?: string; children: React.ReactNode }) {
-  return (
-    <section id={id} className={`mt-3.5 scroll-mt-20 ${className}`}>
-      {children}
-    </section>
-  );
 }
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
@@ -230,14 +222,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           </Section>
         )}
 
-        {/* In the page margin, beside the content rather than taking width from
-          it; below that width the margin is too narrow, so the menu floats. */}
-        <div className="absolute inset-y-0 left-full ml-10 hidden w-44 min-[1500px]:block">
-          <SectionNav sections={sections} />
-        </div>
-        <div className="min-[1500px]:hidden">
-          <FloatingSectionMenu sections={sections} />
-        </div>
+        <SectionRail sections={sections} />
       </div>
     </>
   );

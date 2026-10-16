@@ -2,13 +2,19 @@ import type { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
+import { ActionEmbed } from "@/components/ActionEmbed";
+import { ActionEmbedReveal } from "@/components/ActionEmbedReveal";
+import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
+import { HashDetails } from "@/components/HashDetails";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
-import { Panel, PanelHeading } from "@/components/Panel";
+import { Panel } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RecordScore } from "@/components/RecordScore";
 import { RepoHero } from "@/components/RepoHero";
+import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
+import type { NavSection } from "@/components/SectionNav";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 import { type ParsedRepo, parseRepoUrl } from "@/lib/clients/github";
@@ -21,13 +27,15 @@ import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { topImprovements } from "@/lib/scoring/scorer";
 import type { ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
+import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { hostLabel } from "@/lib/utils/format";
 import { isModelId } from "@/lib/utils/leaderboard-href";
 import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/repo-about";
+import { agentFileShare } from "@/lib/utils/repo-page-data";
 import { repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { ACTION_USES, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
 export const maxDuration = 60;
@@ -174,6 +182,21 @@ export default async function LiveScorePage({
   };
   const alternatives = similarRepos({ ...repo, score: score.overall }, listLeaderboardOverall(), ALTERNATIVES_LIMIT);
 
+  const instructions = agentInstructions(score.signals, agentFileShare(score.language));
+  const slug = `${owner}/${name}`;
+  // The repo page's order, less what needs a leaderboard row: "How it
+  // compares" ranks against the board, and the badge reads the database.
+  const sections: NavSection[] = [
+    { id: "overview", label: "At a glance" },
+    { id: "has-missing", label: "What it has and misses" },
+    { id: "fix-first", label: "What to fix first" },
+    { id: "agent-scores", label: "Score for each agent" },
+    instructions && { id: "agent-instructions", label: "Agent instructions" },
+    { id: "all-checks", label: "All checks" },
+    { id: "similar", label: "Similar repos" },
+    host === "github" && { id: "pr-action", label: "Check every PR" },
+  ].filter((x): x is NavSection => Boolean(x));
+
   return (
     <>
       <Link
@@ -185,44 +208,72 @@ export default async function LiveScorePage({
 
       <RecordScore host={host} owner={owner} name={name} score={score.overall} />
 
-      <RepoHero repo={repo} commitSha={score.sha} />
+      <div className="relative">
+        <RepoHero repo={repo} commitSha={score.sha} />
 
-      <div className="mt-3.5">
-        <RepoSummary summary={summarizeScore(score.modelScores, score.signals)} />
-      </div>
+        <Section id="overview">
+          <RepoSummary summary={summarizeScore(score.modelScores, score.signals)} />
+        </Section>
 
-      <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
-        <SignalListCard
-          items={strengths}
-          variant="strength"
-          empty={{ chip: "bad", text: "Nothing passes fully yet." }}
-        />
-        <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
-      </div>
+        <Section id="has-missing" className="grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
+          <SignalListCard
+            items={strengths}
+            variant="strength"
+            empty={{ chip: "bad", text: "Nothing passes fully yet." }}
+          />
+          <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
+        </Section>
 
-      <div className="mt-3.5">
-        <ModelSuggestions selected={selected} suggestions={suggestions} basePath={`/score/${host}/${owner}/${name}`} />
-      </div>
+        <Section id="fix-first">
+          <ModelSuggestions
+            selected={selected}
+            suggestions={suggestions}
+            basePath={`/score/${host}/${owner}/${name}`}
+          />
+        </Section>
 
-      <div className="mt-3.5">
-        <PerModelScores modelScores={score.modelScores} signals={score.signals} />
-      </div>
+        <Section id="agent-scores">
+          <PerModelScores modelScores={score.modelScores} signals={score.signals} />
+        </Section>
 
-      <div className="mt-3.5">
-        <AlternativesStrip
-          language={score.language}
-          alternatives={alternatives}
-          note={similarNote(repo, alternatives)}
-        />
-      </div>
+        {instructions && (
+          <Section id="agent-instructions">
+            <AgentInstructions data={instructions} slug={slug} repo={repo} />
+          </Section>
+        )}
 
-      <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>All checks</PanelHeading>
-          {score.signals.map((s) => (
-            <SignalRow key={s.id} signal={s} />
-          ))}
-        </Panel>
+        <Section id="all-checks">
+          <HashDetails
+            id="all-checks"
+            summary={
+              <h2 className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+                All {score.signals.length} checks · {score.signals.filter((s) => s.pass >= 1).length} passed
+              </h2>
+            }
+          >
+            {score.signals.map((s) => (
+              <SignalRow key={s.id} signal={s} repo={repo} />
+            ))}
+          </HashDetails>
+        </Section>
+
+        <Section id="similar">
+          <AlternativesStrip
+            language={score.language}
+            alternatives={alternatives}
+            note={similarNote(repo, alternatives)}
+          />
+        </Section>
+
+        {host === "github" && (
+          <Section id="pr-action">
+            <ActionEmbedReveal>
+              <ActionEmbed actionUses={ACTION_USES} branch={score.defaultBranch} showSecretLink highlight="info" />
+            </ActionEmbedReveal>
+          </Section>
+        )}
+
+        <SectionRail sections={sections} />
       </div>
     </>
   );
