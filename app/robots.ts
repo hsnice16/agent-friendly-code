@@ -34,12 +34,16 @@ const DISALLOW = ["/api/", "/score/", "/*?_rsc=", "/*&_rsc="];
 // The home Dataset's `distribution.contentUrl`; the longer rule beats `/api/`.
 const ALLOW = ["/", "/api/repos"];
 
+// Petal Search (Huawei) crawls heavily for an engine that sends next to no visitors.
+const BLOCKED = ["PetalBot"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     sitemap: `${APP_URL}/sitemap.xml`,
     rules: [
       { userAgent: "*", allow: ALLOW, disallow: DISALLOW },
       { userAgent: AI_CRAWLERS, allow: ALLOW, disallow: DISALLOW },
+      { userAgent: BLOCKED, disallow: "/" },
     ],
   };
 }

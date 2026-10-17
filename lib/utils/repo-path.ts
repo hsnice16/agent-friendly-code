@@ -19,7 +19,7 @@ export function repoIdentity(slug: string[] | undefined): RepoIdentity | null {
   const owner = rest.join("/");
 
   // Validated case-insensitively to match the lookup, but returned as written
-  // so the page can spot a non-canonical spelling and redirect it.
+  // so the caller can spot a non-canonical spelling and redirect it.
   return isHost(host?.toLowerCase()) && owner && name ? { host, owner, name } : null;
 }
 

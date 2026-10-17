@@ -41,8 +41,8 @@ const DESTINATIONS = [
 ];
 
 /**
- * Reached most often from `notFound()` in the repo, score and package routes
- * rather than from a mistyped address, so the first thing on it is the page
+ * Reached most often from an unknown repo, score or package address rather
+ * than a mistyped one, so the first thing on it is the page
  * that works for a repo we have never seen.
  */
 export default function NotFound() {
