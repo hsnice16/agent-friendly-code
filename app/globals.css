@@ -105,6 +105,15 @@ a:active {
   text-decoration: none !important;
 }
 
+/* Tailwind v4's preflight dropped the pointer cursor on buttons. In the base
+   layer so a cursor-* utility on a button still wins. */
+@layer base {
+  button:not(:disabled),
+  [role="button"]:not([aria-disabled="true"]) {
+    cursor: pointer;
+  }
+}
+
 a,
 button,
 [role="button"],
