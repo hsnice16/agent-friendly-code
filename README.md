@@ -53,7 +53,7 @@ The skill and the Action vendor the scorer and never call the API.
 - Weights come from each agent's documentation, not yet from measured agent success. A benchmark harness that runs agents on real tasks is planned for 1.0.
 - Static checks can be gamed, for example by an empty `AGENTS.md` (which scores as nearly missing).
 - Live Score supports GitHub only. GitLab and Bitbucket work but are held back by their API limits.
-- Maintainers can't opt out yet; that ships with the claim flow in 0.9. Until then, [open an issue](https://github.com/hsnice16/agent-friendly-code/issues).
+- Maintainers can't opt out yet; that ships with the claim flow in 0.10. Until then, [open an issue](https://github.com/hsnice16/agent-friendly-code/issues).
 
 Roadmap: [/roadmap](https://agentfriendlycode.com/roadmap). Released changes: [/changelog](https://agentfriendlycode.com/changelog).
 
