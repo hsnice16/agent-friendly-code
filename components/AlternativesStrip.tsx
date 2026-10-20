@@ -8,20 +8,22 @@ import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
 
 type Props = {
+  heading?: string;
   language: string | null;
-  alternatives: AlternativeRow[];
+  /** `detail` replaces the language-and-stars line under the name. */
+  alternatives: (AlternativeRow & { detail?: string })[];
   note: string;
   hubHref?: string;
 };
 
-export function AlternativesStrip({ language, alternatives, note, hubHref }: Props) {
+export function AlternativesStrip({ heading = "Similar repos", language, alternatives, note, hubHref }: Props) {
   if (alternatives.length === 0) {
     return null;
   }
 
   return (
     <Panel>
-      <PanelHeading>Similar repos</PanelHeading>
+      <PanelHeading>{heading}</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">{note}</p>
 
@@ -43,8 +45,12 @@ export function AlternativesStrip({ language, alternatives, note, hubHref }: Pro
             </div>
 
             <div className="mt-1 text-[12px] text-muted">
-              {(a.language === undefined ? language : a.language) ?? "—"}
-              {a.stars != null ? ` · ${compactStars(a.stars)}` : ""}
+              {a.detail ?? (
+                <>
+                  {(a.language === undefined ? language : a.language) ?? "—"}
+                  {a.stars != null ? ` · ${compactStars(a.stars)}` : ""}
+                </>
+              )}
             </div>
           </li>
         ))}

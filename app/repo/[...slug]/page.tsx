@@ -25,7 +25,7 @@ import { getModelScores } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
-import { topicLinks } from "@/lib/topics";
+import { reposSharingTopics, topicLabel, topicLinks } from "@/lib/topics";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { groupByLanguage, hubPath, isHub, languageSlug } from "@/lib/utils/language";
 import {
@@ -85,6 +85,15 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const about = loadAbout(repo);
   const board = loadBoard();
   const alternatives = similarRepos({ ...repo, score: repo.overall_score }, board, ALTERNATIVES_LIMIT);
+  const byTopic = reposSharingTopics(
+    { ...repo, score: repo.overall_score },
+    board,
+    new Set(alternatives.map((a) => a.id)),
+    ALTERNATIVES_LIMIT,
+  ).map(({ row, shared }) => ({
+    ...row,
+    detail: `${row.language ?? "—"} · ${shared.map(topicLabel).join(", ")}`,
+  }));
   const report = summary
     ? buildRepoReport({ repo, summary, board, signals, rates: checkRates(signals, repo.language) })
     : null;
@@ -119,6 +128,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     { id: "all-checks", label: "All checks" },
     report && { id: "compare", label: "How it compares" },
     { id: "similar", label: "Similar repos" },
+    byTopic.length > 0 && { id: "same-topics", label: "Same topics" },
     { id: "embed-badge", label: "Add a badge" },
     onGitHub && { id: "pr-action", label: "Check every PR" },
   ].filter((x): x is NavSection => Boolean(x));
@@ -201,6 +211,17 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             note={similarNote(repo, alternatives)}
           />
         </Section>
+
+        {byTopic.length > 0 && (
+          <Section id="same-topics">
+            <AlternativesStrip
+              heading="Same topics, any language"
+              language={repo.language}
+              alternatives={byTopic}
+              note="Repos tagged with the same GitHub topics, most shared first."
+            />
+          </Section>
+        )}
 
         <Section id="embed-badge">
           <BadgeEmbed

@@ -132,6 +132,47 @@ export function relatedTopics<T extends Row>(
     .map((x) => x.g);
 }
 
+// Above this share of the board a topic ("ai") ties together repos that have
+// little else in common, so it never counts as a shared topic.
+const GENERIC_TOPIC_SHARE = 0.08;
+
+export type TopicNeighbour<T> = { row: T; shared: string[] };
+
+/**
+ * Repos in any language that share the most specific topics with `repo`.
+ * Rarer shared topics break ties before score, so "wsgi" outranks "web".
+ * `exclude` holds ids already linked elsewhere on the page.
+ */
+export function reposSharingTopics<T extends Row & { score: number | null }>(
+  repo: T,
+  rows: T[],
+  exclude: Set<number>,
+  limit: number,
+): TopicNeighbour<T>[] {
+  const languages = languageSlugs(rows);
+  const topicsOf = new Map(rows.map((r) => [r.id, rowTopics(r, languages)]));
+  const counts = new Map<string, number>();
+  for (const ts of topicsOf.values()) for (const t of ts) counts.set(t, (counts.get(t) ?? 0) + 1);
+
+  const maxCount = rows.length * GENERIC_TOPIC_SHARE;
+  const own = new Set(
+    (topicsOf.get(repo.id) ?? rowTopics(repo, languages)).filter((t) => (counts.get(t) ?? 0) <= maxCount),
+  );
+  if (own.size === 0) return [];
+
+  return rows
+    .filter((r) => r.id !== repo.id && !exclude.has(r.id))
+    .map((row) => {
+      const shared = (topicsOf.get(row.id) ?? []).filter((t) => own.has(t));
+      const rarity = shared.reduce((sum, t) => sum + 1 / (counts.get(t) ?? 1), 0);
+      return { row, shared, rarity };
+    })
+    .filter((x) => x.shared.length > 0)
+    .sort((a, b) => b.shared.length - a.shared.length || b.rarity - a.rarity || (b.row.score ?? 0) - (a.row.score ?? 0))
+    .slice(0, limit)
+    .map(({ row, shared }) => ({ row, shared }));
+}
+
 /**
  * Where each of a repo's topic chips links: its topic page, else the hub of
  * the language it names. A topic with neither is left out and stays plain.

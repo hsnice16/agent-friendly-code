@@ -5,6 +5,7 @@ import {
   isNoiseTopic,
   normalizeTopic,
   relatedTopics,
+  reposSharingTopics,
   TOPIC_PAGE_MIN_REPOS,
   topicDescription,
   topicGroups,
@@ -140,5 +141,50 @@ describe("topic page copy", () => {
 
   it("reads like the example", () => {
     assert.equal(topicTitle("CLI"), "Agent-ready CLI repos ranked");
+  });
+});
+
+describe("reposSharingTopics", () => {
+  type Scored = Row & { score: number | null };
+  const at = (id: number, topics: string[], score = 50, language: string | null = "Go"): Scored => ({
+    id,
+    language,
+    topics: JSON.stringify(topics),
+    score,
+  });
+  const ids = (out: { row: Scored }[]) => out.map((x) => x.row.id);
+  // The generic cut is a share of the board, so small boards need bystanders.
+  const filler = Array.from({ length: 80 }, (_, i) => at(100 + i, [`other-${i}`]));
+
+  it("ranks by shared topics, then rarer topics, then score, across languages", () => {
+    const repo = at(1, ["wsgi", "web", "http"]);
+    const board = [
+      repo,
+      at(2, ["web"], 99),
+      at(3, ["wsgi", "web"], 10, "Python"),
+      at(4, ["http"], 60),
+      at(5, ["web", "http"], 40),
+      at(6, ["web"], 20),
+      ...filler,
+    ];
+    assert.deepEqual(ids(reposSharingTopics(repo, board, new Set(), 4)), [3, 5, 4, 2]);
+  });
+
+  it("skips excluded repos and reports what is shared", () => {
+    const repo = at(1, ["golang", "cli"]);
+    const out = reposSharingTopics(repo, [repo, at(2, ["cli"]), at(3, ["cli", "tui"]), ...filler], new Set([2]), 6);
+    assert.deepEqual(ids(out), [3]);
+    assert.deepEqual(out[0].shared, ["cli"]);
+  });
+
+  it("ignores languages, noise and topics on a large share of the board", () => {
+    const repo = at(1, ["go", "hacktoberfest", "ai"]);
+    const board = [
+      repo,
+      at(2, ["go", "hacktoberfest", "ai"]),
+      ...Array.from({ length: 10 }, (_, i) => at(10 + i, ["ai"])),
+      ...filler,
+    ];
+    assert.deepEqual(reposSharingTopics(repo, board, new Set(), 6), []);
   });
 });
