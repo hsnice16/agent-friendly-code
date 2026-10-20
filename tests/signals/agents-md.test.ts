@@ -62,4 +62,28 @@ describe("agentsMd signal", () => {
     assert.equal(r.pass, 0);
     assert.equal(r.matchedPath, undefined);
   });
+
+  test("an empty AGENTS.md does not hide a CLAUDE.md with content", () => {
+    fixture = makeFixture({ "AGENTS.md": "  \n", "CLAUDE.md": "x".repeat(900) });
+    const r = agentsMd.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /CLAUDE\.md$/);
+  });
+
+  test("a non-empty AGENTS.md still wins over a longer CLAUDE.md", () => {
+    fixture = makeFixture({ "AGENTS.md": "Short notes.", "CLAUDE.md": "x".repeat(900) });
+    const r = agentsMd.check(fixture);
+
+    assert.equal(r.pass, 0.5);
+    assert.match(r.matchedPath ?? "", /AGENTS\.md$/);
+  });
+
+  test("pass=0.2 on the first empty file when every candidate is empty", () => {
+    fixture = makeFixture({ "CLAUDE.md": "", "AGENT.md": "" });
+    const r = agentsMd.check(fixture);
+
+    assert.equal(r.pass, 0.2);
+    assert.match(r.matchedPath ?? "", /CLAUDE\.md$/);
+  });
 });

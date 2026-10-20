@@ -67,6 +67,14 @@ describe("topicGroups", () => {
     );
   });
 
+  it("makes no page for a free-text topic a URL or the sitemap can't carry as is", () => {
+    const board = rows(TOPIC_PAGE_MIN_REPOS, ["cli", "r&d", "a<b", "machine learning", "c++"]);
+    assert.deepEqual(
+      topicGroups(board).map((g) => g.slug),
+      ["cli"],
+    );
+  });
+
   it("makes no pages when topics are NULL, missing or malformed", () => {
     const board = [
       ...Array.from({ length: 20 }, (_, i) => ({ id: 1000 + i, language: "Go", topics: null })),

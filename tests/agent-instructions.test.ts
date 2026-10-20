@@ -28,10 +28,16 @@ describe("agentInstructions", () => {
     assert.deepEqual(d.absentOthers, ["GEMINI.md", ".cursor/rules", ".openhands/setup.sh", ".aider.conf.yml"]);
   });
 
-  it("knows AGENTS.md is absent when CLAUDE.md is what matched", () => {
+  it("knows AGENTS.md is absent when an empty CLAUDE.md is what matched", () => {
+    const d = agentInstructions([s("agents_md", 0.2, "File exists but empty", "CLAUDE.md")], share);
+    assert.equal(d?.main?.state, "empty");
+    assert.deepEqual(d?.absentMain, ["AGENTS.md"]);
+  });
+
+  it("does not call AGENTS.md absent when CLAUDE.md with content matched, as it may be empty", () => {
     const d = agentInstructions([s("agents_md", 0.5, "File exists (45 chars) — thin", "CLAUDE.md")], share);
     assert.equal(d?.main?.state, "thin");
-    assert.deepEqual(d?.absentMain, ["AGENTS.md"]);
+    assert.deepEqual(d?.absentMain, []);
   });
 
   it("lists every main-file name when none matched", () => {

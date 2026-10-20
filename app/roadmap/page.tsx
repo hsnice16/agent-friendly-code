@@ -16,8 +16,7 @@ export default function RoadmapPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Roadmap</h1>
         <p className="m-0 max-w-[70ch] text-[15.5px] text-ink-dim">
-          What&apos;s coming in the next versions. Each item links to a task file with the full plan, what counts as
-          done, and known limits.
+          What&apos;s coming next. Each item links to its task file: the plan, what counts as done, and known limits.
         </p>
       </section>
 

@@ -34,12 +34,8 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
       <PanelHeading>Score for each AI agent</PanelHeading>
 
       <p className="m-0 mb-1 text-[13.5px] text-muted">
-        Each agent looks for different things in a repo, based on its own docs. Under each score are the three checks it
-        cares about most; the agent&apos;s name links to its leaderboard.{" "}
-        <Link
-          href="/methodology#agents"
-          className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
-        >
+        Each agent weighs the checks by its own docs. Under each score are its top three.{" "}
+        <Link href="/methodology#agents" className="text-ink-dim hover:text-ink-soft">
           How each agent is scored →
         </Link>
       </p>
@@ -56,7 +52,7 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
               <Link
                 href={modelPath(m.id)}
                 aria-label={`${m.label} leaderboard`}
-                className="text-ink underline-offset-4 hover:text-ink-soft hover:underline"
+                className="text-ink hover:text-ink-soft"
               >
                 {m.label}
               </Link>

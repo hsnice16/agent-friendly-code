@@ -960,7 +960,23 @@ exports.agentsMd = {
     description: "An instructions file for agents, with real content.",
     improveSuggestion: "Add an AGENTS.md covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
     check: (repo) => {
-        const matched = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        // An empty AGENTS.md stub must not hide a full CLAUDE.md beside it.
+        let matched = null;
+        let len = 0;
+        for (const c of CANDIDATES) {
+            const hit = (0, helpers_1.firstExisting)(repo, [c]);
+            if (!hit) {
+                continue;
+            }
+            const n = (0, helpers_1.readSafe)(hit, repo).trim().length;
+            if (!matched || n > 0) {
+                matched = hit;
+                len = n;
+            }
+            if (n > 0) {
+                break;
+            }
+        }
         if (!matched) {
             return {
                 pass: 0,
@@ -969,7 +985,6 @@ exports.agentsMd = {
                 detail: "No agent instructions file found",
             };
         }
-        const len = (0, helpers_1.readSafe)(matched, repo).trim().length;
         if (len === 0) {
             return {
                 pass: 0.2,
@@ -1077,7 +1092,7 @@ exports.ci = {
             const abs = (0, node_path_1.join)(repo, ghWf);
             try {
                 if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
-                    const files = (0, node_fs_1.readdirSync)(abs).filter((f) => /\.ya?ml$/i.test(f));
+                    const files = (0, node_fs_1.readdirSync)(abs).filter((f) => /\.ya?ml$/i.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)));
                     if (files.length > 0) {
                         return {
                             pass: 1,
@@ -1128,6 +1143,7 @@ const CANDIDATES = [
     "CONTRIBUTING",
     ".github/CONTRIBUTING.md",
     ".github/CONTRIBUTING.rst",
+    ".github/CONTRIBUTING.adoc",
     "docs/CONTRIBUTING.md",
     "docs/CONTRIBUTING.rst",
     "docs/CONTRIBUTING.adoc",
@@ -1183,7 +1199,7 @@ exports.cursorRules = {
             try {
                 if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
                     const mdc = (0, node_fs_1.readdirSync)(abs)
-                        .filter((f) => f.toLowerCase().endsWith(".mdc"))
+                        .filter((f) => f.toLowerCase().endsWith(".mdc") && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)))
                         .sort();
                     if (mdc.length > 0) {
                         return {
@@ -1228,6 +1244,7 @@ exports.cursorRules = {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.depsManifest = void 0;
 const node_fs_1 = __nccwpck_require__(24);
+const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const CANDIDATES = [
     "package.json",
@@ -1266,7 +1283,7 @@ function findGlobManifest(repo) {
     try {
         const entries = (0, node_fs_1.readdirSync)(repo).sort();
         for (const re of GLOB_MANIFESTS) {
-            const hit = entries.find((f) => re.test(f));
+            const hit = entries.find((f) => re.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, f)));
             if (hit) {
                 return hit;
             }
@@ -1281,7 +1298,7 @@ exports.depsManifest = {
     description: "A dependency manifest, so the agent can reproduce the environment.",
     improveSuggestion: "Commit a proper manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) plus a lockfile.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const m = (0, helpers_1.firstFile)(repo, CANDIDATES);
         if (m) {
             return {
                 pass: 1,
@@ -1330,6 +1347,7 @@ const ARTIFACTS = [
     "shell.nix",
     "Dockerfile",
     "docker-compose.yml",
+    "docker-compose.yaml",
     "compose.yml",
     "compose.yaml",
     "justfile",
@@ -1471,17 +1489,19 @@ exports.entryKind = entryKind;
 exports.resolveRelative = resolveRelative;
 exports.resolveAllRelative = resolveAllRelative;
 exports.firstExisting = firstExisting;
+exports.isFileEntry = isFileEntry;
+exports.firstFile = firstFile;
 exports.readSafe = readSafe;
 exports.walkFind = walkFind;
 const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
-// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
-// are never followed out of it, and no read is unbounded: a README linked to
-// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
 /** The site parses this count back out of stored details (fileLength), so keep the shape. */
 function characters(n) {
     return `${n.toLocaleString("en-US")} characters`;
 }
+// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
+// are never followed out of it, and no read is unbounded: a README linked to
+// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
 exports.MAX_READ_BYTES = 1024 * 1024;
 const inside = (root, p) => p.startsWith(root + node_path_1.sep);
 function entryKind(repo, abs) {
@@ -1495,8 +1515,10 @@ function entryKind(repo, abs) {
         if (!inside((0, node_path_1.resolve)(repo), (0, node_path_1.resolve)((0, node_path_1.dirname)(abs), (0, node_fs_1.readlinkSync)(abs)))) {
             return "escaped";
         }
-        const real = (0, node_fs_1.realpathSync)(abs);
-        if (!inside((0, node_fs_1.realpathSync)(repo), real)) {
+        // .native asks the OS: the JS version resolves `..` after a link textually,
+        // so a chain like `t -> ..` plus `s -> t/../../x` passes it while the read escapes.
+        const real = node_fs_1.realpathSync.native(abs);
+        if (!inside(node_fs_1.realpathSync.native(repo), real)) {
             return "escaped";
         }
         const target = (0, node_fs_1.statSync)(real);
@@ -1580,6 +1602,22 @@ function firstExisting(repo, candidates) {
     for (const c of candidates) {
         const hit = resolveWith(repo, c, cache);
         if (hit) {
+            return (0, node_path_1.join)(repo, hit);
+        }
+    }
+    return null;
+}
+// A name match alone would take a directory called `x.yml` for a workflow file.
+// "escaped" counts because on the live path it is a placeholder file.
+function isFileEntry(repo, abs) {
+    const kind = entryKind(repo, abs);
+    return kind === "file" || kind === "escaped";
+}
+function firstFile(repo, candidates) {
+    const cache = new Map();
+    for (const c of candidates) {
+        const hit = resolveWith(repo, c, cache);
+        if (hit && isFileEntry(repo, (0, node_path_1.join)(repo, hit))) {
             return (0, node_path_1.join)(repo, hit);
         }
     }
@@ -2090,7 +2128,7 @@ exports.size = {
             pass: 0.2,
             id: "size",
             label: "Manageable size",
-            detail: `${count}+ files — very large`,
+            detail: count > CAP ? `${CAP}+ files — very large` : `${count} files — very large`,
         };
     },
 };
@@ -2183,14 +2221,14 @@ const GLOB_TYPED = [
 ];
 function detectTypedLang(repo) {
     for (const { file, lang } of TYPED_LANG_FILES) {
-        if ((0, helpers_1.resolveRelative)(repo, file)) {
+        if ((0, helpers_1.firstFile)(repo, [file])) {
             return lang;
         }
     }
     try {
         const entries = (0, node_fs_1.readdirSync)(repo);
         for (const { re, lang } of GLOB_TYPED) {
-            if (entries.some((f) => re.test(f))) {
+            if (entries.some((f) => re.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, f)))) {
                 return lang;
             }
         }
@@ -2204,7 +2242,7 @@ exports.typeConfig = {
     description: "Static types let the agent check call sites without running code.",
     improveSuggestion: "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python). Rust/Go/JVM/Scala/Swift/C#/OCaml/Haskell/Zig are typed by default.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const m = (0, helpers_1.firstFile)(repo, CANDIDATES);
         if (m) {
             return {
                 pass: 1,
@@ -2256,7 +2294,7 @@ exports.MODELS = [
     {
         id: "claude-code",
         label: "Claude Code",
-        rationale: "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
+        rationale: "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, or AGENTS.md when there is no CLAUDE.md, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
         sources: ["https://code.claude.com/docs/en/memory"],
         weights: {
             ci: 0.5,
@@ -2379,7 +2417,7 @@ exports.MODELS = [
     {
         id: "gemini-cli",
         label: "Gemini CLI",
-        rationale: "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
+        rationale: "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs; AGENTS.md is read only when listed in the `context.fileName` setting. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
         sources: ["https://geminicli.com/docs/cli/gemini-md/"],
         weights: {
             ci: 0.6,
@@ -2427,7 +2465,7 @@ exports.MODELS = [
     {
         id: "openhands",
         label: "OpenHands",
-        rationale: "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is now the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
+        rationale: "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
         sources: [
             "https://docs.openhands.dev/openhands/usage/customization/repository",
             "https://docs.openhands.dev/overview/skills",

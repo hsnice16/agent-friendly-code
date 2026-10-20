@@ -45,14 +45,13 @@ export default function MethodologyPage() {
         <PanelHeading tone="warn">Weights from docs, not yet tested</PanelHeading>
 
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          Every score comes from <strong className="text-ink">file checks</strong>: does a file exist, and how long is
-          it. No agent is run. Each agent&apos;s weights follow <strong className="text-ink">its own docs</strong> (see
-          Sources under each agent), but the numbers are not yet measured against real agent runs. That is planned for
-          v1.0.0 on the{" "}
-          <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+          Scores come from <strong className="text-ink">file checks</strong>: whether a file exists, and how long it is.
+          No agent is run. Each agent&apos;s weights follow <strong className="text-ink">its own docs</strong> (Sources,
+          under each agent) but aren&apos;t yet measured against real runs; that is v1.0.0 on the{" "}
+          <Link href="/roadmap" className="text-ink-dim hover:text-ink-soft">
             roadmap
           </Link>
-          ; until then, treat scores as a guide, not a verdict.
+          . Treat scores as a guide, not a verdict.
         </p>
       </Panel>
 
@@ -68,8 +67,8 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
           <p className="mt-3 text-[13.5px] leading-relaxed text-ink-dim">
             <code className="font-mono text-[12.5px] text-ink">check.pass</code> is a number from{" "}
             <code className="font-mono text-[12.5px] text-ink">0</code> to{" "}
-            <code className="font-mono text-[12.5px] text-ink">1</code>, so a check can pass in part. For example, a
-            short README gets <code className="font-mono text-[12.5px] text-ink">0.3</code> and a long one gets{" "}
+            <code className="font-mono text-[12.5px] text-ink">1</code>, so a check can pass in part: a short README
+            gets <code className="font-mono text-[12.5px] text-ink">0.3</code>, a long one{" "}
             <code className="font-mono text-[12.5px] text-ink">1.0</code>.
           </p>
         </Panel>
@@ -115,11 +114,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
           <nav aria-label="Agents" className="mt-2 mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[13px]">
             {MODELS.map((m) => (
-              <a
-                key={m.id}
-                href={`#model-${m.id}`}
-                className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
-              >
+              <a key={m.id} href={`#model-${m.id}`} className="text-ink-dim hover:text-ink-soft">
                 {m.label}
               </a>
             ))}
@@ -163,20 +158,20 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
         <Panel>
           <PanelHeading>What we don&apos;t check yet</PanelHeading>
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
-            <li>Whether tests actually pass. We only check that they exist.</li>
+            <li>Whether tests pass. We only check that they exist.</li>
             <li>Whether the linter runs without errors.</li>
 
-            <li>Whether the dev setup (Makefile, Dockerfile) really works from start to finish.</li>
+            <li>Whether the dev setup (Makefile, Dockerfile) works end to end.</li>
 
             <li>
-              Anything from commit history, such as activity or contributor count. Clones are{" "}
+              Commit history, such as activity or contributor count. Clones are{" "}
               <code className="rounded border border-line bg-surface-2 px-1 py-0.5 font-mono text-xs">
                 --depth 1 --single-branch
               </code>
               , and history says more about a repo&apos;s health than about how agents work in it.
             </li>
 
-            <li>How well agents actually do on the repo. That comes with the v1.0.0 benchmark.</li>
+            <li>How well agents do on the repo. That comes with the v1.0.0 benchmark.</li>
           </ul>
         </Panel>
       </div>

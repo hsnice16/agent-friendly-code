@@ -96,7 +96,7 @@ async function fetchContent(
   // realpathSync resolves symlinks in the *base* path too, so a /tmp dest comes
   // back as /private/tmp on macOS; relativising against `dest` would emit
   // ../../private/tmp/… and every fetch would 404 into an empty file.
-  const root = realpathSync(dest);
+  const root = realpathSync.native(dest);
 
   const wanted = new Set<string>();
   for (const candidate of CONTENT_CANDIDATES) {
@@ -105,7 +105,7 @@ async function fetchContent(
     const hit = resolveRelative(dest, candidate);
     if (!hit || entryKind(dest, join(dest, hit)) !== "file") continue;
     try {
-      const rel = relative(root, realpathSync(join(dest, hit)));
+      const rel = relative(root, realpathSync.native(join(dest, hit)));
       // A placeholder's raw URL would serve a link the scorer never follows.
       if (!rel || rel.startsWith("..") || isAbsolute(rel) || placeholders.has(rel)) continue;
       wanted.add(rel);

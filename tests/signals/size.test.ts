@@ -74,4 +74,20 @@ describe("size signal", () => {
     assert.equal(r.pass, 0.9);
     assert.match(r.detail, /^15 /);
   });
+
+  test("labels an exact count past 5,000 without a +", () => {
+    fixture = makeFixture(seededFiles(5001));
+    const r = size.check(fixture);
+
+    assert.equal(r.pass, 0.2);
+    assert.equal(r.detail, "5001 files — very large");
+  });
+
+  test("adds the + only when the walk stops at its cap", () => {
+    fixture = makeFixture(seededFiles(10005));
+    const r = size.check(fixture);
+
+    assert.equal(r.pass, 0.2);
+    assert.equal(r.detail, "10000+ files — very large");
+  });
 });

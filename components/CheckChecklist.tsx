@@ -23,7 +23,7 @@ export function CheckChecklist({ rows }: { rows: ChecklistRow[] }) {
       </ol>
       <p className="mt-3 mb-0 text-[13px] text-muted">
         Pass rates count full passes only.{" "}
-        <Link href="/check" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+        <Link href="/check" className="text-ink-dim hover:text-ink-soft">
           The checklist
         </Link>{" "}
         says what each check looks for.

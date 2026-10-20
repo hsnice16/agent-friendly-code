@@ -44,4 +44,9 @@ describe("ci signal", () => {
     fixture = makeFixture({ ".gitlab-ci.yml": "stages: []" });
     assert.equal(ci.check(fixture).pass, 0.9);
   });
+
+  test("a directory named *.yml in .github/workflows is not a workflow", () => {
+    fixture = makeFixture({ ".github/workflows/ci.yml/README.md": "not a workflow" });
+    assert.equal(ci.check(fixture).pass, 0);
+  });
 });

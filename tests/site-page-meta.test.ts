@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { examplesDescription, examplesTitle } from "../lib/agents-md-examples";
-import { OTHER_LANGUAGES_TITLE, otherLanguagesDescription, PAGE_COPY } from "../lib/page-meta";
+import { AGENTS_VS_CLAUDE_MD, OTHER_LANGUAGES_TITLE, otherLanguagesDescription, PAGE_COPY } from "../lib/page-meta";
 import { hubTitle } from "../lib/utils/language";
 import { MAX_DESCRIPTION_LENGTH, MAX_TITLE_LENGTH, pageTitle } from "../lib/utils/page-title";
 
@@ -13,7 +13,7 @@ const fits = (title: string, description: string) => {
 
 describe("static page copy", () => {
   it("fits a search result", () => {
-    for (const { title, description } of Object.values(PAGE_COPY)) fits(title, description);
+    for (const { title, description } of [...Object.values(PAGE_COPY), AGENTS_VS_CLAUDE_MD]) fits(title, description);
   });
 
   it("gives every page its own title and description", () => {

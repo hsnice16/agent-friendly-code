@@ -1,6 +1,6 @@
 {
   "name": "agent-friendly-code",
-  "version": "0.9.0",
+  "version": "0.9.1",
   "description": "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.",
   "private": true,
   "license": "MIT",

@@ -21,6 +21,7 @@ export function FooterDirectory({ hubs, topics }: Props) {
     {
       label: "Agents",
       items: MODELS.map((m) => ({ label: m.label, href: modelPath(m.id) })),
+      all: { label: "Files each reads →", href: "/agents" },
     },
     {
       label: "Languages",

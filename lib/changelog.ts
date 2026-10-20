@@ -10,6 +10,20 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.1",
+    date: "2026-10-21",
+    title: "Which file each agent reads",
+    highlights: [
+      "`/agents` — which repo files each AI coding agent reads, per its own docs, and how many leaderboard repos have each.",
+      "AGENTS.md vs CLAUDE.md — `/check/agents-md/vs-claude-md` says which to use, which agents read each, and what Claude Code does when a repo has both. The AGENTS.md check page lists what to put in the file and what to leave out.",
+      "The AGENTS.md check uses the first of AGENTS.md, CLAUDE.md and AGENT.md with content, so an empty AGENTS.md no longer hides a full CLAUDE.md. `docker-compose.yaml` and `.github/CONTRIBUTING.adoc` now count; a directory named like a checked file no longer does.",
+      "Live Score pages get the repo page's section menu, agent files panel, file links under All checks, and the pull-request Action snippet.",
+      'Repo page titles name the host, descriptions lead with the repo\'s own, and "Same topics, any language" links up to six repos that share its topics.',
+      "Every page's footer lists every agent board, language, check and topic.",
+      "Visitors from the EEA, UK and Switzerland are asked before Google Analytics sets cookies.",
+    ],
+  },
+  {
     label: "0.9.0",
     date: "2026-10-16",
     title: "Repo pages that answer for every agent",

@@ -35,7 +35,7 @@ export function ConsentBanner() {
     >
       <p className="m-0 text-[13.5px] leading-snug text-ink-dim">
         May we use Google Analytics cookies to count visits? Nothing else is tracked.{" "}
-        <Link href="/privacy" className="text-ink-dim underline decoration-dotted hover:text-ink">
+        <Link href="/privacy" className="text-ink-dim hover:text-ink">
           Privacy
         </Link>
       </p>

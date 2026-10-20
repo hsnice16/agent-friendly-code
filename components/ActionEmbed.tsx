@@ -10,6 +10,12 @@ type Props = {
   showSecretLink?: boolean;
 };
 
+// A branch name may hold `,`, `]`, `{` or quotes, which would split or break
+// the flow sequence in the copied YAML.
+export function yamlBranch(branch: string): string {
+  return /^[A-Za-z0-9._/-]+$/.test(branch) ? branch : JSON.stringify(branch);
+}
+
 export function ActionEmbed({ actionUses, branch, showSecretLink = false, highlight = false }: Props) {
   const tone = highlight || undefined;
   const yaml = `# .github/workflows/agent-friendly.yml
@@ -17,7 +23,7 @@ name: Agent-friendly score diff
 
 on:
   pull_request:
-    branches: [${branch || "main"}]
+    branches: [${yamlBranch(branch || "main")}]
 
 permissions:
   contents: read
@@ -39,7 +45,7 @@ jobs:
       <PanelHeading tone={tone}>Check the score on every pull request</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">
-        Add this file to your repo. On each pull request it posts one comment with how the score changed and why.
+        Add this file. Each pull request gets one comment on how the score changed and why.
       </p>
 
       <CopySnippet text={yaml} highlight={highlight} />

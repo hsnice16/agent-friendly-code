@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Fragment } from "react";
 
 import type { AgentFile, AgentInstructionsData } from "@/lib/utils/agent-instructions";
-import { checkPath } from "@/lib/utils/check-path";
+import { checkSubPath } from "@/lib/utils/check-path";
 import { repoFileUrl } from "@/lib/utils/repo-file-url";
 
 import { Panel, PanelHeading } from "./Panel";
@@ -14,12 +14,7 @@ function FileName({ file, repo }: { file: AgentFile; repo: RepoLocation }) {
   const code = <code className="font-mono text-[13px] text-ink">{file.name}</code>;
   if (!href) return code;
   return (
-    <a
-      href={href}
-      target="_blank"
-      rel="nofollow noopener noreferrer"
-      className="underline decoration-line-strong underline-offset-4 hover:decoration-ink-soft"
-    >
+    <a href={href} target="_blank" rel="nofollow noopener noreferrer">
       {code}
       <span className="sr-only"> (new tab)</span>
     </a>
@@ -115,10 +110,7 @@ function HowCommon({ data }: { data: AgentInstructionsData }) {
       )}
       {has} of {total} repos on the leaderboard
       <span className="text-muted"> · </span>
-      <Link
-        href={`${checkPath("agents_md")}/examples`}
-        className="text-ink-dim underline underline-offset-4 hover:text-ink-soft"
-      >
+      <Link href={checkSubPath("agents_md", "examples")} className="text-ink-dim hover:text-ink-soft">
         See examples →
       </Link>
     </>

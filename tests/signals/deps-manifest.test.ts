@@ -110,4 +110,14 @@ describe("depsManifest signal", () => {
     assert.equal(r.pass, 1);
     assert.match(r.matchedPath ?? "", /\.nimble$/);
   });
+
+  test("a directory named like a manifest does not count", () => {
+    fixture = makeFixture({ "package.json/x": "", "App.csproj/x": "" });
+    assert.equal(depsManifest.check(fixture).pass, 0);
+  });
+
+  test("skips a directory named like a manifest for a real one further down the list", () => {
+    fixture = makeFixture({ "package.json/x": "", "go.mod": "module x" });
+    assert.match(depsManifest.check(fixture).matchedPath ?? "", /go\.mod$/);
+  });
 });

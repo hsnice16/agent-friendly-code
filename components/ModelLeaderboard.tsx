@@ -32,7 +32,7 @@ export function ModelLeaderboard({ model, view, stats, panel }: Props) {
         </h1>
 
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Repos from {hostsText(view.host)}, ranked by their {label} score rather than the average across every agent.
+          Repos from {hostsText(view.host)}, ranked by their {label} score.
           {top && (
             <>
               {" "}
@@ -42,17 +42,6 @@ export function ModelLeaderboard({ model, view, stats, panel }: Props) {
               leads with <strong className="text-ink">{(top.score ?? 0).toFixed(1)}</strong>.
             </>
           )}
-        </p>
-
-        <p className="mt-2 max-w-[68ch] text-[13px] text-muted">
-          The{" "}
-          <Link
-            href="/methodology"
-            className="border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn"
-          >
-            methodology
-          </Link>{" "}
-          lists the weight {label} gives each check and the documentation it comes from.
         </p>
       </section>
 

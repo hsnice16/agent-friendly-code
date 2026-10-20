@@ -128,10 +128,13 @@ textarea,
     opacity 150ms ease-out;
 }
 
-*:focus-visible {
-  border-radius: 4px;
-  outline-offset: 2px;
-  outline: 2px solid var(--color-accent);
+/* In the base layer so a rounded-* utility keeps its shape when focused. */
+@layer base {
+  *:focus-visible {
+    border-radius: 4px;
+    outline-offset: 2px;
+    outline: 2px solid var(--color-accent);
+  }
 }
 
 input:focus,

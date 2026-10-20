@@ -5,7 +5,7 @@ import { repoAbout } from "./utils/repo-about";
 // Below this a topic page is a thin list next to the language hubs and the
 // board, which search engines read as a doorway page; the topic stays a chip.
 export const TOPIC_PAGE_MIN_REPOS = 8;
-export const RELATED_TOPICS_LIMIT = 6;
+const RELATED_TOPICS_LIMIT = 6;
 // One shared repo is a coincidence, not a relation.
 const RELATED_MIN_SHARED = 2;
 
@@ -67,6 +67,10 @@ const LABELS: Record<string, string> = {
   vue: "Vue",
 };
 
+// GitHub's topic alphabet. GitLab topics are free text, and Next writes sitemap
+// <loc> values unescaped, so a topic with `&` or `<` would break the sitemap.
+const TOPIC_SLUG = /^[a-z0-9][a-z0-9-]*$/;
+
 export type TopicGroup<T> = { slug: string; label: string; rows: T[] };
 
 type Row = { id: number; language: string | null; topics?: string | null };
@@ -111,7 +115,7 @@ export function topicGroups<T extends Row>(rows: T[]): TopicGroup<T>[] {
     for (const t of rowTopics(row, languages)) bySlug.set(t, [...(bySlug.get(t) ?? []), row]);
   }
   return [...bySlug.entries()]
-    .filter(([, g]) => g.length >= TOPIC_PAGE_MIN_REPOS)
+    .filter(([slug, g]) => g.length >= TOPIC_PAGE_MIN_REPOS && TOPIC_SLUG.test(slug))
     .map(([slug, g]) => ({ slug, label: topicLabel(slug), rows: g }))
     .sort((a, b) => b.rows.length - a.rows.length || a.slug.localeCompare(b.slug));
 }

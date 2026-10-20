@@ -29,12 +29,11 @@ export default function LanguagesPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY["/language"].title}</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          The leaderboard, one language at a time. Each page ranks that language&apos;s repos and shows the checks they
-          most often miss.
+          The leaderboard by language: each page ranks its repos and shows the checks they most often miss.
           {hasTopics && (
             <>
               {" "}
-              To browse by what the code does instead, see{" "}
+              Or browse by{" "}
               <Link href={TOPICS_PATH} className="text-ink hover:text-ink-soft">
                 topics
               </Link>
@@ -69,8 +68,7 @@ export default function LanguagesPage() {
               <Link href={OTHER_LANGUAGES_PATH} className="font-medium text-ink hover:text-ink-soft">
                 {otherCount} repos in other languages
               </Link>
-              : languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos on the leaderboard, and repos whose language
-              was not detected.
+              : languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos here, or none detected.
             </p>
             <p className="m-0 flex flex-wrap gap-x-3 gap-y-1 text-[13.5px]">
               {other.map((g) => (

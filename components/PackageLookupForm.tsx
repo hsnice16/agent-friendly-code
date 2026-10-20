@@ -31,7 +31,7 @@ export function PackageLookupForm() {
           value={registry}
           id="package-registry"
           onChange={(e) => setRegistry(e.target.value as Registry)}
-          className="h-9 w-full appearance-none rounded-md border border-line bg-surface-2 pl-3 pr-8 text-[13.5px] text-ink cursor-pointer sm:w-auto"
+          className="h-9 w-full appearance-none rounded-md border border-line bg-surface-2 pl-3 pr-8 text-[13.5px] text-ink cursor-pointer focus:border-ink-dim sm:w-auto"
         >
           {REGISTRIES.map((r) => (
             <option key={r} value={r}>
@@ -58,7 +58,7 @@ export function PackageLookupForm() {
         spellCheck={false}
         placeholder="package name"
         onChange={(e) => setName(e.target.value)}
-        className="h-9 w-full min-w-0 rounded-md border border-line bg-surface-2 px-3 text-[13.5px] text-ink placeholder:text-muted sm:flex-1"
+        className="h-9 w-full min-w-0 rounded-md border border-line bg-surface-2 px-3 text-[13.5px] text-ink placeholder:text-muted focus:border-ink-dim sm:flex-1"
       />
 
       <button

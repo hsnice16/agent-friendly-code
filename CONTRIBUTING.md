@@ -40,7 +40,7 @@ CI (`.github/workflows/ci.yml`) repeats Biome, tsc, tests and the leak scan, and
 
 Open against `main` and keep the branch rebased. The description follows [the PR template](./.github/PULL_REQUEST_TEMPLATE.md); UI changes need screenshots at mobile and desktop widths, light and dark. Aim for under ~300 changed lines; split larger work by layer (scoring → DB → UI).
 
-A change earns a `lib/changelog.ts` line only if a visitor, API caller or listed maintainer can see it, and then the matching `lib/roadmap.ts` item is removed in the same PR. Details: [AGENTS.md → Versions, changelog, roadmap](./AGENTS.md#versions-changelog-roadmap).
+A change earns a changelog line only if a visitor, API caller or listed maintainer can see it. Details: [AGENTS.md → Versions, changelog, roadmap](./AGENTS.md#versions-changelog-roadmap).
 
 Ready to merge when CI is green, a reviewer has approved, no comments are open, and the description is complete.
 

@@ -11,7 +11,26 @@ export const agentsMd: Signal = {
   improveSuggestion:
     "Add an AGENTS.md covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
   check: (repo) => {
-    const matched = firstExisting(repo, CANDIDATES);
+    // An empty AGENTS.md stub must not hide a full CLAUDE.md beside it.
+    let matched: string | null = null;
+    let len = 0;
+
+    for (const c of CANDIDATES) {
+      const hit = firstExisting(repo, [c]);
+      if (!hit) {
+        continue;
+      }
+
+      const n = readSafe(hit, repo).trim().length;
+      if (!matched || n > 0) {
+        matched = hit;
+        len = n;
+      }
+
+      if (n > 0) {
+        break;
+      }
+    }
 
     if (!matched) {
       return {
@@ -22,7 +41,6 @@ export const agentsMd: Signal = {
       };
     }
 
-    const len = readSafe(matched, repo).trim().length;
     if (len === 0) {
       return {
         pass: 0.2,

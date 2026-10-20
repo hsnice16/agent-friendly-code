@@ -13,3 +13,9 @@ export function signalIdFromSlug(slug: string): string | null {
   // A slug with an underscore would map to the same id and serve a duplicate page.
   return checkSlug(id) === slug && Object.hasOwn(SIGNAL_BY_ID, id) ? id : null;
 }
+
+export type CheckSubPage = "examples" | "vs-claude-md";
+
+export function checkSubPath(signalId: string, page: CheckSubPage): string {
+  return `${checkPath(signalId)}/${page}`;
+}

@@ -4,6 +4,7 @@ import { CHANGELOG } from "@/lib/changelog";
 import { hostsText } from "@/lib/leaderboard-meta";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import type { LeaderboardStats } from "@/lib/types/db";
+import { checkSubPath } from "@/lib/utils/check-path";
 import { APP_VERSION } from "@/lib/version";
 import { HomeJsonLd } from "./HomeJsonLd";
 import { LeaderboardBoard } from "./LeaderboardBoard";
@@ -54,7 +55,7 @@ export function HomeLeaderboard({ view, stats }: Props) {
             GitHub Action
           </Link>{" "}
           to score every pull request, or read{" "}
-          <Link href="/check/agents-md/examples" className={CTA}>
+          <Link href={checkSubPath("agents_md", "examples")} className={CTA}>
             AGENTS.md examples
           </Link>{" "}
           from popular repos.

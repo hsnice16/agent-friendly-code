@@ -13,6 +13,7 @@ import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { VersionPill } from "@/components/VersionPill";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getTopicGroups } from "@/lib/topic-pages";
+import { checkSubPath } from "@/lib/utils/check-path";
 import { isHub } from "@/lib/utils/language";
 import { BRAND_SUFFIX } from "@/lib/utils/page-title";
 import { APP_DESCRIPTION, APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
@@ -104,7 +105,7 @@ const FOOTER_LINKS_PRIMARY = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
-  { href: "/check/agents-md/examples", label: "AGENTS.md examples" },
+  { href: checkSubPath("agents_md", "examples"), label: "AGENTS.md examples" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },
 ];

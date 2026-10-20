@@ -8,6 +8,7 @@ const CANDIDATES = [
   "CONTRIBUTING",
   ".github/CONTRIBUTING.md",
   ".github/CONTRIBUTING.rst",
+  ".github/CONTRIBUTING.adoc",
   "docs/CONTRIBUTING.md",
   "docs/CONTRIBUTING.rst",
   "docs/CONTRIBUTING.adoc",

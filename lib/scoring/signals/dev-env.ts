@@ -11,6 +11,7 @@ const ARTIFACTS = [
   "shell.nix",
   "Dockerfile",
   "docker-compose.yml",
+  "docker-compose.yaml",
   "compose.yml",
   "compose.yaml",
   "justfile",

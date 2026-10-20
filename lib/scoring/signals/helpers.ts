@@ -11,14 +11,14 @@ import {
 } from "node:fs";
 import { dirname, join, resolve, sep } from "node:path";
 
-// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
-// are never followed out of it, and no read is unbounded: a README linked to
-// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
 /** The site parses this count back out of stored details (fileLength), so keep the shape. */
 export function characters(n: number): string {
   return `${n.toLocaleString("en-US")} characters`;
 }
 
+// The scored tree is untrusted — a PR branch, a live-scored repo — so its links
+// are never followed out of it, and no read is unbounded: a README linked to
+// /dev/zero, /etc/passwd or a CI runner's /proc would otherwise be read.
 export const MAX_READ_BYTES = 1024 * 1024;
 
 // "escaped" is a link that leaves the repo, or lands on its root: never followed,
@@ -41,8 +41,10 @@ export function entryKind(repo: string, abs: string): EntryKind | null {
       return "escaped";
     }
 
-    const real = realpathSync(abs);
-    if (!inside(realpathSync(repo), real)) {
+    // .native asks the OS: the JS version resolves `..` after a link textually,
+    // so a chain like `t -> ..` plus `s -> t/../../x` passes it while the read escapes.
+    const real = realpathSync.native(abs);
+    if (!inside(realpathSync.native(repo), real)) {
       return "escaped";
     }
 
@@ -158,6 +160,27 @@ export function firstExisting(repo: string, candidates: string[]): string | null
     const hit = resolveWith(repo, c, cache);
 
     if (hit) {
+      return join(repo, hit);
+    }
+  }
+
+  return null;
+}
+
+// A name match alone would take a directory called `x.yml` for a workflow file.
+// "escaped" counts because on the live path it is a placeholder file.
+export function isFileEntry(repo: string, abs: string): boolean {
+  const kind = entryKind(repo, abs);
+  return kind === "file" || kind === "escaped";
+}
+
+export function firstFile(repo: string, candidates: string[]): string | null {
+  const cache: DirCache = new Map();
+
+  for (const c of candidates) {
+    const hit = resolveWith(repo, c, cache);
+
+    if (hit && isFileEntry(repo, join(repo, hit))) {
       return join(repo, hit);
     }
   }

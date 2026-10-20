@@ -7,7 +7,7 @@ import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicPath } from "@/lib/topics";
-import { checkPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -107,7 +107,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       priority: 0.8,
       changeFrequency: "weekly",
-      url: `${APP_URL}${checkPath("agents_md")}/examples`,
+      url: `${APP_URL}${checkSubPath("agents_md", "examples")}`,
+      lastModified: contentChanged,
+    },
+    {
+      priority: 0.8,
+      changeFrequency: "weekly",
+      url: `${APP_URL}${checkSubPath("agents_md", "vs-claude-md")}`,
+      lastModified: contentChanged,
+    },
+    {
+      priority: 0.8,
+      changeFrequency: "weekly",
+      url: `${APP_URL}/agents`,
       lastModified: contentChanged,
     },
     {

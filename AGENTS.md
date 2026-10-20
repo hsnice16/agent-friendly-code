@@ -83,7 +83,7 @@ data/rank.db  committed database, refreshed by .github/workflows/scheduled-resco
 
 `../agent-friendly-action/` (PR score-diff Action) and `../agent-friendly-skill/` (agent skill) each vendor `lib/scoring/` into `src/scoring/` and ship one `@vercel/ncc` bundle in `dist/`. The three copies are kept in sync by hand.
 
-**Whenever you change `lib/scoring/`**, in both siblings: copy the changed files (same layout), rebuild `dist/`, and add a line under "Unreleased" in `CHANGELOG.md`. Their CI checks `dist/` against `src/` but cannot see upstream drift. If a sibling is not checked out, say so; never skip it silently.
+**Whenever you change `lib/scoring/`**, in both siblings: copy the changed files (same layout), rebuild `dist/`, and, if scores or output change, add a line under "Unreleased" in `CHANGELOG.md`. Their CI checks `dist/` against `src/` but cannot see upstream drift. If a sibling is not checked out, say so; never skip it silently.
 
 Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` builds `ACTION_USES` and `SKILL_INSTALL_CMD`; the major is also written in `skills-lock.json` (`ref`), `.github/workflows/agent-friendly.yml` (`@v0`) and the `/action` and `/skill` FAQ copy. Change them together, only when both siblings cut a new major.
 

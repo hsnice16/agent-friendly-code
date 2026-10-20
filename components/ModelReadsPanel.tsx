@@ -2,7 +2,7 @@ import Link from "next/link";
 
 import { type ModelPanel, sourceLabel } from "@/lib/leaderboard-model-panel";
 import type { ModelProfile } from "@/lib/scoring/weights";
-import { checkPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 
 import { ExternalLink } from "./ExternalLink";
@@ -20,7 +20,7 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
         <PanelHeading>What {model.label} reads in a repo</PanelHeading>
 
         <p className="m-0 mb-2 text-[13px] text-muted">
-          The checks {model.label}&apos;s weights count most, and the share of leaderboard repos that pass each in full:
+          Its highest-weighted checks, and the share of leaderboard repos that pass each:
         </p>
         <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1.5 p-0 text-[14px] text-ink-dim sm:grid-cols-2">
           {checks.map((c) => (
@@ -37,11 +37,11 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
 
         {file && (
           <p className="mt-3 mb-0 text-[14px] text-ink-dim">
-            <Link href={claudeMd ? "/check/agents-md/examples" : checkPath(file.id)} className={LINK}>
+            <Link href={claudeMd ? checkSubPath("agents_md", "examples") : checkPath(file.id)} className={LINK}>
               {file.label}
             </Link>{" "}
-            is in {file.present} of {file.total} repos on the leaderboard
-            {claudeMd ? " as the agent instructions file (a repo with both is counted under AGENTS.md)" : ""}.
+            is in {file.present} of {file.total} leaderboard repos
+            {claudeMd ? " (repos with both count under AGENTS.md unless it is empty)" : ""}.
           </p>
         )}
 
@@ -53,10 +53,7 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
                 {sourceLabel(url)}
               </ExternalLink>
             ))}
-            <Link
-              href={`/methodology#model-${model.id}`}
-              className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline"
-            >
+            <Link href={`/methodology#model-${model.id}`} className="text-ink-dim hover:text-ink-soft">
               all weights
             </Link>
           </p>

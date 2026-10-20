@@ -59,7 +59,7 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
                 target="_blank"
                 rel="nofollow noopener noreferrer"
                 aria-label={`${path} on ${hostLabel(repo?.host ?? "")} (new tab)`}
-                className="text-muted underline-offset-4 hover:text-ink-soft hover:underline"
+                className="text-muted hover:text-ink-soft"
               >
                 {path}
               </a>

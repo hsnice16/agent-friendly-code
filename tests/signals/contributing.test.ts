@@ -49,4 +49,12 @@ describe("contributing signal", () => {
     fixture = makeFixture({ "contributing.md": "x".repeat(400) });
     assert.equal(contributing.check(fixture).pass, 1);
   });
+
+  test("pass=1 for .github/CONTRIBUTING.adoc", () => {
+    fixture = makeFixture({ ".github/CONTRIBUTING.adoc": "= Contributing" });
+    const r = contributing.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /\.github\/CONTRIBUTING\.adoc$/);
+  });
 });

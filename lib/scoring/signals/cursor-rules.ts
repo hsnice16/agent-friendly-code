@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { entryKind, resolveRelative } from "./helpers";
+import { entryKind, isFileEntry, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "Cursor rules (.cursor/rules)";
@@ -21,7 +21,7 @@ export const cursorRules: Signal = {
       try {
         if (entryKind(repo, abs) === "dir") {
           const mdc = readdirSync(abs)
-            .filter((f) => f.toLowerCase().endsWith(".mdc"))
+            .filter((f) => f.toLowerCase().endsWith(".mdc") && isFileEntry(repo, join(abs, f)))
             .sort();
 
           if (mdc.length > 0) {

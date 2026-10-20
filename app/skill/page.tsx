@@ -60,8 +60,7 @@ export default function SkillPage() {
         </h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Scores the repo you&apos;re working in for {MODELS.length} agents, on your own computer, and suggests a model
-          class. The scorer is bundled in, so it runs offline.
+          Scores the repo you&apos;re in for {MODELS.length} agents, locally and offline, and suggests a model class.
         </p>
       </section>
 
@@ -117,6 +116,7 @@ export default function SkillPage() {
 
           <div className="overflow-x-auto rounded-md border border-line">
             <table className="w-full border-separate border-spacing-0 text-[13.5px]">
+              <caption className="sr-only">Suggested model class for each score band</caption>
               <thead>
                 <tr className="bg-surface-2 [&>th]:border-b [&>th]:border-line [&>th]:px-3 [&>th]:py-2 [&>th]:text-left [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted">
                   <th scope="col">Band</th>
@@ -146,8 +146,7 @@ export default function SkillPage() {
         <Panel tone="info">
           <PanelHeading tone="info">Optional: score at the start of every session</PanelHeading>
           <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
-            A session-start hook hands your agent the repo&apos;s score at the start of every session. Add one of these
-            to the matching settings file:
+            Add a session-start hook to the matching settings file:
           </p>
 
           <p className="m-0 mb-1.5 text-[12.5px] font-medium text-muted">

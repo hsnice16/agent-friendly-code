@@ -94,20 +94,24 @@ async function scoreCommand(target: string): Promise<void> {
     if (cloned) rmSync(cloned, { recursive: true, force: true });
   }
 
-  saveScoredRepo({
-    url,
-    host,
-    name,
-    owner,
-    badgeEmbedded,
-    stars: stars ?? null,
-    overall: result.overall,
-    signals: result.signals,
-    language: language ?? null,
-    modelScores: result.modelScores,
-    defaultBranch: defaultBranch ?? null,
-    about,
-  });
+  // A local path is not a public repo: its row would list on the board and
+  // write the caller's absolute path into the committed database.
+  if (host !== "local") {
+    saveScoredRepo({
+      url,
+      host,
+      name,
+      owner,
+      badgeEmbedded,
+      stars: stars ?? null,
+      overall: result.overall,
+      signals: result.signals,
+      language: language ?? null,
+      modelScores: result.modelScores,
+      defaultBranch: defaultBranch ?? null,
+      about,
+    });
+  }
 
   console.log(`\n═══ ${owner}/${name} ═══`);
   console.log(`Overall: ${result.overall.toFixed(1)} / 100`);
@@ -123,7 +127,9 @@ async function scoreCommand(target: string): Promise<void> {
     console.log(`  ${mark} ${s.label.padEnd(28)} ${s.detail}`);
   }
 
-  console.log(`\n(scored in ${((Date.now() - startedAt) / 1000).toFixed(1)}s)`);
+  console.log(
+    `\n(scored in ${((Date.now() - startedAt) / 1000).toFixed(1)}s${host === "local" ? "; local path, not saved" : ""})`,
+  );
 }
 
 const [, , cmd, arg] = process.argv;

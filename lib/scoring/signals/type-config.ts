@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { firstExisting, readSafe, resolveRelative } from "./helpers";
+import { firstFile, isFileEntry, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = ["tsconfig.json", "jsconfig.json", "mypy.ini", ".mypy.ini", "pyrightconfig.json"];
@@ -28,7 +28,7 @@ const GLOB_TYPED: { re: RegExp; lang: string }[] = [
 
 function detectTypedLang(repo: string): string | null {
   for (const { file, lang } of TYPED_LANG_FILES) {
-    if (resolveRelative(repo, file)) {
+    if (firstFile(repo, [file])) {
       return lang;
     }
   }
@@ -36,7 +36,7 @@ function detectTypedLang(repo: string): string | null {
   try {
     const entries = readdirSync(repo);
     for (const { re, lang } of GLOB_TYPED) {
-      if (entries.some((f) => re.test(f))) {
+      if (entries.some((f) => re.test(f) && isFileEntry(repo, join(repo, f)))) {
         return lang;
       }
     }
@@ -52,7 +52,7 @@ export const typeConfig: Signal = {
   improveSuggestion:
     "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python). Rust/Go/JVM/Scala/Swift/C#/OCaml/Haskell/Zig are typed by default.",
   check: (repo) => {
-    const m = firstExisting(repo, CANDIDATES);
+    const m = firstFile(repo, CANDIDATES);
 
     if (m) {
       return {

@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { entryKind, firstExisting, resolveRelative } from "./helpers";
+import { entryKind, firstExisting, isFileEntry, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const OTHER_CI = [
@@ -27,7 +27,7 @@ export const ci: Signal = {
 
       try {
         if (entryKind(repo, abs) === "dir") {
-          const files = readdirSync(abs).filter((f) => /\.ya?ml$/i.test(f));
+          const files = readdirSync(abs).filter((f) => /\.ya?ml$/i.test(f) && isFileEntry(repo, join(abs, f)));
 
           if (files.length > 0) {
             return {

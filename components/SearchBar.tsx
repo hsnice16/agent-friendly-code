@@ -75,7 +75,7 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
         maxLength={MAX_SEARCH_LENGTH}
         placeholder={placeholder}
         onChange={(e) => setValue(e.target.value)}
-        className="block w-full rounded-md border border-line bg-surface py-1.5 pl-8 pr-3 text-[13px] text-ink placeholder:text-muted outline-none"
+        className="block w-full rounded-md border border-line bg-surface py-1.5 pl-8 pr-3 text-[13px] text-ink placeholder:text-muted outline-none focus:border-ink-dim"
       />
     </search>
   );

@@ -71,8 +71,8 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{hubTitle(hub.label)}</h1>
 
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          {hub.rows.length} {hub.label} repos, ranked by their overall score: the average across every agent we score.
-          The average {hub.label} repo scores <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
+          {hub.rows.length} {hub.label} repos, ranked by overall score (the average across agents). They average{" "}
+          <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
           <Link href={repoPath(hub.top)} className="text-ink hover:text-ink-soft">
             {hub.top.owner}/{hub.top.name}
           </Link>{" "}
@@ -95,11 +95,11 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
               ))}
             </ul>
             <p className="mt-3 mb-0 text-[13px] text-muted">
-              Checks that only one agent reads are left out, since almost no repo has them. See the{" "}
-              <Link href="/methodology" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+              Leaves out checks only one agent reads, which almost no repo passes. The{" "}
+              <Link href="/methodology" className="text-ink-dim hover:text-ink-soft">
                 methodology
               </Link>{" "}
-              for what each check looks for.
+              explains each check.
             </p>
           </Panel>
         </div>

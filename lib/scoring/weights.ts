@@ -22,7 +22,7 @@ export const MODELS: ModelProfile[] = [
     id: "claude-code",
     label: "Claude Code",
     rationale:
-      "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
+      "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, or AGENTS.md when there is no CLAUDE.md, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
     sources: ["https://code.claude.com/docs/en/memory"],
     weights: {
       ci: 0.5,
@@ -150,7 +150,7 @@ export const MODELS: ModelProfile[] = [
     id: "gemini-cli",
     label: "Gemini CLI",
     rationale:
-      "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
+      "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs; AGENTS.md is read only when listed in the `context.fileName` setting. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
     sources: ["https://geminicli.com/docs/cli/gemini-md/"],
     weights: {
       ci: 0.6,
@@ -200,7 +200,7 @@ export const MODELS: ModelProfile[] = [
     id: "openhands",
     label: "OpenHands",
     rationale:
-      "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is now the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
+      "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
     sources: [
       "https://docs.openhands.dev/openhands/usage/customization/repository",
       "https://docs.openhands.dev/overview/skills",

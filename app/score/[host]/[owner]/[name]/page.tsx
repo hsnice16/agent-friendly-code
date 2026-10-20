@@ -63,8 +63,16 @@ function cachedLiveScore(parsed: ParsedRepo) {
 // fit it but would walk the API path upwards.
 const SLUG = /^(?!\.+$)[A-Za-z0-9._-]+$/;
 
+function parseTarget({ host, owner, name }: Params): ParsedRepo | null {
+  if (!isHost(host) || !SLUG.test(owner) || !SLUG.test(name)) return null;
+  const parsed = parseRepoUrl(`https://${HOST_DOMAINS[host]}/${owner}/${name}`);
+  return parsed && parsed.host === host ? parsed : null;
+}
+
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
-  const { host, owner, name } = await params;
+  const target = await params;
+  if (!parseTarget(target)) return {};
+  const { host, owner, name } = target;
   const title = `${owner}/${name} — Live Score`;
   const description = `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`;
 
@@ -93,7 +101,7 @@ function Unsupported({ host }: { host: string }) {
     <Panel>
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">{label} support is coming</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
-        {`We can score ${label} repos, but this page can't yet stay within ${label}'s limits, and a wrong score is worse than no score. GitHub repos work today.`}
+        {`This page can't yet stay within ${label}'s API limits, and a wrong score is worse than none. GitHub repos work today.`}
       </p>
       <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
         ← try a GitHub repo
@@ -125,10 +133,8 @@ export default async function LiveScorePage({
   const query = await searchParams;
   const model = typeof query.model === "string" ? query.model : undefined;
 
-  if (!isHost(host) || !SLUG.test(owner) || !SLUG.test(name)) notFound();
-
-  const parsed = parseRepoUrl(`https://${HOST_DOMAINS[host]}/${owner}/${name}`);
-  if (!parsed || parsed.host !== host) notFound();
+  const parsed = parseTarget({ host, owner, name });
+  if (!parsed) notFound();
 
   // Indexed repos get the canonical page: better SEO, and it absorbs the popular
   // repos that are also the most expensive to score cold.
@@ -143,7 +149,7 @@ export default async function LiveScorePage({
   } catch (err) {
     if (err instanceof TooLargeError) {
       return (
-        <Unavailable reason="This repo is too big to score here. You can still score it on your own computer with the agent skill." />
+        <Unavailable reason="This repo is too big to score here. Score it on your own computer with the agent skill." />
       );
     }
     // Everything else is transient — a rate limit, a host blip. Let it reach

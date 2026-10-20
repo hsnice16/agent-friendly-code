@@ -44,6 +44,19 @@ describe("scorer never follows a link out of the repo", () => {
     assert.equal(readSafe(join(dir, "AGENTS.md"), dir), "");
   });
 
+  // JS realpathSync resolves `..` after a link textually; the OS doesn't. This
+  // chain looks like a/x to the former and reaches the repo's parent for real.
+  it("refuses a link chain whose `..` climbs out through another link", () => {
+    const dir = repo({ "a/x": "inside" });
+    writeFileSync(join(dir, "..", "x"), "outside");
+    mkdirSync(join(dir, "a", "b"));
+    symlinkSync("..", join(dir, "a", "b", "t"));
+    symlinkSync("t/../../x", join(dir, "a", "b", "s"));
+    symlinkSync("a/b/s", join(dir, "README.md"));
+    assert.equal(entryKind(dir, join(dir, "README.md")), "escaped");
+    assert.equal(readSafe(join(dir, "README.md"), dir), "");
+  });
+
   it("does not descend into a directory link that leaves the repo", () => {
     const dir = repo();
     symlinkSync(join(outside, "tests"), join(dir, "tests"));
@@ -59,6 +72,22 @@ describe("scorer never follows a link out of the repo", () => {
       walkFind(dir, () => true, 3, 10),
       [".github/workflows", "tests", "zz"],
     );
+  });
+
+  // The live path stands a placeholder file in for each of these, so a clone
+  // must count them as the files they are named for.
+  it("counts an escaping link as a file where only its name is checked", () => {
+    const dir = repo();
+    mkdirSync(join(dir, ".github", "workflows"), { recursive: true });
+    mkdirSync(join(dir, ".cursor", "rules"), { recursive: true });
+    symlinkSync(join(outside, "w"), join(dir, ".github", "workflows", "ci.yml"));
+    symlinkSync(join(outside, "w"), join(dir, ".cursor", "rules", "a.mdc"));
+    symlinkSync(join(outside, "w"), join(dir, "Cargo.toml"));
+
+    assert.equal(signal(dir, "ci")?.pass, 1);
+    assert.equal(signal(dir, "cursor_rules")?.pass, 1);
+    assert.equal(signal(dir, "deps_manifest")?.pass, 1);
+    assert.equal(signal(dir, "type_config")?.detail, "Typed language (Rust)");
   });
 
   it("refuses an intermediate directory that leaves the repo", () => {

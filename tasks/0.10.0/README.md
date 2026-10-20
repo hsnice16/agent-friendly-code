@@ -10,11 +10,3 @@ Planned for 0.9.0; moved here when 0.9.0 was cut from the discovery and repo-pag
 
 - [01-opt-out-claim-flow.md](./01-opt-out-claim-flow.md) — OAuth so maintainers can claim or opt out of their listing. First touchpoint that writes to the DB on behalf of a user.
 - [02-package-registry-overlay.md](./02-package-registry-overlay.md) — per-registry leaderboards on the dashboard + a browser userscript that renders the badge inline on npmjs.com / PyPI / crates.io. Builds on the v0.3.0 lookup endpoint.
-
-## Shipped since 0.9.0, owed a changelog line
-
-- Live Score pages get the repo page's section nav, agent instructions panel, collapsed "All checks" with file links, and the PR Action embed.
-- Every page's footer lists every agent board, language, check and topic; the home page's preview cards are gone.
-- Visitors from the EEA, UK and Switzerland are asked before Google Analytics sets cookies.
-- Repo page titles name the host ("axios/axios GitHub repo: …"), and descriptions lead with the repo's own description when it fits beside the score.
-- Repo pages link up to six repos in any language that share their most specific GitHub topics, under "Same topics, any language".

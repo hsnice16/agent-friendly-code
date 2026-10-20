@@ -23,6 +23,12 @@ export const PAGE_COPY = {
       "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.",
     type: "article",
   },
+  "/agents": {
+    title: "Which files does each AI coding agent read?",
+    description:
+      "AGENTS.md, CLAUDE.md, GEMINI.md or .cursor/rules: the repo files Claude Code, Codex, Cursor, Gemini CLI and other agents read, per their docs.",
+    type: "article",
+  },
   "/check": {
     title: `Agent-ready codebase checklist: ${SIGNALS.length} checks, pass rates`,
     description: fitDescription(
@@ -81,9 +87,9 @@ export const PAGE_COPY = {
     type: "article",
   },
   "/action": {
-    title: "GitHub Action: score every pull request",
+    title: "GitHub Action: AI agent readiness check on every PR",
     description:
-      "A GitHub Action that comments on each pull request with how it changes the repo's score for each AI coding agent. Opt-in, and it runs only in your CI.",
+      "A GitHub Action that checks AI agent readiness on every pull request and comments with how it moves the score for each coding agent. Runs only in your CI.",
     type: "article",
   },
 } as const satisfies Record<string, Copy>;
@@ -102,6 +108,13 @@ export function staticPageMetadata(path: StaticPath, image: Image = DEFAULT_OG_I
     openGraph: { ...OG_DEFAULTS, images: [image], title, description, url: path, type },
   };
 }
+
+// Not in PAGE_COPY: the page sits under the dynamic /check/[slug] segment.
+export const AGENTS_VS_CLAUDE_MD = {
+  title: "AGENTS.md vs CLAUDE.md: which one should you use?",
+  description:
+    "Use AGENTS.md, plus a CLAUDE.md that imports it if you use Claude Code. Which agents read each file, and what Claude Code does when a repo has both.",
+} as const;
 
 export const OTHER_LANGUAGES_TITLE = "Agent-friendly repos in other languages";
 

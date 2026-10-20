@@ -1,6 +1,6 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.9.0-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
+[![Release](https://img.shields.io/badge/release-0.9.1-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Node ≥22](https://img.shields.io/badge/node-%E2%89%A522-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/hsnice16)
@@ -24,7 +24,7 @@ AI coding agents succeed far more often on some repos than others, and the diffe
 | Where                                                                  | What you get                                                                                                     |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | [agentfriendlycode.com](https://agentfriendlycode.com)                 | Ranked public repos from GitHub, GitLab and Bitbucket, with boards per agent, language and topic, and a page per check.          |
-| [Live Score](https://agentfriendlycode.com/score)                      | Paste any public GitHub repo URL and get its full score, scored from its current commit.                         |
+| [Live Score](https://agentfriendlycode.com/score)                      | Paste any public GitHub repo URL to score its current commit.                                                   |
 | [Agent skill](https://github.com/hsnice16/agent-friendly-skill)        | `npx skills add hsnice16/agent-friendly-skill#v0` — scores the repo you are in, offline, and suggests a model.   |
 | [GitHub Action](https://github.com/hsnice16/agent-friendly-action)     | Comments on each pull request with how it changes the score. Runs in your CI.                                    |
 | Badge                                                                  | `https://agentfriendlycode.com/api/badge/<host>/<owner>/<name>.svg`, `?model=<id>` for one agent.               |

@@ -4,7 +4,7 @@
 
 ## Goal
 
-Auto-discover and rank a large slice of public GitHub — not just the curated `scripts/seed.ts` list — so the leaderboard reflects the ecosystem rather than our hand-picked sample.
+Auto-discover and rank a large slice of public GitHub — not just the curated `scripts/seed-list.ts` — so the leaderboard reflects the ecosystem rather than our hand-picked sample.
 
 ## Why this rides with 1.0.0
 

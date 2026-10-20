@@ -14,7 +14,7 @@ import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath, checkSlug } from "@/lib/utils/check-path";
+import { checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
@@ -23,11 +23,11 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const SIGNAL_ID = "agents_md";
-const PATH = `${checkPath(SIGNAL_ID)}/examples`;
+const PATH = checkSubPath(SIGNAL_ID, "examples");
 const TOP_STARRED = 20;
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink underline-offset-4 hover:text-ink-soft hover:underline";
+const LINK = "text-ink hover:text-ink-soft";
 
 // Only AGENTS.md is common enough to fill an examples page; every other slug is a 404.
 export const dynamicParams = false;
@@ -104,13 +104,12 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
           AGENTS.md examples from {ex.rows.length} open source repos
         </h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink-dim">
-          Of the {ex.boardSize} repos on the leaderboard, {ex.rows.length} have an AGENTS.md or CLAUDE.md at the root,
-          and {ex.passing} of those files are long enough (800 characters or more) to pass the{" "}
+          {ex.rows.length} of {ex.boardSize} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
+          {ex.passing} are long enough (800+ characters) to pass the{" "}
           <Link href={checkPath(SIGNAL_ID)} className={LINK}>
             AGENTS.md check
           </Link>{" "}
-          in full. Each file name below links to the file on its host, so you can read how a popular project explains
-          itself to an agent.
+          in full. Each file name links to the file.
         </p>
       </section>
 
@@ -128,8 +127,12 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             <PanelHeading>Longest and shortest files that pass</PanelHeading>
             <h3 className="m-0 mb-2 text-[14px] font-semibold text-ink">Longest</h3>
             <AgentsMdExampleTable rows={ex.longest} caption="Longest AGENTS.md or CLAUDE.md files that pass" />
-            <h3 className="mt-4 mb-2 text-[14px] font-semibold text-ink">Shortest</h3>
-            <AgentsMdExampleTable rows={ex.shortest} caption="Shortest AGENTS.md or CLAUDE.md files that pass" />
+            {ex.shortest.length > 0 && (
+              <>
+                <h3 className="mt-4 mb-2 text-[14px] font-semibold text-ink">Shortest</h3>
+                <AgentsMdExampleTable rows={ex.shortest} caption="Shortest AGENTS.md or CLAUDE.md files that pass" />
+              </>
+            )}
           </Panel>
         </div>
       )}
@@ -146,8 +149,12 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             ))}
           </ul>
           <p className={PROSE}>
-            The check accepts AGENTS.md, CLAUDE.md or AGENT.md at the repo root and reads the first one it finds, in
-            that order, so a repo with both files is counted under AGENTS.md. Either name passes for every agent.
+            The check reads the first of AGENTS.md, CLAUDE.md and AGENT.md with content, so a repo with both counts
+            under AGENTS.md unless its AGENTS.md is empty. Either name passes.{" "}
+            <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={LINK}>
+              Which one to use
+            </Link>
+            .
           </p>
           <p className={`${PROSE} mt-3`}>
             <CodeText text={CHECK_CONTENT[SIGNAL_ID].why} />
@@ -168,7 +175,7 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             <Link href="/methodology" className={LINK}>
               methodology
             </Link>{" "}
-            links the docs each agent&apos;s weights come from.
+            links the docs behind each weight.
           </p>
         </Panel>
       </div>

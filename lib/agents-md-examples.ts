@@ -23,6 +23,8 @@ export type AgentsMdExamples = {
   /** Most-starred repos with no file, or only an empty one. */
   missing: LeaderboardRow[];
   languages: { slug: string; label: string; withFile: number; total: number }[];
+  /** Characters in the middle file of those with a measured length; null when none has one. */
+  medianLength: number | null;
 };
 
 export const LENGTH_LIST_LIMIT = 5;
@@ -76,14 +78,23 @@ export function buildAgentsMdExamples(board: LeaderboardRow[], files: SignalFile
     boardSize: board.length,
     passing: rows.filter((r) => r.pass >= 1).length,
     longest: byLength.slice(0, LENGTH_LIST_LIMIT),
-    shortest: byLength.slice(-LENGTH_LIST_LIMIT).reverse(),
+    // From the remainder, so a short list never repeats a repo already under longest.
+    shortest: byLength.slice(LENGTH_LIST_LIMIT).slice(-LENGTH_LIST_LIMIT).reverse(),
     byFile: [...byFile.entries()].map(([file, c]) => ({ file, ...c })).sort((a, b) => b.count - a.count),
     missing: board
       .filter((r) => fileOf.has(r.id) && !has.has(r.id))
       .sort(byStars)
       .slice(0, MISSING_LIST_LIMIT),
     languages,
+    medianLength: median(rows.flatMap((r) => (r.length == null ? [] : [r.length]))),
   };
+}
+
+function median(values: number[]): number | null {
+  if (values.length === 0) return null;
+  const sorted = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
 }
 
 export function examplesTitle(count: number): string {

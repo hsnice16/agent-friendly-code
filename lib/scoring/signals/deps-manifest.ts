@@ -1,6 +1,7 @@
 import { readdirSync } from "node:fs";
+import { join } from "node:path";
 
-import { firstExisting } from "./helpers";
+import { firstFile, isFileEntry } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = [
@@ -42,7 +43,7 @@ function findGlobManifest(repo: string): string | null {
   try {
     const entries = readdirSync(repo).sort();
     for (const re of GLOB_MANIFESTS) {
-      const hit = entries.find((f) => re.test(f));
+      const hit = entries.find((f) => re.test(f) && isFileEntry(repo, join(repo, f)));
       if (hit) {
         return hit;
       }
@@ -59,7 +60,7 @@ export const depsManifest: Signal = {
   improveSuggestion:
     "Commit a proper manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) plus a lockfile.",
   check: (repo) => {
-    const m = firstExisting(repo, CANDIDATES);
+    const m = firstFile(repo, CANDIDATES);
 
     if (m) {
       return {

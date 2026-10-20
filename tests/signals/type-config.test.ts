@@ -81,4 +81,9 @@ describe("typeConfig signal", () => {
     fixture = makeFixture({ "app.cabal": "name: app\nversion: 0.1" });
     assert.equal(typeConfig.check(fixture).pass, 1);
   });
+
+  test("directories named like type configs or typed-language manifests do not count", () => {
+    fixture = makeFixture({ "tsconfig.json/x": "", "Cargo.toml/x": "", "app.cabal/x": "" });
+    assert.equal(typeConfig.check(fixture).pass, 0);
+  });
 });

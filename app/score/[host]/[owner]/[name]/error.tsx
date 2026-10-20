@@ -7,7 +7,7 @@ import { Panel } from "@/components/Panel";
 // host rate limit, a timeout. It exists so page.tsx can throw instead of
 // rendering an apology: a throw is never cached, so the failure is not served
 // to everyone else for the next hour.
-export default function LiveScoreError({ reset }: { error: Error; reset: () => void }) {
+export default function LiveScoreError({ retry }: { error: Error; retry: () => void }) {
   return (
     <Panel>
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo right now</h1>
@@ -19,7 +19,7 @@ export default function LiveScoreError({ reset }: { error: Error; reset: () => v
       <div className="mt-3.5 flex flex-wrap items-center gap-4">
         <button
           type="button"
-          onClick={reset}
+          onClick={retry}
           className="cursor-pointer rounded-lg border border-line bg-ink px-4 py-2 text-[14px] font-medium text-accent-ink hover:bg-ink-soft"
         >
           Try again

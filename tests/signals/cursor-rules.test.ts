@@ -53,4 +53,14 @@ describe("cursorRules signal", () => {
 
     assert.equal(cursorRules.check(fixture).pass, 1);
   });
+
+  test("a directory named *.mdc is not a rule file", () => {
+    fixture = makeFixture({ ".cursor/rules/style.mdc/README.md": "not a rule" });
+    assert.equal(cursorRules.check(fixture).pass, 0);
+  });
+
+  test("counts only the .mdc files, not .mdc directories beside them", () => {
+    fixture = makeFixture({ ".cursor/rules/a.mdc": "rule", ".cursor/rules/b.mdc/x": "" });
+    assert.equal(cursorRules.check(fixture).detail, "1 .mdc file in .cursor/rules/");
+  });
 });

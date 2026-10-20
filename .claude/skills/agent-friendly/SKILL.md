@@ -73,7 +73,7 @@ Print a tight summary the user can read at a glance:
 - **Best-fit agent** — the highest-scoring entry in `modelScores`, with its score.
 - **Runner-up** if its score is within ~5 points of the best — gives the user a real alternative.
 - **Why** — one short sentence pointing at the strongest signals (e.g. "strong AGENTS.md, tests in place, reproducible dev env"). Use the `signals` array (signals with `pass: 1` and high weight in the best agent's profile).
-- **Recommended model class** — mapped from the overall score (frontier / standard / small — see table). Note that the user can switch using `/model` (Claude Code / Codex / Gemini CLI), `/profile` (Cursor), or whatever their agent's equivalent is — but **don't switch for them**, just suggest.
+- **Recommended model class** — mapped from the overall score (frontier / standard / small — see table). Note that the user can switch using `/model` (Claude Code, Codex, Gemini CLI, Cursor CLI) or their agent's equivalent — but **don't switch for them**, just suggest.
 - **Top improvements** — up to 3 entries from `topImprovements`, each with its score gain.
 
 Example output:

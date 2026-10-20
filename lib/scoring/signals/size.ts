@@ -104,7 +104,7 @@ export const size: Signal = {
       pass: 0.2,
       id: "size",
       label: "Manageable size",
-      detail: `${count}+ files — very large`,
+      detail: count > CAP ? `${CAP}+ files — very large` : `${count} files — very large`,
     };
   },
 };

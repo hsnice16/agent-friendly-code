@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { AgentsMdGuide } from "@/components/AgentsMdGuide";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
@@ -10,8 +11,9 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
-import { checkPath, checkSlug, signalIdFromSlug } from "@/lib/utils/check-path";
+import { checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
@@ -21,7 +23,7 @@ import { APP_NAME, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from 
 type Params = { slug: string };
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink underline-offset-4 hover:text-ink-soft hover:underline";
+const LINK = "text-ink hover:text-ink-soft";
 
 export function generateStaticParams(): Params[] {
   return SIGNALS.map((s) => ({ slug: checkSlug(s.id) }));
@@ -59,6 +61,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
   const stats = getCheckStats(id);
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
   const { contentChangedAt } = getLeaderboardStats();
+  const examples = id === "agents_md" ? getAgentsMdExamples() : null;
 
   return (
     <>
@@ -116,6 +119,12 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         </Panel>
       </div>
 
+      {examples && (
+        <div className="mt-3.5">
+          <AgentsMdGuide medianLength={examples.medianLength} files={examples.rows.length} />
+        </div>
+      )}
+
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <Panel className="h-full">
           <PanelHeading>{questions.scoring}</PanelHeading>
@@ -127,11 +136,11 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
             ))}
           </ul>
           <p className="mt-3 mb-0 text-[13px] text-muted">
-            The{" "}
-            <Link href="/methodology" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+            How checks become a score:{" "}
+            <Link href="/methodology" className="text-ink-dim hover:text-ink-soft">
               methodology
-            </Link>{" "}
-            has the formula that turns checks into a score.
+            </Link>
+            .
           </p>
         </Panel>
 
@@ -179,10 +188,14 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       {id === "agents_md" && (
         <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
-          <Link href={`${checkPath(id)}/examples`} className={LINK}>
+          <Link href={checkSubPath(id, "examples")} className={LINK}>
             AGENTS.md examples
           </Link>
-          : every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file on its host.
+          : every one on the leaderboard, linked to its source.{" "}
+          <Link href={checkSubPath(id, "vs-claude-md")} className={LINK}>
+            AGENTS.md vs CLAUDE.md
+          </Link>
+          : which to use.
         </p>
       )}
 

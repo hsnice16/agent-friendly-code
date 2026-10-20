@@ -31,8 +31,7 @@ export default function PackageIndexPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Packages</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          People usually pick packages on npm, PyPI, or crates.io, not on GitHub. Type a package name to see how ready
-          its source repo is for AI coding agents.
+          Type an npm, PyPI or crates.io package name to see how ready its source repo is for AI coding agents.
         </p>
       </section>
 
@@ -71,9 +70,9 @@ export default function PackageIndexPage() {
         <Panel>
           <PanelHeading>What if a package has no score yet?</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            If the package&apos;s source repo isn&apos;t on our list yet, the page shows which repo we found. It also
-            links to a <strong className="text-ink mr-1">ready-made GitHub issue</strong> you can send to ask us to
-            score it. If the package doesn&apos;t list a source link we can read, the issue asks you for the right link.
+            The page shows the source repo we found and links a{" "}
+            <strong className="text-ink">ready-made GitHub issue</strong> asking us to score it. If the package lists no
+            source link we can read, the issue asks you for one.
           </p>
         </Panel>
       </div>

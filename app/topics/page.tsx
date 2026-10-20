@@ -28,7 +28,7 @@ export default function TopicsPage() {
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY[TOPICS_PATH].title}</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          The leaderboard cut by the topics owners tag their repos with. A topic gets a page once {TOPIC_PAGE_MIN_REPOS}{" "}
+          The leaderboard by the topics owners tag their repos with. A topic gets a page once {TOPIC_PAGE_MIN_REPOS}{" "}
           repos share it.
         </p>
       </section>

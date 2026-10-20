@@ -70,6 +70,12 @@ describe("buildAgentsMdExamples", () => {
     assert.ok(!ex.shortest.some((r) => r.pass < 1));
   });
 
+  it("keeps longest and shortest disjoint when there are fewer than twice the limit", () => {
+    const longest = new Set(ex.longest.map((r) => r.id));
+    assert.equal(ex.shortest.length, 4);
+    assert.ok(!ex.shortest.some((r) => longest.has(r.id)));
+  });
+
   it("counts each file name", () => {
     assert.deepEqual(ex.byFile, [
       { file: "AGENTS.md", count: 9, passing: 8 },
@@ -100,6 +106,11 @@ describe("buildAgentsMdExamples", () => {
     assert.ok(withEmpty.rows.some((r) => r.id === 13));
     assert.ok(!withEmpty.longest.some((r) => r.id === 13));
     assert.equal(withEmpty.longest[0].length, 1700);
+  });
+
+  it("takes the median length over every file with one", () => {
+    assert.equal(ex.medianLength, 1250);
+    assert.equal(buildAgentsMdExamples(board, []).medianLength, null);
   });
 
   it("links each file on its host", () => {

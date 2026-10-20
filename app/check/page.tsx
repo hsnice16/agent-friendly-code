@@ -9,11 +9,11 @@ import { checksBySummedWeight } from "@/lib/leaderboard-model-panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 
 const START_WITH = 3;
-const LINK = "text-ink underline-offset-4 hover:text-ink-soft hover:underline";
+const LINK = "text-ink hover:text-ink-soft";
 
 export const metadata: Metadata = staticPageMetadata("/check");
 
@@ -35,13 +35,12 @@ export default function ChecksPage() {
           show what a change must pass, a reproducible dev setup, and a size it can read.
         </p>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Every score on this site comes from {SIGNALS.length} checks on the files in a repo. Each one has its own page:
-          what it looks for, why agents need it, how to pass it, and how many of the {total} repos on the leaderboard
-          do. The{" "}
-          <Link href="/methodology" className="text-ink-dim underline underline-offset-4 hover:text-ink-soft">
+          Every score here comes from these {SIGNALS.length} file checks. Each has a page: what it looks for, why agents
+          need it, how to pass it, and how many of the {total} leaderboard repos do. The{" "}
+          <Link href="/methodology" className="text-ink-dim hover:text-ink-soft">
             methodology
           </Link>{" "}
-          covers how the checks are weighted into a score.
+          covers the weights.
         </p>
       </section>
 
@@ -49,8 +48,7 @@ export default function ChecksPage() {
         <Panel tone="warn">
           <PanelHeading tone="warn">Start with these {START_WITH}</PanelHeading>
           <p className="m-0 mb-2.5 text-[13.5px] text-ink-dim">
-            The checks with the most weight summed across all {MODELS.length} agents, so fixing one moves every
-            agent&apos;s score:
+            The most weight summed across all {MODELS.length} agents, so each fix moves every agent&apos;s score:
           </p>
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             {startWith.map((c) => {
@@ -70,7 +68,7 @@ export default function ChecksPage() {
               Check your repo now
             </Link>{" "}
             to see which of the {SIGNALS.length} it passes, or read{" "}
-            <Link href="/check/agents-md/examples" className={LINK}>
+            <Link href={checkSubPath("agents_md", "examples")} className={LINK}>
               real AGENTS.md examples
             </Link>{" "}
             from popular repos.

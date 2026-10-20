@@ -52,12 +52,12 @@ export default function AboutPage() {
         <PanelHeading>Who</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Built and maintained by <ExternalLink href="https://github.com/hsnice16">Himanshu Singh</ExternalLink>, a
-          software engineer working remotely who builds side projects in the open. X:{" "}
+          software engineer who builds side projects in the open. X:{" "}
           <ExternalLink href="https://x.com/hsnice16">@hsnice16</ExternalLink>.
         </p>
         <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
-          It is an independent project, not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other
-          company whose agent is scored here.
+          Independent: not tied to Anthropic, OpenAI, Google, Cognition, Anysphere, or any other company whose agent is
+          scored here.
         </p>
       </Panel>
 
@@ -65,10 +65,9 @@ export default function AboutPage() {
         <Panel tone="warn">
           <PanelHeading tone="warn">Why it exists</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            Having a README is not the same as helping an AI coding agent get work done, and there is no public way to
-            see which repos have done that work. {APP_NAME} shows it for each agent separately, because they read
-            different files: Claude Code loads CLAUDE.md, Cursor its own rules and AGENTS.md, and Devin needs a dev
-            setup it can run. One repo can suit one agent and not another.
+            A README alone doesn&apos;t help an AI coding agent get work done, and nothing public showed which repos do
+            more. {APP_NAME} shows it per agent, because agents read different files: Claude Code loads CLAUDE.md,
+            Cursor its own rules and AGENTS.md, and Devin needs a dev setup it can run.
           </p>
         </Panel>
       </div>
@@ -78,14 +77,15 @@ export default function AboutPage() {
           <PanelHeading>What it is not</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             Not a test of how well agents perform. Scores come from <strong className="text-ink">file checks</strong>,
-            and no agent is run. Weights follow each agent&apos;s docs but are not yet measured against real runs; the{" "}
+            and no agent is run. Weights follow each agent&apos;s docs but aren&apos;t yet measured against real runs.
+            The{" "}
             <Link
               href="/methodology"
               className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
               methodology
             </Link>{" "}
-            has the details and the plan to measure them.
+            has the plan to measure them.
           </p>
         </Panel>
       </div>
@@ -97,20 +97,19 @@ export default function AboutPage() {
             The leaderboard is a curated list of {count} public repos on GitHub, GitLab and Bitbucket, kept in{" "}
             <ExternalLink href={`${REPO_URL}/blob/main/scripts/seed-list.ts`}>scripts/seed-list.ts</ExternalLink> and
             grouped by ecosystem: JavaScript and TypeScript, Python, Rust, Go, the JVM, other languages, and AI coding
-            agents, models and SDKs. Every repo on it is scored again every six hours, and a repo taken off the list
-            leaves the leaderboard at the next rescore.
+            agents, models and SDKs. It is rescored every six hours; a repo taken off the list leaves the leaderboard at
+            the next rescore.
           </p>
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             A weekly audit flags repos on the list that were renamed, archived, deleted or made private, that are forks
-            or mirrors, or whose score has stopped refreshing. Each finding is fixed in the list or accepted on purpose.
-            Scoring a repo with{" "}
+            or mirrors, or whose score stopped refreshing; each is fixed or accepted on purpose. Scoring a repo with{" "}
             <Link
               href="/score"
               className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
             >
               Live Score
             </Link>{" "}
-            never adds it. To suggest a repo, open an issue or a pull request that edits the list.
+            never adds it. To suggest one, open an issue or a pull request that edits the list.
           </p>
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             This site&apos;s own repo,{" "}
@@ -120,9 +119,9 @@ export default function AboutPage() {
             >
               {OWN_REPO.owner}/{OWN_REPO.name}
             </Link>
-            , is on the list and scored by the same rules as every other repo, and so are the author&apos;s other repos.
-            Wherever repos are listed, it is marked &ldquo;this site&apos;s own repo&rdquo; and they are marked
-            &ldquo;by this site&apos;s author&rdquo;.
+            , and the author&apos;s other repos are on the list and scored by the same rules. They are labelled
+            &ldquo;this site&apos;s own repo&rdquo; and &ldquo;by this site&apos;s author&rdquo; wherever repos are
+            listed.
           </p>
         </Panel>
       </div>
@@ -131,9 +130,9 @@ export default function AboutPage() {
         <Panel>
           <PanelHeading>Open source</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            MIT-licensed. The checks, the weights, the scoring code, the list of repos, and every score are all in the{" "}
+            MIT-licensed. The checks, weights, scoring code, repo list and every score are in the{" "}
             <ExternalLink href={REPO_URL}>source repository</ExternalLink>. If a score looks wrong, open an issue with a
-            link and say which rule to look at again. If a check is missing, suggest one.
+            link and the rule in question. Missing a check? Suggest one.
           </p>
         </Panel>
       </div>
@@ -143,9 +142,8 @@ export default function AboutPage() {
           <PanelHeading>Contact</PanelHeading>
 
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The best way to reach me: open an issue or discussion on{" "}
-            <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>. For anything that should not be public,
-            email{" "}
+            Open an issue or discussion on <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>. For anything
+            private, email{" "}
             <a
               href={`mailto:${CONTACT_EMAIL}`}
               className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"

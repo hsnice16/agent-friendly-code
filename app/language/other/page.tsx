@@ -69,9 +69,8 @@ export default function OtherLanguagesPage() {
       <section className="mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{OTHER_LANGUAGES_TITLE}</h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          {rows.length} repos in languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos on the leaderboard, too few
-          for a page of their own, plus the repos whose language was not detected. Grouped by language, highest overall
-          score first.
+          {rows.length} repos in languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos here, or with none detected.
+          Grouped by language, highest score first.
         </p>
       </section>
 

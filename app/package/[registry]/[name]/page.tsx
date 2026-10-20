@@ -135,7 +135,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
 
             <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
               <span className="mr-1">{registry}</span> doesn&apos;t list a source repo for this package, or it lists one
-              we can&apos;t read (for example, a folder inside a larger repo, or a self-hosted git server).
+              we can&apos;t read (such as a folder in a larger repo, or a self-hosted git server).
             </p>
 
             <a

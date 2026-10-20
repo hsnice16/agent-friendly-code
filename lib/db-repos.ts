@@ -16,6 +16,8 @@ export const BY_NAME = "host = ? COLLATE NOCASE AND owner = ? COLLATE NOCASE AND
 export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
   const dir = opts.dir === "asc" ? "ASC" : "DESC";
   const sort = opts.sort === "stars" ? "stars" : "score";
+  // Then r.id: rows tied on both would follow the query plan, and repo pages
+  // number them as the board does.
   const secondary = sort === "stars" ? "score DESC" : "stars DESC";
   const hostFilter = opts.host ? "AND r.host = ?" : "";
   const hostArgs = opts.host ? [opts.host] : [];
@@ -26,7 +28,7 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
       .prepare(
         `SELECT r.*, r.overall_score AS score FROM repo r
          WHERE r.overall_score IS NOT NULL ${hostFilter}
-         ORDER BY ${sortCol} ${dir}, ${secondary}`,
+         ORDER BY ${sortCol} ${dir}, ${secondary}, r.id`,
       )
       .all(...hostArgs) as LeaderboardRow[];
   }
@@ -37,7 +39,7 @@ export function listLeaderboard(opts: LeaderboardOptions): LeaderboardRow[] {
       `SELECT r.*, m.score AS score FROM repo r
        JOIN model_score m ON m.repo_id = r.id AND m.model_id = ?
        WHERE 1=1 ${hostFilter}
-       ORDER BY ${sortCol} ${dir}, ${secondary}`,
+       ORDER BY ${sortCol} ${dir}, ${secondary}, r.id`,
     )
     .all(opts.model, ...hostArgs) as LeaderboardRow[];
 }

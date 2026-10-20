@@ -18,7 +18,7 @@ export default function ChangelogPage() {
 
         <p className="m-0 max-w-[70ch] text-[15.5px] text-ink-dim">
           What each release shipped from the{" "}
-          <Link href="/roadmap" className="text-ink-dim underline-offset-4 hover:text-ink-soft hover:underline">
+          <Link href="/roadmap" className="text-ink-dim hover:text-ink-soft">
             roadmap
           </Link>
           .

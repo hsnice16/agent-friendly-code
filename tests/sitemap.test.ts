@@ -11,8 +11,9 @@ describe("sitemap", async () => {
   const { default: sitemap } = await import("../app/sitemap");
   const urls = sitemap().map((e) => e.url);
 
-  it("lists the examples page and the other-languages hub", () => {
+  it("lists the AGENTS.md sub-pages and the other-languages hub", () => {
     assert.ok(urls.includes(`${APP_URL}/check/agents-md/examples`));
+    assert.ok(urls.includes(`${APP_URL}/check/agents-md/vs-claude-md`));
     assert.ok(urls.includes(`${APP_URL}/language/other`));
   });
 

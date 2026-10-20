@@ -30,32 +30,32 @@ type FaqEntry = {
 const FAQ: FaqEntry[] = [
   {
     q: "Which AI coding agent should I use for my codebase?",
-    a: "This page tells you which agent your repo is best set up for, not which one writes the best code. Each agent reads different files: Claude Code loads CLAUDE.md, Cursor its rules files, and so on. You get a score for each agent and what to add for each.",
+    a: "This page tells you which agent your repo is best set up for, not which writes the best code. Each agent reads different files (Claude Code loads CLAUDE.md, Cursor its rules files), so you get a score and fixes for each.",
   },
   {
     q: "Does the repo have to be on the leaderboard?",
-    a: "No. Paste any public GitHub repo and it is scored right away. If it is already on the leaderboard, you are sent to its page, which also shows how the score changed since the last rescore.",
+    a: "No. Any public GitHub repo is scored right away. One already on the leaderboard opens its page, which also shows how the score changed since the last rescore.",
   },
   {
     q: "Is this score different from the leaderboard score?",
-    a: "No. Same checks, same weights. The leaderboard clones each repo every six hours; this page rebuilds it from GitHub's file list. An automated test checks that both give the same numbers.",
+    a: "No. Same checks, same weights. The leaderboard clones each repo every six hours; this page rebuilds it from GitHub's file list, and a test checks both give the same numbers.",
   },
   {
     q: "Do you save or list my repo anywhere?",
-    a: "No. The result is cached for up to an hour, then dropped. Nothing goes into our database, the repo is never added to the leaderboard, and search engines are told not to index the result. Your list of scored repos stays in your browser.",
+    a: "No. The result is cached for up to an hour, then dropped. Nothing goes into our database or onto the leaderboard, and search engines are told not to index it. Your list of scored repos stays in your browser.",
   },
   {
     q: "How up to date is the score?",
-    a: "It uses the latest commit and shows which one. Results are cached for an hour, so a change pushed a few minutes ago may not show yet.",
+    a: "It scores the latest commit and shows which one. Results are cached for an hour, so a very recent push may not show yet.",
   },
   {
     q: "Does it work on private repos, GitLab, or Bitbucket?",
-    a: "Only public GitHub repos for now. Private repos would need access we choose not to ask for. GitLab and Bitbucket work but are held back by their API limits: GitLab returns 100 items per request, and Bitbucket allows 60 requests an hour without a login. For a private repo, run the agent skill locally.",
+    a: "Only public GitHub repos for now. Private repos would need access we choose not to ask for. GitLab and Bitbucket work but are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. For a private repo, run the agent skill locally.",
     link: { phrase: "the agent skill", href: "/skill" },
   },
   {
     q: "Why won't a very large repo get a score?",
-    a: "A repo with more than 150,000 files and folders takes longer to rebuild than a page may run, so we stop and say so instead of giving a partial score. The agent skill scores it locally, with no size limit.",
+    a: "Past 150,000 files and folders, rebuilding a repo takes longer than a page may run, so we say so rather than give a partial score. The agent skill scores it locally, with no size limit.",
     link: { phrase: "The agent skill", href: "/skill" },
   },
 ];
@@ -130,8 +130,8 @@ export default function ScoreIndexPage() {
           Is your repo ready for AI coding agents?
         </h1>
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Paste a public GitHub repo link. You get a score for each agent and the one the repo is best set up for, with
-          the same checks and weights as the leaderboard. Nothing is saved; results are cached for an hour.
+          Paste a public GitHub repo link to get a score for each agent and the one the repo is best set up for. Same
+          checks and weights as the leaderboard; nothing is saved.
         </p>
 
         <LiveScoreForm />

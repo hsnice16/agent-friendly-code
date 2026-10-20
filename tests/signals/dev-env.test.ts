@@ -79,4 +79,12 @@ describe("devEnv signal", () => {
     fixture = makeFixture({ Makefile: "test:\n\tpytest" });
     assert.equal(devEnv.check(fixture).pass, 0.7);
   });
+
+  test("pass=0.7 for docker-compose.yaml alone", () => {
+    fixture = makeFixture({ "docker-compose.yaml": "services: {}" });
+    const r = devEnv.check(fixture);
+
+    assert.equal(r.pass, 0.7);
+    assert.equal(r.matchedPath, "docker-compose.yaml");
+  });
 });

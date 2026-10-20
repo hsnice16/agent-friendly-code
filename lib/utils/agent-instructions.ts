@@ -11,7 +11,7 @@ export type AgentFileShare = {
 
 export type AgentInstructionsData = {
   main: (AgentFile & { state: "ok" | "thin" | "empty" }) | null;
-  /** Main-file names known to be absent. Past the first match the check looks no further, so this is never a guess. */
+  /** Main-file names known to be absent. Never a guess: the check passes over an empty file for one with content, so only an empty match proves the names before it absent. */
   absentMain: string[];
   others: AgentFile[];
   absentOthers: string[];
@@ -91,7 +91,7 @@ export function agentInstructions(signals: SignalResult[], share: AgentFileShare
           state: agentsMd.pass < HAS_FILE_PASS ? "empty" : agentsMd.pass < 0.8 ? "thin" : "ok",
         }
       : null,
-    absentMain: matched ? MAIN_FILES.slice(0, Math.max(at, 0)) : MAIN_FILES,
+    absentMain: !matched ? MAIN_FILES : agentsMd.pass < HAS_FILE_PASS ? MAIN_FILES.slice(0, Math.max(at, 0)) : [],
     others,
     absentOthers,
     share,

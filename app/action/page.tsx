@@ -12,23 +12,27 @@ export const metadata: Metadata = staticPageMetadata("/action");
 const FAQ = [
   {
     q: "What does the action do on a pull request?",
-    a: "It scores the pull request and the branch it targets, then posts one comment with how the overall score, each check and each agent's score changed. Later pushes update that comment instead of adding new ones.",
+    a: "Scores the pull request and its target branch, then posts one comment with how the overall score, each check and each agent's score changed. Later pushes update that comment.",
+  },
+  {
+    q: "Is it an AI code reviewer?",
+    a: "No. It calls no model and reviews no code. It checks the files agents rely on, like AGENTS.md, tests and CI config.",
   },
   {
     q: "Why is AGENTS_BADGE_TOKEN required?",
-    a: "It's an on switch, not a password. Set it to any text to turn the comment on; leave it unset and the action does nothing. That lets template repos ship the workflow without it running in every copy.",
+    a: "It's an on switch, not a password. Any value turns the comment on; unset, the action does nothing, so template repos can ship the workflow without it running in every copy.",
   },
   {
     q: "Does it contact this website?",
-    a: "No. The scoring code and weights are bundled into the action, so it keeps working if this site goes offline.",
+    a: "No. The scorer and weights are bundled into the action, so it works even if this site is down.",
   },
   {
     q: "Does it work on private repos?",
-    a: "Yes. Scoring happens on the CI machine and your code is never sent anywhere. The comment is posted with the workflow's own GITHUB_TOKEN.",
+    a: "Yes. Scoring runs on the CI machine and your code is never sent anywhere. The comment uses the workflow's own GITHUB_TOKEN.",
   },
   {
     q: "How do I pin a version?",
-    a: "Use @v0 to follow the latest 0.x release, or an exact tag such as @v0.1.0 to stay on one version.",
+    a: "@v0 follows the latest 0.x release; an exact tag such as @v0.1.0 stays on one version.",
   },
 ];
 
@@ -90,11 +94,11 @@ export default function ActionPage() {
         <Panel>
           <PanelHeading>Set the AGENTS_BADGE_TOKEN secret</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The action only fires when{" "}
+            The action runs only when{" "}
             <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
               AGENTS_BADGE_TOKEN
             </code>{" "}
-            is set. It&apos;s an on switch, not a password:
+            is set:
           </p>
 
           <ol className="m-0 ml-5 mt-3 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
@@ -113,7 +117,7 @@ export default function ActionPage() {
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 enabled
               </code>
-              . The value isn&apos;t checked.
+              . The value isn&apos;t read.
             </li>
             <li>
               Click <strong className="text-ink">Add secret</strong>. The action runs on your next pull request.
@@ -138,17 +142,14 @@ export default function ActionPage() {
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 actions/checkout
               </code>{" "}
-              with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the pull request and the
-              history of the branch it targets.
+              with <code className="text-ink-dim">fetch-depth: 0</code> gives the action the pull request and its target
+              branch's history.
             </li>
 
-            <li>
-              It scores the pull request and the target branch (fetching just that commit if it is missing) with the
-              same weights, so the comparison is fair.
-            </li>
+            <li>It scores both with the same weights, fetching the target commit if it is missing.</li>
 
             <li>
-              It posts one comment on the pull request (or updates it), marked with{" "}
+              It posts or updates one comment, marked with{" "}
               <code className="rounded border border-line bg-surface-2 px-1.5 py-0.5 font-mono text-xs text-muted">
                 {"<!-- agent-friendly-action -->"}
               </code>

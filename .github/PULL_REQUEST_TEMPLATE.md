@@ -24,8 +24,8 @@ _Required for any UI change. Drag-and-drop into this description._
 
 _Confirm one of:_
 
-- _"Ships a roadmap item — removed from `lib/roadmap.ts`, added to `lib/changelog.ts` under the current release bucket."_
-- _"N/A — internal refactor / polish; no changelog entry."_
+- _"User-facing — listed in the next version's `tasks/<version>/README.md`; any shipped roadmap item removed from `lib/roadmap.ts`."_
+- _"N/A — not user-facing; no changelog line."_
 
 _Plus: "AGENTS.md / README.md updated if structure or conventions changed."_
 

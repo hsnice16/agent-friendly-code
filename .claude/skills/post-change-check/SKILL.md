@@ -29,10 +29,9 @@ Keep a mental list of: touched files, added/removed exports, new deps, new env v
 
 For each category below, decide **yes / no / N/A**, then act on the yeses:
 
-- **`lib/changelog.ts` under the current release bucket**
-  - Yes **only** if the change ships a user-facing capability (something a dashboard visitor, API caller, or maintainer of a listed repo can observe) **and** that capability maps to a `lib/roadmap.ts` entry or a `tasks/` file whose `Status` just flipped to `done`.
-  - No for codebase hygiene (CI, linter, pre-commit, tests), contributor docs (CONTRIBUTING, PR templates), internal refactors, dep bumps, directory moves, or UI polish without a semantic change.
-  - Action: append a one-line capability bullet (newest-first) **and** delete the matching item from `lib/roadmap.ts` — moved, not duplicated.
+- **Changelog line** (rule: AGENTS.md → Versions, changelog, roadmap)
+  - Yes only for a user-facing capability. No for hygiene, contributor docs, refactors, dep bumps or UI polish without a semantic change.
+  - Action: add a one-line bullet under "Shipped since …, owed a changelog line" in the next version's `tasks/<version>/README.md` (`lib/changelog.ts` gets it when the release is cut), and delete any shipped item from `lib/roadmap.ts`.
 - **`lib/roadmap.ts` integrity**
   - Every item must point to a real `tasks/X.Y.Z/NN-*.md` file — no dangling `taskFile` references.
   - Adding a roadmap entry requires adding its task file in the same PR. Don't split.
@@ -52,7 +51,7 @@ For each category below, decide **yes / no / N/A**, then act on the yeses:
   - Yes if a product-facing behaviour, command, or screenshot changed.
   - Specifics: "Run locally" commands must work; the agent list, signal count and Public API section must match the code.
 - **`CONTRIBUTING.md`**
-  - Yes if the branch/commit/PR flow or review bar changed, or if the security-contact email moved.
+  - Yes if the branch/commit/PR flow or review bar changed.
 - **`.env.example`**
   - Yes if a new env var was introduced.
   - Action: document with a one-line comment above the line.
@@ -64,27 +63,11 @@ Report each as `✓ updated`, `✓ N/A — reason`, or `✗ missing — file:lin
 
 ### Phase 3 — Code review
 
-Invoke the `code-review` skill on the diff. Its checklist:
-
-- Tailwind-first (utilities > custom classes, `@theme` tokens > hex, no `@apply` in `globals.css`).
-- Constants / utils extracted when the rule-of-three is hit.
-- I/O boundary held — `lib/scoring/` stays pure, all SQL in `lib/db*.ts`.
-- Server components default, client only when interactivity demands it.
-- Components presentational — no data fetching, no effects.
-- Phosphor icons only.
-
-Report findings in severity order: **Must fix** / **Should fix** / **Consider**.
+Invoke the `code-review` skill on the diff and report in its format.
 
 ### Phase 4 — Quality sweep
 
-Invoke the `quality-check` skill on the diff. Four dimensions:
-
-- **Accessibility**: landmarks, aria, contrast, reduced-motion, keyboard reachability.
-- **Responsiveness**: 320 → 1080+, mobile nav, table overflow, line-length caps.
-- **Performance**: RSC default, `next/script` for third-party, bundle weight, prepared statements.
-- **Security**: parameterised SQL, `dangerouslySetInnerHTML` only for the existing server-built JSON-LD scripts (with the `<` → `\u003c` escape preserved), `rel="noopener noreferrer"` on external links, clone safety.
-
-Report Pass / Fail / Needs manual check per dimension.
+Invoke the `quality-check` skill on the diff and report in its format.
 
 ## Output format
 
