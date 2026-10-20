@@ -16,7 +16,7 @@ export function repoMetadata(repo: RepoRow, { signals, summary, about }: PageFac
   const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${slug} — agent-friendliness score` };
 
   // Absolute, so the root template's suffix can't push it past 60 characters.
-  const title = repoTitle(slug, repo.overall_score, signals);
+  const title = repoTitle(slug, repo.overall_score, signals, repo.host);
   const description = repoDescription(slug, summary, repo.overall_score, signals, about.description);
 
   return {

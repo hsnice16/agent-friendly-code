@@ -1,3 +1,4 @@
+import { HOST_LABELS } from "@/lib/constants/hosts";
 import type { SignalResult } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { hasAgentFile } from "@/lib/utils/agent-instructions";
@@ -60,20 +61,27 @@ function listThatFits(items: string[], room: number, render: (items: string[]) =
 
 /**
  * Says what the number measures: a bare "83.8 / 100" earned impressions for
- * score-string and "<repo> github" searches, and no clicks from either. The
- * AGENTS.md state leads when it fits, for "<repo> AGENTS.md" searches. The
- * slug is in every form, which keeps titles unique.
+ * score-string and "<repo> github" searches, and no clicks from either. Most
+ * searches that reach these pages are "<repo> github" or "<repo> repo", so the
+ * slug leads and "GitHub repo" follows it; the AGENTS.md state comes next when
+ * it fits, for "<repo> AGENTS.md" searches. The slug is in every form, which
+ * keeps titles unique.
  */
-export function repoTitle(slug: string, overall: number | null, signals: SignalResult[] = []): string {
-  if (overall == null) return `${slug}: AI agent readiness`;
+export function repoTitle(slug: string, overall: number | null, signals: SignalResult[] = [], host?: string): string {
+  const label = host ? HOST_LABELS[host] : undefined;
+  const repo = label ? `${label} repo` : "repo";
+  if (overall == null) return `${slug} ${repo}: AI agent readiness`;
 
   const score = `${overall.toFixed(1)}/100`;
   const file = agentsFile(signals);
   const forms = [
-    ...(file ? [`${slug}: ${file}, agent readiness ${score}`] : []),
-    ...(file === null ? [`${slug}: no AGENTS.md · agent readiness ${score}`] : []),
-    `${slug}: AI agent readiness score ${score}`,
-    `${slug} AI agent readiness: ${score}`,
+    ...(file ? [`${slug} ${repo}: ${file}, agent score ${score}`] : []),
+    ...(file === null ? [`${slug} ${repo}: no AGENTS.md, agent score ${score}`] : []),
+    `${slug} ${repo}: agent readiness ${score}`,
+    `${slug} ${repo}, agent score ${score}`,
+    ...(label ? [`${slug} on ${label}: agent score ${score}`] : []),
+    `${slug} repo: agent readiness ${score}`,
+    `${slug} repo · agent score ${score}`,
     `${slug} agent readiness ${score}`,
     `${slug} ${score}`,
   ];
@@ -90,9 +98,10 @@ function aboutSentence(about: string | null | undefined, lead: string): string |
   return lead.length + 1 + s.length <= MAX_DESCRIPTION_LENGTH ? s : null;
 }
 
-// The repo's own words come straight after the lead: they are the only text
-// here not derived from our scores, so they are what tells two repos with the
-// same gaps apart. Never cut, since a truncated sentence reads as a bug.
+// The repo's own words lead when they fit beside the score: searchers looking
+// for the repo recognise its description before our numbers, and it is the only
+// text here not derived from scores, so it tells repos with the same gaps
+// apart. Never cut, since a truncated sentence reads as a bug.
 export function repoDescription(
   slug: string,
   summary: RepoSummary | null,
@@ -108,11 +117,11 @@ export function repoDescription(
 
   const lr = summary.languageRank;
   const inLanguage = lr ? `, #${lr.rank} of ${lr.total} in ${lr.language}` : "";
-  const lead = `${slug} scores ${overall.toFixed(1)}/100 for AI agent readiness: #${summary.rank} of ${summary.total}${inLanguage}.`;
+  const ranks = `${overall.toFixed(1)}/100 for AI agent readiness: #${summary.rank} of ${summary.total}${inLanguage}.`;
   const missing = sharedMissing(signals);
-  const own = aboutSentence(about, lead);
 
-  const parts = own ? [lead, own] : [lead];
+  const own = aboutSentence(about, `${slug}: Scores ${ranks}`);
+  const parts = own ? [`${slug}: ${own}`, `Scores ${ranks}`] : [`${slug} scores ${ranks}`];
   const room = MAX_DESCRIPTION_LENGTH - parts.join(" ").length - 1;
   const list =
     missing.length === 0

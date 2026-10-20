@@ -24,47 +24,65 @@ const summary: RepoSummary = {
 };
 
 describe("repoTitle", () => {
-  it("keeps the full form when it fits", () => {
-    assert.equal(repoTitle("o/r", 83.84), "o/r: AI agent readiness score 83.8/100");
+  it("names the host after the slug, for '<repo> github' searches", () => {
+    assert.equal(repoTitle("o/r", 83.84, [], "github"), "o/r GitHub repo: agent readiness 83.8/100");
+    assert.equal(repoTitle("o/r", 83.84, [], "gitlab"), "o/r GitLab repo: agent readiness 83.8/100");
+    assert.equal(repoTitle("o/r", 83.84), "o/r repo: agent readiness 83.8/100");
   });
 
   it("drops words, never the slug or score, to stay within the limit", () => {
     const slug = "kubernetes-sigs/cluster-api-provider";
     for (const signals of [[], withAgents, withoutAgents]) {
-      const title = repoTitle(slug, 70, signals);
+      const title = repoTitle(slug, 70, signals, "github");
       assert.ok(title.length <= MAX_TITLE_LENGTH, title);
       assert.ok(title.startsWith(slug));
       assert.ok(title.endsWith("70.0/100"));
     }
   });
 
+  it("keeps the host in a form that fits before dropping it", () => {
+    assert.equal(
+      repoTitle("Significant-Gravitas/AutoGPT", 49.7, withoutAgents, "github"),
+      "Significant-Gravitas/AutoGPT on GitHub: agent score 49.7/100",
+    );
+  });
+
   it("leads with the AGENTS.md state when it fits", () => {
-    assert.equal(repoTitle("axios/axios", 91.94, withAgents), "axios/axios: AGENTS.md, agent readiness 91.9/100");
-    assert.equal(repoTitle("golang/go", 31.2, withoutAgents), "golang/go: no AGENTS.md · agent readiness 31.2/100");
+    assert.equal(
+      repoTitle("axios/axios", 91.94, withAgents, "github"),
+      "axios/axios GitHub repo: AGENTS.md, agent score 91.9/100",
+    );
+    assert.equal(
+      repoTitle("golang/go", 31.2, withoutAgents, "github"),
+      "golang/go GitHub repo: no AGENTS.md, agent score 31.2/100",
+    );
     const claude = [signal("agents_md", "AGENTS.md / CLAUDE.md", 0.8, "CLAUDE.md")];
-    assert.equal(repoTitle("o/r", 50, claude), "o/r: CLAUDE.md, agent readiness 50.0/100");
+    assert.equal(repoTitle("o/r", 50, claude, "github"), "o/r GitHub repo: CLAUDE.md, agent score 50.0/100");
   });
 
   it("reads an empty instructions file as none", () => {
     const empty = [signal("agents_md", "AGENTS.md / CLAUDE.md", 0.2, "AGENTS.md")];
-    assert.equal(repoTitle("o/r", 50, empty), "o/r: no AGENTS.md · agent readiness 50.0/100");
+    assert.equal(repoTitle("o/r", 50, empty, "github"), "o/r GitHub repo: no AGENTS.md, agent score 50.0/100");
   });
 
   it("keeps the score when even the slug alone is too long", () => {
     const slug = `${"a".repeat(40)}/${"b".repeat(30)}`;
-    const title = repoTitle(slug, 42, withAgents);
+    const title = repoTitle(slug, 42, withAgents, "github");
     assert.ok(title.length <= MAX_TITLE_LENGTH, title);
     assert.ok(title.startsWith("aaaa") && title.endsWith(" 42.0/100"), title);
   });
 
   it("gives every slug its own title", () => {
     const slugs = ["o/r", "o/r2", "kicad/code/kicad", "a-long-owner/a-long-repository-name-here"];
-    const titles = slugs.flatMap((s) => [repoTitle(s, 60, withAgents), repoTitle(`x${s}`, 60, withoutAgents)]);
+    const titles = slugs.flatMap((s) => [
+      repoTitle(s, 60, withAgents, "github"),
+      repoTitle(`x${s}`, 60, withoutAgents, "gitlab"),
+    ]);
     assert.equal(new Set(titles).size, titles.length);
   });
 
   it("has no score part for an unscored repo", () => {
-    assert.equal(repoTitle("o/r", null), "o/r: AI agent readiness");
+    assert.equal(repoTitle("o/r", null, [], "github"), "o/r GitHub repo: AI agent readiness");
   });
 });
 
@@ -116,9 +134,12 @@ describe("repoDescription", () => {
     assert.match(repoDescription("o/r", null, null, []), /^How ready o\/r is/);
   });
 
-  it("puts the repo's own description straight after the lead when it fits", () => {
+  it("leads with the repo's own description when it fits beside the score", () => {
     const d = repoDescription("o/r", summary, 81, signals, "A tiny HTTP client");
-    assert.match(d, /in Go\. A tiny HTTP client\. /);
+    assert.match(
+      d,
+      /^o\/r: A tiny HTTP client\. Scores 81\.0\/100 for AI agent readiness: #12 of 371, #3 of 40 in Go\. /,
+    );
     assert.ok(d.length <= MAX_DESCRIPTION_LENGTH, d);
 
     const fallback = repoDescription("o/r", null, null, [], "A tiny HTTP client.");
