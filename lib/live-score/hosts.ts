@@ -114,7 +114,7 @@ async function listGitHub(
   const init = { headers: requestHeaders("github", token) };
   const api = `https://api.github.com/repos/${repoSegment(owner, name)}/git/trees`;
 
-  const res = await timedFetch(`${api}/${ref}?recursive=1`, init, deadline);
+  const res = await timedFetch(`${api}/${pathSegments(ref)}?recursive=1`, init, deadline);
   if (!res.ok) {
     assertNotRateLimited("github", res);
     throw new Error(`${res.status} listing tree`);
@@ -128,7 +128,7 @@ async function listGitHub(
   // would still lose entries; none of the fixtures reach that, so it is not
   // recursed further.
   if (truncated) {
-    const rootRes = await timedFetch(`${api}/${ref}`, init, deadline);
+    const rootRes = await timedFetch(`${api}/${pathSegments(ref)}`, init, deadline);
     if (rootRes.ok) {
       const root = (await rootRes.json()) as { tree: GitHubNode[] };
       const merged = new Map<string, GitHubNode>(root.tree.map((e) => [e.path, e]));
@@ -169,7 +169,7 @@ async function listGitLab(
   token?: string,
   deadline?: AbortSignal,
 ): Promise<TreeEntry[]> {
-  const base = `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/tree?recursive=true&per_page=100&ref=${ref}`;
+  const base = `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/tree?recursive=true&per_page=100&ref=${encodeURIComponent(ref)}`;
 
   const bodies = await paginate(
     "gitlab",
@@ -192,7 +192,7 @@ async function listGitLab(
 type BitbucketNode = { path: string; type: string; attributes?: string[] };
 
 async function listBitbucket(owner: string, name: string, ref: string, deadline?: AbortSignal): Promise<TreeEntry[]> {
-  const base = `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${ref}/?max_depth=${BITBUCKET_MAX_DEPTH}&pagelen=100`;
+  const base = `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${pathSegments(ref)}/?max_depth=${BITBUCKET_MAX_DEPTH}&pagelen=100`;
 
   const bodies = await paginate(
     "bitbucket",
@@ -235,12 +235,12 @@ export function listTree(
 
 export function rawUrl(host: RepoHost, owner: string, name: string, ref: string, path: string): string {
   if (host === "gitlab") {
-    return `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/files/${encodeURIComponent(path)}/raw?ref=${ref}`;
+    return `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/files/${encodeURIComponent(path)}/raw?ref=${encodeURIComponent(ref)}`;
   }
   if (host === "bitbucket") {
-    return `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${ref}/${pathSegments(path)}`;
+    return `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/src/${pathSegments(ref)}/${pathSegments(path)}`;
   }
-  return `https://raw.githubusercontent.com/${repoSegment(owner, name)}/${ref}/${pathSegments(path)}`;
+  return `https://raw.githubusercontent.com/${repoSegment(owner, name)}/${pathSegments(ref)}/${pathSegments(path)}`;
 }
 
 // A dangling symlink 404s on the raw endpoint because the target doesn't
@@ -268,10 +268,10 @@ export async function resolveCommit(
 ): Promise<string | null> {
   const url =
     host === "github"
-      ? `https://api.github.com/repos/${repoSegment(owner, name)}/commits/${ref}`
+      ? `https://api.github.com/repos/${repoSegment(owner, name)}/commits/${pathSegments(ref)}`
       : host === "gitlab"
-        ? `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/commits/${ref}`
-        : `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/commit/${ref}`;
+        ? `https://gitlab.com/api/v4/projects/${gitlabProjectId(owner, name)}/repository/commits/${encodeURIComponent(ref)}`
+        : `https://api.bitbucket.org/2.0/repositories/${repoSegment(owner, name)}/commit/${pathSegments(ref)}`;
 
   const res = await timedFetch(url, { headers: requestHeaders(host, token) }, deadline);
 

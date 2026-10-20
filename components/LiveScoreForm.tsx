@@ -3,9 +3,8 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-
-import { parseRepoUrl } from "@/lib/clients/github";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
+import { parseRepoUrl } from "@/lib/repo-url";
 import { hostLabel } from "@/lib/utils/format";
 
 export function LiveScoreForm() {

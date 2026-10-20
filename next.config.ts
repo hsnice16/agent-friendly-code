@@ -26,6 +26,7 @@ const CSP = [
 // function bundle. The scorer can't be annotated away — it is vendored verbatim
 // into the sibling action and skill repos — so the weight is trimmed here.
 const config: NextConfig = {
+  poweredByHeader: false,
   outputFileTracingIncludes: {
     "/*": ["./data/rank.db"],
   },
