@@ -65,7 +65,7 @@ data/rank.db  committed database, refreshed by .github/workflows/scheduled-resco
 - **Signal IDs** (`agents_md`, `tests`, …) are stable. Renaming one is a migration.
 - **Path lookups** in signals go through `firstExisting` / `resolveRelative` / `resolveAllRelative` (`helpers.ts`), never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
 - **An empty AGENTS.md / CLAUDE.md** (`agents_md` pass 0.2) does not count as having one wherever a share is shown.
-- **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`) wrapped in try/catch, read after mount so server HTML matches.
+- **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`, `analytics-consent.ts`) wrapped in try/catch, read after mount so server HTML matches.
 - **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`.
 - **Comments say why, never what.** The shallow-clone note in `lib/clients/git.ts` is the model.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines (pre-commit enforced). `scripts/` is exempt.

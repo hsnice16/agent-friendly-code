@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 import { BackToTop } from "@/components/BackToTop";
+import { ConsentBanner } from "@/components/ConsentBanner";
 import { FooterDirectory } from "@/components/FooterDirectory";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { JsonLd } from "@/components/JsonLd";
@@ -126,6 +127,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <JsonLd data={JSON_LD} />
         <GoogleAnalytics />
+        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && <ConsentBanner />}
 
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
           <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-3 py-3 sm:px-6">

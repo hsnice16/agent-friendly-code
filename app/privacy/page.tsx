@@ -7,7 +7,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
 
-const LAST_UPDATED = "October 16, 2026";
+const LAST_UPDATED = "October 20, 2026";
 
 export const metadata: Metadata = staticPageMetadata("/privacy");
 
@@ -61,9 +61,9 @@ export default function PrivacyPage() {
               read. The result is cached on our servers for up to one hour and is not added to our database.
             </li>
             <li className="mt-2">
-              <strong className="text-ink">Browser storage.</strong> The repositories you scored, with their scores, and
-              the last release notice you were shown are kept in your browser&apos;s localStorage. They are never sent
-              to us, and clearing site data for this site removes them.
+              <strong className="text-ink">Browser storage.</strong> The repositories you scored, with their scores, the
+              last release notice you were shown, and your analytics choice are kept in your browser&apos;s
+              localStorage. They are never sent to us, and clearing site data for this site removes them.
             </li>
           </ul>
 
@@ -83,6 +83,11 @@ export default function PrivacyPage() {
             The Service itself does not set first-party cookies. Cookies may be set by Google Analytics, which we embed
             for usage measurement. The Service shows no advertising. You can disable or delete cookies in your browser
             at any time; doing so will not break the Service, only analytics will be affected.
+          </p>
+          <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
+            For visitors from the European Economic Area, the United Kingdom, and Switzerland, Google Analytics sets no
+            cookies until they accept, and sends only cookieless pings that carry no identifier. Clear site data for
+            this site to be asked again.
           </p>
         </Panel>
       </div>
