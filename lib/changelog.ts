@@ -10,6 +10,19 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.2",
+    date: "2026-10-22",
+    title: "Share your score",
+    highlights: [
+      "Share a Live Score — a share button sends the result to X, LinkedIn or Bluesky, or copies the link, and the post previews with the repo's own score card.",
+      "Live Score results offer the README badge, and the badge now works for any public GitHub repo, not only leaderboard repos.",
+      "Repo pages point to Live Score for scoring your own repo, and the agent skill shows it is listed on skills.sh.",
+      "A GitHub rate limit during a Live Score offers a retry instead of a score built from missing files.",
+      "The Aider config check's fix adds `auto-test`, which Aider needs before it runs tests after edits.",
+      "Pages fit phones down to 320px: leaderboard scores stay on screen and suggested fixes keep their full width.",
+    ],
+  },
+  {
     label: "0.9.1",
     date: "2026-10-21",
     title: "Which file each agent reads",

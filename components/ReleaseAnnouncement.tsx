@@ -10,13 +10,23 @@ type Props = {
   version: string;
   /** Newest changelog headline — the whole point of the notice. */
   title: string;
+  /** Which side of the release's section it sits on; the arrow points at the section. */
+  placement?: "above" | "below";
 };
 
-// Render it directly above the section the release is about. `sticky bottom`
-// pins it to the foot of the viewport while that spot is below the fold and
-// lets it settle there once scrolled to, so the pointer always means "this,
-// here" with no measuring and nothing to redo on resize.
-export function ReleaseAnnouncement({ version, title }: Props) {
+// "above" renders in flow over the section, and `sticky bottom` pins it to the
+// foot of the viewport while that spot is below the fold, so the pointer always
+// means "this, here" with no measuring. "below" floats under an above-the-fold
+// anchor (a `relative` parent) without pushing the content after it down.
+const POSITION = {
+  above: "sticky bottom-4 -mb-3 mt-6",
+  below: "absolute left-4 top-full mt-3",
+};
+const ARROW = {
+  above: "-bottom-[5px] border-b border-r",
+  below: "-top-[5px] border-t border-l",
+};
+export function ReleaseAnnouncement({ version, title, placement = "above" }: Props) {
   // Never set during the server render — localStorage is unreadable there, and
   // deciding at render time would hydrate a mismatch.
   const [isOpen, setIsOpen] = useState(false);
@@ -52,11 +62,11 @@ export function ReleaseAnnouncement({ version, title }: Props) {
       role="status"
       aria-live="polite"
       aria-label="What's new"
-      className="animate-pop-in sticky bottom-4 z-30 -mb-3 mt-6 w-[280px] max-w-full rounded-card border border-line bg-surface p-3.5 shadow-lg"
+      className={`animate-pop-in ${POSITION[placement]} z-30 w-[280px] max-w-full rounded-card border border-line bg-surface p-3.5 shadow-lg`}
     >
       <span
         aria-hidden="true"
-        className="absolute -bottom-[5px] left-6 h-2 w-2 rotate-45 border-b border-r border-line bg-surface"
+        className={`absolute left-6 h-2 w-2 rotate-45 ${ARROW[placement]} border-line bg-surface`}
       />
 
       <div className="flex items-start justify-between gap-3">

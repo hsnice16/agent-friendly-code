@@ -32,13 +32,21 @@ export function HomeLeaderboard({ view, stats }: Props) {
         </p>
 
         {/* LiveScoreForm stacks below `sm`; the copy around it stays short so the board is still near the fold on a phone. */}
-        <div className="mt-4 max-w-[640px] rounded-xl border border-line bg-surface px-4 pt-3 pb-4">
+        <div className="relative mt-4 max-w-[640px] rounded-xl border border-line bg-surface px-4 pt-3 pb-4">
           <p className="m-0 text-[14.5px] font-medium text-ink">
             Is your repo ready for AI agents? Paste a GitHub URL.
           </p>
           <div className="-mt-2">
             <LiveScoreForm />
           </div>
+
+          {/* Announced only once the release it describes is the one deployed —
+              otherwise a version bump ahead of the changelog entry (or behind it)
+              would advertise the wrong thing. It points at the section that
+              release is about, so move it when the next one is cut. */}
+          {CHANGELOG[0]?.label === APP_VERSION && (
+            <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} placement="below" />
+          )}
         </div>
 
         <p className="mt-3 max-w-[68ch] text-[13px] text-muted">
@@ -61,12 +69,6 @@ export function HomeLeaderboard({ view, stats }: Props) {
           from popular repos.
         </p>
       </section>
-
-      {/* Announced only once the release it describes is the one deployed —
-          otherwise a version bump ahead of the changelog entry (or behind it)
-          would advertise the wrong thing. It sits above the section that
-          release is about, so move it when the next one is cut. */}
-      {CHANGELOG[0]?.label === APP_VERSION && <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} />}
 
       <LeaderboardBoard view={view} stats={stats} />
     </>
