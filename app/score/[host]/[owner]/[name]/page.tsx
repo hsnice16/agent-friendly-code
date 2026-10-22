@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { unstable_cache } from "next/cache";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { ActionEmbedReveal } from "@/components/ActionEmbedReveal";
 import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
+import { BadgeEmbed } from "@/components/BadgeEmbed";
 import { HashDetails } from "@/components/HashDetails";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
 import { Panel } from "@/components/Panel";
@@ -15,14 +15,13 @@ import { RepoHero } from "@/components/RepoHero";
 import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
 import type { NavSection } from "@/components/SectionNav";
+import { ShareScore } from "@/components/ShareScore";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
-import { type ParsedRepo, parseRepoUrl } from "@/lib/clients/github";
-import { HOST_DOMAINS, isHost } from "@/lib/constants/hosts";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getRepoByHostOwnerName, listLeaderboardOverall } from "@/lib/db";
+import { cachedLiveScore, type LiveTarget, parseLiveTarget } from "@/lib/live-score/cached";
 import { TooLargeError } from "@/lib/live-score/hosts";
-import { liveScore } from "@/lib/live-score/score";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { topImprovements } from "@/lib/scoring/scorer";
 import type { ModelId } from "@/lib/scoring/weights";
@@ -35,60 +34,39 @@ import { agentFileShare } from "@/lib/utils/repo-page-data";
 import { repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
-import { ACTION_USES, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { ACTION_USES, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 // Hobby defaults to 10s; a large tree needs more.
 export const maxDuration = 60;
 
-const CACHE_SECONDS = 3600;
-
-type Params = { host: string; owner: string; name: string };
-
-// Reading `searchParams` for `?model=` makes this route dynamic, so a
-// segment-level `revalidate` would never cache the render — every visit would
-// re-list the tree and re-score. Cache the expensive half explicitly instead,
-// keyed by repo and not by model: the score is the same for all of them, and
-// the result is deterministic given (commit, weights), so an hour of staleness
-// costs nothing. A throw is not cached, which is what keeps a transient host
-// failure from being pinned here for the hour. Lowercased because every host
-// matches names case-insensitively: one repo, one entry, one scoring.
-function cachedLiveScore(parsed: ParsedRepo) {
-  const key = ["live-score", parsed.host, parsed.owner.toLowerCase(), parsed.name.toLowerCase()];
-  return unstable_cache(() => liveScore(parsed), key, { revalidate: CACHE_SECONDS })();
-}
-
-// Every miss here is a tree-API call and a cold function, and the route is
-// crawler-reachable regardless of robots.txt. GitHub, GitLab and Bitbucket all
-// restrict slugs to this alphabet, so anything else is a probe. `.` and `..`
-// fit it but would walk the API path upwards.
-const SLUG = /^(?!\.+$)[A-Za-z0-9._-]+$/;
-
-function parseTarget({ host, owner, name }: Params): ParsedRepo | null {
-  if (!isHost(host) || !SLUG.test(owner) || !SLUG.test(name)) return null;
-  const parsed = parseRepoUrl(`https://${HOST_DOMAINS[host]}/${owner}/${name}`);
-  return parsed && parsed.host === host ? parsed : null;
-}
+type Params = LiveTarget;
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const target = await params;
-  if (!parseTarget(target)) return {};
+  const parsed = parseLiveTarget(target);
+  if (!parsed) return {};
   const { host, owner, name } = target;
   const title = `${owner}/${name} — Live Score`;
   const description = `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`;
+  const path = `/score/${host}/${owner}/${name}`;
+  // The card 404s for a host Live Score doesn't score yet.
+  const image = SUPPORTED_HOSTS.includes(parsed.host)
+    ? { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${owner}/${name} — agent-friendliness score` }
+    : DEFAULT_OG_IMAGE;
 
   return {
     title,
     description,
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
-    alternates: { canonical: `/score/${host}/${owner}/${name}` },
-    // Unbounded URL space; robots.ts disallows /score/* and the sitemap stays on the repo pages.
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
+    alternates: { canonical: path },
+    // Unbounded URL space: robots.ts disallows /score/* for search crawlers and the sitemap stays on the repo pages.
     robots: { index: false, follow: true },
     openGraph: {
       ...OG_DEFAULTS,
-      images: [DEFAULT_OG_IMAGE],
+      images: [image],
       title,
       description,
-      url: `/score/${host}/${owner}/${name}`,
+      url: path,
       type: "website",
     },
   };
@@ -133,7 +111,7 @@ export default async function LiveScorePage({
   const query = await searchParams;
   const model = typeof query.model === "string" ? query.model : undefined;
 
-  const parsed = parseTarget({ host, owner, name });
+  const parsed = parseLiveTarget({ host, owner, name });
   if (!parsed) notFound();
 
   // Indexed repos get the canonical page: better SEO, and it absorbs the popular
@@ -143,7 +121,7 @@ export default async function LiveScorePage({
 
   if (!SUPPORTED_HOSTS.includes(parsed.host)) return <Unsupported host={host} />;
 
-  let score: Awaited<ReturnType<typeof liveScore>>;
+  let score: Awaited<ReturnType<typeof cachedLiveScore>>;
   try {
     score = await cachedLiveScore(parsed);
   } catch (err) {
@@ -152,10 +130,7 @@ export default async function LiveScorePage({
         <Unavailable reason="This repo is too big to score here. Score it on your own computer with the agent skill." />
       );
     }
-    // Everything else is transient — a rate limit, a host blip. Let it reach
-    // error.tsx rather than rendering an apology: a throw is never cached, so
-    // the failure isn't served to everyone else for the next hour. Too-large is
-    // the exception above; it is stable, so rendering (and caching) it is right.
+    // Everything else is transient — a rate limit, a host blip — so error.tsx offers a retry.
     throw err;
   }
 
@@ -190,8 +165,8 @@ export default async function LiveScorePage({
 
   const instructions = agentInstructions(score.signals, agentFileShare(score.language));
   const slug = `${owner}/${name}`;
-  // The repo page's order, less what needs a leaderboard row: "How it
-  // compares" ranks against the board, and the badge reads the database.
+  const path = `/score/${host}/${owner}/${name}`;
+  // The repo page's order, less "How it compares", which ranks against the board.
   const sections: NavSection[] = [
     { id: "overview", label: "At a glance" },
     { id: "has-missing", label: "What it has and misses" },
@@ -200,6 +175,7 @@ export default async function LiveScorePage({
     instructions && { id: "agent-instructions", label: "Agent instructions" },
     { id: "all-checks", label: "All checks" },
     { id: "similar", label: "Similar repos" },
+    { id: "embed-badge", label: "Add a badge" },
     host === "github" && { id: "pr-action", label: "Check every PR" },
   ].filter((x): x is NavSection => Boolean(x));
 
@@ -231,11 +207,7 @@ export default async function LiveScorePage({
         </Section>
 
         <Section id="fix-first">
-          <ModelSuggestions
-            selected={selected}
-            suggestions={suggestions}
-            basePath={`/score/${host}/${owner}/${name}`}
-          />
+          <ModelSuggestions selected={selected} suggestions={suggestions} basePath={path} />
         </Section>
 
         <Section id="agent-scores">
@@ -271,6 +243,19 @@ export default async function LiveScorePage({
           />
         </Section>
 
+        <Section id="embed-badge">
+          <BadgeEmbed
+            highlight="tip"
+            appUrl={APP_URL}
+            name={name}
+            host={host}
+            owner={owner}
+            repoPagePath={path}
+            score={score.overall}
+            page="live_score"
+          />
+        </Section>
+
         {host === "github" && (
           <Section id="pr-action">
             <ActionEmbedReveal>
@@ -279,7 +264,10 @@ export default async function LiveScorePage({
           </Section>
         )}
 
-        <SectionRail sections={sections} />
+        <SectionRail
+          sections={sections}
+          action={(align) => <ShareScore slug={slug} score={score.overall} url={`${APP_URL}${path}`} align={align} />}
+        />
       </div>
     </>
   );

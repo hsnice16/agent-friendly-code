@@ -3,6 +3,7 @@
 import { ArrowRight } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { track } from "@/lib/analytics-events";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { parseRepoUrl } from "@/lib/repo-url";
 import { hostLabel } from "@/lib/utils/format";
@@ -29,6 +30,7 @@ export function LiveScoreForm() {
 
     setError(null);
     setPending(true);
+    track({ name: "live_score_submit", host: parsed.host });
     router.push(`/score/${parsed.host}/${parsed.owner}/${parsed.name}`);
   }
 

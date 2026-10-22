@@ -7,7 +7,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
 
-const LAST_UPDATED = "October 20, 2026";
+const LAST_UPDATED = "October 22, 2026";
 
 export const metadata: Metadata = staticPageMetadata("/privacy");
 
@@ -42,8 +42,9 @@ export default function PrivacyPage() {
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               <strong className="text-ink">Analytics.</strong> We use Google Analytics 4, which does not log or store IP
-              addresses, to measure aggregate traffic patterns — page views, referrers, approximate location, device and
-              browser type, and time on page. This data is not used to identify individual visitors.
+              addresses, to measure aggregate traffic patterns — page views, clicks on the Live Score, share and badge
+              buttons, referrers, approximate location, device and browser type, and time on page. This data is not used
+              to identify individual visitors.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard
@@ -58,7 +59,8 @@ export default function PrivacyPage() {
             <li className="mt-2">
               <strong className="text-ink">Live Score.</strong> A repository URL you submit is sent from our server to
               GitHub to read that repository&apos;s public file list, its basic details, and the few files the checks
-              read. The result is cached on our servers for up to one hour and is not added to our database.
+              read. The result is cached on our servers for up to one hour and is not added to our database. The page
+              address, which includes the repository name, is recorded as a page view in analytics.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Browser storage.</strong> The repositories you scored, with their scores, the

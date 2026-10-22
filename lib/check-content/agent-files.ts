@@ -64,11 +64,11 @@ export const AGENT_FILE_CHECKS: Record<string, CheckContent> = {
     description:
       "What .aider.conf.yml is, which settings matter for an agent-ready repo, how we score it, and how many popular open source repos have one.",
     what: "`.aider.conf.yml` is Aider's config file. Committed at the repo root, it sets options for everyone using Aider there, including the lint command, test command and extra files to read.",
-    why: "Per its lint and test docs, Aider lints after every edit by default and runs tests once a test command is set. It reads AGENTS.md only when the config's `read:` lists it. So this file is how a repo tells Aider what to run and read. Only Aider reads it, so this check only affects its score.",
+    why: "Per its lint and test docs, Aider lints after every edit by default and runs tests after edits once `test-cmd` and `auto-test` are set. It reads AGENTS.md only when the config's `read:` lists it. So this file is how a repo tells Aider what to run and read. Only Aider reads it, so this check only affects its score.",
     scoring: [
       "Full pass: `.aider.conf.yml` or `.aider.conf.yaml` at the repo root.",
       "Fail: neither file is present. We do not look at what the file contains.",
     ],
-    fix: "Set `test-cmd` and `lint-cmd` to the commands your CI runs, and list AGENTS.md under `read:`.",
+    fix: "Set `test-cmd` and `lint-cmd` to the commands your CI runs, turn on `auto-test`, and list AGENTS.md under `read:`.",
   },
 };

@@ -3,6 +3,8 @@
 import { Check, Copy } from "@phosphor-icons/react";
 import { useState } from "react";
 
+import { type AnalyticsEvent, track } from "@/lib/analytics-events";
+
 const RESET_MS = 1500;
 
 export type SnippetTone = false | "warn" | "info" | "tip";
@@ -19,13 +21,23 @@ const BTN_TONE: Record<Exclude<SnippetTone, false>, string> = {
   warn: "border-warn/40 text-warn hover:border-warn",
 };
 
-export function CopySnippet({ text, highlight = false }: { text: string; highlight?: SnippetTone }) {
+export function CopySnippet({
+  text,
+  highlight = false,
+  event,
+}: {
+  text: string;
+  highlight?: SnippetTone;
+  /** Sent on a successful copy. */
+  event?: AnalyticsEvent;
+}) {
   const [copied, setCopied] = useState(false);
   const isMultiLine = text.includes("\n");
 
   async function onCopy() {
     try {
       await navigator.clipboard.writeText(text);
+      if (event) track(event);
 
       setCopied(true);
       setTimeout(() => setCopied(false), RESET_MS);

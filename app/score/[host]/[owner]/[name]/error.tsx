@@ -4,9 +4,7 @@ import Link from "next/link";
 import { Panel } from "@/components/Panel";
 
 // Reached when scoring failed for a reason that could resolve on its own — a
-// host rate limit, a timeout. It exists so page.tsx can throw instead of
-// rendering an apology: a throw is never cached, so the failure is not served
-// to everyone else for the next hour.
+// host rate limit, a timeout — so it offers a retry, not a verdict.
 export default function LiveScoreError({ retry }: { error: Error; retry: () => void }) {
   return (
     <Panel>

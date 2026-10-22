@@ -18,6 +18,8 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { registry, name } = await params;
   const title = `${registry}/${name}`;
+  // A scoped npm name holds a slash, which unencoded would be two path segments.
+  const path = `/package/${registry}/${encodeURIComponent(name)}`;
   const description = `How ready the ${registry} package "${name}" and its source repo are for AI coding agents.`;
 
   if (!isRegistry(registry)) {
@@ -32,13 +34,13 @@ export async function generateMetadata({
     title,
     description,
     twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
-    alternates: { canonical: `/package/${registry}/${name}` },
+    alternates: { canonical: path },
     openGraph: {
       ...OG_DEFAULTS,
       images: [DEFAULT_OG_IMAGE],
       title,
       description,
-      url: `/package/${registry}/${name}`,
+      url: path,
       type: "article",
     },
   };
@@ -57,7 +59,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
     <>
       <BreadcrumbJsonLd
         parent={{ name: "Packages", path: "/package" }}
-        current={{ name: `${registry}/${name}`, path: `/package/${registry}/${name}` }}
+        current={{ name: `${registry}/${name}`, path: `/package/${registry}/${encodeURIComponent(name)}` }}
       />
       <Link
         href="/package"

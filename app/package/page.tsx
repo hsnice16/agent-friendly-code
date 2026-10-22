@@ -88,7 +88,7 @@ export default function PackageIndexPage() {
               {topRows.map((row) => (
                 <li key={`${row.registry}/${row.name}`}>
                   <Link
-                    href={`/package/${row.registry}/${row.name}`}
+                    href={`/package/${row.registry}/${encodeURIComponent(row.name)}`}
                     className="flex items-center justify-between rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
                   >
                     <span className="truncate">

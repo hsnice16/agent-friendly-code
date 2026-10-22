@@ -26,6 +26,15 @@
   --color-info: #2563eb;
   --color-tip: #0f766e;
 
+  /* Brand colours, the same in both themes: a recoloured logo stops being recognisable. */
+  --color-linkedin: #0a66c2;
+  --color-bluesky: #1185fe;
+  /* Third-party badge cards: the Product Hunt and Peerlist embeds are light in
+     both themes, so ours matches them rather than the page. */
+  --color-badge-card: #ffffff;
+  --color-badge-line: #d4d4d4;
+  --color-badge-ink: #0a0a0a;
+
   --font-sans:
     -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Segoe UI",
     Roboto, sans-serif;

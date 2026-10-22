@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { CodeText } from "@/components/CodeText";
 import { Panel } from "@/components/Panel";
 import { CHANGELOG } from "@/lib/changelog";
 import { staticPageMetadata } from "@/lib/page-meta";
@@ -44,7 +45,9 @@ export default function ChangelogPage() {
                   <span aria-hidden="true" className="select-none text-line">
                     ·
                   </span>
-                  <span>{h}</span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">
+                    <CodeText text={h} />
+                  </span>
                 </li>
               ))}
             </ul>

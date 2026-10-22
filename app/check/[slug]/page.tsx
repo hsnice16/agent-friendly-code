@@ -8,6 +8,7 @@ import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { AUTHOR_JSON_LD } from "@/lib/author";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
@@ -24,6 +25,8 @@ type Params = { slug: string };
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const LINK = "text-ink hover:text-ink-soft";
+
+export const dynamicParams = false;
 
 export function generateStaticParams(): Params[] {
   return SIGNALS.map((s) => ({ slug: checkSlug(s.id) }));
@@ -79,7 +82,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           image: `${APP_URL}/og${checkPath(id)}`,
           about: { "@type": "Thing", name: signal.label },
           ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
-          author: { "@id": `${APP_URL}/about#author` },
+          author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />

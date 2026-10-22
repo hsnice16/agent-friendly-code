@@ -7,6 +7,7 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AGENT_READS, agentsUsingAgentsMd } from "@/lib/agent-reads";
+import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { sourceLabel } from "@/lib/leaderboard-model-panel";
@@ -42,7 +43,7 @@ export default function AgentsPage() {
           image: `${APP_URL}${DEFAULT_OG_IMAGE.url}`,
           about: MODELS.map((m) => ({ "@type": "SoftwareApplication", name: m.label })),
           ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
-          author: { "@id": `${APP_URL}/about#author` },
+          author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />

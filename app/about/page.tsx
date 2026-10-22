@@ -5,6 +5,7 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { OWN_REPO } from "@/lib/utils/own-repo";
@@ -16,11 +17,8 @@ export const metadata: Metadata = staticPageMetadata("/about");
 const ABOUT_JSON_LD = {
   "@graph": [
     {
-      "@id": `${APP_URL}/about#author`,
-      "@type": "Person",
-      name: "Himanshu Singh",
+      ...AUTHOR_JSON_LD,
       jobTitle: "Software Engineer",
-      url: "https://github.com/hsnice16",
       sameAs: ["https://github.com/hsnice16", "https://x.com/hsnice16", "https://github.com/sponsors/hsnice16"],
     },
     {

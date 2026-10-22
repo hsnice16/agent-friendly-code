@@ -18,4 +18,11 @@ describe("robots", () => {
       assert.ok(![rule.disallow].flat().includes("/"), agent);
     }
   });
+
+  it("lets link unfurlers read Live Score pages that search crawlers can't", () => {
+    assert.ok([ruleFor("*")?.disallow].flat().includes("/score/"));
+    const preview = [ruleFor("Twitterbot")?.disallow].flat();
+    assert.ok(!preview.includes("/score/"));
+    assert.ok(preview.includes("/api/"));
+  });
 });

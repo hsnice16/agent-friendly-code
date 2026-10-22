@@ -4,7 +4,7 @@ import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 import type { RepoHost } from "../clients/github";
 import { entryKind, MAX_READ_BYTES, resolveRelative } from "../scoring/signals/helpers";
 import { CONTENT_CANDIDATES } from "./content-files";
-import { blobUrl, hostToken, listTree, rawUrl, requestHeaders, type TreeEntry } from "./hosts";
+import { assertNotRateLimited, blobUrl, hostToken, listTree, rawUrl, requestHeaders, type TreeEntry } from "./hosts";
 import { pooled, readCapped, timedFetch } from "./http";
 
 // A tree can hold up to MAX_ENTRIES links, and each request or blob lookup is a
@@ -47,6 +47,7 @@ async function linkTargets(
     let target: string | null = null;
 
     const res = await timedFetch(rawUrl(host, owner, name, ref, entry.path), { headers }, deadline);
+    assertNotRateLimited(host, res);
     if (res.ok) {
       target = await text(res);
     } else if (entry.sha && blobLookups < MAX_BLOB_LOOKUPS) {
@@ -55,6 +56,7 @@ async function linkTargets(
         blobLookups++;
         const blobHeaders = { ...headers, Accept: "application/vnd.github.raw+json" };
         const blobRes = await timedFetch(blob, { headers: blobHeaders }, deadline);
+        assertNotRateLimited(host, blobRes);
         if (blobRes.ok) target = await text(blobRes);
       }
     }
@@ -114,6 +116,8 @@ async function fetchContent(
 
   await pooled([...wanted], async (path) => {
     const res = await timedFetch(rawUrl(host, owner, name, ref, path), { headers }, deadline);
+    // A swallowed rate limit would cache an empty README as the score for an hour.
+    assertNotRateLimited(host, res);
     if (!res.ok) return;
     // The scorer reads no further than MAX_READ_BYTES either.
     writeFileSync(join(root, path), await readCapped(res, MAX_READ_BYTES));

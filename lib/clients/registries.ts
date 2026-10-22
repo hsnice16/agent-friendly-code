@@ -1,5 +1,5 @@
+import { type ParsedRepo, parseRepoUrl } from "../repo-url";
 import { obj, str } from "../utils/json";
-import { type ParsedRepo, parseRepoUrl } from "./github";
 
 export type Registry = "npm" | "pypi" | "cargo";
 export const REGISTRIES: Registry[] = ["npm", "pypi", "cargo"];

@@ -31,6 +31,12 @@ const AI_CRAWLERS = [
 // follows those too: they were 94% of its requests here, against 5% for HTML.
 const DISALLOW = ["/api/", "/score/", "/*?_rsc=", "/*&_rsc="];
 
+// A shared Live Score link is only worth sharing with its card, and these
+// unfurlers obey robots.txt: a Disallow leaves the post with a bare URL. They
+// fetch only what someone pasted, so /score/ costs nothing to open to them.
+const LINK_PREVIEW = ["Twitterbot", "LinkedInBot", "facebookexternalhit", "Discordbot", "TelegramBot", "WhatsApp"];
+const PREVIEW_DISALLOW = DISALLOW.filter((path) => path !== "/score/");
+
 // The home Dataset's `distribution.contentUrl`; the longer rule beats `/api/`.
 const ALLOW = ["/", "/api/repos"];
 
@@ -43,6 +49,7 @@ export default function robots(): MetadataRoute.Robots {
     rules: [
       { userAgent: "*", allow: ALLOW, disallow: DISALLOW },
       { userAgent: AI_CRAWLERS, allow: ALLOW, disallow: DISALLOW },
+      { userAgent: LINK_PREVIEW, allow: ALLOW, disallow: PREVIEW_DISALLOW },
       { userAgent: BLOCKED, disallow: "/" },
     ],
   };

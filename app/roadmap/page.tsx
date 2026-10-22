@@ -53,7 +53,7 @@ export default function RoadmapPage() {
                       target="_blank"
                       href={`${REPO_URL}/blob/main/${it.taskFile}`}
                       aria-label={`Open ${it.taskFile} on GitHub (new tab)`}
-                      className="mt-1 inline-flex items-center gap-1 self-start whitespace-nowrap rounded border border-line bg-surface-2 px-2 py-0.5 font-mono text-[11.5px] text-muted hover:text-ink-soft"
+                      className="mt-1 inline-flex max-w-full items-center gap-1 self-start rounded [overflow-wrap:anywhere] border border-line bg-surface-2 px-2 py-0.5 font-mono text-[11.5px] text-muted hover:text-ink-soft"
                     >
                       {it.taskFile}
                       <ArrowUpRight size={11} weight="bold" aria-hidden="true" />

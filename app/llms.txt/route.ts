@@ -16,6 +16,7 @@ import {
   APP_URL,
   REPO_URL,
   SKILL_INSTALL_CMD,
+  SKILL_LISTING_URL,
   SKILL_REPO_URL,
 } from "@/lib/version";
 
@@ -91,7 +92,7 @@ ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by re
 ## Tools
 
 - [Agent Friendly Action](${ACTION_REPO_URL}): GitHub Action that posts a per-PR score-delta comment — runs entirely inside the maintainer's CI, opt-in via \`AGENTS_BADGE_TOKEN\`, listed on the GitHub Marketplace
-- [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the user's current repo locally, no service dependency
+- [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the user's current repo locally, no service dependency. Listed on [skills.sh](${SKILL_LISTING_URL})
 
 ## Top scored packages
 

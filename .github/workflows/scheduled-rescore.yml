@@ -129,6 +129,8 @@ jobs:
       - name: Tell IndexNow which pages changed
         if: steps.publish.outputs.pushed == 'true'
         continue-on-error: true
+        env:
+          STARTED_AT: ${{ needs.rescore.outputs.started-at }}
         run: |
           sleep 300
-          bun run indexnow --since "${{ needs.rescore.outputs.started-at }}"
+          bun run indexnow --since "$STARTED_AT"

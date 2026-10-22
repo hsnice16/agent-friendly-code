@@ -18,16 +18,23 @@ export function Section({
 }
 
 /** Place inside a `relative` wrapper that spans the sections. */
-export function SectionRail({ sections }: { sections: NavSection[] }) {
+export function SectionRail({
+  sections,
+  action,
+}: {
+  sections: NavSection[];
+  /** Rendered once per layout, so it must not rely on being unique in the DOM. */
+  action?: (align: "start" | "end") => React.ReactNode;
+}) {
   return (
     <>
       {/* In the page margin, beside the content rather than taking width from
         it; below that width the margin is too narrow, so the menu floats. */}
-      <div className="absolute inset-y-0 left-full ml-10 hidden w-44 min-[1500px]:block">
-        <SectionNav sections={sections} />
+      <div className="absolute inset-y-0 left-full ml-10 hidden w-44 min-[1600px]:block">
+        <SectionNav sections={sections} action={action?.("start")} />
       </div>
-      <div className="min-[1500px]:hidden">
-        <FloatingSectionMenu sections={sections} />
+      <div className="min-[1600px]:hidden">
+        <FloatingSectionMenu sections={sections} action={action?.("end")} />
       </div>
     </>
   );

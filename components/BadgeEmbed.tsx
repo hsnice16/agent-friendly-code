@@ -12,9 +12,11 @@ type Props = {
   /** What the badge prints, so the preview reserves its real width. */
   score: number | null;
   highlight?: SnippetTone;
+  /** Which page offered the badge, for the copy event. */
+  page: "repo" | "live_score";
 };
 
-export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, score, highlight = false }: Props) {
+export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, score, highlight = false, page }: Props) {
   const slug = `${host}/${owner}/${name}`;
   const previewSrc = `/api/badge/${slug}.svg`;
   const absoluteBadgeUrl = `${appUrl}/api/badge/${slug}.svg`;
@@ -40,7 +42,7 @@ export function BadgeEmbed({ host, owner, name, appUrl, repoPagePath, score, hig
         />
       </div>
 
-      <CopySnippet text={markdown} highlight={highlight} />
+      <CopySnippet text={markdown} highlight={highlight} event={{ name: "badge_copy", page }} />
     </Panel>
   );
 }

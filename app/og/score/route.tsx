@@ -1,8 +1,7 @@
 import { ogCard, ogSiteUrl } from "@/lib/og-card";
 
-// Not the next/og file convention under app/score/: robots.txt disallows
-// /score/ (one URL per repo anywhere), which would hide the image from the
-// crawlers that build link previews.
+// Not the next/og file convention under app/score/: unfurlers outside
+// robots.ts's LINK_PREVIEW group obey its /score/ Disallow.
 export const dynamic = "force-static";
 
 export function GET() {

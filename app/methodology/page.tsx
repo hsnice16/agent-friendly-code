@@ -96,7 +96,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
                 </div>
 
-                <div>
+                <div className="min-w-0 [overflow-wrap:anywhere]">
                   <div className="text-sm text-ink-dim">{s.description}</div>
                   <div className="mt-1.5 text-[13px] text-muted">
                     <strong className="text-ink-dim">Improve:</strong> {s.improveSuggestion}

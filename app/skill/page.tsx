@@ -4,12 +4,13 @@ import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { SkillsShRail } from "@/components/SkillsShRail";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { CLAUDE_HOOK_SNIPPET, CODEX_HOOK_SNIPPET, SCORE_BANDS, SKILL_FAQ } from "@/lib/skill-content";
 import { agentList } from "@/lib/utils/agent-list";
-import { ACTION_REPO_URL, APP_URL, SKILL_INSTALL_CMD, SKILL_REPO_URL } from "@/lib/version";
+import { ACTION_REPO_URL, APP_URL, SKILL_INSTALL_CMD, SKILL_LISTING_URL, SKILL_REPO_URL } from "@/lib/version";
 
 export const metadata: Metadata = staticPageMetadata("/skill");
 
@@ -28,13 +29,14 @@ const APPLICATION_JSON_LD = {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-        { "@type": "ListItem", position: 2, name: "Skill", item: `${APP_URL}/skill` },
+        { "@type": "ListItem", position: 2, name: "Agent Skill", item: `${APP_URL}/skill` },
       ],
     },
     {
       "@type": "SoftwareApplication",
       "@id": `${APP_URL}/skill#app`,
       url: SKILL_REPO_URL,
+      sameAs: [SKILL_LISTING_URL],
       isAccessibleForFree: true,
       name: "Agent Friendly Skill",
       description: PAGE_COPY["/skill"].description,
@@ -53,6 +55,7 @@ export default function SkillPage() {
     <>
       <JsonLd data={APPLICATION_JSON_LD} />
       <JsonLd data={FAQ_JSON_LD} />
+      <SkillsShRail />
 
       <section className="my-3 mb-7">
         <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
@@ -118,7 +121,7 @@ export default function SkillPage() {
             <table className="w-full border-separate border-spacing-0 text-[13.5px]">
               <caption className="sr-only">Suggested model class for each score band</caption>
               <thead>
-                <tr className="bg-surface-2 [&>th]:border-b [&>th]:border-line [&>th]:px-3 [&>th]:py-2 [&>th]:text-left [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted">
+                <tr className="bg-surface-2 [&>th]:border-b [&>th]:border-line [&>th]:px-2 [&>th]:py-2 sm:[&>th]:px-3 [&>th]:text-left [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted">
                   <th scope="col">Band</th>
                   <th scope="col">Score</th>
                   <th scope="col">Suggested model</th>
@@ -129,7 +132,7 @@ export default function SkillPage() {
                 {SCORE_BANDS.map((b) => (
                   <tr
                     key={b.band}
-                    className="[&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-2.5 last:[&>td]:border-b-0"
+                    className="[&>td]:border-b [&>td]:border-line [&>td]:px-2 [&>td]:py-2.5 sm:[&>td]:px-3 last:[&>td]:border-b-0"
                   >
                     <td className="font-medium text-ink">{b.band}</td>
                     <td className="tabular-nums text-ink-dim">{b.range}</td>

@@ -90,7 +90,7 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                     <Link
                       href={repoPath(r)}
                       aria-label={`View ${r.owner}/${r.name} details`}
-                      className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
+                      className="font-medium text-ink [overflow-wrap:anywhere] hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
                     >
                       {r.owner}/{r.name}
                     </Link>

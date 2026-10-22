@@ -50,7 +50,7 @@ export class RateLimitedError extends Error {
 }
 
 // 429 is explicit; GitHub and GitLab both also answer a spent quota with 403.
-function assertNotRateLimited(host: RepoHost, res: Response): void {
+export function assertNotRateLimited(host: RepoHost, res: Response): void {
   if (res.status === 429 || res.status === 403) throw new RateLimitedError(host);
 }
 
@@ -62,7 +62,7 @@ export function requestHeaders(host: RepoHost, token?: string): Record<string, s
   return base;
 }
 
-// The route's SLUG regex already limits the alphabet; this keeps any other caller
+// parseLiveTarget's SLUG regex already limits the alphabet; this keeps any other caller
 // from smuggling a `/` or `?` into the API path.
 const repoSegment = (owner: string, name: string) => `${encodeURIComponent(owner)}/${encodeURIComponent(name)}`;
 
@@ -129,6 +129,7 @@ async function listGitHub(
   // recursed further.
   if (truncated) {
     const rootRes = await timedFetch(`${api}/${pathSegments(ref)}`, init, deadline);
+    assertNotRateLimited("github", rootRes);
     if (rootRes.ok) {
       const root = (await rootRes.json()) as { tree: GitHubNode[] };
       const merged = new Map<string, GitHubNode>(root.tree.map((e) => [e.path, e]));
@@ -137,6 +138,7 @@ async function listGitHub(
 
       await pooled(dirs, async (dir) => {
         const sub = await timedFetch(`${api}/${dir.sha}?recursive=1`, init, deadline);
+        assertNotRateLimited("github", sub);
         if (!sub.ok) return;
         for (const e of ((await sub.json()) as { tree: GitHubNode[] }).tree) {
           const path = `${dir.path}/${e.path}`;

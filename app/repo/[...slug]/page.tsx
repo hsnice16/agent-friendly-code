@@ -9,6 +9,7 @@ import { BadgeEmbed } from "@/components/BadgeEmbed";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HashDetails } from "@/components/HashDetails";
 import { JsonLd } from "@/components/JsonLd";
+import { LiveScoreNudge } from "@/components/LiveScoreNudge";
 import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RepoHero } from "@/components/RepoHero";
@@ -151,6 +152,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           topicLinks={topicHrefs}
           language={hub && hubHref ? { label: hub.label, href: hubHref } : undefined}
         />
+        <LiveScoreNudge />
 
         {summary && (
           <Section id="overview">
@@ -232,6 +234,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             owner={repo.owner}
             repoPagePath={path}
             score={repo.overall_score}
+            page="repo"
           />
         </Section>
 

@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { MobileNav } from "@/components/MobileNav";
 import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
+import { SkillsShBadge } from "@/components/SkillsShBadge";
 import { VersionPill } from "@/components/VersionPill";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getTopicGroups } from "@/lib/topic-pages";
@@ -171,7 +172,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               from its own docs, but how much each check counts is still our best guess, not yet tested.
             </p>
 
-            <div className="mt-5 flex flex-wrap items-start gap-4">
+            <SkillsShBadge className="mt-5" />
+
+            <div className="mt-4 flex flex-wrap items-start gap-4">
               <PeerlistBadge />
               <ProductHuntBadge />
             </div>

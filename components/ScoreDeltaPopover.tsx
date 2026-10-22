@@ -13,7 +13,6 @@ type Props = {
 export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
   const dialogId = useId();
   const [open, setOpen] = useState(false);
-  const btnRef = useRef<HTMLButtonElement>(null);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const diff = Math.round((current - previous) * 10) / 10;
@@ -42,10 +41,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
     }
 
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        btnRef.current?.blur();
-      }
+      if (e.key === "Escape") setOpen(false);
     };
 
     document.addEventListener("keydown", onKey);
@@ -64,7 +60,6 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
   return (
     <div className="relative mt-1.5 inline-block">
       <button
-        ref={btnRef}
         type="button"
         aria-expanded={open}
         onBlur={handleLeave}

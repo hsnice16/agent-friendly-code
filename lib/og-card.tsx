@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 
+import { MODELS } from "@/lib/scoring/weights";
 import { APP_HOST, APP_NAME, OG_IMAGE_SIZE } from "@/lib/version";
 
 type OgCard = {
@@ -13,8 +14,8 @@ type OgCard = {
 
 const LINE = { display: "flex", fontWeight: 700, lineHeight: 1.05, letterSpacing: "-0.02em" } as const;
 
-export const OG_MUTED = "#525252";
-export const OG_FOOTER = {
+const OG_MUTED = "#525252";
+const OG_FOOTER = {
   display: "flex",
   fontSize: "22px",
   color: "#737373",
@@ -28,7 +29,7 @@ export function ogSiteUrl(path = ""): string {
 }
 
 /** The page and brand row every share card starts with; `children` fill the rest of the column. */
-export function OgFrame({ children }: { children: React.ReactNode }) {
+function OgFrame({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
@@ -94,6 +95,41 @@ export function ogCard({ heading, sub, footerLeft, footerRight, headingSize = 70
         <div style={{ display: "flex" }}>{footerLeft ?? ""}</div>
         <div style={{ display: "flex" }}>{footerRight}</div>
       </div>
+    </OgFrame>,
+    { ...OG_IMAGE_SIZE },
+  );
+}
+
+type RepoScoreCard = {
+  slug: string;
+  /** Printed as is; "—" when the repo has no score. */
+  score: string;
+  /** Host label and language, joined into the line under the name. */
+  context: (string | null)[];
+};
+
+/** A repo's share card: its name, its overall score, and the agents it is scored for. */
+export function repoScoreCard({ slug, score, context }: RepoScoreCard): ImageResponse {
+  return new ImageResponse(
+    <OgFrame>
+      <div style={{ flex: 1, display: "flex", marginTop: "32px", flexDirection: "column", justifyContent: "center" }}>
+        <div style={{ display: "flex", fontWeight: 700, fontSize: "78px", lineHeight: 1.05, letterSpacing: "-0.02em" }}>
+          {slug}
+        </div>
+        <div style={{ display: "flex", color: OG_MUTED, fontSize: "30px", marginTop: "16px" }}>
+          {["Agent-friendliness score", ...context.filter(Boolean)].join(" · ")}
+        </div>
+      </div>
+
+      <div style={{ display: "flex", alignItems: "baseline", gap: "20px" }}>
+        <div style={{ lineHeight: 1, display: "flex", fontWeight: 700, fontSize: "192px", letterSpacing: "-0.04em" }}>
+          {score}
+        </div>
+        <div style={{ display: "flex", color: OG_MUTED, fontSize: "48px" }}>/ 100</div>
+      </div>
+
+      {/* 20px, not the footer's 22: the full agent labels have to fit one line at 1040px. */}
+      <div style={{ ...OG_FOOTER, fontSize: "20px", marginTop: "32px" }}>{MODELS.map((m) => m.label).join(" · ")}</div>
     </OgFrame>,
     { ...OG_IMAGE_SIZE },
   );

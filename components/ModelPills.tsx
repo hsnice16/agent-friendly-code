@@ -24,7 +24,7 @@ export function ModelPills({
         <Link
           scroll={scroll}
           href={hrefFor("overall")}
-          aria-pressed={selected === "overall"}
+          aria-current={selected === "overall" ? "true" : undefined}
           className={pillClass(selected === "overall")}
         >
           Overall
@@ -36,7 +36,7 @@ export function ModelPills({
           key={m.id}
           scroll={scroll}
           href={hrefFor(m.id)}
-          aria-pressed={selected === m.id}
+          aria-current={selected === m.id ? "true" : undefined}
           className={pillClass(selected === m.id)}
         >
           {m.label}

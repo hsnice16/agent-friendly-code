@@ -51,7 +51,7 @@ const APPLICATION_JSON_LD = {
       "@type": "BreadcrumbList",
       itemListElement: [
         { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-        { "@type": "ListItem", position: 2, name: "Action", item: `${APP_URL}/action` },
+        { "@type": "ListItem", position: 2, name: "GitHub Action", item: `${APP_URL}/action` },
       ],
     },
     {

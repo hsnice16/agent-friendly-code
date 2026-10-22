@@ -104,7 +104,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 
 ## Adding a host
 
-1. `parseRepoUrl` in `lib/clients/github.ts`.
+1. `parseRepoUrl` in `lib/repo-url.ts`.
 2. `fetchRepoMetaOrPrivate`: the host's API (token from `process.env.<HOST>_TOKEN`), language through `canonicalLanguage` / `primaryLanguage`, description and topics through `sanitizeDescription` / `sanitizeTopics`, `"private"` for non-public repos, and a recorded response in `tests/fixtures/repo-meta/`.
 3. A seed in `scripts/seed-list.ts`; label and domain in `lib/constants/hosts.ts`.
 4. Live Score: URL builders in `lib/live-score/hosts.ts`, a fixture in `scripts/parity-check.ts`, and only once parity is green the id in `SUPPORTED_HOSTS` (`lib/live-score/supported.ts`). `/score/[host]/[owner]/[name]` takes one segment per field, so nested namespaces need a route change.
@@ -113,13 +113,13 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 
 - Clones are `git clone --depth 1 --single-branch`, no submodules. Nothing from a clone is ever executed or installed.
 - Repo contents are untrusted. The scorer never follows a symlink out of the tree, reads only regular files, and stops at `MAX_READ_BYTES` (1 MiB); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
-- `/score/[host]/[owner]/[name]` turns visitor input into host API calls and a temp directory. The route's `SLUG` regex and `safeAbsolute` in `lib/live-score/materialize.ts` are the guards; `tests/live-score*.test.ts` and `tests/symlink-containment.test.ts` cover them. Never weaken either.
+- `/score/[host]/[owner]/[name]`, its OG card and the badge for a repo off the board turn visitor input into host API calls and a temp directory. `parseLiveTarget` (`lib/live-score/cached.ts`) and `safeAbsolute` (`lib/live-score/materialize.ts`) are the guards; `tests/live-*.test.ts` and `tests/symlink-containment.test.ts` cover them. Never weaken either.
 - Private repos are never scored, live or by CLI, even when the token can read them.
 - The only `dangerouslySetInnerHTML` is `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped). Owner-written repo descriptions and topics reach it only after `lib/utils/repo-about.ts` sanitises them, and never reach OG images.
 - `data/rank.db` is public, freed pages included: `bun run check-db-leaks` must pass before committing it.
 - No auth. The only write a request can cause is caching a package → repo alias, off Vercel only, for a name valid on its registry. Auth arrives with `tasks/0.10.0/01-opt-out-claim-flow.md`; gate DB writes per user then.
 - Secrets live in env vars only (`.env.example`). The production `GITHUB_TOKEN` must be read-only.
-- Not yet done: rate limits on the public API and `/score/*` (an uncached slug spends the shared GitHub quota), and sandboxing the cloner.
+- Not yet done: rate limits on the public API and the live-scored routes (an uncached slug spends the shared GitHub quota), and sandboxing the cloner.
 
 ## Leave alone
 
