@@ -42,9 +42,9 @@ export default function PrivacyPage() {
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               <strong className="text-ink">Analytics.</strong> We use Google Analytics 4, which does not log or store IP
-              addresses, to measure aggregate traffic patterns — page views, clicks on the Live Score, share and badge
-              buttons, referrers, approximate location, device and browser type, and time on page. This data is not used
-              to identify individual visitors.
+              addresses, to measure aggregate traffic patterns — page views, Live Score results, package lookups, clicks
+              on the share, badge, copy and agent buttons, referrers, approximate location, device and browser type, and
+              time on page. This data is not used to identify individual visitors.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard

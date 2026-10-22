@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 
+import { track } from "@/lib/analytics-events";
 import type { ImprovementSuggestion } from "@/lib/scoring/scorer";
 
 import { Panel, PanelHeading } from "./Panel";
@@ -43,7 +44,10 @@ export function ModelSuggestionsSwitch({ agents }: { agents: Agent[] }) {
             key={a.id}
             type="button"
             aria-pressed={a.id === agent.id}
-            onClick={() => pick(a.id)}
+            onClick={() => {
+              pick(a.id);
+              track({ name: "select_agent", agent: a.id });
+            }}
             className={`${pillClass(a.id === agent.id)} cursor-pointer`}
           >
             {a.label}

@@ -2,12 +2,14 @@
 
 import Link from "next/link";
 import { Panel } from "@/components/Panel";
+import { TrackEvent } from "@/components/TrackEvent";
 
 // Reached when scoring failed for a reason that could resolve on its own — a
 // host rate limit, a timeout — so it offers a retry, not a verdict.
 export default function LiveScoreError({ retry }: { error: Error; retry: () => void }) {
   return (
     <Panel>
+      <TrackEvent event={{ name: "live_score_result", outcome: "error" }} />
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo right now</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
         The repo is probably fine. The host may be limiting how often we can ask, or the files took too long to read.

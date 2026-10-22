@@ -48,7 +48,7 @@ jobs:
         Add this file. Each pull request gets one comment on how the score changed and why.
       </p>
 
-      <CopySnippet text={yaml} highlight={highlight} />
+      <CopySnippet text={yaml} highlight={highlight} event={{ name: "copy_install", tool: "action" }} />
 
       <p className="mt-3 text-[12.5px] text-muted">
         Add <code className="text-ink-dim mr-0.5">AGENTS_BADGE_TOKEN</code> to the repo&apos;s secrets to turn the

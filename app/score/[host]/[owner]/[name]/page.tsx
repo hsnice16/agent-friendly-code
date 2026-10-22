@@ -18,6 +18,7 @@ import type { NavSection } from "@/components/SectionNav";
 import { ShareScore } from "@/components/ShareScore";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
+import { TrackEvent } from "@/components/TrackEvent";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getRepoByHostOwnerName, listLeaderboardOverall } from "@/lib/db";
 import { cachedLiveScore, type LiveTarget, parseLiveTarget } from "@/lib/live-score/cached";
@@ -33,6 +34,7 @@ import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/r
 import { agentFileShare } from "@/lib/utils/repo-page-data";
 import { repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
+import { scoreTier } from "@/lib/utils/score";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
 import { ACTION_USES, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -77,6 +79,7 @@ function Unsupported({ host }: { host: string }) {
 
   return (
     <Panel>
+      <TrackEvent event={{ name: "live_score_result", outcome: "unsupported" }} />
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">{label} support is coming</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
         {`This page can't yet stay within ${label}'s API limits, and a wrong score is worse than none. GitHub repos work today.`}
@@ -88,9 +91,10 @@ function Unsupported({ host }: { host: string }) {
   );
 }
 
-function Unavailable({ reason }: { reason: string }) {
+function Unavailable({ reason, outcome }: { reason: string; outcome: "not_found" | "too_large" }) {
   return (
     <Panel>
+      <TrackEvent event={{ name: "live_score_result", outcome }} />
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">{reason}</p>
       <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
@@ -127,7 +131,10 @@ export default async function LiveScorePage({
   } catch (err) {
     if (err instanceof TooLargeError) {
       return (
-        <Unavailable reason="This repo is too big to score here. Score it on your own computer with the agent skill." />
+        <Unavailable
+          outcome="too_large"
+          reason="This repo is too big to score here. Score it on your own computer with the agent skill."
+        />
       );
     }
     // Everything else is transient — a rate limit, a host blip — so error.tsx offers a retry.
@@ -135,7 +142,12 @@ export default async function LiveScorePage({
   }
 
   if (!score) {
-    return <Unavailable reason="We couldn't find a public repo with that name. Check the owner and repo name." />;
+    return (
+      <Unavailable
+        outcome="not_found"
+        reason="We couldn't find a public repo with that name. Check the owner and repo name."
+      />
+    );
   }
 
   const selected: ModelId = isModelId(model) ? model : "claude-code";
@@ -189,6 +201,7 @@ export default async function LiveScorePage({
       </Link>
 
       <RecordScore host={host} owner={owner} name={name} score={score.overall} />
+      <TrackEvent event={{ name: "live_score_result", outcome: "scored", tier: scoreTier(score.overall) }} />
 
       <div className="relative">
         <RepoHero repo={repo} commitSha={score.sha} />

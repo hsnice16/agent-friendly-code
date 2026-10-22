@@ -3,6 +3,8 @@
 import { CaretDown, MagnifyingGlass } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { type FormEvent, useState } from "react";
+
+import { track } from "@/lib/analytics-events";
 import { REGISTRIES, type Registry } from "@/lib/clients/registries";
 
 export function PackageLookupForm() {
@@ -18,6 +20,7 @@ export function PackageLookupForm() {
     if (!canSubmit) {
       return;
     }
+    track({ name: "package_lookup", registry });
     router.push(`/package/${registry}/${encodeURIComponent(trimmed)}`);
   };
 

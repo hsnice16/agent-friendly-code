@@ -77,7 +77,7 @@ export default function SkillPage() {
           CLI adds the skill to every agent you have set up.
         </p>
 
-        <CopySnippet text={SKILL_INSTALL_CMD} highlight="warn" />
+        <CopySnippet text={SKILL_INSTALL_CMD} highlight="warn" event={{ name: "copy_install", tool: "skill" }} />
 
         <p className="mt-3 text-[12.5px] text-muted">
           Then run <code className="text-ink-dim">/agent-friendly</code> (or however your agent runs skills) from the
@@ -155,12 +155,20 @@ export default function SkillPage() {
           <p className="m-0 mb-1.5 text-[12.5px] font-medium text-muted">
             Claude Code · <code className="text-ink-dim">.claude/settings.json</code>
           </p>
-          <CopySnippet text={CLAUDE_HOOK_SNIPPET} highlight="info" />
+          <CopySnippet
+            text={CLAUDE_HOOK_SNIPPET}
+            highlight="info"
+            event={{ name: "copy_install", tool: "skill_hook" }}
+          />
 
           <p className="mt-3 mb-1.5 text-[12.5px] font-medium text-muted">
             Codex CLI · <code className="text-ink-dim">.codex/hooks.json</code>
           </p>
-          <CopySnippet text={CODEX_HOOK_SNIPPET} highlight="info" />
+          <CopySnippet
+            text={CODEX_HOOK_SNIPPET}
+            highlight="info"
+            event={{ name: "copy_install", tool: "skill_hook" }}
+          />
 
           <p className="mt-3 text-[12.5px] text-muted">
             In other agents, run <code className="text-ink-dim">/agent-friendly</code> whenever you want a fresh score.
