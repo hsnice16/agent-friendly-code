@@ -70,7 +70,9 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
       />
 
       <div className="flex items-start justify-between gap-3">
-        <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.1em] text-warn">New in v{version}</p>
+        <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.1em] text-warn">
+          New in <span className="normal-case">v{version}</span>
+        </p>
 
         <button
           type="button"
