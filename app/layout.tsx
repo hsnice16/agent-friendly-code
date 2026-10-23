@@ -194,6 +194,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 </span>
 
                 <span aria-hidden="true">·</span>
+                <span>
+                  also made{" "}
+                  <a
+                    target="_blank"
+                    rel="noopener"
+                    href="https://usetu.la/"
+                    className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                  >
+                    tula — crypto liquidation risk CLI
+                  </a>
+                </span>
+
+                <span aria-hidden="true">·</span>
                 <a
                   target="_blank"
                   rel="noopener noreferrer"
