@@ -63,7 +63,7 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
 
 ## How to render the result
 
-The scorer profiles **9 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands, and Pi.
+The scorer profiles **9 agents** and always returns scores for all of them in `modelScores`: Claude Code, Cursor, Devin, Codex, Gemini CLI, Kimi Code CLI, Aider, OpenHands, and Pi.
 
 **The recommendation is score-driven.** Don't try to detect which agent is invoking this skill — the answer is the same either way: find the highest-scoring entry in `modelScores`, that's the agent this repo is most tuned for. Show the user; let them decide whether to switch. Never programmatically switch the agent or model.
 
@@ -114,7 +114,7 @@ Snippets live at <https://agentfriendlycode.com/skill>.
 ## Failure modes
 
 - **Bundle missing.** If `dist/index.js` doesn't exist next to this `SKILL.md`, the install was incomplete or the user is on an older skill version. Tell them to re-run `npx skills add hsnice16/agent-friendly-skill#v0`.
-- **Low score because cwd is a subdirectory.** The scorer reads the path you pass it (default: cwd). If the user is in a subdirectory of their project (e.g. `src/`), 16 signals will mostly fail because root-level files like `AGENTS.md`, `README.md`, `package.json` aren't there. If the score looks unexpectedly low, mention this and ask the user to invoke from the project root (or pass the root path explicitly).
+- **Low score because cwd is a subdirectory.** The scorer reads the path you pass it (default: cwd). If the user is in a subdirectory of their project (e.g. `src/`), 17 signals will mostly fail because root-level files like `AGENTS.md`, `README.md`, `package.json` aren't there. If the score looks unexpectedly low, mention this and ask the user to invoke from the project root (or pass the root path explicitly).
 - **Node not on PATH.** Tell the user to install Node ≥ 20.9.0 (matches the bundle's runtime requirement).
 
 ## Out of scope

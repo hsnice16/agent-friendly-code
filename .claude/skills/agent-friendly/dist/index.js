@@ -944,6 +944,57 @@ function topImprovements(modelId, signals, limit = scoring_1.DEFAULT_SUGGESTION_
 
 /***/ }),
 
+/***/ 605:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.agentSkills = void 0;
+const node_fs_1 = __nccwpck_require__(24);
+const node_path_1 = __nccwpck_require__(760);
+const helpers_1 = __nccwpck_require__(742);
+const LABEL = "Skills (.agents/skills)";
+// Presence only: the live-score path materializes the tree without skill
+// contents, so judging a SKILL.md by what it says would score a clone differently.
+exports.agentSkills = {
+    label: LABEL,
+    id: "agent_skills",
+    description: "Task-specific instructions in `.agents/skills/<name>/SKILL.md`, which agents load when a task matches.",
+    improveSuggestion: "Add `.agents/skills/<name>/SKILL.md` for the workflows an agent repeats here (running one test, cutting a release, adding a migration), each with a `name` and `description` in its frontmatter.",
+    check: (repo) => {
+        const dir = (0, helpers_1.resolveRelative)(repo, ".agents/skills");
+        if (dir && (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, dir)) === "dir") {
+            let names = [];
+            try {
+                names = (0, node_fs_1.readdirSync)((0, node_path_1.join)(repo, dir)).sort();
+            }
+            catch { }
+            const skills = names
+                .map((n) => (0, helpers_1.resolveRelative)(repo, `${dir}/${n}/SKILL.md`))
+                .filter((p) => !!p && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, p)));
+            if (skills.length > 0) {
+                return {
+                    pass: 1,
+                    label: LABEL,
+                    id: "agent_skills",
+                    matchedPath: skills[0],
+                    detail: `${skills.length} skill${skills.length === 1 ? "" : "s"} in ${dir}/`,
+                };
+            }
+        }
+        return {
+            pass: 0,
+            label: LABEL,
+            id: "agent_skills",
+            detail: "No .agents/skills/<name>/SKILL.md",
+        };
+    },
+};
+
+
+/***/ }),
+
 /***/ 299:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -952,7 +1003,8 @@ function topImprovements(modelId, signals, limit = scoring_1.DEFAULT_SUGGESTION_
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.agentsMd = void 0;
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
+// Only Claude Code reads the `.claude/` names, so a root file wins over them.
+const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"];
 const LABEL = "AGENTS.md / CLAUDE.md";
 exports.agentsMd = {
     label: LABEL,
@@ -1032,30 +1084,57 @@ exports.agentsMd = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.aiderConf = void 0;
+const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const LABEL = ".aider.conf.yml";
-const CANDIDATES = [".aider.conf.yml", ".aider.conf.yaml"];
+// Aider looks for this one spelling only; a `.yaml` file loads just through `--config`.
+const REL = ".aider.conf.yml";
+// Settings that change what Aider runs or reads; a model choice, `auto-test: false` or `read: []` changes neither.
+const USEFUL = [
+    /^(?:test|lint)-cmd[ \t]*:[ \t]*[^\s#]/m,
+    /^auto-test[ \t]*:[ \t]*true\b/im,
+    /^read[ \t]*:[ \t]*(?:[^\s#[]|\[[ \t]*[^\s\]]|\r?\n[ \t]+-[ \t]*\S)/m,
+];
 exports.aiderConf = {
     label: LABEL,
     id: "aider_conf",
-    description: "`.aider.conf.yml` (or `.yaml`): Aider's repo config — model, lint and test commands.",
-    improveSuggestion: "Add a `.aider.conf.yml` at the repo root pinning Aider's `test-cmd` and `lint-cmd` so it auto-runs them after edits.",
+    description: "`.aider.conf.yml`: Aider's repo config — test and lint commands, and the files it reads.",
+    improveSuggestion: "Add a `.aider.conf.yml` at the repo root with `test-cmd`, `lint-cmd` and `auto-test: true`, and list AGENTS.md under `read:`.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
-        if (m) {
+        const rel = (0, helpers_1.resolveRelative)(repo, REL);
+        if (!rel) {
             return {
-                pass: 1,
+                pass: 0,
                 label: LABEL,
-                matchedPath: m,
                 id: "aider_conf",
-                detail: "Aider config present",
+                detail: "No .aider.conf.yml at repo root",
+            };
+        }
+        const text = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo);
+        if (text.trim().length === 0) {
+            return {
+                pass: 0.2,
+                label: LABEL,
+                matchedPath: rel,
+                id: "aider_conf",
+                detail: "Empty .aider.conf.yml",
+            };
+        }
+        if (!USEFUL.some((re) => re.test(text))) {
+            return {
+                pass: 0.5,
+                label: LABEL,
+                matchedPath: rel,
+                id: "aider_conf",
+                detail: "Aider config sets no test-cmd, lint-cmd, auto-test or read",
             };
         }
         return {
-            pass: 0,
+            pass: 1,
             label: LABEL,
+            matchedPath: rel,
             id: "aider_conf",
-            detail: "No .aider.conf.yml at repo root",
+            detail: "Aider config sets test-cmd, lint-cmd, auto-test or read",
         };
     },
 };
@@ -1187,32 +1266,73 @@ const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const LABEL = "Cursor rules (.cursor/rules)";
+// Cursor reads `.mdc` (not `.md`) in `.cursor/rules/`, its subfolders, and any
+// subdirectory's `.cursor/rules/` (CLI changelog). The search stops at the tests
+// check's depth so a repo without rules doesn't cost a full walk.
+const PARENT_DEPTH = 3;
+const SUBFOLDER_DEPTH = 3;
+const SKIP = new Set(["node_modules", ".git", "vendor", "target"]);
+function list(repo, rel) {
+    try {
+        // Sorted: readdir order is filesystem-dependent, and the first hit becomes matchedPath.
+        return (0, node_fs_1.readdirSync)((0, node_path_1.join)(repo, rel)).sort();
+    }
+    catch {
+        return [];
+    }
+}
+function mdcFiles(repo, rel, depth, out) {
+    for (const e of list(repo, rel)) {
+        const child = `${rel}/${e}`;
+        const kind = (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, child));
+        if (kind === "dir") {
+            if (depth < SUBFOLDER_DEPTH)
+                mdcFiles(repo, child, depth + 1, out);
+        }
+        else if (e.toLowerCase().endsWith(".mdc") && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, child))) {
+            out.push(child);
+        }
+    }
+}
+/** Every `.cursor/rules/` folder, the root one first. */
+function rulesDirs(repo) {
+    const found = [];
+    const visit = (rel, depth) => {
+        const dir = (0, helpers_1.resolveRelative)(repo, rel ? `${rel}/.cursor/rules` : ".cursor/rules");
+        if (dir && (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, dir)) === "dir")
+            found.push(dir);
+        if (depth >= PARENT_DEPTH)
+            return;
+        for (const e of list(repo, rel || ".")) {
+            if (SKIP.has(e) || e.toLowerCase() === ".cursor")
+                continue;
+            const child = rel ? `${rel}/${e}` : e;
+            if ((0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, child)) === "dir")
+                visit(child, depth + 1);
+        }
+    };
+    visit("", 0);
+    return found;
+}
 exports.cursorRules = {
     label: LABEL,
     id: "cursor_rules",
-    description: "Cursor's instructions: `.cursor/rules/*.mdc`, or the legacy `.cursorrules`.",
-    improveSuggestion: "Add `.cursor/rules/*.mdc` files describing how Cursor should work in this repo (architecture, conventions, naming). The legacy `.cursorrules` file is still read but is deprecated.",
+    description: "Cursor's instructions: `.cursor/rules/*.mdc`, or the older `.cursorrules`.",
+    improveSuggestion: "Add `.cursor/rules/*.mdc` files describing how Cursor should work in this repo (architecture, conventions, naming). Cursor's current docs no longer mention the single `.cursorrules` file.",
     check: (repo) => {
-        const dir = (0, helpers_1.resolveRelative)(repo, ".cursor/rules");
-        if (dir) {
-            const abs = (0, node_path_1.join)(repo, dir);
-            try {
-                if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
-                    const mdc = (0, node_fs_1.readdirSync)(abs)
-                        .filter((f) => f.toLowerCase().endsWith(".mdc") && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)))
-                        .sort();
-                    if (mdc.length > 0) {
-                        return {
-                            pass: 1,
-                            label: LABEL,
-                            id: "cursor_rules",
-                            matchedPath: `${dir}/${mdc[0]}`,
-                            detail: `${mdc.length} .mdc file${mdc.length === 1 ? "" : "s"} in .cursor/rules/`,
-                        };
-                    }
-                }
-            }
-            catch { }
+        const dirs = rulesDirs(repo);
+        const mdc = [];
+        for (const d of dirs)
+            mdcFiles(repo, d, 0, mdc);
+        if (mdc.length > 0) {
+            const onlyRoot = mdc.every((p) => p.toLowerCase().startsWith(".cursor/rules/"));
+            return {
+                pass: 1,
+                label: LABEL,
+                id: "cursor_rules",
+                matchedPath: mdc[0],
+                detail: `${mdc.length} .mdc file${mdc.length === 1 ? "" : "s"} in ${onlyRoot ? ".cursor/rules/" : ".cursor/rules/ folders"}`,
+            };
         }
         const legacy = (0, helpers_1.resolveRelative)(repo, ".cursorrules");
         if (legacy) {
@@ -1221,7 +1341,7 @@ exports.cursorRules = {
                 label: LABEL,
                 id: "cursor_rules",
                 matchedPath: legacy,
-                detail: "Legacy .cursorrules — Cursor still reads it, but .cursor/rules/*.mdc is preferred",
+                detail: "Only the older .cursorrules — Cursor's docs now cover .cursor/rules/*.mdc instead",
             };
         }
         return {
@@ -1357,6 +1477,8 @@ const ARTIFACTS = [
     "mvnw",
     "gradlew",
     "bin/setup",
+    ".devin/blueprint.yaml",
+    ".cursor/environment.json",
 ];
 exports.devEnv = {
     id: "dev_env",
@@ -1421,10 +1543,24 @@ exports.geminiMd = void 0;
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const LABEL = "GEMINI.md";
+// Gemini CLI inlines `@file.md` imports. Only these are followed: the live-score
+// path fetches no other file's content, so any other would break parity.
+const IMPORTABLE = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
+// Gemini CLI skips imports in code blocks, so a fenced block matches first and is kept.
+const IMPORT_OR_FENCE = /^[ \t]*(?:```|~~~)[^\n]*\n[\s\S]*?^[ \t]*(?:```|~~~)[ \t]*\r?$|^[ \t]*@(?:\.\/)?([^\s/]+\.md)[ \t]*\r?$/gim;
+function withImports(repo, text) {
+    return text.replace(IMPORT_OR_FENCE, (match, name) => {
+        if (!name || !IMPORTABLE.some((f) => f.toLowerCase() === name.toLowerCase())) {
+            return match;
+        }
+        const rel = (0, helpers_1.resolveRelative)(repo, name);
+        return rel ? (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo) : match;
+    });
+}
 exports.geminiMd = {
     label: LABEL,
     id: "gemini_md",
-    description: "Gemini CLI's instructions file, read on every prompt.",
+    description: "Gemini CLI's instructions file, sent with every prompt.",
     improveSuggestion: "Add a GEMINI.md at the repo root covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
     check: (repo) => {
         const matched = (0, helpers_1.resolveRelative)(repo, "GEMINI.md");
@@ -1436,7 +1572,7 @@ exports.geminiMd = {
                 detail: "No GEMINI.md at repo root",
             };
         }
-        const len = (0, helpers_1.readSafe)((0, node_path_1.join)(repo, matched), repo).trim().length;
+        const len = withImports(repo, (0, helpers_1.readSafe)((0, node_path_1.join)(repo, matched), repo)).trim().length;
         if (len === 0) {
             return {
                 pass: 0.2,
@@ -1701,6 +1837,7 @@ function walkFind(root, match, maxDepth = 3, maxHits = 1) {
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.SIGNAL_BY_ID = exports.SIGNALS = void 0;
 exports.runAllSignals = runAllSignals;
+const agent_skills_1 = __nccwpck_require__(605);
 const agents_md_1 = __nccwpck_require__(299);
 const aider_conf_1 = __nccwpck_require__(585);
 const ci_1 = __nccwpck_require__(543);
@@ -1723,6 +1860,7 @@ exports.SIGNALS = [
     gemini_md_1.geminiMd,
     openhands_setup_1.openhandsSetup,
     aider_conf_1.aiderConf,
+    agent_skills_1.agentSkills,
     readme_1.readme,
     tests_1.tests,
     ci_1.ci,
@@ -2294,8 +2432,8 @@ exports.MODELS = [
     {
         id: "claude-code",
         label: "Claude Code",
-        rationale: "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, or AGENTS.md when there is no CLAUDE.md, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
-        sources: ["https://code.claude.com/docs/en/memory"],
+        rationale: "Loads CLAUDE.md (or `.claude/CLAUDE.md`) at the start of every session per Anthropic's memory docs, and AGENTS.md only when there is no CLAUDE.md, so the instructions file and a fast test loop carry the most weight. Its skills live in `.claude/skills/`, not `.agents/skills/`.",
+        sources: ["https://code.claude.com/docs/en/memory", "https://code.claude.com/docs/en/skills"],
         weights: {
             ci: 0.5,
             size: 0.5,
@@ -2307,6 +2445,7 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 1.0,
+            agent_skills: 0,
             cursor_rules: 0,
             pre_commit: 0.4,
             type_config: 0.6,
@@ -2318,8 +2457,8 @@ exports.MODELS = [
     {
         id: "cursor",
         label: "Cursor",
-        rationale: "Per Cursor's Rules docs, reads `.cursor/rules/*.mdc` and AGENTS.md as the canonical repo-side input. Type config and a clean README still aid the codebase index but aren't the docs-cited signal.",
-        sources: ["https://cursor.com/docs/rules"],
+        rationale: "Per Cursor's Rules docs, reads `.cursor/rules/*.mdc` (subfolders included) and AGENTS.md as its repo instructions, and loads skills from `.agents/skills/`. Type config and a clear README help its codebase search but aren't the docs-cited signal.",
+        sources: ["https://cursor.com/docs/rules", "https://cursor.com/docs/skills"],
         weights: {
             ci: 0.4,
             size: 0.4,
@@ -2331,6 +2470,7 @@ exports.MODELS = [
             license: 0.3,
             aider_conf: 0,
             agents_md: 0.8,
+            agent_skills: 0.4,
             pre_commit: 0.3,
             type_config: 1.0,
             contributing: 0.3,
@@ -2342,8 +2482,12 @@ exports.MODELS = [
     {
         id: "devin",
         label: "Devin",
-        rationale: "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs. CI config files alone aren't what the docs ask for — a runnable dev environment is.",
-        sources: ["https://docs.devin.ai/onboard-devin/environment"],
+        rationale: "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs; a committed `.devin/blueprint.yaml` defines that environment. CI config files alone aren't what the docs ask for — a runnable dev environment is. Pulls Cursor rule files into its Knowledge and discovers skills in `.agents/skills/`.",
+        sources: [
+            "https://docs.devin.ai/onboard-devin/environment",
+            "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
+            "https://docs.devin.ai/product-guides/skills",
+        ],
         weights: {
             ci: 0.7,
             size: 0.6,
@@ -2355,7 +2499,8 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 0.6,
-            cursor_rules: 0,
+            agent_skills: 0.4,
+            cursor_rules: 0.3,
             pre_commit: 0.5,
             type_config: 0.5,
             contributing: 0.5,
@@ -2365,9 +2510,12 @@ exports.MODELS = [
     },
     {
         id: "gpt-5-codex",
-        label: "GPT-5 Codex",
-        rationale: "Reads AGENTS.md before doing any work per OpenAI's Codex docs. Hierarchical (per-directory) AGENTS.md and AGENTS.override.md are first-class.",
-        sources: ["https://learn.chatgpt.com/docs/agent-configuration/agents-md"],
+        label: "Codex",
+        rationale: "Reads AGENTS.md before doing any work per OpenAI's Codex docs: one per directory from the repo root down to the working directory, where AGENTS.override.md replaces AGENTS.md, up to 32 KiB combined. Skills load from `.agents/skills/`.",
+        sources: [
+            "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+            "https://learn.chatgpt.com/docs/build-skills",
+        ],
         weights: {
             ci: 0.7,
             size: 0.5,
@@ -2379,6 +2527,7 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 0.9,
+            agent_skills: 0.4,
             cursor_rules: 0,
             pre_commit: 0.4,
             type_config: 0.7,
@@ -2389,11 +2538,12 @@ exports.MODELS = [
     },
     {
         id: "kimi-cli",
-        label: "Kimi CLI",
-        rationale: "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Runs shell commands step-by-step under an approval gate rather than a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
+        label: "Kimi Code CLI",
+        rationale: "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Skills load from `.agents/skills/`. Runs shell commands step-by-step under approval modes rather than in a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
         sources: [
             "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md",
             "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md",
+            "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/skills.md",
         ],
         weights: {
             ci: 0.4,
@@ -2406,6 +2556,7 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 1.0,
+            agent_skills: 0.4,
             cursor_rules: 0,
             pre_commit: 0.4,
             type_config: 0.6,
@@ -2417,8 +2568,8 @@ exports.MODELS = [
     {
         id: "gemini-cli",
         label: "Gemini CLI",
-        rationale: "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs; AGENTS.md is read only when listed in the `context.fileName` setting. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
-        sources: ["https://geminicli.com/docs/cli/gemini-md/"],
+        rationale: "Loads `GEMINI.md` from the global file and from the workspace and its parent directories and sends it with every prompt, per Gemini CLI's docs; one in a subdirectory loads when a tool first touches that directory. AGENTS.md is read only when listed in the `context.fileName` setting. Skills load from `.agents/skills/`.",
+        sources: ["https://geminicli.com/docs/cli/gemini-md/", "https://geminicli.com/docs/cli/skills/"],
         weights: {
             ci: 0.6,
             size: 0.5,
@@ -2429,6 +2580,7 @@ exports.MODELS = [
             license: 0.3,
             aider_conf: 0,
             agents_md: 0.7,
+            agent_skills: 0.4,
             gemini_md: 1.0,
             cursor_rules: 0,
             pre_commit: 0.4,
@@ -2441,7 +2593,7 @@ exports.MODELS = [
     {
         id: "aider",
         label: "Aider",
-        rationale: "Auto-lints on every edit by default; runs the configured test command after edits when `--test-cmd` is set (per Aider's lint/test docs). It doesn't natively read AGENTS.md or CONVENTIONS.md — those load only when wired via `.aider.conf.yml`'s `read:` — so the config file, a green linter, and a declared test command are what translate into successful commits.",
+        rationale: "Auto-lints on every edit by default, and runs the test command after edits once both `test-cmd` and `auto-test` are set (per Aider's lint/test docs). It doesn't natively read AGENTS.md or CONVENTIONS.md — those load only when wired via `.aider.conf.yml`'s `read:` — so the config file, a green linter, and a declared test command are what translate into successful commits.",
         sources: ["https://aider.chat/docs/usage/lint-test.html", "https://aider.chat/docs/config/aider_conf.html"],
         weights: {
             ci: 0.3,
@@ -2453,6 +2605,7 @@ exports.MODELS = [
             license: 0.2,
             gemini_md: 0,
             agents_md: 0.3,
+            agent_skills: 0,
             aider_conf: 1.0,
             cursor_rules: 0,
             pre_commit: 0.3,
@@ -2465,10 +2618,11 @@ exports.MODELS = [
     {
         id: "openhands",
         label: "OpenHands",
-        rationale: "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
+        rationale: "Executes `.openhands/setup.sh` whenever it starts work on a repo, per OpenHands' repo-customization docs; its backend runs on the user's machine by default, or in Docker, a VM or OpenHands Cloud. A root AGENTS.md goes into its system prompt in full; skills live in `.agents/skills/`, with the legacy `.openhands/skills/` and `.openhands/microagents/` still loaded.",
         sources: [
             "https://docs.openhands.dev/openhands/usage/customization/repository",
             "https://docs.openhands.dev/overview/skills",
+            "https://docs.openhands.dev/openhands/usage/agent-canvas/overview",
         ],
         weights: {
             ci: 1.0,
@@ -2481,6 +2635,7 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 0.5,
+            agent_skills: 0.4,
             cursor_rules: 0,
             pre_commit: 0.6,
             type_config: 0.5,
@@ -2492,8 +2647,11 @@ exports.MODELS = [
     {
         id: "pi",
         label: "Pi",
-        rationale: "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) from its agent directory, the working directory and its parent directories, per Pi's configuration docs. It has no built-in sandbox; isolation is left to a container the user runs it in.",
-        sources: ["https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md"],
+        rationale: "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) from its agent directory, the working directory and its parent directories, per Pi's configuration docs, and skills from `.agents/skills/`. It has no built-in sandbox; isolation is left to a container the user runs it in.",
+        sources: [
+            "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md",
+            "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md",
+        ],
         weights: {
             ci: 0.4,
             size: 0.5,
@@ -2505,6 +2663,7 @@ exports.MODELS = [
             gemini_md: 0,
             aider_conf: 0,
             agents_md: 1.0,
+            agent_skills: 0.4,
             cursor_rules: 0,
             pre_commit: 0.4,
             type_config: 0.6,
