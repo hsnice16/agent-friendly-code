@@ -10,6 +10,18 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.3",
+    date: "2026-10-24",
+    title: "Every agent checked against its docs",
+    weightChange: "agent skills check added; Devin weighs Cursor rules",
+    highlights: [
+      "A new check, agent skills: `.agents/skills/<name>/SKILL.md`, which Codex, Cursor, Devin, Gemini CLI, Kimi Code CLI, OpenHands and Pi load when a task matches.",
+      "Each agent's weights, rationale and read list re-checked against its current docs. GPT-5 Codex is now Codex and Kimi CLI is Kimi Code CLI; `/agents` shows that Cursor, Devin, OpenHands and Pi also read CLAUDE.md.",
+      "Cursor rules in subfolders, or in a subdirectory's own `.cursor/rules/`, now count, as do `.claude/CLAUDE.md`, `.devin/blueprint.yaml` and `.cursor/environment.json`. A GEMINI.md that imports AGENTS.md is measured with it.",
+      "The Aider check no longer passes on `.aider.conf.yaml`, which Aider never loads, and gives full credit only to a config that sets a test, lint or read option.",
+    ],
+  },
+  {
     label: "0.9.2",
     date: "2026-10-22",
     title: "Share your score",

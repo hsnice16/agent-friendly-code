@@ -1,4 +1,4 @@
-export const APP_VERSION = "0.9.2";
+export const APP_VERSION = "0.9.3";
 export const APP_NAME = "Agent Friendly Code";
 
 export const IS_PRE_RELEASE = APP_VERSION.startsWith("0.0.");

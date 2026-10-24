@@ -1,10 +1,10 @@
 # 0.9.3 — agent docs audit
 
-**Status**: in_progress
+**Status**: released
 
 Each agent's weights, rationale and read list re-checked against its docs and source on 2026-10-24. Cut as a patch so [0.10.0](../0.10.0/README.md) stays the maintainer opt-out and registry release.
 
-## Owed a changelog line
+## Shipped
 
 - A seventeenth check, agent skills (`.agents/skills/<name>/SKILL.md`), counts for the seven agents that load that folder: Codex, Cursor, Devin, Gemini CLI, Kimi Code CLI, OpenHands and Pi.
 - "GPT-5 Codex" is now "Codex" and "Kimi CLI" is "Kimi Code CLI", after the products' current names. Their URLs are unchanged.

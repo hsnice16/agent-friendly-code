@@ -1,6 +1,6 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.9.2-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
+[![Release](https://img.shields.io/badge/release-0.9.3-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Node ≥22](https://img.shields.io/badge/node-%E2%89%A522-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/hsnice16)
