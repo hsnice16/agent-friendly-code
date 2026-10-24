@@ -39,14 +39,6 @@ export function HomeLeaderboard({ view, stats }: Props) {
           <div className="-mt-2">
             <LiveScoreForm />
           </div>
-
-          {/* Announced only once the release it describes is the one deployed —
-              otherwise a version bump ahead of the changelog entry (or behind it)
-              would advertise the wrong thing. It points at the section that
-              release is about, so move it when the next one is cut. */}
-          {CHANGELOG[0]?.label === APP_VERSION && (
-            <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} placement="below" />
-          )}
         </div>
 
         <p className="mt-3 max-w-[68ch] text-[13px] text-muted">
@@ -69,6 +61,12 @@ export function HomeLeaderboard({ view, stats }: Props) {
           from popular repos.
         </p>
       </section>
+
+      {/* Announced only once the release it describes is the one deployed —
+          otherwise a version bump ahead of the changelog entry (or behind it)
+          would advertise the wrong thing. It points at the section that
+          release is about, so move it when the next one is cut. */}
+      {CHANGELOG[0]?.label === APP_VERSION && <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} />}
 
       <LeaderboardBoard view={view} stats={stats} />
     </>
