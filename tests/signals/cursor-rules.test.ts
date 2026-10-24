@@ -59,6 +59,41 @@ describe("cursorRules signal", () => {
     assert.equal(cursorRules.check(fixture).pass, 0);
   });
 
+  test("counts .mdc files in subfolders of .cursor/rules/", () => {
+    fixture = makeFixture({ ".cursor/rules/frontend/components.mdc": "rule", ".cursor/rules/api.mdc": "rule" });
+    const r = cursorRules.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.equal(r.detail, "2 .mdc files in .cursor/rules/");
+  });
+
+  test("counts a .cursor/rules/ folder in a subdirectory, and links the root one first", () => {
+    fixture = makeFixture({ "packages/web/.cursor/rules/ui.mdc": "rule" });
+    const nested = cursorRules.check(fixture);
+    assert.equal(nested.pass, 1);
+    assert.equal(nested.matchedPath, "packages/web/.cursor/rules/ui.mdc");
+    removeFixture(fixture);
+
+    fixture = makeFixture({ "a/.cursor/rules/ui.mdc": "rule", ".cursor/rules/z.mdc": "rule" });
+    const both = cursorRules.check(fixture);
+    assert.equal(both.matchedPath, ".cursor/rules/z.mdc");
+    assert.equal(both.detail, "2 .mdc files in .cursor/rules/ folders");
+  });
+
+  test("looks for .cursor/rules/ folders only three directories down", () => {
+    fixture = makeFixture({ "a/b/c/.cursor/rules/x.mdc": "rule" });
+    assert.equal(cursorRules.check(fixture).pass, 1);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ "a/b/c/d/.cursor/rules/x.mdc": "rule", "node_modules/p/.cursor/rules/y.mdc": "rule" });
+    assert.equal(cursorRules.check(fixture).pass, 0);
+  });
+
+  test("a plain .md in .cursor/rules/ is not a rule file", () => {
+    fixture = makeFixture({ ".cursor/rules/style.md": "Cursor ignores this" });
+    assert.equal(cursorRules.check(fixture).pass, 0);
+  });
+
   test("counts only the .mdc files, not .mdc directories beside them", () => {
     fixture = makeFixture({ ".cursor/rules/a.mdc": "rule", ".cursor/rules/b.mdc/x": "" });
     assert.equal(cursorRules.check(fixture).detail, "1 .mdc file in .cursor/rules/");

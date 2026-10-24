@@ -38,13 +38,19 @@ describe("topWeightedChecks", () => {
 });
 
 describe("exclusiveSignal", () => {
-  it("finds the file only one agent reads", () => {
+  it("finds the file that is mainly one agent's", () => {
     assert.equal(exclusiveSignal(MODEL_BY_ID.cursor), "cursor_rules");
     assert.equal(exclusiveSignal(MODEL_BY_ID["gemini-cli"]), "gemini_md");
     assert.equal(exclusiveSignal(MODEL_BY_ID.openhands), "openhands_setup");
     assert.equal(exclusiveSignal(MODEL_BY_ID.aider), "aider_conf");
     assert.equal(exclusiveSignal(MODEL_BY_ID["claude-code"]), null);
     assert.equal(exclusiveSignal(MODEL_BY_ID.devin), null);
+    assert.equal(exclusiveSignal(MODEL_BY_ID.pi), null);
+  });
+
+  it("keeps a file the agent's own when another agent weights it lightly", () => {
+    assert.ok(MODEL_BY_ID.devin.weights.cursor_rules > 0);
+    assert.equal(exclusiveSignal(MODEL_BY_ID.cursor), "cursor_rules");
   });
 });
 

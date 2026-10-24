@@ -79,6 +79,20 @@ describe("agentsMd signal", () => {
     assert.match(r.matchedPath ?? "", /AGENTS\.md$/);
   });
 
+  test("finds Claude Code's .claude/CLAUDE.md and .claude/AGENTS.md", () => {
+    fixture = makeFixture({ ".claude/CLAUDE.md": "x".repeat(900) });
+    assert.match(agentsMd.check(fixture).matchedPath ?? "", /\/\.claude\/CLAUDE\.md$/);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ ".claude/AGENTS.md": "x".repeat(300) });
+    assert.equal(agentsMd.check(fixture).pass, 0.8);
+  });
+
+  test("a root file comes before the .claude/ ones", () => {
+    fixture = makeFixture({ "CLAUDE.md": "Short notes.", ".claude/CLAUDE.md": "x".repeat(900) });
+    assert.doesNotMatch(agentsMd.check(fixture).matchedPath ?? "", /\.claude/);
+  });
+
   test("pass=0.2 on the first empty file when every candidate is empty", () => {
     fixture = makeFixture({ "CLAUDE.md": "", "AGENT.md": "" });
     const r = agentsMd.check(fixture);

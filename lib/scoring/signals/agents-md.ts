@@ -1,7 +1,8 @@
 import { characters, firstExisting, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
-const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
+// Only Claude Code reads the `.claude/` names, so a root file wins over them.
+const CANDIDATES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"];
 const LABEL = "AGENTS.md / CLAUDE.md";
 
 export const agentsMd: Signal = {

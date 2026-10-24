@@ -8,7 +8,7 @@
 
 **Scores how ready a repo is for AI coding agents, one score per agent, from static file checks.**
 
-AI coding agents succeed far more often on some repos than others, and the difference is usually the repo: an `AGENTS.md`, tests, CI, a reproducible dev environment. Each agent reads different files, so a repo set up well for Claude Code may not be for Devin. Agent Friendly Code checks 16 signals, weights them per agent, and tells you which fixes would raise each agent's score most.
+AI coding agents succeed far more often on some repos than others, and the difference is usually the repo: an `AGENTS.md`, tests, CI, a reproducible dev environment. Each agent reads different files, so a repo set up well for Claude Code may not be for Devin. Agent Friendly Code checks 17 signals, weights them per agent, and tells you which fixes would raise each agent's score most.
 
 ![Agent Friendly Code — leaderboard](./public/demo/light.png)
 
@@ -29,7 +29,7 @@ AI coding agents succeed far more often on some repos than others, and the diffe
 | [GitHub Action](https://github.com/hsnice16/agent-friendly-action)     | Comments on each pull request with how it changes the score. Runs in your CI.                                    |
 | Badge                                                                  | `https://agentfriendlycode.com/api/badge/<host>/<owner>/<name>.svg`, `?model=<id>` for one agent.               |
 
-Scored agents: Claude Code, Cursor, Devin, GPT-5 Codex, Gemini CLI, Kimi CLI, Aider, OpenHands and Pi. Each agent's weights cite its published docs; [/methodology](https://agentfriendlycode.com/methodology) shows them.
+Scored agents: Claude Code, Cursor, Devin, Codex, Gemini CLI, Kimi Code CLI, Aider, OpenHands and Pi. Each agent's weights cite its published docs; [/methodology](https://agentfriendlycode.com/methodology) shows them.
 
 ### Public API
 

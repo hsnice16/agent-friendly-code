@@ -165,7 +165,8 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
             ))}
           </ul>
           <p className={`${PROSE} mt-3 text-[13px]`}>
-            Needs Claude Code v2.1.277 or later. A CLAUDE.local.md counts as a CLAUDE.md.{" "}
+            Needs Claude Code v2.1.277 or later. A <code className={CODE}>.claude/CLAUDE.md</code> or CLAUDE.local.md
+            counts as a CLAUDE.md.{" "}
             <ExternalLink href={CLAUDE_DOCS} title={CLAUDE_DOCS}>
               Claude Code&apos;s docs
             </ExternalLink>{" "}

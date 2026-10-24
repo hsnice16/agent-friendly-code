@@ -706,7 +706,7 @@ export const SEEDS: Seed[] = [
   },
   {
     url: "https://github.com/MoonshotAI/kimi-code",
-    note: "Kimi Code CLI — Moonshot AI's terminal coding agent (the Kimi CLI profile this dashboard scores)",
+    note: "Kimi Code CLI — Moonshot AI's terminal coding agent (the Kimi Code CLI profile this dashboard scores)",
   },
   {
     url: "https://github.com/Aider-AI/aider",

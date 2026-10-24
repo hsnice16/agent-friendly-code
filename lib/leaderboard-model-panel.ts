@@ -25,11 +25,13 @@ export function topWeightedChecks(model: ModelProfile, limit = MODEL_PANEL_CHECK
     .slice(0, limit);
 }
 
-/** The check no other agent gives any weight: the file only this agent reads. */
+/** The agent's own file: weighted in full by it, at most half that by any other (Devin reads Cursor rules too). */
 export function exclusiveSignal(model: ModelProfile): string | null {
   return (
     SIGNALS.find(
-      (s) => (model.weights[s.id] ?? 0) > 0 && MODELS.every((m) => m.id === model.id || (m.weights[s.id] ?? 0) === 0),
+      (s) =>
+        (model.weights[s.id] ?? 0) >= 1 &&
+        MODELS.every((m) => m.id === model.id || (m.weights[s.id] ?? 0) <= (model.weights[s.id] ?? 0) / 2),
     )?.id ?? null
   );
 }

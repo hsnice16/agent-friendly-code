@@ -13,6 +13,7 @@ const none = [
   s("gemini_md", 0, "No GEMINI.md at repo root"),
   s("openhands_setup", 0, "No .openhands/setup.sh"),
   s("aider_conf", 0, "No .aider.conf.yml at repo root"),
+  s("agent_skills", 0, "No .agents/skills/<name>/SKILL.md"),
 ];
 
 describe("agentInstructions", () => {
@@ -25,7 +26,13 @@ describe("agentInstructions", () => {
     );
     // The check stops at AGENTS.md, so whether CLAUDE.md exists is unknown.
     assert.deepEqual(d.absentMain, []);
-    assert.deepEqual(d.absentOthers, ["GEMINI.md", ".cursor/rules", ".openhands/setup.sh", ".aider.conf.yml"]);
+    assert.deepEqual(d.absentOthers, [
+      "GEMINI.md",
+      ".cursor/rules",
+      ".openhands/setup.sh",
+      ".aider.conf.yml",
+      ".agents/skills",
+    ]);
   });
 
   it("knows AGENTS.md is absent when an empty CLAUDE.md is what matched", () => {
@@ -43,10 +50,10 @@ describe("agentInstructions", () => {
   it("lists every main-file name when none matched", () => {
     const d = agentInstructions([s("agents_md", 0, "No agent instructions file found"), ...none], share);
     assert.equal(d?.main, null);
-    assert.deepEqual(d?.absentMain, ["AGENTS.md", "CLAUDE.md", "AGENT.md"]);
+    assert.deepEqual(d?.absentMain, ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"]);
   });
 
-  it("links Cursor rules as a directory and notes the legacy file", () => {
+  it("links Cursor rules as a directory and notes the older file", () => {
     const rules = agentInstructions(
       [s("agents_md", 0, ""), s("cursor_rules", 1, "13 .mdc files in .cursor/rules/", ".cursor/rules/a.mdc")],
       share,
@@ -58,7 +65,22 @@ describe("agentInstructions", () => {
       [s("agents_md", 0, ""), s("cursor_rules", 0.5, "Legacy .cursorrules — …", ".cursorrules")],
       share,
     );
-    assert.equal(legacy?.others[0].note, "the legacy form");
+    assert.equal(legacy?.others[0].note, "the older form");
+    const nested = agentInstructions(
+      [s("agents_md", 0, ""), s("cursor_rules", 1, "1 .mdc file in .cursor/rules/ folders", "web/.cursor/rules/a.mdc")],
+      share,
+    );
+    assert.equal(nested?.others[0].path, "web/.cursor/rules");
+  });
+
+  it("links agent skills as a directory with their count", () => {
+    const d = agentInstructions(
+      [s("agents_md", 0, ""), s("agent_skills", 1, "3 skills in .agents/skills/", ".agents/skills/a/SKILL.md")],
+      share,
+    );
+    assert.deepEqual(d?.others, [
+      { name: ".agents/skills", path: ".agents/skills", directory: true, note: "3 skills" },
+    ]);
   });
 
   it("notes an empty agent file instead of crediting it", () => {

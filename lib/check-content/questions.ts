@@ -36,9 +36,16 @@ export const CHECK_QUESTIONS: Record<string, CheckQuestions> = {
   aider_conf: {
     pass: "How many repos have an .aider.conf.yml?",
     why: "Why does Aider need an .aider.conf.yml?",
-    scoring: "What counts as an Aider config?",
+    scoring: "What makes a useful Aider config?",
     fix: "How do I add an .aider.conf.yml to my repo?",
     agents: "Which AI agents read .aider.conf.yml?",
+  },
+  agent_skills: {
+    pass: "How many repos ship agent skills?",
+    why: "Why add agent skills to a repo?",
+    scoring: "What counts as an agent skill?",
+    fix: "How do I add agent skills to my repo?",
+    agents: "Which AI agents load .agents/skills?",
   },
   readme: {
     pass: "How many repos have a detailed README?",

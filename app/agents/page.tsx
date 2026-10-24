@@ -137,8 +137,16 @@ export default function AgentsPage() {
               <code className={CODE}>context.fileName</code>, or keep a GEMINI.md.
             </li>
             <li>
-              Cursor-only rules go in <code className={CODE}>.cursor/rules/</code>, OpenHands setup in{" "}
+              Cursor rules go in <code className={CODE}>.cursor/rules/</code>, OpenHands setup in{" "}
               <code className={CODE}>.openhands/setup.sh</code>.
+            </li>
+            <li>
+              Longer task steps go in <code className={CODE}>.agents/skills/</code>, which every agent here but Claude
+              Code and Aider loads when a task matches.{" "}
+              <Link href={checkPath("agent_skills")} className={LINK}>
+                Agent skills
+              </Link>
+              .
             </li>
           </ol>
         </Panel>

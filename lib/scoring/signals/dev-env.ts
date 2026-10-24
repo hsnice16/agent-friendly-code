@@ -21,6 +21,8 @@ const ARTIFACTS = [
   "mvnw",
   "gradlew",
   "bin/setup",
+  ".devin/blueprint.yaml",
+  ".cursor/environment.json",
 ];
 
 export const devEnv: Signal = {

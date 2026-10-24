@@ -22,8 +22,8 @@ export const MODELS: ModelProfile[] = [
     id: "claude-code",
     label: "Claude Code",
     rationale:
-      "Loads CLAUDE.md at the start of every conversation per Anthropic's memory docs, or AGENTS.md when there is no CLAUDE.md, so AGENTS.md / CLAUDE.md and a fast test loop carry the most weight.",
-    sources: ["https://code.claude.com/docs/en/memory"],
+      "Loads CLAUDE.md (or `.claude/CLAUDE.md`) at the start of every session per Anthropic's memory docs, and AGENTS.md only when there is no CLAUDE.md, so the instructions file and a fast test loop carry the most weight. Its skills live in `.claude/skills/`, not `.agents/skills/`.",
+    sources: ["https://code.claude.com/docs/en/memory", "https://code.claude.com/docs/en/skills"],
     weights: {
       ci: 0.5,
       size: 0.5,
@@ -35,6 +35,7 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 1.0,
+      agent_skills: 0,
       cursor_rules: 0,
       pre_commit: 0.4,
       type_config: 0.6,
@@ -47,8 +48,8 @@ export const MODELS: ModelProfile[] = [
     id: "cursor",
     label: "Cursor",
     rationale:
-      "Per Cursor's Rules docs, reads `.cursor/rules/*.mdc` and AGENTS.md as the canonical repo-side input. Type config and a clean README still aid the codebase index but aren't the docs-cited signal.",
-    sources: ["https://cursor.com/docs/rules"],
+      "Per Cursor's Rules docs, reads `.cursor/rules/*.mdc` (subfolders included) and AGENTS.md as its repo instructions, and loads skills from `.agents/skills/`. Type config and a clear README help its codebase search but aren't the docs-cited signal.",
+    sources: ["https://cursor.com/docs/rules", "https://cursor.com/docs/skills"],
     weights: {
       ci: 0.4,
       size: 0.4,
@@ -60,6 +61,7 @@ export const MODELS: ModelProfile[] = [
       license: 0.3,
       aider_conf: 0,
       agents_md: 0.8,
+      agent_skills: 0.4,
       pre_commit: 0.3,
       type_config: 1.0,
       contributing: 0.3,
@@ -72,8 +74,12 @@ export const MODELS: ModelProfile[] = [
     id: "devin",
     label: "Devin",
     rationale:
-      "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs. CI config files alone aren't what the docs ask for — a runnable dev environment is.",
-    sources: ["https://docs.devin.ai/onboard-devin/environment"],
+      "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs; a committed `.devin/blueprint.yaml` defines that environment. CI config files alone aren't what the docs ask for — a runnable dev environment is. Pulls Cursor rule files into its Knowledge and discovers skills in `.agents/skills/`.",
+    sources: [
+      "https://docs.devin.ai/onboard-devin/environment",
+      "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
+      "https://docs.devin.ai/product-guides/skills",
+    ],
     weights: {
       ci: 0.7,
       size: 0.6,
@@ -85,7 +91,8 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 0.6,
-      cursor_rules: 0,
+      agent_skills: 0.4,
+      cursor_rules: 0.3,
       pre_commit: 0.5,
       type_config: 0.5,
       contributing: 0.5,
@@ -95,10 +102,13 @@ export const MODELS: ModelProfile[] = [
   },
   {
     id: "gpt-5-codex",
-    label: "GPT-5 Codex",
+    label: "Codex",
     rationale:
-      "Reads AGENTS.md before doing any work per OpenAI's Codex docs. Hierarchical (per-directory) AGENTS.md and AGENTS.override.md are first-class.",
-    sources: ["https://learn.chatgpt.com/docs/agent-configuration/agents-md"],
+      "Reads AGENTS.md before doing any work per OpenAI's Codex docs: one per directory from the repo root down to the working directory, where AGENTS.override.md replaces AGENTS.md, up to 32 KiB combined. Skills load from `.agents/skills/`.",
+    sources: [
+      "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "https://learn.chatgpt.com/docs/build-skills",
+    ],
     weights: {
       ci: 0.7,
       size: 0.5,
@@ -110,6 +120,7 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 0.9,
+      agent_skills: 0.4,
       cursor_rules: 0,
       pre_commit: 0.4,
       type_config: 0.7,
@@ -120,12 +131,13 @@ export const MODELS: ModelProfile[] = [
   },
   {
     id: "kimi-cli",
-    label: "Kimi CLI",
+    label: "Kimi Code CLI",
     rationale:
-      "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Runs shell commands step-by-step under an approval gate rather than a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
+      "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Skills load from `.agents/skills/`. Runs shell commands step-by-step under approval modes rather than in a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
     sources: [
       "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md",
       "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md",
+      "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/skills.md",
     ],
     weights: {
       ci: 0.4,
@@ -138,6 +150,7 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 1.0,
+      agent_skills: 0.4,
       cursor_rules: 0,
       pre_commit: 0.4,
       type_config: 0.6,
@@ -150,8 +163,8 @@ export const MODELS: ModelProfile[] = [
     id: "gemini-cli",
     label: "Gemini CLI",
     rationale:
-      "Reads hierarchical `GEMINI.md` (global → workspace → component-level) at every prompt per Gemini CLI's docs; AGENTS.md is read only when listed in the `context.fileName` setting. The long-context advantage favors repos that split context per directory rather than docs-heavy in general.",
-    sources: ["https://geminicli.com/docs/cli/gemini-md/"],
+      "Loads `GEMINI.md` from the global file and from the workspace and its parent directories and sends it with every prompt, per Gemini CLI's docs; one in a subdirectory loads when a tool first touches that directory. AGENTS.md is read only when listed in the `context.fileName` setting. Skills load from `.agents/skills/`.",
+    sources: ["https://geminicli.com/docs/cli/gemini-md/", "https://geminicli.com/docs/cli/skills/"],
     weights: {
       ci: 0.6,
       size: 0.5,
@@ -162,6 +175,7 @@ export const MODELS: ModelProfile[] = [
       license: 0.3,
       aider_conf: 0,
       agents_md: 0.7,
+      agent_skills: 0.4,
       gemini_md: 1.0,
       cursor_rules: 0,
       pre_commit: 0.4,
@@ -175,7 +189,7 @@ export const MODELS: ModelProfile[] = [
     id: "aider",
     label: "Aider",
     rationale:
-      "Auto-lints on every edit by default; runs the configured test command after edits when `--test-cmd` is set (per Aider's lint/test docs). It doesn't natively read AGENTS.md or CONVENTIONS.md — those load only when wired via `.aider.conf.yml`'s `read:` — so the config file, a green linter, and a declared test command are what translate into successful commits.",
+      "Auto-lints on every edit by default, and runs the test command after edits once both `test-cmd` and `auto-test` are set (per Aider's lint/test docs). It doesn't natively read AGENTS.md or CONVENTIONS.md — those load only when wired via `.aider.conf.yml`'s `read:` — so the config file, a green linter, and a declared test command are what translate into successful commits.",
     sources: ["https://aider.chat/docs/usage/lint-test.html", "https://aider.chat/docs/config/aider_conf.html"],
     weights: {
       ci: 0.3,
@@ -187,6 +201,7 @@ export const MODELS: ModelProfile[] = [
       license: 0.2,
       gemini_md: 0,
       agents_md: 0.3,
+      agent_skills: 0,
       aider_conf: 1.0,
       cursor_rules: 0,
       pre_commit: 0.3,
@@ -200,10 +215,11 @@ export const MODELS: ModelProfile[] = [
     id: "openhands",
     label: "OpenHands",
     rationale:
-      "Runs in a sandboxed container and executes `.openhands/setup.sh` at session start per OpenHands' repo-customization docs. A root AGENTS.md is the preferred always-on instruction surface; the older `.openhands/microagents/` path has been renamed to Skills (`.agents/skills/`).",
+      "Executes `.openhands/setup.sh` whenever it starts work on a repo, per OpenHands' repo-customization docs; its backend runs on the user's machine by default, or in Docker, a VM or OpenHands Cloud. A root AGENTS.md goes into its system prompt in full; skills live in `.agents/skills/`, with the legacy `.openhands/skills/` and `.openhands/microagents/` still loaded.",
     sources: [
       "https://docs.openhands.dev/openhands/usage/customization/repository",
       "https://docs.openhands.dev/overview/skills",
+      "https://docs.openhands.dev/openhands/usage/agent-canvas/overview",
     ],
     weights: {
       ci: 1.0,
@@ -216,6 +232,7 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 0.5,
+      agent_skills: 0.4,
       cursor_rules: 0,
       pre_commit: 0.6,
       type_config: 0.5,
@@ -228,8 +245,11 @@ export const MODELS: ModelProfile[] = [
     id: "pi",
     label: "Pi",
     rationale:
-      "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) from its agent directory, the working directory and its parent directories, per Pi's configuration docs. It has no built-in sandbox; isolation is left to a container the user runs it in.",
-    sources: ["https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md"],
+      "Minimal terminal coding harness. Loads `AGENTS.md` (or `CLAUDE.md`) from its agent directory, the working directory and its parent directories, per Pi's configuration docs, and skills from `.agents/skills/`. It has no built-in sandbox; isolation is left to a container the user runs it in.",
+    sources: [
+      "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md",
+      "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md",
+    ],
     weights: {
       ci: 0.4,
       size: 0.5,
@@ -241,6 +261,7 @@ export const MODELS: ModelProfile[] = [
       gemini_md: 0,
       aider_conf: 0,
       agents_md: 1.0,
+      agent_skills: 0.4,
       cursor_rules: 0,
       pre_commit: 0.4,
       type_config: 0.6,

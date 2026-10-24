@@ -1,3 +1,4 @@
+import { agentSkills } from "./agent-skills";
 import { agentsMd } from "./agents-md";
 import { aiderConf } from "./aider-conf";
 import { ci } from "./ci";
@@ -24,6 +25,7 @@ export const SIGNALS: Signal[] = [
   geminiMd,
   openhandsSetup,
   aiderConf,
+  agentSkills,
   readme,
   tests,
   ci,

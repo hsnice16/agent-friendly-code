@@ -29,6 +29,7 @@ function richFixtureFiles(): FixtureFiles {
     "lefthook.yml": "pre-commit:\n  commands: {}",
     ".openhands/setup.sh": "#!/usr/bin/env bash\nbun install",
     ".cursor/rules/style.mdc": "---\nname: style\n---\nUse Tailwind.",
+    ".agents/skills/release/SKILL.md": "---\nname: release\ndescription: Cut a release\n---\nSteps.",
     "package.json": JSON.stringify({
       name: "demo",
       scripts: { dev: "d", build: "b", test: "t" },

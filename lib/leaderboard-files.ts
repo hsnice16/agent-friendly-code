@@ -33,6 +33,7 @@ export function getInstructionFileCounts(): { total: number; files: InstructionF
       { file: ".cursor/rules or .cursorrules", signalId: "cursor_rules" },
       { file: ".openhands/setup.sh", signalId: "openhands_setup" },
       { file: ".aider.conf.yml", signalId: "aider_conf" },
+      { file: ".agents/skills", signalId: "agent_skills" },
     ].map((f) => ({ ...f, count: getCheckStats(f.signalId).present })),
   ];
   return { total: getAgentsMdExamples().boardSize, files: files.sort((a, b) => b.count - a.count) };

@@ -28,13 +28,14 @@ export function hasAgentFile(s: { pass: number; matchedPath?: string | null }): 
 }
 
 // The agents_md check's candidates, in its lookup order.
-const MAIN_FILES = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
+const MAIN_FILES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"];
 
 const OTHERS: { id: string; name: string }[] = [
   { id: "gemini_md", name: "GEMINI.md" },
   { id: "cursor_rules", name: ".cursor/rules" },
   { id: "openhands_setup", name: ".openhands/setup.sh" },
   { id: "aider_conf", name: ".aider.conf.yml" },
+  { id: "agent_skills", name: ".agents/skills" },
 ];
 
 const NUMBER = new Intl.NumberFormat("en-US");
@@ -51,13 +52,24 @@ function chars(detail: string): string | null {
   return n == null ? null : `${NUMBER.format(n)} characters`;
 }
 
-function other(s: SignalResult, name: string): AgentFile | null {
+function other(s: SignalResult): AgentFile | null {
   if (s.pass === 0 || !s.matchedPath) return null;
   if (s.id === "cursor_rules") {
     const mdc = /^(\d+) \.mdc files? in/.exec(s.detail);
+    // The matched file can sit in a subfolder or in a subdirectory's own rules folder.
+    const at = s.matchedPath.toLowerCase().indexOf(".cursor/rules");
+    const path = at >= 0 ? s.matchedPath.slice(0, at + ".cursor/rules".length) : ".cursor/rules";
     return mdc
-      ? { name, path: ".cursor/rules", directory: true, note: `${mdc[1]} .mdc file${mdc[1] === "1" ? "" : "s"}` }
-      : { name: s.matchedPath, path: s.matchedPath, directory: false, note: "the legacy form" };
+      ? { name: path, path, directory: true, note: `${mdc[1]} .mdc file${mdc[1] === "1" ? "" : "s"}` }
+      : { name: s.matchedPath, path: s.matchedPath, directory: false, note: "the older form" };
+  }
+  if (s.id === "agent_skills") {
+    const n = /^(\d+) skills?/.exec(s.detail)?.[1] ?? null;
+    const path = s.matchedPath.split("/").slice(0, 2).join("/");
+    return { name: path, path, directory: true, note: n && `${n} skill${n === "1" ? "" : "s"}` };
+  }
+  if (s.id === "aider_conf" && s.pass === 0.5) {
+    return { name: s.matchedPath, path: s.matchedPath, directory: false, note: "sets no test or lint command" };
   }
   const note = s.pass < HAS_FILE_PASS ? "empty" : chars(s.detail);
   return { name: s.matchedPath, path: s.matchedPath, directory: false, note };
@@ -76,7 +88,7 @@ export function agentInstructions(signals: SignalResult[], share: AgentFileShare
   for (const o of OTHERS) {
     const s = byId.get(o.id);
     if (!s) continue;
-    const found = other(s, o.name);
+    const found = other(s);
     if (found) others.push(found);
     else absentOthers.push(o.name);
   }

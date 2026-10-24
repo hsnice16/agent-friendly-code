@@ -73,8 +73,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     metaTitle: "Reproducible dev environments: one-command agent setup",
     description:
       "Why AI coding agents need a reproducible dev environment, which setup files we detect, and how many popular open source repos have them.",
-    what: "This check looks for files that set the project up in one command: a Makefile, devcontainer, Dockerfile or compose file, Nix files, a justfile, a Taskfile, `tox.ini`, `noxfile.py`, the Maven or Gradle wrapper, or `bin/setup`.",
-    why: "Agents that run on their own machine must get the project working there first. Devin starts from a VM with the repo, tools and dependencies already set up, per Cognition's environment docs, so its profile weighs a runnable environment above CI. A setup written as a file is one an agent can run.",
+    what: "This check looks for files that set the project up in one command: a Makefile, devcontainer, Dockerfile or compose file, Nix files, a justfile, a Taskfile, `tox.ini`, `noxfile.py`, the Maven or Gradle wrapper, `bin/setup`, or an agent's own environment file: Devin's `.devin/blueprint.yaml` or Cursor's `.cursor/environment.json`.",
+    why: "Agents that run on their own machine must get the project working there first. Devin starts from a VM with the repo, tools and dependencies already set up, per Cognition's environment docs, and Cursor's cloud agents do the same, so Devin's profile weighs a runnable environment above CI. A setup written as a file is one an agent can run.",
     scoring: [
       "Full pass: two or more of these files.",
       "70%: exactly one.",

@@ -42,6 +42,28 @@ describe("geminiMd signal", () => {
     assert.match(r.matchedPath ?? "", /GEMINI\.md$/i);
   });
 
+  test("counts an imported AGENTS.md toward the length", () => {
+    fixture = makeFixture({ "GEMINI.md": "@AGENTS.md\n", "AGENTS.md": "x".repeat(1200) });
+    assert.equal(geminiMd.check(fixture).pass, 1);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ "GEMINI.md": "# Notes\r\n@./agents.md\r\n", "AGENTS.md": "x".repeat(300) });
+    assert.equal(geminiMd.check(fixture).pass, 0.8);
+  });
+
+  test("leaves other imports, and a missing AGENTS.md, as the line they are", () => {
+    fixture = makeFixture({ "GEMINI.md": "@docs/guide.md\n@AGENTS.md", "docs/guide.md": "x".repeat(1200) });
+    assert.equal(geminiMd.check(fixture).pass, 0.5);
+  });
+
+  test("does not inline an import shown in a code block", () => {
+    fixture = makeFixture({
+      "GEMINI.md": "Import it like this:\n\n```\n@AGENTS.md\n```\n",
+      "AGENTS.md": "x".repeat(1200),
+    });
+    assert.equal(geminiMd.check(fixture).pass, 0.5);
+  });
+
   test("matches case-insensitively", () => {
     fixture = makeFixture({ "Gemini.md": "x".repeat(1200) });
     assert.equal(geminiMd.check(fixture).pass, 1);
