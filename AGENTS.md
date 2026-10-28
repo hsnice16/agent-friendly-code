@@ -120,7 +120,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 - `data/rank.db` is public, freed pages included: `bun run check-db-leaks` must pass before committing it.
 - No auth. The only write a request can cause is caching a package → repo alias, off Vercel only, for a name valid on its registry. Auth arrives with `tasks/0.10.0/01-opt-out-claim-flow.md`; gate DB writes per user then.
 - Secrets live in env vars only (`.env.example`). The production `GITHUB_TOKEN` must be read-only.
-- Not yet done: rate limits on the public API and the live-scored routes (an uncached slug spends the shared GitHub quota), and sandboxing the cloner.
+- Missing: rate limits on the public API and the live-scored routes (an uncached slug spends the shared GitHub quota), and sandboxing the cloner.
 
 ## Leave alone
 

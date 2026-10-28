@@ -85,7 +85,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         </p>
         {examples && (
           <p className="mt-2 mb-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-            {examples.rows.length} have an AGENTS.md or CLAUDE.md:{" "}
+            {examples.rows.length} of them have an AGENTS.md or CLAUDE.md:{" "}
             <Link href={languageExamplesPath(hub.slug)} className="text-ink hover:text-ink-soft">
               {hub.label} AGENTS.md examples
             </Link>

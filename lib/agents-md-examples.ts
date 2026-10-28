@@ -112,7 +112,7 @@ export function examplesDescription(ex: Pick<AgentsMdExamples, "rows" | "passing
   return fitDescription(
     `Real AGENTS.md and CLAUDE.md files from ${ex.rows.length} open source repos, linked at their source.`,
     `${ex.passing} pass our check in full.`,
-    "The most-starred, the longest and shortest, and which file name repos use.",
+    "Longest, shortest and most-starred.",
   );
 }
 
@@ -127,8 +127,8 @@ export function examplesByLanguage(ex: Pick<AgentsMdExamples, "rows" | "language
     .sort((a, b) => b.rows.length - a.rows.length);
 }
 
-export function languageExamplesTitle(lang: Pick<LanguageExamples, "label" | "rows">): string {
-  return `${lang.label} AGENTS.md examples: ${lang.rows.length} open source repos`;
+export function languageExamplesTitle(lang: Pick<LanguageExamples, "slug" | "label" | "rows">): string {
+  return `${SEARCH_NAMES[lang.slug] ?? lang.label} AGENTS.md examples: ${lang.rows.length} open source repos`;
 }
 
 export function languageExamplesDescription(lang: LanguageExamples): string {
@@ -136,6 +136,6 @@ export function languageExamplesDescription(lang: LanguageExamples): string {
   return fitDescription(
     `Real AGENTS.md and CLAUDE.md files from ${lang.rows.length} ${name} repos, linked at their source.`,
     `${lang.passing} pass our check in full.`,
-    "With each file's length, the repo's stars and its agent-readiness score.",
+    "With length, stars and score.",
   );
 }

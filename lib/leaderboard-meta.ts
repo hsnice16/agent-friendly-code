@@ -69,7 +69,7 @@ export function leaderboardMetadata(view: LeaderboardView): Metadata {
   const image =
     view.model === "overall"
       ? DEFAULT_OG_IMAGE
-      : { url: `/og/model/${view.model}`, ...OG_IMAGE_SIZE, alt: `Most ${MODEL_BY_ID[view.model].label}-ready repos` };
+      : { url: `/og/model/${view.model}`, ...OG_IMAGE_SIZE, alt: modelBoardTitle(MODEL_BY_ID[view.model].label) };
 
   return {
     title: { absolute: title },

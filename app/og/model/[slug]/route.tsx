@@ -23,10 +23,10 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   const top = rows[0];
 
   return ogCard({
-    heading: [`Most ${label}-ready`, "open source repos"],
+    heading: [`Best repos for ${label}`, "ranked by agent readiness"],
     sub: top
-      ? `Ranked by their ${label} score. ${top.owner}/${top.name} leads with ${(top.score ?? 0).toFixed(1)}.`
-      : `Ranked by their ${label} score.`,
+      ? `By their ${label} score. ${top.owner}/${top.name} leads with ${(top.score ?? 0).toFixed(1)}.`
+      : `By their ${label} score.`,
     footerLeft: `${rows.length} repos scored for ${label}`,
     footerRight: ogSiteUrl(modelPath(slug)),
   });

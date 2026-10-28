@@ -127,14 +127,15 @@ jobs:
           git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
-      # Hooks off: an earlier step ran dependency code that could have written one.
+      # Earlier steps ran dependency code, which could have planted a hook, a
+      # proxy or a TLS override for the token to leak through.
       - name: Push
         id: publish
         if: steps.commit.outputs.committed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git -c core.hooksPath=/dev/null -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push
+          /usr/bin/git -c core.hooksPath=/dev/null -c http.proxy= -c http.sslVerify=true -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 
       # The push only starts the deploy. A crawler told about a page before the

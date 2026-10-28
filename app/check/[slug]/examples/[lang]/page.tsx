@@ -12,7 +12,6 @@ import {
   languageExamplesDescription,
   languageExamplesTitle,
 } from "@/lib/agents-md-examples";
-import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { checkPath, checkSlug, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
@@ -54,7 +53,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-function jsonLd(lang: LanguageExamples, contentChangedAt: number | null) {
+function jsonLd(lang: LanguageExamples) {
+  // Matches the sitemap's lastmod: the newest change among this language's repos.
+  const changed = Math.max(0, ...lang.rows.map((r) => r.content_changed_at ?? 0));
   const url = `${APP_URL}${languageExamplesPath(lang.slug)}`;
   return {
     "@graph": [
@@ -69,7 +70,7 @@ function jsonLd(lang: LanguageExamples, contentChangedAt: number | null) {
           { "@type": "ComputerLanguage", name: lang.label },
         ],
         isPartOf: { "@id": `${APP_URL}/#site` },
-        ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+        ...(changed > 0 ? { dateModified: new Date(changed * 1000).toISOString() } : {}),
         mainEntity: {
           "@type": "ItemList",
           name: `${lang.label} repos with an AGENTS.md or CLAUDE.md`,
@@ -95,7 +96,7 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
 
   return (
     <>
-      <JsonLd data={jsonLd(lang, getLeaderboardStats().contentChangedAt)} />
+      <JsonLd data={jsonLd(lang)} />
       <Breadcrumbs
         parents={[
           { name: "Checks", path: "/check" },

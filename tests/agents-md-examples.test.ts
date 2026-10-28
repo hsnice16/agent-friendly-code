@@ -141,7 +141,7 @@ describe("examplesByLanguage", () => {
   const langs = examplesByLanguage(buildAgentsMdExamples(board, files));
 
   it("keeps hub languages with at least the minimum number of files", () => {
-    assert.ok(LANGUAGE_EXAMPLES_MIN > 4);
+    assert.equal(LANGUAGE_EXAMPLES_MIN, 5);
     assert.deepEqual(
       langs.map((l) => l.slug),
       ["go"],
@@ -158,5 +158,18 @@ describe("examplesByLanguage", () => {
 
   it("names Go the way people search for it", () => {
     assert.match(languageExamplesDescription(langs[0]), /Go \(Golang\) repos/);
+  });
+
+  it("groups spellings of one language onto one page", () => {
+    const mixed = Array.from({ length: 5 }, (_, i) => repo(i + 1, { language: i === 0 ? "go" : "Go" }));
+    const [page] = examplesByLanguage(
+      buildAgentsMdExamples(
+        mixed,
+        mixed.map((r) => file(r.id, "AGENTS.md", 1000, 1)),
+      ),
+    );
+    assert.equal(page.slug, "go");
+    assert.equal(page.label, "Go");
+    assert.equal(page.rows.length, 5);
   });
 });

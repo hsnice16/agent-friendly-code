@@ -15,6 +15,5 @@ Planned for 0.9.0; moved here when 0.9.0 was cut from the discovery and repo-pag
 
 - Microsoft Clarity records heatmaps and visits, with typed text masked; visitors from the EEA, UK and Switzerland are asked first, and can change their answer on /privacy. Google Analytics also counts leaderboard searches, filter and sort changes, and "Score your repo" clicks; /privacy says so.
 - The leaderboard search keeps what you type while results load, and shows a spinner until they arrive.
-- AGENTS.md examples have a page per language (TypeScript, Python, Rust, Go and six more), linked from each language hub.
-- Agent leaderboards are titled "Best repos for <agent>", the way people search for them.
+- AGENTS.md examples have a page per language with five or more files, linked from its language hub.
 - A Live Score of a very large GitHub repo offers a retry when part of its file list fails to load, instead of scoring without those files.
