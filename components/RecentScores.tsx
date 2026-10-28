@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { type RecentScore, readRecents } from "@/lib/live-score/recents";
-import { repoPath } from "@/lib/utils/repo-path";
+import { liveScorePath, repoPath } from "@/lib/utils/repo-path";
 
 import { HostPill } from "./HostPill";
 import { OwnRepoTag } from "./OwnRepoTag";
@@ -22,7 +22,7 @@ type Props = {
 // An indexed repo's /score/… URL only redirects to its repo page, at the cost
 // of a cold server render first.
 function hrefFor(row: Row): string {
-  return row.id == null ? `/score/${row.host}/${row.owner}/${row.name}` : repoPath(row);
+  return row.id == null ? liveScorePath(row) : repoPath(row);
 }
 
 function ScoreList({ rows }: { rows: Row[] }) {

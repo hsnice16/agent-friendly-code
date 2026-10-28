@@ -7,6 +7,7 @@ import { track } from "@/lib/analytics-events";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { parseRepoUrl } from "@/lib/repo-url";
 import { hostLabel } from "@/lib/utils/format";
+import { liveScorePath } from "@/lib/utils/repo-path";
 
 export function LiveScoreForm() {
   const router = useRouter();
@@ -31,7 +32,7 @@ export function LiveScoreForm() {
     setError(null);
     setPending(true);
     track({ name: "live_score_submit", host: parsed.host });
-    router.push(`/score/${parsed.host}/${parsed.owner}/${parsed.name}`);
+    router.push(liveScorePath(parsed));
   }
 
   return (

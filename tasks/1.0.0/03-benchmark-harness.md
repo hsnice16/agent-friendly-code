@@ -25,7 +25,7 @@ This is the one task in the roadmap that has to actually *run* repos — install
 
 ## Dependency
 
-Blocker for removing the "illustrative weights" disclaimer in the README and on the dashboard.
+Blocker for removing the "not yet measured" caveat (README Limits, /methodology and its FAQ, /about, site footer).
 
 ## Output: `agent-friendly-weights` package
 

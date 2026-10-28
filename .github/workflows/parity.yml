@@ -16,7 +16,7 @@ on:
       - "package.json"
       - "bun.lock"
   schedule:
-    # 03:00 UTC. Runs the curated fixture set in scripts/parity-check.ts — the
+    # Runs the curated fixture set in scripts/parity-check.ts — the
     # failure classes, not the seed list: parity is a property of the two code
     # paths, so more repos of the same shape buy no coverage and cost clone time.
     - cron: "0 3 * * *"

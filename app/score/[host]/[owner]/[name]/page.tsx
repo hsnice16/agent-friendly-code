@@ -32,13 +32,13 @@ import { hostLabel } from "@/lib/utils/format";
 import { isModelId } from "@/lib/utils/leaderboard-href";
 import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/repo-about";
 import { agentFileShare } from "@/lib/utils/repo-page-data";
-import { repoPath, withQuery } from "@/lib/utils/repo-path";
+import { liveScorePath, repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
 import { scoreTier } from "@/lib/utils/score";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
 import { ACTION_USES, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
-// Hobby defaults to 10s; a large tree needs more.
+// lib/live-score/score.ts and http.ts time out inside this cap.
 export const maxDuration = 60;
 
 type Params = LiveTarget;
@@ -50,8 +50,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { host, owner, name } = target;
   const title = `${owner}/${name} — Live Score`;
   const description = `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`;
-  const path = `/score/${host}/${owner}/${name}`;
-  // The card 404s for a host Live Score doesn't score yet.
+  const path = liveScorePath({ host, owner, name });
+  // The card 404s for a host outside SUPPORTED_HOSTS.
   const image = SUPPORTED_HOSTS.includes(parsed.host)
     ? { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${owner}/${name} — agent-friendliness score` }
     : DEFAULT_OG_IMAGE;
@@ -177,7 +177,7 @@ export default async function LiveScorePage({
 
   const instructions = agentInstructions(score.signals, agentFileShare(score.language));
   const slug = `${owner}/${name}`;
-  const path = `/score/${host}/${owner}/${name}`;
+  const path = liveScorePath({ host, owner, name });
   // The repo page's order, less "How it compares", which ranks against the board.
   const sections: NavSection[] = [
     { id: "overview", label: "At a glance" },

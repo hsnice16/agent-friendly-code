@@ -1,6 +1,6 @@
 # AGENTS.md
 
-Instructions for AI coding agents working on this repo. `CLAUDE.md` points here. Human contributors: [CONTRIBUTING.md](./CONTRIBUTING.md) has the same rules phrased for PRs.
+Instructions for AI coding agents working on this repo. `CLAUDE.md` points here. Human contributors: PR workflow in [CONTRIBUTING.md](./CONTRIBUTING.md).
 
 ## What this is
 
@@ -44,6 +44,7 @@ lib/
   version.ts  app and sibling constants (APP_URL, SIBLING_VERSION, install snippets, OG defaults)
   changelog.ts, roadmap.ts  what /changelog and /roadmap render
 scripts/      CLI entry points (run with tsx)
+proxy.ts      /language/<spelling> → canonical hub redirect
 tests/        node --test suites; fixtures/repo-meta/ holds recorded host API responses
 tasks/        per-version task files
 data/rank.db  committed database, refreshed by .github/workflows/scheduled-rescore.yml

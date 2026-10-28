@@ -10,16 +10,10 @@ const TOO_LARGE = "too-large";
 
 export type LiveTarget = { host: string; owner: string; name: string };
 
-// Reading `searchParams` for `?model=` makes the Live Score route dynamic, so a
-// segment-level `revalidate` would never cache the render — every visit would
-// re-list the tree and re-score. Cache the expensive half explicitly instead,
-// keyed by repo and not by model: the score is the same for all of them, and
-// the result is deterministic given (commit, weights), so an hour of staleness
-// costs nothing. A throw is not cached, which keeps a transient host failure
-// from being pinned for the hour — so too-large, which is stable and the
-// costliest to rediscover, is stored as a value and re-thrown. Lowercased
-// because every host matches names case-insensitively: one repo, one entry,
-// one scoring — shared by the page, its share card and its badge.
+// `?model=` makes the Live Score route dynamic, so the score is cached here
+// instead, keyed by lowercased repo (hosts match names case-insensitively) and
+// shared by the page, its card and its badge. Throws aren't cached; too-large is
+// stable and costly to rediscover, so it is stored as a value and re-thrown.
 export async function cachedLiveScore(parsed: ParsedRepo) {
   const key = ["live-score", parsed.host, parsed.owner.toLowerCase(), parsed.name.toLowerCase()];
   const result = await unstable_cache(

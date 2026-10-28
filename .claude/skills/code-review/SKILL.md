@@ -25,7 +25,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 
 - **`lib/scoring/` stays pure** — no DB imports, no HTTP, no side effects.
 - **All SQL in `lib/db*.ts`.** Don't call `db.prepare(...)` from pages or components.
-- **Clients in `lib/clients/`** — `git.ts` for cloning, `github.ts` for host APIs.
+- **Clients in `lib/clients/`** — git, host and registry APIs.
 - Pages and scripts are thin wrappers.
 
 ## React Server Components

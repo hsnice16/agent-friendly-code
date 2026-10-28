@@ -77,7 +77,7 @@ Print a single consolidated report:
 Post-change check — <N> files touched
 
 Docs sync
-  ✓ lib/changelog.ts — bullet added
+  ✓ tasks/0.10.0/README.md — owed-changelog bullet added
   ✓ N/A — README.md (no product-facing change)
   ✗ tasks/0.2.0/01-tests.md — status still "planned" but harness already committed; flip to in_progress
 
@@ -101,4 +101,4 @@ If every phase is clean, say so plainly in one line. Don't invent findings to lo
 
 - It does not run tests, biome, or tsc — those are the pre-commit hook's job (`lefthook.yml`).
 - It does not push, commit, or open PRs.
-- It does not modify the codebase beyond the docs updates in Phase 2 (changelog / tasks / AGENTS / README).
+- It does not modify the codebase beyond the docs updates in Phase 2 (tasks / roadmap / AGENTS / README).

@@ -8,6 +8,10 @@ export function repoPath({ host, owner, name }: RepoIdentity): string {
   return `/repo/${[host, ...owner.split("/"), name].map(encodeURIComponent).join("/")}`;
 }
 
+export function liveScorePath({ host, owner, name }: RepoIdentity): string {
+  return `/score/${[host, ...owner.split("/"), name].map(encodeURIComponent).join("/")}`;
+}
+
 // GitLab nests groups, so an owner can span several segments ("kicad/code").
 // Host is always first and the repo name always last; everything between them
 // is the owner. A fixed three-segment route would 404 on those repos.
