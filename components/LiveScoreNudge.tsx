@@ -1,5 +1,5 @@
 import { ArrowRight, Gauge } from "@phosphor-icons/react/dist/ssr";
-import Link from "next/link";
+import { TrackedLink } from "./TrackedLink";
 
 // Most visitors land on a repo page from a search for that repo, not their own;
 // the form lives on the home page and /score, so this only points at it.
@@ -13,13 +13,14 @@ export function LiveScoreNudge() {
           in seconds.
         </p>
       </div>
-      <Link
+      <TrackedLink
         href="/score"
+        event={{ name: "score_nudge_click" }}
         className="inline-flex shrink-0 items-center gap-1.5 self-start rounded-lg bg-accent px-3.5 py-2 text-[13.5px] font-medium text-accent-ink no-underline hover:opacity-90 hover:no-underline sm:self-auto"
       >
         Score your repo
         <ArrowRight size={14} weight="bold" aria-hidden="true" />
-      </Link>
+      </TrackedLink>
     </aside>
   );
 }

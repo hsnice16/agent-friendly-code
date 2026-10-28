@@ -1,6 +1,6 @@
 import Script from "next/script";
 
-import { CONSENT_KEY, CONSENT_REGIONS } from "@/lib/analytics-consent";
+import { CONSENT_KEY, CONSENT_REGIONS, LEGACY_KEY } from "@/lib/analytics-consent";
 
 /** Loads nothing unless NEXT_PUBLIC_GA_MEASUREMENT_ID is set. */
 export function GoogleAnalytics() {
@@ -29,7 +29,8 @@ export function GoogleAnalytics() {
           ad_personalization: 'denied'
         });
         try {
-          var choice = localStorage.getItem(${JSON.stringify(CONSENT_KEY)});
+          var choice = localStorage.getItem(${JSON.stringify(CONSENT_KEY)})
+            || (localStorage.getItem(${JSON.stringify(LEGACY_KEY)}) === 'denied' ? 'denied' : null);
           if (choice === 'granted' || choice === 'denied') {
             gtag('consent', 'update', { analytics_storage: choice });
           }

@@ -3,6 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useRef } from "react";
 
+import { track } from "@/lib/analytics-events";
 import { DEFAULT_DIR, DEFAULT_SORT, type SortDir, type SortKey } from "@/lib/constants/sort";
 import { SelectMenu, type SelectMenuOption } from "./SelectMenu";
 
@@ -41,6 +42,7 @@ export function SortSelect({ sort, dir }: Props) {
   const value = `${sort}-${dir}`;
 
   const onChange = (v: string) => {
+    if (v === value) return;
     const [nextSort, nextDir] = v.split("-") as [SortKey, SortDir];
     const next = new URLSearchParams(paramsRef.current.toString());
 
@@ -60,6 +62,7 @@ export function SortSelect({ sort, dir }: Props) {
     const qs = next.toString();
 
     router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+    track({ name: "leaderboard_filter", filter: "sort", option: v });
   };
 
   return <SelectMenu value={value} options={OPTIONS} label="Sort order" onChange={onChange} />;

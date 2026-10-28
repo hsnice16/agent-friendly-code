@@ -1,8 +1,19 @@
-export const CONSENT_KEY = "afc:analytics-consent";
+// v2: consent given before recordings were added didn't cover them, so it is
+// asked again. A v1 decline still stands (LEGACY_KEY).
+export const CONSENT_KEY = "afc:analytics-consent:v2";
+export const LEGACY_KEY = "afc:analytics-consent";
 
-// EEA + UK + Switzerland. France's overseas regions are EU territory but
-// geolocate under their own codes, so they are listed too. Consent Mode applies `region` by the visitor's IP on
-// Google's side, so pages stay static: no geo lookup in a render or the proxy.
+export const ANALYTICS_ON = Boolean(
+  process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID,
+);
+
+// The /privacy "Change your analytics choice" button dispatches this to reopen the banner.
+export const OPEN_CONSENT_EVENT = "afc:open-consent";
+
+// EEA + UK + Switzerland. France's overseas regions are EU territory but geolocate
+// under their own codes, so they are listed too. Consent Mode applies `region` by
+// the visitor's IP on Google's side, so pages stay static: no geo lookup in a
+// render or the proxy.
 export const CONSENT_REGIONS = [
   "AT",
   "BE",
@@ -66,7 +77,8 @@ export type ConsentChoice = "granted" | "denied";
 export function readConsent(): ConsentChoice | null {
   try {
     const value = window.localStorage.getItem(CONSENT_KEY);
-    return value === "granted" || value === "denied" ? value : null;
+    if (value === "granted" || value === "denied") return value;
+    return window.localStorage.getItem(LEGACY_KEY) === "denied" ? "denied" : null;
   } catch {
     return null;
   }

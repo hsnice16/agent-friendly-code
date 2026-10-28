@@ -10,6 +10,7 @@ import { ModelPills } from "./ModelPills";
 import { Pagination } from "./Pagination";
 import { SearchBar } from "./SearchBar";
 import { SortSelect } from "./SortSelect";
+import { TrackEvent } from "./TrackEvent";
 
 export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats: LeaderboardStats }) {
   const { q, page, totalPages, dir, sort, host, model } = view;
@@ -28,6 +29,15 @@ export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats
 
       <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
         <SearchBar />
+        {/* Rendered here rather than in SearchBar so the event carries the
+            server's match count and only queries that outlived the debounce.
+            Keyed by board + term: a host or sort change re-counts results but isn't a new search. */}
+        {q && (
+          <TrackEvent
+            dedupeKey={`${model}:${q}`}
+            event={{ name: "search", search_term: q, results: view.filteredRows.length, board: model }}
+          />
+        )}
 
         <div className="flex flex-wrap items-center gap-2">
           <HostSelect value={host} />

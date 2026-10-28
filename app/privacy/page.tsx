@@ -2,12 +2,14 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { ConsentSettingsButton } from "@/components/ConsentSettingsButton";
 import { ExternalLink } from "@/components/ExternalLink";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { ANALYTICS_ON } from "@/lib/analytics-consent";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
 
-const LAST_UPDATED = "October 22, 2026";
+const LAST_UPDATED = "October 28, 2026";
 
 export const metadata: Metadata = staticPageMetadata("/privacy");
 
@@ -23,6 +25,10 @@ export default function PrivacyPage() {
           doesn&apos;t, and how to get in touch about your data.
         </p>
         <p className="mt-2 text-[13px] text-muted">Last updated: {LAST_UPDATED}.</p>
+        <p className="mt-1 text-[13px] text-muted">
+          Changed on {LAST_UPDATED}: Microsoft Clarity heatmaps and session recordings, and leaderboard search terms in
+          analytics.
+        </p>
       </section>
 
       <Panel>
@@ -42,9 +48,16 @@ export default function PrivacyPage() {
           <ul className="m-0 ml-5 list-disc text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               <strong className="text-ink">Analytics.</strong> We use Google Analytics 4, which does not log or store IP
-              addresses, to measure aggregate traffic patterns — page views, Live Score results, package lookups, clicks
-              on the share, badge, copy and agent buttons, referrers, approximate location, device and browser type, and
-              time on page. This data is not used to identify individual visitors.
+              addresses, to measure aggregate traffic patterns — page views, leaderboard searches (the words searched
+              and how many repos matched), filter and sort changes, Live Score results, package lookups, clicks on the
+              share, badge, copy, agent and &ldquo;Score your repo&rdquo; buttons, referrers, approximate location,
+              device and browser type, and time on page. This data is not used to identify individual visitors.
+            </li>
+            <li className="mt-2">
+              <strong className="text-ink">Heatmaps and session recordings.</strong> We use Microsoft Clarity to see
+              where visitors click and how far they scroll, and to replay visits as recordings of mouse movement, clicks
+              and scrolling. Text typed into fields is masked before it leaves your browser, though a leaderboard search
+              also appears in the page address.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard
@@ -71,9 +84,9 @@ export default function PrivacyPage() {
 
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
             We do <strong className="text-ink mr-0.5">not</strong> ask for, or store, your name, email address, payment
-            details, account credentials, or any content you submit — beyond a repository URL sent to Live Score, as
-            described above, and information you optionally include in GitHub issues filed via links from this Service
-            (which are governed by GitHub&apos;s own privacy policy).
+            details, account credentials, or any content you submit — beyond a repository URL sent to Live Score and
+            leaderboard search terms, as described above, and information you optionally include in GitHub issues filed
+            via links from this Service (which are governed by GitHub&apos;s own privacy policy).
           </p>
         </Panel>
       </div>
@@ -82,15 +95,19 @@ export default function PrivacyPage() {
         <Panel>
           <PanelHeading>Cookies</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The Service itself does not set first-party cookies. Cookies may be set by Google Analytics, which we embed
-            for usage measurement. The Service shows no advertising. You can disable or delete cookies in your browser
-            at any time; doing so will not break the Service, only analytics will be affected.
+            The Service&apos;s own code sets no cookies. Cookies may be set by Google Analytics and Microsoft Clarity,
+            which we embed for usage measurement. The Service shows no advertising. You can disable or delete cookies in
+            your browser at any time; doing so will not break the Service, only analytics will be affected.
           </p>
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
             For visitors from the European Economic Area, the United Kingdom, and Switzerland, Google Analytics sets no
-            cookies until they accept, and sends only cookieless pings that carry no identifier. Clear site data for
-            this site to be asked again.
+            cookies until they accept, and sends only cookieless pings that carry no identifier. Microsoft Clarity sets
+            no cookies for them until they accept. They can change their answer below; declining removes Clarity&apos;s
+            cookies at once and stops it from loading on later pages.
           </p>
+          {ANALYTICS_ON && (
+            <ConsentSettingsButton className="mt-3 cursor-pointer rounded-md border border-line px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover" />
+          )}
         </Panel>
       </div>
 
@@ -101,6 +118,13 @@ export default function PrivacyPage() {
             <li>
               Google Analytics —{" "}
               <ExternalLink href="https://policies.google.com/privacy">policies.google.com/privacy</ExternalLink>.
+            </li>
+            <li className="mt-1">
+              Microsoft Clarity —{" "}
+              <ExternalLink href="https://www.microsoft.com/privacy/privacystatement">
+                microsoft.com/privacy/privacystatement
+              </ExternalLink>
+              .
             </li>
             <li className="mt-1">
               Vercel (hosting) —{" "}
@@ -141,8 +165,9 @@ export default function PrivacyPage() {
         <Panel>
           <PanelHeading>Data retention</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            Aggregate analytics data is retained per Google Analytics&apos; default retention. We do not maintain a
-            separate database of visitor information.
+            Google Analytics keeps event data for 14 months. Microsoft Clarity keeps session recordings for 30 days, and
+            heatmaps and a sample of recordings for up to 9 months. We do not maintain a separate database of visitor
+            information.
           </p>
         </Panel>
       </div>

@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 import { BackToTop } from "@/components/BackToTop";
+import { Clarity } from "@/components/Clarity";
 import { ConsentBanner } from "@/components/ConsentBanner";
 import { FooterDirectory } from "@/components/FooterDirectory";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
@@ -12,6 +13,7 @@ import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { SkillsShBadge } from "@/components/SkillsShBadge";
 import { VersionPill } from "@/components/VersionPill";
+import { ANALYTICS_ON } from "@/lib/analytics-consent";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { checkSubPath } from "@/lib/utils/check-path";
@@ -129,7 +131,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body>
         <JsonLd data={JSON_LD} />
         <GoogleAnalytics />
-        {process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && <ConsentBanner />}
+        {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID && <Clarity />}
+        {ANALYTICS_ON && <ConsentBanner />}
 
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
           <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-3 py-3 sm:px-6">

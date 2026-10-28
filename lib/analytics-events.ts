@@ -8,7 +8,11 @@ export type AnalyticsEvent =
   | { name: "badge_copy"; page: "repo" | "live_score" }
   | { name: "copy_install"; tool: "skill" | "skill_hook" | "action" }
   | { name: "package_lookup"; registry: string }
-  | { name: "select_agent"; agent: string };
+  | { name: "select_agent"; agent: string }
+  // GA4's recommended name: its built-in "Search term" dimension reads `search_term`.
+  | { name: "search"; search_term: string; results: number; board: string }
+  | { name: "leaderboard_filter"; filter: "host" | "sort"; option: string }
+  | { name: "score_nudge_click" };
 
 export type ShareNetwork = "x" | "linkedin" | "bluesky" | "copy_link";
 export type LiveScoreOutcome = "scored" | "not_found" | "too_large" | "unsupported" | "error";

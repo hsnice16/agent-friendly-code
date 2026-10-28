@@ -3,7 +3,14 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
-import { type ConsentChoice, inConsentRegion, readConsent, storeConsent } from "@/lib/analytics-consent";
+import {
+  type ConsentChoice,
+  inConsentRegion,
+  OPEN_CONSENT_EVENT,
+  readConsent,
+  storeConsent,
+} from "@/lib/analytics-consent";
+import { startClarity, stopClarity } from "@/lib/clarity";
 
 declare global {
   interface Window {
@@ -18,6 +25,9 @@ export function ConsentBanner() {
 
   useEffect(() => {
     if (readConsent() === null && inConsentRegion()) setIsOpen(true);
+    const open = () => setIsOpen(true);
+    window.addEventListener(OPEN_CONSENT_EVENT, open);
+    return () => window.removeEventListener(OPEN_CONSENT_EVENT, open);
   }, []);
 
   if (!isOpen) return null;
@@ -25,6 +35,8 @@ export function ConsentBanner() {
   const choose = (choice: ConsentChoice) => {
     storeConsent(choice);
     window.gtag?.("consent", "update", { analytics_storage: choice });
+    if (choice === "granted") startClarity();
+    else stopClarity();
     setIsOpen(false);
   };
 
@@ -34,7 +46,7 @@ export function ConsentBanner() {
       className="animate-pop-in fixed inset-x-3 bottom-3 z-40 rounded-card border border-line bg-surface p-3.5 shadow-lg sm:inset-x-auto sm:bottom-6 sm:left-6 sm:w-[340px]"
     >
       <p className="m-0 text-[13.5px] leading-snug text-ink-dim">
-        May we use Google Analytics cookies to count visits? Nothing else is tracked.{" "}
+        May we use analytics cookies to count visits and record how pages are used?{" "}
         <Link href="/privacy" className="text-ink-dim hover:text-ink">
           Privacy
         </Link>

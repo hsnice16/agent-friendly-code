@@ -60,7 +60,10 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                 {q ? (
                   <>
                     No repos match &ldquo;
-                    <strong className="text-ink">{q}</strong>&rdquo;.{" "}
+                    <strong data-clarity-mask="true" className="text-ink">
+                      {q}
+                    </strong>
+                    &rdquo;.{" "}
                     <Link href={clearSearchHref} className="text-ink-dim hover:text-ink-soft">
                       Clear search
                     </Link>
