@@ -8,13 +8,18 @@ import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { type AgentsMdExamples, examplesDescription, examplesTitle } from "@/lib/agents-md-examples";
+import {
+  type AgentsMdExamples,
+  examplesDescription,
+  examplesTitle,
+  LANGUAGE_EXAMPLES_MIN,
+} from "@/lib/agents-md-examples";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
+import { checkPath, checkSlug, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
@@ -196,7 +201,10 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1.5 p-0 text-[14px] text-ink-dim sm:grid-cols-2 md:grid-cols-3">
               {ex.languages.map((l) => (
                 <li key={l.slug} className="flex items-baseline justify-between gap-3">
-                  <Link href={hubPath(l.slug)} className={LINK}>
+                  <Link
+                    href={l.withFile >= LANGUAGE_EXAMPLES_MIN ? languageExamplesPath(l.slug) : hubPath(l.slug)}
+                    className={LINK}
+                  >
                     {l.label}
                   </Link>
                   <span className="tabular-nums">

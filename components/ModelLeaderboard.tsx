@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { hostsText } from "@/lib/leaderboard-meta";
+import { hostsText, modelBoardTitle } from "@/lib/leaderboard-meta";
 import type { ModelPanel } from "@/lib/leaderboard-model-panel";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
@@ -19,7 +19,7 @@ export function ModelLeaderboard({ model, view, stats, panel }: Props) {
   const profile = MODEL_BY_ID[model];
   const { label } = profile;
   const top = view.filtered ? undefined : view.filteredRows[0];
-  const itemList = boardItemList(view, `Most ${label}-ready open source repos`);
+  const itemList = boardItemList(view, modelBoardTitle(label));
 
   return (
     <>

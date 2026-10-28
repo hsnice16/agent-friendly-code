@@ -1,6 +1,6 @@
 import type { LeaderboardRow, SignalFile } from "./types/db";
 import { fileLength, hasAgentFile } from "./utils/agent-instructions";
-import { groupByLanguage, isHub } from "./utils/language";
+import { groupByLanguage, isHub, languageSlug } from "./utils/language";
 import { repoOwnership } from "./utils/own-repo";
 import { fitDescription } from "./utils/page-title";
 import { repoFileUrl } from "./utils/repo-file-url";
@@ -28,6 +28,13 @@ export type AgentsMdExamples = {
 };
 
 export const LENGTH_LIST_LIMIT = 5;
+/** Fewer files than this make a thin page that adds nothing to the full list. */
+export const LANGUAGE_EXAMPLES_MIN = 5;
+
+export type LanguageExamples = { slug: string; label: string; rows: ExampleRow[]; total: number; passing: number };
+
+// People search "golang agents.md"; the board labels the language "Go".
+const SEARCH_NAMES: Record<string, string> = { go: "Go (Golang)" };
 const MISSING_LIST_LIMIT = 8;
 
 const byStars = (a: LeaderboardRow, b: LeaderboardRow) => (b.stars ?? 0) - (a.stars ?? 0);
@@ -106,5 +113,29 @@ export function examplesDescription(ex: Pick<AgentsMdExamples, "rows" | "passing
     `Real AGENTS.md and CLAUDE.md files from ${ex.rows.length} open source repos, linked at their source.`,
     `${ex.passing} pass our check in full.`,
     "The most-starred, the longest and shortest, and which file name repos use.",
+  );
+}
+
+/** Hub languages with enough files for a page of their own, most files first. */
+export function examplesByLanguage(ex: Pick<AgentsMdExamples, "rows" | "languages">): LanguageExamples[] {
+  return ex.languages
+    .filter((l) => l.withFile >= LANGUAGE_EXAMPLES_MIN)
+    .map((l) => {
+      const rows = ex.rows.filter((r) => r.language != null && languageSlug(r.language) === l.slug);
+      return { slug: l.slug, label: l.label, rows, total: l.total, passing: rows.filter((r) => r.pass >= 1).length };
+    })
+    .sort((a, b) => b.rows.length - a.rows.length);
+}
+
+export function languageExamplesTitle(lang: Pick<LanguageExamples, "label" | "rows">): string {
+  return `${lang.label} AGENTS.md examples: ${lang.rows.length} open source repos`;
+}
+
+export function languageExamplesDescription(lang: LanguageExamples): string {
+  const name = SEARCH_NAMES[lang.slug] ?? lang.label;
+  return fitDescription(
+    `Real AGENTS.md and CLAUDE.md files from ${lang.rows.length} ${name} repos, linked at their source.`,
+    `${lang.passing} pass our check in full.`,
+    "With each file's length, the repo's stars and its agent-readiness score.",
   );
 }

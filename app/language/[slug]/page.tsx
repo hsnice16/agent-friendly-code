@@ -5,8 +5,10 @@ import { notFound } from "next/navigation";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
-import { checkPath } from "@/lib/utils/check-path";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { checkPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { hubPath, hubTitle, isHub } from "@/lib/utils/language";
 import { fitDescription, pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -57,6 +59,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
   }
 
   const path = hubPath(hub.slug);
+  const examples = examplesByLanguage(getAgentsMdExamples()).find((l) => l.slug === hub.slug);
 
   return (
     <>
@@ -80,6 +83,15 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
           </Link>{" "}
           leads with <strong className="text-ink">{(hub.top.score ?? 0).toFixed(1)}</strong>.
         </p>
+        {examples && (
+          <p className="mt-2 mb-0 max-w-[72ch] text-[15.5px] text-ink-dim">
+            {examples.rows.length} have an AGENTS.md or CLAUDE.md:{" "}
+            <Link href={languageExamplesPath(hub.slug)} className="text-ink hover:text-ink-soft">
+              {hub.label} AGENTS.md examples
+            </Link>
+            .
+          </p>
+        )}
       </section>
 
       {hub.gaps.length > 0 && (

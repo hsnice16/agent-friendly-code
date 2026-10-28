@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
-import { buildAgentsMdExamples, LENGTH_LIST_LIMIT } from "../lib/agents-md-examples";
+import {
+  buildAgentsMdExamples,
+  examplesByLanguage,
+  LANGUAGE_EXAMPLES_MIN,
+  LENGTH_LIST_LIMIT,
+  languageExamplesDescription,
+} from "../lib/agents-md-examples";
 import type { LeaderboardRow, SignalFile } from "../lib/types/db";
 import { fileLength } from "../lib/utils/agent-instructions";
 
@@ -115,5 +121,42 @@ describe("buildAgentsMdExamples", () => {
 
   it("links each file on its host", () => {
     assert.equal(ex.rows[0].fileUrl, "https://github.com/o/r10/blob/main/AGENTS.md");
+  });
+});
+
+describe("examplesByLanguage", () => {
+  // 7 Go repos with a file, 5 Rust repos with 4 files, 2 Zig repos (no hub).
+  const board = [
+    ...Array.from({ length: 7 }, (_, i) => repo(i + 1, { language: "Go" })),
+    ...Array.from({ length: 5 }, (_, i) => repo(i + 8, { language: "Rust" })),
+    repo(13, { language: "Zig" }),
+    repo(14, { language: "Zig" }),
+  ];
+  const files = [
+    ...board.slice(0, 7).map((r, i) => file(r.id, "AGENTS.md", 1000 + i, i < 6 ? 1 : 0.8)),
+    ...board.slice(7, 11).map((r) => file(r.id, "AGENTS.md", 1000, 1)),
+    file(13, "AGENTS.md", 1000, 1),
+    file(14, "AGENTS.md", 1000, 1),
+  ];
+  const langs = examplesByLanguage(buildAgentsMdExamples(board, files));
+
+  it("keeps hub languages with at least the minimum number of files", () => {
+    assert.ok(LANGUAGE_EXAMPLES_MIN > 4);
+    assert.deepEqual(
+      langs.map((l) => l.slug),
+      ["go"],
+    );
+  });
+
+  it("carries the language's rows, board total and full passes", () => {
+    const [go] = langs;
+    assert.equal(go.rows.length, 7);
+    assert.equal(go.total, 7);
+    assert.equal(go.passing, 6);
+    assert.ok(go.rows.every((r) => r.language === "Go"));
+  });
+
+  it("names Go the way people search for it", () => {
+    assert.match(languageExamplesDescription(langs[0]), /Go \(Golang\) repos/);
   });
 });

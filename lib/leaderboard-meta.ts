@@ -14,6 +14,11 @@ export function hostsText(host: LeaderboardView["host"]): string {
   return host === "all" ? "GitHub, GitLab and Bitbucket" : HOST_LABELS[host];
 }
 
+// The searches that reach these boards are "best repos for Claude Code" and the like.
+export function modelBoardTitle(label: string): string {
+  return `Best repos for ${label}, ranked by agent readiness`;
+}
+
 export function leaderboardTitle(view: LeaderboardView): string {
   const { page, totalPages, model } = view;
   if (model === "overall") {
@@ -21,9 +26,7 @@ export function leaderboardTitle(view: LeaderboardView): string {
   }
 
   const { label } = MODEL_BY_ID[model];
-  return pageTitle(
-    page > 1 ? `${label} leaderboard page ${page} of ${totalPages}` : `Most ${label}-ready open source repos`,
-  ).absolute;
+  return pageTitle(page > 1 ? `${label} leaderboard page ${page} of ${totalPages}` : modelBoardTitle(label)).absolute;
 }
 
 export function leaderboardDescription(view: LeaderboardView): string {

@@ -1,13 +1,15 @@
 import type { MetadataRoute } from "next";
 
+import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { LATEST_RELEASE_DATE } from "@/lib/changelog";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { getLanguageGroups } from "@/lib/language-hubs";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicPath } from "@/lib/topics";
-import { checkPath, checkSubPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -173,6 +175,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${APP_URL}${modelPath(m.id)}`,
   }));
 
+  const examplesRoutes: MetadataRoute.Sitemap = examplesByLanguage(getAgentsMdExamples()).map((l) => ({
+    priority: 0.7,
+    changeFrequency: "weekly",
+    url: `${APP_URL}${languageExamplesPath(l.slug)}`,
+    lastModified: newest(l.rows),
+  }));
+
   const checkRoutes: MetadataRoute.Sitemap = SIGNALS.map((s) => ({
     priority: 0.8,
     changeFrequency: "weekly",
@@ -181,5 +190,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   // No /package/<registry>/<name>: those pages are noindex (see their page.tsx).
-  return [...staticRoutes, ...checkRoutes, ...modelRoutes, ...hubRoutes, ...topicRoutes, ...repoRoutes];
+  return [
+    ...staticRoutes,
+    ...checkRoutes,
+    ...examplesRoutes,
+    ...modelRoutes,
+    ...hubRoutes,
+    ...topicRoutes,
+    ...repoRoutes,
+  ];
 }

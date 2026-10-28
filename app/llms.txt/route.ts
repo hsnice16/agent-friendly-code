@@ -1,11 +1,13 @@
+import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { REGISTRIES } from "@/lib/clients/registries";
 import { getTopPackagesByRegistry } from "@/lib/db";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH } from "@/lib/topics";
-import { checkPath, checkSubPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { OTHER_LANGUAGES_PATH } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -71,7 +73,11 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 - [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check, with what it looks for, how to pass it and how many leaderboard repos do
 - [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent, from each agent's docs, with how many leaderboard repos have each file
 - [AGENTS.md vs CLAUDE.md](${APP_URL}${checkSubPath("agents_md", "vs-claude-md")}): Which one to use, which agents read each, and what Claude Code does when a repo has both
-- [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score
+- [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score; by language: ${examplesByLanguage(
+    getAgentsMdExamples(),
+  )
+    .map((l) => `[${l.label}](${APP_URL}${languageExamplesPath(l.slug)})`)
+    .join(", ")}
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
 - [Other languages](${APP_URL}${OTHER_LANGUAGES_PATH}): Repos in languages too small for their own hub, grouped by language
 ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations

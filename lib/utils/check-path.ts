@@ -19,3 +19,7 @@ export type CheckSubPage = "examples" | "vs-claude-md";
 export function checkSubPath(signalId: string, page: CheckSubPage): string {
   return `${checkPath(signalId)}/${page}`;
 }
+
+export function languageExamplesPath(languageSlug: string): string {
+  return `${checkSubPath("agents_md", "examples")}/${languageSlug}`;
+}

@@ -14,7 +14,16 @@ const TH =
 const WIDE_ONLY = "hidden sm:table-cell";
 const TD = "[&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-2.5 last:[&>td]:border-b-0";
 
-export function AgentsMdExampleTable({ rows, caption }: { rows: ExampleRow[]; caption: string }) {
+export function AgentsMdExampleTable({
+  rows,
+  caption,
+  showLanguage = true,
+}: {
+  rows: ExampleRow[];
+  caption: string;
+  /** Off on a one-language page, where every row would repeat it. */
+  showLanguage?: boolean;
+}) {
   return (
     <div className="overflow-x-auto rounded-lg border border-line">
       <table className="w-full border-separate border-spacing-0 text-[14px]">
@@ -29,9 +38,11 @@ export function AgentsMdExampleTable({ rows, caption }: { rows: ExampleRow[]; ca
             <th scope="col" className={`text-right ${WIDE_ONLY}`}>
               Stars
             </th>
-            <th scope="col" className={WIDE_ONLY}>
-              Language
-            </th>
+            {showLanguage && (
+              <th scope="col" className={WIDE_ONLY}>
+                Language
+              </th>
+            )}
             <th scope="col" className={`text-right ${WIDE_ONLY}`}>
               Score
             </th>
@@ -67,7 +78,7 @@ export function AgentsMdExampleTable({ rows, caption }: { rows: ExampleRow[]; ca
               <td className={`whitespace-nowrap text-right tabular-nums text-ink-dim ${WIDE_ONLY}`}>
                 {compactStars(r.stars)}
               </td>
-              <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>
+              {showLanguage && <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>}
               <td className={`text-right ${WIDE_ONLY}`}>
                 <ScoreNumber score={r.score ?? 0} size="sm" />
               </td>
