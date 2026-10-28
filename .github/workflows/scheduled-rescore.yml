@@ -17,8 +17,8 @@ jobs:
   # its token is read-only; only publish can push.
   rescore:
     runs-on: ubuntu-latest
-    # Runs take ~45 min for ~400 repos; the margin keeps a slow host from
-    # killing the run, which would throw away every score it had made.
+    # The margin keeps a slow host from killing the run, which would throw away
+    # every score it had made.
     timeout-minutes: 75
     permissions:
       contents: read
@@ -87,7 +87,11 @@ jobs:
     permissions:
       contents: write
     steps:
+      # The write token stays off disk while dependency code runs (install, the
+      # leak gate); only the push step below receives it.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -107,8 +111,8 @@ jobs:
           name: rescore
           path: /tmp/rescore
 
-      - name: Commit and push if the repo set, a score, badge adoption or repo metadata changed
-        id: publish
+      - name: Commit if the repo set, a score, badge adoption or repo metadata changed
+        id: commit
         run: |
           cp /tmp/rescore/rank.db data/rank.db
           sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded, language, description, topics FROM repo ORDER BY url;" > /tmp/state-after.txt
@@ -121,7 +125,16 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/rank.db
           git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
-          git push
+          echo "committed=true" >> "$GITHUB_OUTPUT"
+
+      # Hooks off: an earlier step ran dependency code that could have written one.
+      - name: Push
+        id: publish
+        if: steps.commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git -c core.hooksPath=/dev/null -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
 
       # The push only starts the deploy. A crawler told about a page before the

@@ -23,8 +23,8 @@ const SYMLINK_MODE = "120000";
 const BITBUCKET_MAX_DEPTH = 10;
 
 // Refuse rather than hang. Above the largest seed (JetBrains/kotlin, ~97k
-// entries); it exists for the pathological tail, and
-// bites hardest on GitLab, which paginates at 100 entries per call.
+// entries), so only the pathological tail hits it; it bites hardest on GitLab,
+// which paginates at 100 entries per call.
 export const MAX_ENTRIES = 150_000;
 
 // Each is one API call against the shared token on a truncated tree. Far above
@@ -130,25 +130,24 @@ async function listGitHub(
   if (truncated) {
     const rootRes = await timedFetch(`${api}/${pathSegments(ref)}`, init, deadline);
     assertNotRateLimited("github", rootRes);
-    if (rootRes.ok) {
-      const root = (await rootRes.json()) as { tree: GitHubNode[] };
-      const merged = new Map<string, GitHubNode>(root.tree.map((e) => [e.path, e]));
-      const dirs = root.tree.filter((e) => e.type === "tree");
-      if (dirs.length > MAX_SUBTREES) throw new TooLargeError("github");
+    if (!rootRes.ok) throw new Error(`${rootRes.status} listing root tree`);
+    const root = (await rootRes.json()) as { tree: GitHubNode[] };
+    const merged = new Map<string, GitHubNode>(root.tree.map((e) => [e.path, e]));
+    const dirs = root.tree.filter((e) => e.type === "tree");
+    if (dirs.length > MAX_SUBTREES) throw new TooLargeError("github");
 
-      await pooled(dirs, async (dir) => {
-        const sub = await timedFetch(`${api}/${dir.sha}?recursive=1`, init, deadline);
-        assertNotRateLimited("github", sub);
-        if (!sub.ok) return;
-        for (const e of ((await sub.json()) as { tree: GitHubNode[] }).tree) {
-          const path = `${dir.path}/${e.path}`;
-          merged.set(path, { ...e, path });
-        }
-        if (merged.size > MAX_ENTRIES) throw new TooLargeError("github");
-      });
+    await pooled(dirs, async (dir) => {
+      const sub = await timedFetch(`${api}/${dir.sha}?recursive=1`, init, deadline);
+      assertNotRateLimited("github", sub);
+      if (!sub.ok) throw new Error(`${sub.status} listing subtree ${dir.path}`);
+      for (const e of ((await sub.json()) as { tree: GitHubNode[] }).tree) {
+        const path = `${dir.path}/${e.path}`;
+        merged.set(path, { ...e, path });
+      }
+      if (merged.size > MAX_ENTRIES) throw new TooLargeError("github");
+    });
 
-      tree = [...merged.values()];
-    }
+    tree = [...merged.values()];
   }
 
   if (tree.length > MAX_ENTRIES) throw new TooLargeError("github");

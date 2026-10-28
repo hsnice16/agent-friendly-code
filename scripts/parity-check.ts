@@ -93,10 +93,11 @@ async function compare(url: string, work: string): Promise<Diff | null> {
   } finally {
     // Unguarded, this kills the run: delta-io/delta nests fixtures deep enough
     // to blow PATH_MAX on macOS during cleanup.
-    try {
-      rmSync(cloneDir, { recursive: true, force: true });
-      rmSync(liveDir, { recursive: true, force: true });
-    } catch {}
+    for (const dir of [cloneDir, liveDir]) {
+      try {
+        rmSync(dir, { recursive: true, force: true });
+      } catch {}
+    }
   }
 }
 

@@ -2,7 +2,10 @@
 // a committed DB publishes them. Plain substrings with no word boundary, since
 // the byte before a value is a record header that is often a letter.
 const PATTERNS: { label: string; re: RegExp }[] = [
-  { label: "local path", re: /\/Users\/|\/home\/|\/var\/folders\/|\/private\/var\/|[A-Za-z]:[\\/]Users[\\/]/g },
+  {
+    label: "local path",
+    re: /\/Users\/|\/home\/|\/var\/folders\/|\/private\/var\/|\/tmp\/afc-|[A-Za-z]:[\\/]Users[\\/]/g,
+  },
   { label: "GitHub token", re: /gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}/g },
   { label: "GitLab token", re: /glpat-[A-Za-z0-9_-]{20}/g },
   { label: "AWS key", re: /AKIA[0-9A-Z]{16}/g },

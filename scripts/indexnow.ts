@@ -37,6 +37,7 @@ async function main() {
   for (let i = 0; i < urls.length; i += MAX_URLS_PER_REQUEST) {
     const res = await fetch(ENDPOINT, {
       method: "POST",
+      signal: AbortSignal.timeout(30_000),
       headers: { "Content-Type": "application/json; charset=utf-8" },
       body: JSON.stringify({
         key: KEY,

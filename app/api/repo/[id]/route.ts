@@ -9,7 +9,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> 
   const { id: idStr } = await ctx.params;
   const id = Number(idStr);
 
-  if (!Number.isFinite(id)) {
+  if (!Number.isInteger(id) || id <= 0) {
     return NextResponse.json({ error: "bad id" }, { status: 400 });
   }
 

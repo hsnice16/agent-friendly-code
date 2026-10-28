@@ -62,21 +62,21 @@ async function scoreCommand(target: string): Promise<void> {
       process.exitCode = PRIVATE_EXIT_CODE;
       return;
     }
+    // 404 is also how GitHub answers for a private repo the token can't see.
+    if (!meta) throw new Error(`Could not confirm ${url} is public`);
 
     mkdirSync(CLONE_ROOT, { recursive: true });
 
     repoPath = join(CLONE_ROOT, `${parsed.host}__${parsed.owner.replace(/\//g, "_")}__${parsed.name}`);
 
     console.log(`[clone] ${parsed.cloneUrl} → ${repoPath}`);
-    await shallowClone(parsed.cloneUrl, repoPath);
     cloned = repoPath;
+    await shallowClone(parsed.cloneUrl, repoPath);
 
-    if (meta) {
-      defaultBranch = meta.defaultBranch;
-      stars = meta.stars;
-      language = meta.language;
-      about = { description: meta.description, topics: meta.topics };
-    }
+    defaultBranch = meta.defaultBranch;
+    stars = meta.stars;
+    language = meta.language;
+    about = { description: meta.description, topics: meta.topics };
   }
 
   console.log(`[score] scanning ${repoPath}`);
@@ -88,7 +88,7 @@ async function scoreCommand(target: string): Promise<void> {
     result = scoreRepo(repoPath);
     badgeEmbedded = detectBadgeEmbed(repoPath, `${host}/${owner}/${name}`);
   } finally {
-    // `bun run seed` scores 350+ repos in one pass; keeping every tree would
+    // `bun run seed` scores hundreds of repos in one pass; keeping every tree would
     // put tens of gigabytes under CLONE_ROOT and eventually fill the disk.
     // Nothing downstream reads the tree again — the score is already in memory.
     if (cloned) rmSync(cloned, { recursive: true, force: true });

@@ -24,6 +24,7 @@ try {
 } catch {}
 
 const UA = { "User-Agent": "agent-friendly-code" };
+const FETCH_TIMEOUT_MS = 15_000;
 
 // A rejected token would otherwise be reported once per repo. Drop it on the
 // first 401 and keep going unauthenticated — slower, but it still answers.
@@ -37,7 +38,10 @@ async function checkGithub(p: ParsedRepo): Promise<Flag[] | "rate-limited"> {
   const headers: Record<string, string> = { ...UA, Accept: "application/vnd.github+json" };
   if (githubToken) headers.Authorization = `Bearer ${githubToken}`;
 
-  const res = await fetch(`https://api.github.com/repos/${p.owner}/${p.name}`, { headers });
+  const res = await fetch(`https://api.github.com/repos/${p.owner}/${p.name}`, {
+    headers,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   if (res.status === 401 && githubToken) {
     console.warn("  ! GITHUB_TOKEN rejected (401) — continuing unauthenticated at 60 req/hr.");
     githubToken = undefined;
@@ -55,12 +59,18 @@ async function checkGitlab(p: ParsedRepo): Promise<Flag[]> {
   if (process.env.GITLAB_TOKEN) headers.Authorization = `Bearer ${process.env.GITLAB_TOKEN}`;
 
   const slug = encodeURIComponent(`${p.owner}/${p.name}`);
-  const res = await fetch(`https://gitlab.com/api/v4/projects/${slug}`, { headers });
+  const res = await fetch(`https://gitlab.com/api/v4/projects/${slug}`, {
+    headers,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   return gitlabFlags(p, res.status, await body(res));
 }
 
 async function checkBitbucket(p: ParsedRepo): Promise<Flag[]> {
-  const res = await fetch(`https://api.bitbucket.org/2.0/repositories/${p.owner}/${p.name}`, { headers: UA });
+  const res = await fetch(`https://api.bitbucket.org/2.0/repositories/${p.owner}/${p.name}`, {
+    headers: UA,
+    signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+  });
   return bitbucketFlags(p, res.status, await body(res));
 }
 

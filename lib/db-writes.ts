@@ -18,14 +18,14 @@ export function saveScoredRepo(args: {
   language?: string | null;
   modelScores: ModelScore[];
   defaultBranch?: string | null;
-  /** Omitted when the metadata call failed, which keeps the stored values. */
+  /** Omitted to keep the stored values. */
   about?: { description: string | null; topics: string[] };
 }): number {
   ensureRepoAbout(db);
   ensureIndexes(db);
   const now = Math.floor(Date.now() / 1000);
   const tx = db.transaction(() => {
-    // Not COALESCE like language: a cleared description must clear here too, so only a failed fetch
+    // Not COALESCE like language: a cleared description must clear here too, so only an omitted `about`
     // (@known = 0) keeps the stored one. Either changing changes the page, so content_changed_at moves.
     const { id: repoId } = db
       .prepare(

@@ -6,9 +6,9 @@ import type { NextConfig } from "next";
 // websocket, and a policy loosened for dev would test nothing.
 const CSP = [
   "default-src 'self'",
-  "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com",
-  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com",
-  "img-src 'self' data: https://api.producthunt.com https://peerlist.io https://*.google-analytics.com https://*.googletagmanager.com",
+  "script-src 'self' 'unsafe-inline' https://*.googletagmanager.com https://www.clarity.ms https://scripts.clarity.ms",
+  "connect-src 'self' https://*.google-analytics.com https://*.analytics.google.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com",
+  "img-src 'self' data: https://api.producthunt.com https://peerlist.io https://*.google-analytics.com https://*.googletagmanager.com https://*.clarity.ms https://c.bing.com",
   "style-src 'self' 'unsafe-inline'",
   "object-src 'none'",
   "base-uri 'self'",
@@ -18,8 +18,8 @@ const CSP = [
 ].join("; ");
 
 // lib/db-connection.ts opens data/rank.db via `join(process.cwd(), ...)`, which
-// Next.js's static file tracer can't follow — without this, the DB is missing
-// from the serverless function bundle on Vercel and /api/repos returns stale data.
+// Next.js's file tracer can't follow, so the DB would be left out of the Vercel
+// bundle and every route that reads it would fail.
 //
 // The same dynamic `join` / `readdirSync` calls in the scorer and the tree
 // materializer make the tracer give up and pull the *entire* project into every
@@ -52,6 +52,8 @@ const config: NextConfig = {
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "X-Frame-Options", value: "DENY" },
+          { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
+          { key: "Cross-Origin-Opener-Policy", value: "same-origin" },
           { key: "Permissions-Policy", value: "camera=(), microphone=(), geolocation=(), browsing-topics=()" },
           ...(process.env.NODE_ENV === "production" ? [{ key: "Content-Security-Policy", value: CSP }] : []),
         ],

@@ -18,7 +18,6 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
-      GH_TOKEN: ${{ github.token }}
       GH_REPO: ${{ github.repository }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -53,6 +52,8 @@ jobs:
       # under its own duplicates.
       - name: Open or update the findings issue
         if: steps.audit.outputs.code == '1'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           gh label create seed-audit --description "Findings from the weekly seed audit" --color D93F0B --force
           existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
@@ -64,6 +65,8 @@ jobs:
 
       - name: Close the findings issue once clean
         if: steps.audit.outputs.code == '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
