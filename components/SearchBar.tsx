@@ -1,8 +1,8 @@
 "use client";
 
-import { MagnifyingGlass } from "@phosphor-icons/react";
+import { CircleNotch, MagnifyingGlass } from "@phosphor-icons/react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 
 type Props = {
@@ -18,17 +18,29 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
   // Capped like the server reads it (lib/leaderboard-view.ts): a hand-typed long `q`
   // would otherwise sit in the box while the board filtered on the slice.
   // The push below then rewrites the URL down to it.
-  const currentQ = (params.get("q") ?? "").slice(0, MAX_SEARCH_LENGTH);
+  const currentQ = (params.get("q") ?? "").trim().slice(0, MAX_SEARCH_LENGTH);
 
   const [value, setValue] = useState(currentQ);
+  const [isPending, startTransition] = useTransition();
+  // Queries this box sent that haven't settled yet. Each lands after the debounce
+  // plus a server round trip; copying one in would overwrite what was typed
+  // since. Any other change (Clear search, Back) refills the box.
+  const sentRef = useRef<{ pending: Set<string>; last: string | null }>({ pending: new Set(), last: null });
 
   useEffect(() => {
+    const sent = sentRef.current;
+    if (sent.pending.has(currentQ)) {
+      if (currentQ === sent.last) sent.pending.clear();
+      return;
+    }
+    sent.pending.clear();
     setValue(currentQ);
   }, [currentQ]);
 
   const paramsRef = useRef(params);
   paramsRef.current = params;
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `currentQ` re-runs it once the URL settles, in case an older search landed last
   useEffect(() => {
     const t = setTimeout(() => {
       const pushQ = value.trim();
@@ -47,11 +59,16 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
 
       next.delete("page");
       const qs = next.toString();
-      router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+      sentRef.current.pending.add(pushQ);
+      sentRef.current.last = pushQ;
+      startTransition(() => router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false }));
     }, DEBOUNCE_MS);
 
     return () => clearTimeout(t);
-  }, [value, router, pathname]);
+  }, [value, currentQ, router, pathname]);
+
+  const updating = isPending || value.trim() !== currentQ;
+  const Icon = updating ? CircleNotch : MagnifyingGlass;
 
   return (
     <search className="relative min-w-0 flex-1">
@@ -59,15 +76,16 @@ export function SearchBar({ placeholder = "Search repos by owner/name" }: Props)
         {placeholder}
       </label>
 
-      <MagnifyingGlass
+      <Icon
         size={14}
         weight="bold"
         aria-hidden="true"
-        className="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted"
+        className={`pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted ${updating ? "animate-spin" : ""}`}
       />
 
       <input
         type="search"
+        aria-busy={updating}
         value={value}
         id="repo-search"
         autoComplete="off"

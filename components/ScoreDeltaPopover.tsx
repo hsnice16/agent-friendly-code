@@ -14,6 +14,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
   const dialogId = useId();
   const [open, setOpen] = useState(false);
   const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
 
   const diff = Math.round((current - previous) * 10) / 10;
   const down = diff < 0;
@@ -43,9 +44,18 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") setOpen(false);
     };
+    // iOS Safari neither focuses a tapped button nor fires its blur, so a tap
+    // elsewhere is the only way to close it there.
+    const onPointer = (e: PointerEvent) => {
+      if (!wrapRef.current?.contains(e.target as Node)) setOpen(false);
+    };
 
     document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
+    document.addEventListener("pointerdown", onPointer);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      document.removeEventListener("pointerdown", onPointer);
+    };
   }, [open]);
 
   useEffect(
@@ -58,7 +68,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
   );
 
   return (
-    <div className="relative mt-1.5 inline-block">
+    <div ref={wrapRef} className="relative mt-1.5 inline-block">
       <button
         type="button"
         aria-expanded={open}
@@ -68,7 +78,10 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
         aria-controls={dialogId}
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
-        onClick={() => setOpen((o) => !o)}
+        onClick={() => {
+          cancelClose();
+          setOpen(true);
+        }}
         className="inline-flex cursor-pointer items-center gap-1 text-[12px] leading-none tabular-nums"
         aria-label={`${down ? "Down" : "Up"} ${Math.abs(diff).toFixed(1)} points from previous overall ${previous.toFixed(1)}. Activate or focus for score history.`}
       >
@@ -83,6 +96,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
       <div
         id={dialogId}
         role="dialog"
+        inert={!open}
         aria-label="Score history"
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
