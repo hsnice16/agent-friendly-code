@@ -1,6 +1,7 @@
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { REGISTRIES } from "@/lib/clients/registries";
+import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNALS } from "@/lib/scoring/signals";
@@ -26,7 +27,7 @@ export const dynamic = "force-static";
 
 const HEADERS = {
   "Content-Type": "text/markdown; charset=utf-8",
-  "Cache-Control": "public, max-age=3600, s-maxage=86400",
+  "Cache-Control": BOARD_CACHE_CONTROL,
 };
 
 const LLMS_TOP_PACKAGES_PER_REGISTRY = 10;

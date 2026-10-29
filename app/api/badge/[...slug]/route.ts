@@ -1,3 +1,4 @@
+import { BOARD_CACHE_CONTROL, LIVE_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getModelScores, getRepoByHostOwnerName } from "@/lib/db";
 import { cachedLiveScore, parseLiveTarget } from "@/lib/live-score/cached";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
@@ -13,28 +14,30 @@ export const maxDuration = 60;
 
 const HEADERS = {
   "Content-Type": "image/svg+xml; charset=utf-8",
-  "Cache-Control": "public, max-age=3600, s-maxage=3600",
+  "Cache-Control": LIVE_CACHE_CONTROL,
 };
+
+const BOARD_HEADERS = { ...HEADERS, "Cache-Control": BOARD_CACHE_CONTROL };
 
 // A failed live score is a rate limit or host blip, not a verdict: README
 // proxies would otherwise pin "not scored" for the full hour.
 const RETRY_HEADERS = { ...HEADERS, "Cache-Control": "public, max-age=60, s-maxage=60" };
 const FAILED = Symbol("failed");
 
-type Scores = { overall: number | null; byModel: () => { modelId: string; score: number }[] };
+type Scores = { overall: number | null; byModel: () => { modelId: string; score: number }[]; onBoard: boolean };
 
 // Live Score offers this badge, so a repo that isn't on the board would
 // otherwise print "not scored" in the README it was just pasted into.
 async function scoresFor(host: string, owner: string, name: string): Promise<Scores | null | typeof FAILED> {
   const repo = getRepoByHostOwnerName(host, owner, name);
-  if (repo) return { overall: repo.overall_score, byModel: () => getModelScores(repo.id) };
+  if (repo) return { overall: repo.overall_score, byModel: () => getModelScores(repo.id), onBoard: true };
 
   const parsed = parseLiveTarget({ host, owner, name });
   if (!parsed || !SUPPORTED_HOSTS.includes(parsed.host)) return null;
 
   const live = await cachedLiveScore(parsed).catch((): typeof FAILED => FAILED);
   if (live === FAILED) return FAILED;
-  return live && { overall: live.overall, byModel: () => live.modelScores };
+  return live && { overall: live.overall, byModel: () => live.modelScores, onBoard: false };
 }
 
 export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] }> }) {
@@ -43,7 +46,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] 
   const url = new URL(req.url);
   const modelParam = url.searchParams.get("model");
 
-  const scores = identity && (await scoresFor(identity.host, identity.owner, identity.name.replace(/\.svg$/i, "")));
+  const scores =
+    identity && (await scoresFor(identity.host.toLowerCase(), identity.owner, identity.name.replace(/\.svg$/i, "")));
   if (!scores || scores === FAILED) {
     return new Response(badgeSvg("agent friendly", "not scored", null), {
       headers: scores === FAILED ? RETRY_HEADERS : HEADERS,
@@ -61,5 +65,5 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] 
   }
 
   const value = score == null ? "—" : score.toFixed(1);
-  return new Response(badgeSvg(label, value, score), { headers: HEADERS });
+  return new Response(badgeSvg(label, value, score), { headers: scores.onBoard ? BOARD_HEADERS : HEADERS });
 }

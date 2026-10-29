@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { LIVE_CACHE_CONTROL } from "@/lib/constants/cache";
 import { cachedLiveScore, type LiveTarget, parseLiveTarget } from "@/lib/live-score/cached";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { repoScoreCard } from "@/lib/og-card";
@@ -11,7 +12,7 @@ export const maxDuration = 60;
 // Outside /score/ for the reason app/og/score/route.tsx gives. Previews are
 // fetched by every chat app a link is pasted into, so the card keeps the
 // page's hour: the same cache entry, and a CDN copy for as long.
-const CACHE_CONTROL = "public, max-age=3600, s-maxage=3600";
+const CACHE_CONTROL = LIVE_CACHE_CONTROL;
 
 export async function GET(_request: Request, { params }: { params: Promise<LiveTarget> }) {
   const target = await params;

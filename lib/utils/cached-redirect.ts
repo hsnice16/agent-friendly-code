@@ -1,6 +1,5 @@
+import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { APP_URL } from "@/lib/version";
-
-const CACHE_CONTROL = "public, max-age=3600, s-maxage=86400";
 
 // A page that redirects is rendered per request and sent `no-store`; a route
 // handler's 308 can carry its own Cache-Control, so the CDN answers repeats.
@@ -8,7 +7,7 @@ const CACHE_CONTROL = "public, max-age=3600, s-maxage=86400";
 export function cachedRedirect(path: string, request: Request): Response {
   return new Response(null, {
     status: 308,
-    headers: { Location: `${path}${new URL(request.url).search}`, "Cache-Control": CACHE_CONTROL },
+    headers: { Location: `${path}${new URL(request.url).search}`, "Cache-Control": BOARD_CACHE_CONTROL },
   });
 }
 
@@ -25,7 +24,7 @@ export async function notFoundPage(): Promise<Response> {
     if ((page.ok || page.status === 404) && type.startsWith("text/html")) {
       return new Response(page.body, {
         status: 404,
-        headers: { "Content-Type": type, "Cache-Control": CACHE_CONTROL },
+        headers: { "Content-Type": type, "Cache-Control": BOARD_CACHE_CONTROL },
       });
     }
   } catch {

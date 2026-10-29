@@ -1,12 +1,10 @@
 import { notFound } from "next/navigation";
 
+import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getRepoByHostOwnerName } from "@/lib/db";
 import { repoScoreCard } from "@/lib/og-card";
 import { hostLabel } from "@/lib/utils/format";
 import { repoIdentity } from "@/lib/utils/repo-path";
-
-// Scores only change on a rescore deploy, which purges the CDN.
-const CACHE_CONTROL = "public, max-age=3600, s-maxage=86400";
 
 export async function GET(_request: Request, { params }: { params: Promise<{ slug: string[] }> }) {
   const identity = repoIdentity((await params).slug);
@@ -21,6 +19,6 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
     score: repo.overall_score != null ? repo.overall_score.toFixed(1) : "—",
     context: [hostLabel(repo.host), repo.language],
   });
-  card.headers.set("Cache-Control", CACHE_CONTROL);
+  card.headers.set("Cache-Control", BOARD_CACHE_CONTROL);
   return card;
 }

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
-
 import { isRegistry } from "@/lib/clients/registries";
+import { LIVE_CACHE_CONTROL } from "@/lib/constants/cache";
 import { lookupPackage } from "@/lib/package-lookup";
 import { APP_URL } from "@/lib/version";
 
 export const dynamic = "force-dynamic";
 
-const HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600" };
+const HEADERS = { "Cache-Control": LIVE_CACHE_CONTROL };
 
 export async function GET(_req: Request, ctx: { params: Promise<{ registry: string; name: string }> }) {
   const { registry, name } = await ctx.params;

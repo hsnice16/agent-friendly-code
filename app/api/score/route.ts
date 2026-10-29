@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 
 import { isHost } from "@/lib/constants/hosts";
 import { getModelScores, getRepoByHostOwnerName, getSignalResults } from "@/lib/db";
@@ -6,7 +7,7 @@ import { ownerAndName } from "@/lib/utils/repo-path";
 
 export const dynamic = "force-dynamic";
 
-const HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600" };
+const HEADERS = { "Cache-Control": BOARD_CACHE_CONTROL };
 
 export async function GET(req: Request) {
   const url = new URL(req.url);

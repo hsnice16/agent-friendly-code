@@ -1,9 +1,10 @@
 import { NextResponse } from "next/server";
+import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getModelScores, getRepo, getSignalResults } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
 
-const HEADERS = { "Cache-Control": "public, max-age=3600, s-maxage=3600" };
+const HEADERS = { "Cache-Control": BOARD_CACHE_CONTROL };
 
 export async function GET(_req: Request, ctx: { params: Promise<{ id: string }> }) {
   const { id: idStr } = await ctx.params;
