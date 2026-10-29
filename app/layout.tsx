@@ -125,6 +125,18 @@ const FOOTER_LINKS_LEGAL = [
   { href: "/terms", label: "Terms" },
 ];
 
+const FOOTER_LINK_CLASS =
+  "border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft";
+
+// No prefetch: the footer is on every page, and each prefetched link is a billed ISR read.
+function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
+  return (
+    <Link href={href} prefetch={false} className={FOOTER_LINK_CLASS}>
+      {children}
+    </Link>
+  );
+}
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
@@ -190,7 +202,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                     target="_blank"
                     rel="noopener noreferrer"
                     href="https://github.com/hsnice16"
-                    className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                    className={FOOTER_LINK_CLASS}
                   >
                     Himanshu Singh
                   </a>
@@ -199,12 +211,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span aria-hidden="true">·</span>
                 <span>
                   also made{" "}
-                  <a
-                    target="_blank"
-                    rel="noopener"
-                    href="https://usetu.la/"
-                    className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                  >
+                  <a target="_blank" rel="noopener" href="https://usetu.la/" className={FOOTER_LINK_CLASS}>
                     tula — crypto liquidation risk CLI
                   </a>
                 </span>
@@ -214,7 +221,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   target="_blank"
                   rel="noopener noreferrer"
                   href={`${REPO_URL}/blob/main/LICENSE`}
-                  className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
+                  className={FOOTER_LINK_CLASS}
                 >
                   MIT
                 </a>
@@ -222,12 +229,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 {FOOTER_LINKS_LEGAL.map((l) => (
                   <span key={l.href} className="contents">
                     <span aria-hidden="true">·</span>
-                    <Link
-                      href={l.href}
-                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                    >
-                      {l.label}
-                    </Link>
+                    <FooterLink href={l.href}>{l.label}</FooterLink>
                   </span>
                 ))}
               </p>
@@ -235,25 +237,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">
                 <div className="flex flex-col items-start gap-1">
                   {FOOTER_LINKS_PRIMARY.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                    >
+                    <FooterLink key={l.href} href={l.href}>
                       {l.label}
-                    </Link>
+                    </FooterLink>
                   ))}
                 </div>
 
                 <div className="flex flex-col items-start gap-1">
                   {FOOTER_LINKS_TOOLS.map((l) => (
-                    <Link
-                      key={l.href}
-                      href={l.href}
-                      className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-                    >
+                    <FooterLink key={l.href} href={l.href}>
                       {l.label}
-                    </Link>
+                    </FooterLink>
                   ))}
                 </div>
               </nav>

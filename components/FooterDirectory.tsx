@@ -50,7 +50,7 @@ export function FooterDirectory({ hubs, topics }: Props) {
             <ul className="m-0 flex list-none flex-wrap gap-y-1 p-0">
               {(r.all ? [...r.items, r.all] : r.items).map((i) => (
                 <li key={i.href} className="mr-3 border-r border-line pr-3 last:mr-0 last:border-r-0 last:pr-0">
-                  <Link href={i.href} className="hover:text-ink-soft">
+                  <Link href={i.href} prefetch={false} className="hover:text-ink-soft">
                     {i.label}
                   </Link>
                 </li>
