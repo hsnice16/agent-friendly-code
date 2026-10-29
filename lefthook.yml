@@ -1,6 +1,6 @@
 # https://lefthook.dev/configuration/
 #
-# Activate locally: `bun run prepare-hooks` (alias for `lefthook install`).
+# Activate locally: `bun run prepare-hooks`.
 
 pre-commit:
   parallel: true

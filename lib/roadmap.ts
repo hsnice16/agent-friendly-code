@@ -1,7 +1,7 @@
 type RoadmapItem = {
   title: string;
   summary: string;
-  taskFile?: string;
+  taskFile: string;
 };
 
 type RoadmapVersion = {

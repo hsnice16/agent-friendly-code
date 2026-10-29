@@ -25,7 +25,7 @@ const BITBUCKET_MAX_DEPTH = 10;
 // Refuse rather than hang. Above the largest seed (JetBrains/kotlin, ~97k
 // entries), so only the pathological tail hits it; it bites hardest on GitLab,
 // which paginates at 100 entries per call.
-export const MAX_ENTRIES = 150_000;
+const MAX_ENTRIES = 150_000;
 
 // Each is one API call against the shared token on a truncated tree. Far above
 // any fixture (kotlin has ~30); only a tree built to burn the quota gets here.

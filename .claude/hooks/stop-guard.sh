@@ -11,7 +11,6 @@ set -eu
 
 input="$(cat)"
 
-# Anti-loop: let the turn end if we already blocked once this cycle.
 if printf '%s' "$input" | grep -qE '"stop_hook_active"[[:space:]]*:[[:space:]]*true'; then
   exit 0
 fi
@@ -28,7 +27,6 @@ fi
 
 file_list="$(printf '%s\n' "$changed" | sed 's/^/  • /')"
 
-# Build the reason text, then let python3 produce safely-escaped JSON.
 printf '%s\n' \
   "Source files changed this turn:" \
   "$file_list" \
