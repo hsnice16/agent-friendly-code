@@ -31,7 +31,7 @@ export const METHODOLOGY_FAQ = [
   },
   {
     q: "How often are scores updated?",
-    a: "Every six hours, and whenever the repo list or the scoring rules change.",
+    a: "Daily. A change to the repo list applies at the next run; a change to the scoring rules is rescored when it ships.",
   },
   {
     q: "Which code hosts are supported?",

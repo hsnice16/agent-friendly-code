@@ -44,7 +44,7 @@ The skill and the Action vendor the scorer and never call the API.
 
 ## How it works
 
-- **Ranked repos** are shallow-cloned (`--depth 1`), scored, and stored in a committed SQLite file. A GitHub Actions cron rescores them every six hours; a weekly audit flags seeds that were renamed, archived or removed.
+- **Ranked repos** are shallow-cloned (`--depth 1`), scored, and stored in a committed SQLite file. A GitHub Actions cron rescores them daily; a weekly audit flags seeds that were renamed, archived or removed.
 - **Live Score** runs on Vercel, which has no `git`, so it rebuilds the file tree from the host API and fetches only the files a signal reads. A parity check asserts both paths give identical scores. Host tarballs are not used: they honour `export-ignore` and drop files.
 - The scorer only reads files. It never runs code from a repo, never follows a symlink out of it, and reads at most 1 MiB per file.
 

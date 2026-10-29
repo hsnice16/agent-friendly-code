@@ -38,7 +38,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Is this score different from the leaderboard score?",
-    a: "No. Same checks, same weights. The leaderboard clones each repo every six hours; this page rebuilds it from GitHub's file list, and a test checks both give the same numbers.",
+    a: "No. Same checks, same weights. The leaderboard clones each repo daily; this page rebuilds it from GitHub's file list, and a test checks both give the same numbers.",
   },
   {
     q: "Do you save or list my repo anywhere?",

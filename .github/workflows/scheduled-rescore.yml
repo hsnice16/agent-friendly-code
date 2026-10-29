@@ -2,7 +2,10 @@ name: Scheduled rescore
 
 on:
   schedule:
-    - cron: "0 */6 * * *"
+    # Each push to main redeploys and starts an empty CDN cache, which crawlers
+    # then refill from origin; daily keeps that to one refill. Off the hour
+    # because GitHub delays or drops scheduled runs queued at :00.
+    - cron: "17 3 * * *"
   workflow_dispatch:
 
 concurrency:
@@ -73,6 +76,11 @@ jobs:
           sqlite3 data/rank.db "PRAGMA wal_checkpoint(TRUNCATE);"
           cp data/rank.db /tmp/rescore/rank.db
 
+      # Here, not in publish: it runs dependency code, which must not share a
+      # job with the write token.
+      - name: Check the database for leaks
+        run: bun run check-db-leaks
+
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: rescore
@@ -87,24 +95,11 @@ jobs:
     permissions:
       contents: write
     steps:
-      # The write token stays off disk while dependency code runs (install, the
-      # leak gate); only the push step below receives it.
+      # No dependency code runs before the push: it could plant git config (a
+      # URL-scoped proxy or sslVerify) that the push's -c flags don't override.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
-        with:
-          bun-version: 1.2.16
-
-      - name: Setup Node
-        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
-        with:
-          node-version: "22"
-
-      - name: Install
-        run: bun install --frozen-lockfile
 
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -120,15 +115,13 @@ jobs:
             echo "No repo, score, badge-adoption or metadata changes — skipping commit (last_scored_at churn ignored)."
             exit 0
           fi
-          bun run check-db-leaks
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add data/rank.db
           git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
-      # Earlier steps ran dependency code, which could have planted a hook, a
-      # proxy or a TLS override for the token to leak through.
+      # Hooks off and proxy/TLS pinned as defence in depth.
       - name: Push
         id: publish
         if: steps.commit.outputs.committed == 'true'
@@ -137,6 +130,22 @@ jobs:
         run: |
           /usr/bin/git -c core.hooksPath=/dev/null -c http.proxy= -c http.sslVerify=true -c http.https://github.com/.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" push
           echo "pushed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Setup Bun
+        if: steps.publish.outputs.pushed == 'true'
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: 1.2.16
+
+      - name: Setup Node
+        if: steps.publish.outputs.pushed == 'true'
+        uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: "22"
+
+      - name: Install
+        if: steps.publish.outputs.pushed == 'true'
+        run: bun install --frozen-lockfile
 
       # The push only starts the deploy. A crawler told about a page before the
       # new build serves it re-reads the old one and has no reason to come back.

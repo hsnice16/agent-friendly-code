@@ -27,7 +27,7 @@ bun run check-db-leaks # local paths / tokens in data/rank.db — run before com
 bun run indexnow       # submit sitemap URLs to IndexNow (--since <ISO time>, --dry-run)
 ```
 
-Set `RANK_DB_PATH` to work on a copy of the database; `data/rank.db` is rewritten on `main` every six hours.
+Set `RANK_DB_PATH` to work on a copy of the database; `data/rank.db` is rewritten on `main` daily.
 
 ## Layout
 
