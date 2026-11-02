@@ -50,7 +50,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Does it work on private repos, GitLab, or Bitbucket?",
-    a: "Only public GitHub repos for now. Private repos would need access we choose not to ask for. GitLab and Bitbucket work but are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. For a private repo, run the agent skill locally.",
+    a: "Only public GitHub repos for now. GitLab and Bitbucket are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. Private repos would need access we choose not to ask for; run the agent skill locally instead.",
     link: { phrase: "the agent skill", href: "/skill" },
   },
   {

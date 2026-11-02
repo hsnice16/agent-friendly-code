@@ -45,7 +45,7 @@ export default function TopicsPage() {
                 className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
               >
                 {/* Labels stay lowercase for use mid-sentence; a tile starts one. */}
-                <span className="inline-block first-letter:uppercase">{t.label}</span>
+                <span>{t.label}</span>
               </Link>
               <span className="text-[12px] text-muted">{t.rows.length} repos</span>
             </li>

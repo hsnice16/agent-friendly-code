@@ -19,7 +19,7 @@ type Props = {
 // means "this, here" with no measuring. "below" floats under an above-the-fold
 // anchor (a `relative` parent) without pushing the content after it down.
 const POSITION = {
-  above: "sticky bottom-4 -mb-3 mt-6",
+  above: "sticky bottom-4 mb-3 mt-6",
   below: "absolute left-4 top-full mt-3",
 };
 const ARROW = {

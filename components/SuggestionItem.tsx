@@ -11,11 +11,11 @@ export function SuggestionItem({ index, suggestion }: { index: number; suggestio
           row outgrows a phone screen and pushes the points off the edge. */}
       <div className="min-w-0 break-words">
         <div className="text-[15px] font-medium">{suggestion.label}</div>
-        <div className="mt-1 text-sm leading-relaxed text-ink-dim">{suggestion.suggestion}</div>
+        <div className="mt-1 text-[13.5px] leading-relaxed text-ink-dim">{suggestion.suggestion}</div>
       </div>
 
       {/* Under the text on phones: a column of its own leaves the fix a word per line. */}
-      <div className="col-start-2 shrink-0 whitespace-nowrap text-sm sm:col-start-auto sm:self-center font-semibold tabular-nums text-ok">
+      <div className="col-start-2 shrink-0 whitespace-nowrap text-[13.5px] sm:col-start-auto sm:self-center font-semibold tabular-nums text-ok">
         +{suggestion.scoreGain.toFixed(1)} pts
       </div>
     </li>

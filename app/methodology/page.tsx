@@ -124,7 +124,9 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
             {MODELS.map((m) => (
               <li key={m.id} id={`model-${m.id}`} className="scroll-mt-20 border-b border-line py-3 last:border-b-0">
                 <div className="text-[15px] font-medium">{m.label}</div>
-                <div className="mt-1 text-[13.5px] text-ink-dim">{m.rationale}</div>
+                <div className="mt-1 text-[13.5px] text-ink-dim">
+                  <CodeText text={m.rationale} />
+                </div>
 
                 {m.sources.length > 0 && (
                   <div className="mt-1.5 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[12.5px] text-muted">

@@ -1,7 +1,7 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
-import { Panel, PanelHeading } from "@/components/Panel";
+import { Panel } from "@/components/Panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { ROADMAP } from "@/lib/roadmap";
 import { REPO_URL } from "@/lib/version";
@@ -35,7 +35,6 @@ export default function RoadmapPage() {
               </span>
             </div>
 
-            <PanelHeading>Planned</PanelHeading>
             <ul className="m-0 list-none p-0">
               {v.items.map((it) => (
                 <li
@@ -44,7 +43,7 @@ export default function RoadmapPage() {
                 >
                   <div>
                     <div className="text-[15px] font-medium">{it.title}</div>
-                    <div className="mt-1 text-sm text-ink-dim">{it.summary}</div>
+                    <div className="mt-1 text-[13.5px] text-ink-dim">{it.summary}</div>
                   </div>
 
                   {it.taskFile && (

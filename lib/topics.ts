@@ -64,6 +64,7 @@ const LABELS: Record<string, string> = {
   react: "React",
   "self-hosted": "self-hosted",
   sql: "SQL",
+  ui: "UI",
   vue: "Vue",
 };
 
