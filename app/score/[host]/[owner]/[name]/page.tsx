@@ -29,7 +29,7 @@ import type { ModelId } from "@/lib/scoring/weights";
 import type { RepoRow } from "@/lib/types/db";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { hostLabel } from "@/lib/utils/format";
-import { isModelId } from "@/lib/utils/leaderboard-href";
+import { isModelId } from "@/lib/utils/model-id";
 import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/repo-about";
 import { agentFileShare } from "@/lib/utils/repo-page-data";
 import { liveScorePath, repoPath, withQuery } from "@/lib/utils/repo-path";

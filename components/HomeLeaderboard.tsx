@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 import { CHANGELOG } from "@/lib/changelog";
-import { hostsText } from "@/lib/leaderboard-meta";
+import { HOSTS_TEXT } from "@/lib/leaderboard-meta";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import type { LeaderboardStats } from "@/lib/types/db";
 import { checkSubPath } from "@/lib/utils/check-path";
@@ -28,7 +28,7 @@ export function HomeLeaderboard({ view, stats }: Props) {
           Which public repos are easiest for AI coding agents to work in?
         </h1>
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Repos from {hostsText(view.host)}, scored on what each agent looks for, then ranked.
+          Repos from {HOSTS_TEXT}, scored on what each agent looks for, then ranked.
         </p>
 
         {/* LiveScoreForm stacks below `sm`; the copy around it stays short so the board is still near the fold on a phone. */}

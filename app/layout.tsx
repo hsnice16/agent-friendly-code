@@ -3,6 +3,7 @@ import Link from "next/link";
 import "./globals.css";
 
 import { BackToTop } from "@/components/BackToTop";
+import { BoardPendingScript } from "@/components/BoardPendingScript";
 import { Clarity } from "@/components/Clarity";
 import { ConsentBanner } from "@/components/ConsentBanner";
 import { FooterDirectory } from "@/components/FooterDirectory";
@@ -139,7 +140,11 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    // The board's pending mark is set on <html> before hydration (BoardPendingScript).
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <BoardPendingScript />
+      </head>
       <body>
         <JsonLd data={JSON_LD} />
         <GoogleAnalytics />

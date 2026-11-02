@@ -33,7 +33,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 - **Default to server components.** Only add `"use client"` when you need state, effects, browser APIs, or event handlers.
 - **Fetch data in pages**, pass props down. Components don't fetch.
 - **Use `<Link>` from `next/link`** for internal navigation, not `<a href>`.
-- **Query params over client state** where possible (model filter, pagination, search).
+- **Query params over client state** where possible; the boards are the exception (AGENTS.md → Conventions).
 
 ## Components
 
@@ -54,7 +54,7 @@ Only `@phosphor-icons/react`. Block Lucide, Heroicons, React Icons, inline SVG, 
 ## Security
 
 - Parameterised SQL only.
-- `dangerouslySetInnerHTML` only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped). Reject any other use.
+- `dangerouslySetInnerHTML` only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped) and the constant pre-paint script in `components/BoardPendingScript.tsx`. Reject any other use.
 - External links include `rel="noopener noreferrer"`.
 - Never execute code from a cloned repo.
 

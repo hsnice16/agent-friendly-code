@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { hostsText, modelBoardTitle } from "@/lib/leaderboard-meta";
+import { HOSTS_TEXT, modelBoardTitle } from "@/lib/leaderboard-meta";
 import type { ModelPanel } from "@/lib/leaderboard-model-panel";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { MODEL_BY_ID, type ModelId } from "@/lib/scoring/weights";
@@ -18,7 +18,7 @@ type Props = { model: ModelId; view: LeaderboardView; stats: LeaderboardStats; p
 export function ModelLeaderboard({ model, view, stats, panel }: Props) {
   const profile = MODEL_BY_ID[model];
   const { label } = profile;
-  const top = view.filtered ? undefined : view.filteredRows[0];
+  const top = view.allRows[0];
   const itemList = boardItemList(view, modelBoardTitle(label));
 
   return (
@@ -32,7 +32,7 @@ export function ModelLeaderboard({ model, view, stats, panel }: Props) {
         </h1>
 
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Repos from {hostsText(view.host)}, ranked by their {label} score.
+          Repos from {HOSTS_TEXT}, ranked by their {label} score.
           {top && (
             <>
               {" "}

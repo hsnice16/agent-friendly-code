@@ -31,7 +31,7 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 
 - **Server components by default.** Client components only when necessary.
 - **Third-party scripts** load after hydration: `next/script` `afterInteractive` (`GoogleAnalytics.tsx`), or injected on consent (`lib/clarity.ts`). Each origin needs a CSP entry in `next.config.ts`.
-- **No client-side data fetching** for rendering — use the DB in a Server Component or API route.
+- **No client-side data fetching** for rendering — use the DB in a Server Component or API route. Exception: a board re-cut (search, filter, sort) reads the static `/api/board` in `BoardClient`, because the boards are prerendered.
 - **Images**: `next/image` for local images; plain `<img loading="lazy">` only for remote badge SVGs.
 - **Bundle weight**: flag any new dep > 50 KB gzipped. Justify or use a smaller alternative.
 - **Database queries** are `prepare`d once and reused where hot.
@@ -39,7 +39,7 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 ## Security
 
 - **SQL parameterisation**: every query uses `?` placeholders. No string concatenation.
-- **`dangerouslySetInnerHTML`** only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped). Reject any other use.
+- **`dangerouslySetInnerHTML`** only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped) and the constant pre-paint script in `components/BoardPendingScript.tsx`. Reject any other use.
 - **External URLs** in `<a target="_blank">` always include `rel="noopener noreferrer"`.
 - **User input at every boundary** is validated: `parseRepoUrl` for repo URLs, `Number.isInteger` and `> 0` for ids, length caps on search strings.
 - **Clone safety**: `git clone --depth 1 --single-branch`; never execute code from a clone (no `bun install`, no `npm install`, no post-clone scripts); `-c credential.helper=` so stored credentials never clone a private repo.

@@ -1,6 +1,6 @@
 # tasks/
 
-Per-version work breakdown, readable by any agent (Claude Code, Cursor, Codex, Devin, etc.).
+Per-version work breakdown.
 
 ## Structure
 

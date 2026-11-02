@@ -4,7 +4,7 @@ import { cachedLiveScore, parseLiveTarget } from "@/lib/live-score/cached";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { MODEL_BY_ID } from "@/lib/scoring/weights";
 import { badgeSvg } from "@/lib/utils/badge";
-import { isModelId } from "@/lib/utils/leaderboard-href";
+import { isModelId } from "@/lib/utils/model-id";
 import { repoIdentity } from "@/lib/utils/repo-path";
 
 export const dynamic = "force-dynamic";

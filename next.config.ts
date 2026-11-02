@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+import { BOARD_REDIRECTS } from "./lib/board-redirects";
+
 // 'unsafe-inline' scripts: Next's hydration payload and the GA init are inline,
 // and nonces would need a proxy on every route, which would make the static
 // pages dynamic. Production only: `next dev` needs 'unsafe-eval' and an HMR
@@ -31,7 +33,7 @@ const config: NextConfig = {
     "/*": ["./data/rank.db"],
   },
   outputFileTracingExcludes: {
-    "/*": ["./tasks/**", "./tests/**", "./public/**", "./.claude/**", "./.next/cache/**"],
+    "/*": ["./tasks/**", "./tests/**", "./scripts/**", "./*.md", "./public/**", "./.claude/**", "./.next/cache/**"],
   },
 
   // Every deployment answers on its *.vercel.app alias as well as the custom
@@ -64,7 +66,7 @@ const config: NextConfig = {
   // Crawlers and some clients request /favicon.ico without reading the page's
   // <link rel="icon">, which points at /icon.svg.
   async redirects() {
-    return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: true }];
+    return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: true }, ...BOARD_REDIRECTS];
   },
 
   // `/repo/:id` was the original repo URL, and repos also answer to other

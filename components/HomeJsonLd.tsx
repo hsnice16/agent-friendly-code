@@ -7,22 +7,19 @@ import { APP_NAME, APP_URL, APP_VERSION } from "@/lib/version";
 import { JsonLd } from "./JsonLd";
 
 type HomeJsonLdProps = {
-  view: Pick<LeaderboardView, "page" | "filtered" | "filteredRows">;
+  view: Pick<LeaderboardView, "page" | "allRows">;
   contentChangedAt: number | null;
 };
 
 /**
  * The Dataset is the whole leaderboard (its download is /api/repos), so only
- * the canonical home carries it: on page 2+ or a re-cut it would be a second
+ * the canonical home carries it: on page 2+ it would be a second
  * copy of one dataset at a URL that shows a slice of it. Organization, WebSite
  * and WebApplication are site-wide and live in app/layout.tsx. No mainEntity:
  * the page's ItemList is one page of rows, not the dataset.
  */
 export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Record<string, unknown>[] {
   const itemList = boardItemList(view, "Agent-friendliness leaderboard");
-  if (!itemList) {
-    return [];
-  }
   if (view.page > 1) {
     return [itemList];
   }
@@ -51,10 +48,5 @@ export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Re
 }
 
 export function HomeJsonLd(props: HomeJsonLdProps) {
-  const graph = homeJsonLdGraph(props);
-  if (graph.length === 0) {
-    return null;
-  }
-
-  return <JsonLd data={{ "@graph": graph }} />;
+  return <JsonLd data={{ "@graph": homeJsonLdGraph(props) }} />;
 }

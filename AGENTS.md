@@ -59,10 +59,10 @@ data/rank.db  committed database, refreshed by .github/workflows/scheduled-resco
 ## Conventions
 
 - **Exact-pinned deps** (no `^`, no `latest`) — scoring must be deterministic.
-- **Server components by default.** Prefer `<Link>` and query params over client state. Exception: repo pages are prerendered, so they never read `?model=`; `ModelSuggestionsSwitch` reads it in the browser.
+- **Server components by default.** Prefer `<Link>` and query params over client state. Exceptions, both because the page is prerendered: repo pages never read `?model=` (`ModelSuggestionsSwitch` reads it in the browser), and the boards never read search params: search, filter and sort run in `BoardClient` over `/api/board`, an internal payload whose order must match `listLeaderboard` (`tests/board.test.ts`).
 - **One place per URL shape.** Build repo URLs with `lib/utils/repo-path.ts`, check URLs with `check-path.ts`, board URLs with `leaderboard-href.ts`, links to a file on its host with `repo-file-url.ts`.
 - **Page metadata.** Static-page titles and descriptions live in `PAGE_COPY` (`lib/page-meta.ts`); length caps come from `lib/utils/page-title.ts`. Next.js shallow-merges `openGraph` / `twitter`, so a page that sets either re-spreads `OG_DEFAULTS` / `TWITTER_DEFAULTS` and sets an image (`DEFAULT_OG_IMAGE` or its own).
-- **Indexing.** Filtered board views are deduped with `noindex,follow` (`lib/leaderboard-meta.ts`), never a robots.txt `Disallow`, which would hide that directive. Package pages are noindex and stay out of the sitemap.
+- **Indexing.** A board page is `/`, `/model/<id>` or `…/page/<n>`; a searched, filtered or sorted view is the same prerendered page re-cut in the browser, so its canonical is the board. Never a robots.txt `Disallow` for them, which would hide the canonical. Package pages are noindex and stay out of the sitemap.
 - **Signal IDs** (`agents_md`, `tests`, …) are stable. Renaming one is a migration.
 - **Path lookups** in signals go through `firstExisting` / `resolveRelative` / `resolveAllRelative` (`helpers.ts`), never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
 - **An empty AGENTS.md / CLAUDE.md** (`agents_md` pass 0.2) does not count as having one wherever a share is shown.
@@ -84,7 +84,7 @@ data/rank.db  committed database, refreshed by .github/workflows/scheduled-resco
 
 `../agent-friendly-action/` (PR score-diff Action) and `../agent-friendly-skill/` (agent skill) each vendor `lib/scoring/` into `src/scoring/` and ship one `@vercel/ncc` bundle in `dist/`. The three copies are kept in sync by hand.
 
-**Whenever you change `lib/scoring/`**, in both siblings: copy the changed files (same layout), rebuild `dist/`, and, if scores or output change, add a line under "Unreleased" in `CHANGELOG.md`. Their CI checks `dist/` against `src/` but cannot see upstream drift. If a sibling is not checked out, say so; never skip it silently.
+**Whenever you change `lib/scoring/`**, in both siblings: copy the changed files (same layout), keeping each sibling's deliberate prunes (listed in its AGENTS.md, e.g. `MODEL_BY_ID` in `weights.ts`), rebuild `dist/`, and, if scores or output change, add a line under "Unreleased" in `CHANGELOG.md`. Their CI checks `dist/` against `src/` but cannot see upstream drift. If a sibling is not checked out, say so; never skip it silently.
 
 Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` builds `ACTION_USES` and `SKILL_INSTALL_CMD`; the major is also written in `skills-lock.json` (`ref`), `.github/workflows/agent-friendly.yml` (`@v0`) and the `/action` and `/skill` FAQ copy. Change them together, only when both siblings cut a new major.
 
@@ -116,7 +116,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 - Repo contents are untrusted. The scorer never follows a symlink out of the tree, reads only regular files, and stops at `MAX_READ_BYTES` (1 MiB); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
 - `/score/[host]/[owner]/[name]`, its OG card and the badge for a repo off the board turn visitor input into host API calls and a temp directory. `parseLiveTarget` (`lib/live-score/cached.ts`) and `safeAbsolute` (`lib/live-score/materialize.ts`) are the guards; `tests/live-*.test.ts` and `tests/symlink-containment.test.ts` cover them. Never weaken either.
 - Private repos are never scored, live or by CLI, even when the token can read them.
-- The only `dangerouslySetInnerHTML` is `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped). Owner-written repo descriptions and topics reach it only after `lib/utils/repo-about.ts` sanitises them, and never reach OG images.
+- `dangerouslySetInnerHTML` appears only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped) and `BoardPendingScript.tsx` (a constant string). Owner-written repo descriptions and topics reach JSON-LD only after `lib/utils/repo-about.ts` sanitises them, and never reach OG images.
 - `data/rank.db` is public, freed pages included: `bun run check-db-leaks` must pass before committing it.
 - No auth. The only write a request can cause is caching a package → repo alias, off Vercel only, for a name valid on its registry. Auth arrives with `tasks/0.10.0/01-opt-out-claim-flow.md`; gate DB writes per user then.
 - Secrets live in env vars only (`.env.example`). The production `GITHUB_TOKEN` must be read-only.

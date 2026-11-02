@@ -1,65 +1,23 @@
 import { cache } from "react";
 
-import { type Host, isHost } from "@/lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
-import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
+import { pageSlice } from "@/lib/board";
 import { listLeaderboard } from "@/lib/db";
 import type { ModelId } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
 
-type Param = string | string[] | undefined;
-
-// A repeated key (?q=a&q=b) arrives as an array.
-export type LeaderboardSearchParams = { q?: Param; dir?: Param; host?: Param; page?: Param; sort?: Param };
-
-const first = (v: Param): string | undefined => (Array.isArray(v) ? v[0] : v);
-
+/** A prerendered board page. Search, filters and sorting happen in the browser (components/BoardClient.tsx). */
 export type LeaderboardView = {
-  q: string;
+  model: ModelId | "overall";
   page: number;
   totalPages: number;
-  dir: SortDir;
-  sort: SortKey;
-  host: Host | "all";
-  model: ModelId | "overall";
-  /** A re-cut of the board (host, search, sort) rather than the board itself. */
-  filtered: boolean;
-  filteredRows: LeaderboardRow[];
+  /** The whole board in rank order; the page shows a slice of it. */
+  allRows: LeaderboardRow[];
 };
 
-function matchesQuery(row: LeaderboardRow, q: string): boolean {
-  return `${row.owner}/${row.name}`.toLowerCase().includes(q.toLowerCase());
-}
-
-// Shared by generateMetadata and the page body, which run in one request
-// scope — without this the whole board is queried and filtered twice.
-export const resolveLeaderboardView = cache(
-  (model: ModelId | "overall", sp: LeaderboardSearchParams): LeaderboardView => {
-    const q = (first(sp.q) ?? "").trim().slice(0, MAX_SEARCH_LENGTH);
-    const spHost = first(sp.host);
-    const spDir = first(sp.dir);
-    const spSort = first(sp.sort);
-    const host: Host | "all" = isHost(spHost) ? spHost : "all";
-    const dir: SortDir = isSortDir(spDir) ? spDir : DEFAULT_DIR;
-    const sort: SortKey = isSortKey(spSort) ? spSort : DEFAULT_SORT;
-
-    const baseRows = listLeaderboard({
-      dir,
-      sort,
-      model,
-      host: host === "all" ? undefined : host,
-    });
-
-    const filteredRows = q ? baseRows.filter((r) => matchesQuery(r, q)) : baseRows;
-    const totalPages = Math.max(1, Math.ceil(filteredRows.length / LEADERBOARD_PAGE_SIZE));
-
-    // Out-of-range clamps rather than 404s, so a stale or hand-typed page number
-    // still lands on rows; the canonical folds it onto the page it shows.
-    const parsedPage = Number(first(sp.page));
-    const page = Number.isFinite(parsedPage) ? Math.min(totalPages, Math.max(1, Math.floor(parsedPage))) : 1;
-
-    const filtered = host !== "all" || q !== "" || sort !== DEFAULT_SORT || dir !== DEFAULT_DIR;
-
-    return { q, page, totalPages, dir, sort, host, model, filtered, filteredRows };
-  },
-);
+// Shared by generateMetadata and the page body. React's cache compares
+// arguments by identity, so they stay primitives.
+export const resolveLeaderboardView = cache((model: ModelId | "overall", page = 1): LeaderboardView => {
+  const allRows = listLeaderboard({ model });
+  const slice = pageSlice(allRows.length, page);
+  return { model, page: slice.page, totalPages: slice.totalPages, allRows };
+});

@@ -4,33 +4,14 @@ import { MODELS, type ModelId } from "@/lib/scoring/weights";
 import { pillClass } from "./pill-class";
 
 type Props = {
-  label?: string;
   scroll?: boolean;
-  includeOverall?: boolean;
-  selected: ModelId | "overall";
-  hrefFor: (id: ModelId | "overall") => string;
+  selected: ModelId;
+  hrefFor: (id: ModelId) => string;
 };
 
-export function ModelPills({
-  hrefFor,
-  selected,
-  scroll = true,
-  includeOverall = false,
-  label = "Pick an AI agent",
-}: Props) {
+export function ModelPills({ hrefFor, selected, scroll = true }: Props) {
   return (
-    <nav aria-label={label} className="mb-4 flex flex-wrap gap-2">
-      {includeOverall && (
-        <Link
-          scroll={scroll}
-          href={hrefFor("overall")}
-          aria-current={selected === "overall" ? "true" : undefined}
-          className={pillClass(selected === "overall")}
-        >
-          Overall
-        </Link>
-      )}
-
+    <nav aria-label="Pick an AI agent" className="mb-4 flex flex-wrap gap-2">
       {MODELS.map((m) => (
         <Link
           key={m.id}

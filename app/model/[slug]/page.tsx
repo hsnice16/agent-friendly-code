@@ -5,18 +5,24 @@ import { ModelLeaderboard } from "@/components/ModelLeaderboard";
 import { getLeaderboardStats } from "@/lib/db";
 import { getModelPanel } from "@/lib/leaderboard-files";
 import { leaderboardMetadata } from "@/lib/leaderboard-meta";
-import { type LeaderboardSearchParams, resolveLeaderboardView } from "@/lib/leaderboard-view";
-import { MODEL_BY_ID } from "@/lib/scoring/weights";
-import { isModelId } from "@/lib/utils/leaderboard-href";
+import { resolveLeaderboardView } from "@/lib/leaderboard-view";
+import { MODEL_BY_ID, MODELS } from "@/lib/scoring/weights";
+import { isModelId } from "@/lib/utils/model-id";
 
-type Props = { params: Promise<{ slug: string }>; searchParams: Promise<LeaderboardSearchParams> };
+type Props = { params: Promise<{ slug: string }> };
 
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
-  const { slug } = await params;
-  return isModelId(slug) ? leaderboardMetadata(resolveLeaderboardView(slug, await searchParams)) : {};
+export const dynamicParams = false;
+
+export function generateStaticParams() {
+  return MODELS.map((m) => ({ slug: m.id }));
 }
 
-export default async function ModelPage({ params, searchParams }: Props) {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  return isModelId(slug) ? leaderboardMetadata(resolveLeaderboardView(slug)) : {};
+}
+
+export default async function ModelPage({ params }: Props) {
   const { slug } = await params;
   if (!isModelId(slug)) {
     notFound();
@@ -25,7 +31,7 @@ export default async function ModelPage({ params, searchParams }: Props) {
   return (
     <ModelLeaderboard
       model={slug}
-      view={resolveLeaderboardView(slug, await searchParams)}
+      view={resolveLeaderboardView(slug)}
       stats={getLeaderboardStats()}
       panel={getModelPanel(MODEL_BY_ID[slug])}
     />

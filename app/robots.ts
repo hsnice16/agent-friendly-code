@@ -22,10 +22,8 @@ const AI_CRAWLERS = [
   "Meta-ExternalAgent",
 ];
 
-// /score/* is unbounded — one URL per repo that exists anywhere. Filtered
-// leaderboard views are deduped with `noindex, follow` instead of a Disallow:
-// a blocked URL is one whose canonical and noindex a crawler is never allowed
-// to read.
+// /score/* is unbounded — one URL per repo that exists anywhere. Re-cut board
+// URLs aren't disallowed: a blocked URL's canonical is never read.
 //
 // `_rsc` is the payload Next.js fetches when it prefetches a link. Googlebot
 // follows those too: they were 94% of its requests here, against 5% for HTML.

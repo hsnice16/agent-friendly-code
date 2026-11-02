@@ -156,6 +156,88 @@ select:focus-visible {
   box-shadow: none !important;
 }
 
+/* A shared link to a sorted, filtered or searched board opens the prerendered
+   default rows, which are re-cut in the browser once the board data arrives.
+   Until then the rows keep their place but show as placeholders, so the
+   default order never flashes. `data-board-pending` is set by an inline script
+   before the rows are parsed (components/BoardPendingScript.tsx), then by React. */
+@keyframes afc-board-pulse {
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* If the script that resolves the placeholders never runs (a failed chunk,
+   a crash), the default rows come back rather than placeholders forever. */
+@keyframes afc-board-reveal {
+  to {
+    visibility: visible;
+  }
+}
+
+@keyframes afc-board-hide {
+  to {
+    visibility: hidden;
+  }
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td {
+  position: relative;
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td > * {
+  visibility: hidden;
+  animation: afc-board-reveal 0s 20s forwards;
+}
+
+/* Shapes echo what they stand in for: the round rank badge, pill-shaped text.
+   Insets match the cells' px-3 / sm:px-[18px] padding. */
+:root[data-board-pending] [data-board] [data-board-rows] td:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  height: 12px;
+  translate: 0 -50%;
+  border-radius: 9999px;
+  background: var(--color-line);
+  animation:
+    afc-board-pulse 1.4s ease-in-out infinite,
+    afc-board-hide 0s 20s forwards;
+  --inset: 0.75rem;
+}
+
+@media (width >= 40rem) {
+  :root[data-board-pending] [data-board] [data-board-rows] td::after {
+    --inset: 18px;
+  }
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td:nth-child(1)::after {
+  left: var(--inset);
+  width: 24px;
+  height: 24px;
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td:nth-child(2)::after {
+  left: var(--inset);
+  width: min(60%, 260px);
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td:nth-child(3)::after {
+  right: var(--inset);
+  width: 44px;
+}
+
+:root[data-board-pending] [data-board] [data-board-rows] td:nth-child(4)::after {
+  right: var(--inset);
+  width: min(70%, 140px);
+}
+
+:root[data-board-pending] [data-board] [data-board-pager] {
+  visibility: hidden;
+  animation: afc-board-reveal 0s 20s forwards;
+}
+
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;
@@ -166,5 +248,15 @@ select:focus-visible {
   *::after {
     animation: none !important;
     transition: none !important;
+  }
+
+  /* The placeholder fallback isn't motion; it must survive the reset above. */
+  :root[data-board-pending] [data-board] [data-board-rows] td > *,
+  :root[data-board-pending] [data-board] [data-board-pager] {
+    animation: afc-board-reveal 0s 20s forwards !important;
+  }
+
+  :root[data-board-pending] [data-board] [data-board-rows] td:not(:last-child)::after {
+    animation: afc-board-hide 0s 20s forwards !important;
   }
 }

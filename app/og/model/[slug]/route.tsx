@@ -3,7 +3,8 @@ import { notFound } from "next/navigation";
 import { resolveLeaderboardView } from "@/lib/leaderboard-view";
 import { ogCard, ogSiteUrl } from "@/lib/og-card";
 import { MODEL_BY_ID, MODELS } from "@/lib/scoring/weights";
-import { isModelId, modelPath } from "@/lib/utils/leaderboard-href";
+import { modelPath } from "@/lib/utils/leaderboard-href";
+import { isModelId } from "@/lib/utils/model-id";
 
 export const dynamic = "force-static";
 export const dynamicParams = false;
@@ -19,7 +20,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
   }
 
   const { label } = MODEL_BY_ID[slug];
-  const rows = resolveLeaderboardView(slug, {}).filteredRows;
+  const rows = resolveLeaderboardView(slug).allRows;
   const top = rows[0];
 
   return ogCard({

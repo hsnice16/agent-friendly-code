@@ -1,7 +1,8 @@
 import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
+import type { MouseEvent, ReactNode } from "react";
+import type { BoardRow } from "@/lib/board";
 import type { Host } from "@/lib/constants/hosts";
-import type { LeaderboardRow } from "@/lib/types/db";
 import { compactStars } from "@/lib/utils/format";
 import { sanitizeDescription } from "@/lib/utils/repo-about";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -11,21 +12,55 @@ import { Medal } from "./Medal";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreCell } from "./ScoreCell";
 
+/** What a row shows; both a database row and a browser board row fit it. */
+type TableRow = Omit<BoardRow, "id" | "description"> & { description?: string | null };
+
 type Props = {
   q: string;
   page: number;
-  rows: LeaderboardRow[];
+  rows: TableRow[];
   totalPages: number;
   activeLabel: string;
   host: Host | "all";
   /** Rank of `rows[0]` on the full board — rows are already the current page's slice. */
   startIdx: number;
   clearSearchHref: string;
+  /** Clears the search in place instead of following `clearSearchHref`. */
+  onClearSearch?: () => void;
+  /** Rows are about to be replaced by a re-cut that is still loading. */
+  busy?: boolean;
+  /** Rows show as placeholders until the re-cut loads (styled by `data-board-pending`). */
+  loading?: boolean;
+  /** Replaces the rows, e.g. when the board data failed to load. */
+  notice?: ReactNode;
 };
 
-export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, activeLabel, clearSearchHref }: Props) {
+export function LeaderboardTable({
+  q,
+  host,
+  page,
+  rows,
+  startIdx,
+  totalPages,
+  activeLabel,
+  clearSearchHref,
+  onClearSearch,
+  busy = false,
+  loading = false,
+  notice,
+}: Props) {
+  const clearSearch = onClearSearch
+    ? (e: MouseEvent) => {
+        e.preventDefault();
+        onClearSearch();
+      }
+    : undefined;
+
   return (
-    <div className="overflow-x-auto rounded-xl border border-line bg-surface">
+    <div
+      aria-busy={busy || loading || undefined}
+      className={`overflow-x-auto rounded-xl border border-line bg-surface transition-opacity ${busy ? "opacity-60" : ""}`}
+    >
       <table className="w-full border-separate border-spacing-0">
         <caption className="sr-only">
           Leaderboard — page {page} of {totalPages} for {activeLabel}
@@ -53,8 +88,14 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
           </tr>
         </thead>
 
-        <tbody>
-          {rows.length === 0 ? (
+        <tbody data-board-rows>
+          {notice ? (
+            <tr>
+              <td colSpan={5} className="p-11 text-center text-[13px] text-muted">
+                {notice}
+              </td>
+            </tr>
+          ) : rows.length === 0 ? (
             <tr>
               <td colSpan={5} className="p-11 text-center text-[13px] text-muted">
                 {q ? (
@@ -64,7 +105,7 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                       {q}
                     </strong>
                     &rdquo;.{" "}
-                    <Link href={clearSearchHref} className="text-ink-dim hover:text-ink-soft">
+                    <Link href={clearSearchHref} onClick={clearSearch} className="text-ink-dim hover:text-ink-soft">
                       Clear search
                     </Link>
                     .
@@ -107,7 +148,9 @@ export function LeaderboardTable({ q, host, page, rows, startIdx, totalPages, ac
                       </p>
                     )}
                   </td>
-                  <td className="hidden text-right tabular-nums text-ink-dim sm:table-cell">{compactStars(r.stars)}</td>
+                  <td className="hidden text-right tabular-nums text-ink-dim sm:table-cell">
+                    <span>{compactStars(r.stars)}</span>
+                  </td>
                   <td className="text-right">
                     <ScoreCell score={r.score} />
                   </td>

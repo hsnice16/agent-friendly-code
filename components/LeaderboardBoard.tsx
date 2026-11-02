@@ -1,83 +1,52 @@
+import { toBoardRow } from "@/lib/board-data";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
-import { MODEL_BY_ID } from "@/lib/scoring/weights";
+import { MODEL_BY_ID, MODELS } from "@/lib/scoring/weights";
 import type { LeaderboardStats } from "@/lib/types/db";
 import { boardPage } from "@/lib/utils/board-item-list";
-import { relativeTime } from "@/lib/utils/format";
-import { leaderboardHref } from "@/lib/utils/leaderboard-href";
-import { HostSelect } from "./HostSelect";
-import { LeaderboardTable } from "./LeaderboardTable";
-import { ModelPills } from "./ModelPills";
-import { Pagination } from "./Pagination";
-import { SearchBar } from "./SearchBar";
-import { SortSelect } from "./SortSelect";
-import { TrackEvent } from "./TrackEvent";
+import { BoardClient } from "./BoardClient";
+import { CodeText } from "./CodeText";
+import { RelativeTime } from "./RelativeTime";
+
+const AGENTS = [{ id: "overall" as const, label: "Overall" }, ...MODELS.map((m) => ({ id: m.id, label: m.label }))];
+
+const DATE = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" });
 
 export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats: LeaderboardStats }) {
-  const { q, page, totalPages, dir, sort, host, model } = view;
-
+  const { page, totalPages, model } = view;
   const { startIdx, rows } = boardPage(view);
 
   const activeLabel = model === "overall" ? "Overall" : MODEL_BY_ID[model].label;
   const rationale = model === "overall" ? "the average of every agent's score." : MODEL_BY_ID[model].rationale;
 
   return (
-    <>
-      <ModelPills includeOverall selected={model} hrefFor={(id) => leaderboardHref({ ...view, model: id, page: 1 })} />
-      <div className="mx-0.5 mb-5 -mt-0.5 max-w-[80ch] text-[13px] leading-[1.55] text-muted">
-        <strong className="text-ink-dim">{activeLabel}</strong> — {rationale}
-      </div>
-
-      <div className="mb-3 flex flex-col gap-3 sm:flex-row sm:items-center">
-        <SearchBar />
-        {/* Rendered here rather than in SearchBar so the event carries the
-            server's match count and only queries that outlived the debounce.
-            Keyed by board + term: a host or sort change re-counts results but isn't a new search. */}
-        {q && (
-          <TrackEvent
-            dedupeKey={`${model}:${q}`}
-            event={{ name: "search", search_term: q, results: view.filteredRows.length, board: model }}
-          />
-        )}
-
-        <div className="flex flex-wrap items-center gap-2">
-          <HostSelect value={host} />
-          <SortSelect sort={sort} dir={dir} />
-        </div>
-      </div>
-
-      <LeaderboardTable
-        q={q}
-        host={host}
-        page={page}
-        rows={rows}
-        startIdx={startIdx}
-        totalPages={totalPages}
+    <div data-board>
+      <BoardClient
+        key={`${model}:${page}`}
+        model={model}
+        agents={AGENTS}
         activeLabel={activeLabel}
-        clearSearchHref={leaderboardHref({ ...view, q: "", page: 1 })}
+        intro={
+          <div className="mx-0.5 mb-5 -mt-0.5 max-w-[80ch] text-[13px] leading-[1.55] text-muted">
+            <strong className="text-ink-dim">{activeLabel}</strong> — <CodeText text={rationale} />
+          </div>
+        }
+        server={{ page, totalPages, startIdx, rows: rows.map(toBoardRow) }}
+        summary={
+          <p className="m-0 text-[12.5px] text-muted">
+            Tracking <strong className="font-medium text-ink-dim">{stats.count}</strong>{" "}
+            {stats.count === 1 ? "repo" : "repos"}
+            {stats.lastScoredAt != null && (
+              <>
+                {" · "}last updated{" "}
+                <RelativeTime
+                  epochSec={stats.lastScoredAt}
+                  fallback={DATE.format(new Date(stats.lastScoredAt * 1000))}
+                />
+              </>
+            )}
+          </p>
+        }
       />
-
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="m-0 text-[12.5px] text-muted">
-          Tracking <strong className="font-medium text-ink-dim">{stats.count}</strong>{" "}
-          {stats.count === 1 ? "repo" : "repos"}
-          {stats.lastScoredAt != null && (
-            <>
-              {" · "}last updated{" "}
-              <time dateTime={new Date(stats.lastScoredAt * 1000).toISOString()}>
-                {relativeTime(stats.lastScoredAt)}
-              </time>
-            </>
-          )}
-        </p>
-
-        <Pagination
-          page={page}
-          size="compact"
-          totalPages={totalPages}
-          label="Leaderboard pages"
-          hrefFor={(p) => leaderboardHref({ ...view, page: p })}
-        />
-      </div>
-    </>
+    </div>
   );
 }

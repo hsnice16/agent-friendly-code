@@ -17,12 +17,7 @@ export function ModelSuggestions({ basePath, selected, suggestions }: Props) {
     <Panel>
       <PanelHeading>What to fix first</PanelHeading>
 
-      <ModelPills
-        scroll={false}
-        selected={selected}
-        hrefFor={(m) => `${basePath}?model=${m}`}
-        label="Pick an AI agent"
-      />
+      <ModelPills scroll={false} selected={selected} hrefFor={(m) => `${basePath}?model=${m}`} />
 
       {suggestions.length === 0 ? (
         <div className="text-muted">
