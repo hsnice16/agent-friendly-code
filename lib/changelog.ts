@@ -10,6 +10,21 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.4",
+    date: "2026-11-04",
+    title: "Guides for agent-ready repos",
+    highlights: [
+      "`/guide` — how to make a codebase agent-friendly: every check grouped into what to do, with how many leaderboard repos pass it.",
+      "What to put in an AGENTS.md for Go, Python, TypeScript, Rust and Java repos and for Next.js, FastAPI, Django and Rails projects, from each tool's docs, beside real examples. AGENTS.md examples also have a page per language.",
+      "Cursor rules and GEMINI.md each get a page comparing them with AGENTS.md: which agents read each, and when you need both.",
+      "`/report/agents-md` — how many popular repos have an AGENTS.md or CLAUDE.md, tracked since April 2026, by language, with a CSV to cite.",
+      "Repo pages without a usable AGENTS.md offer a starter one to copy, built from the files the checks found.",
+      "The leaderboards load faster and show 12 rows a page. Search, the platform filter and sorting update instantly, and later pages have their own address (`/page/2`); old `?page=` and `?model=` links redirect.",
+      "A Live Score of a very large GitHub repo offers a retry when part of its file list fails to load, instead of scoring without those files.",
+      "Microsoft Clarity records heatmaps with typed text masked; visitors from the EEA, UK and Switzerland are asked first and can change their answer on /privacy, which also lists what Google Analytics counts.",
+    ],
+  },
+  {
     label: "0.9.3",
     date: "2026-10-24",
     title: "Every agent checked against its docs",
