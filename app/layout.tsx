@@ -103,7 +103,6 @@ export const viewport: Viewport = {
 const NAV_LINKS = [
   { href: "/skill", label: "Agent Skill" },
   { href: "/action", label: "GitHub Action" },
-  { href: "/guide", label: "Guide" },
   { href: "/score", label: "Live Score" },
   { href: "/methodology", label: "Methodology" },
 ];
