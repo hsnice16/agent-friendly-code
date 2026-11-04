@@ -41,7 +41,7 @@ function SectionLinks({
   onPick?: () => void;
 }) {
   return (
-    <ul className="m-0 list-none space-y-0.5 border-l border-line p-0">
+    <ul className="m-0 list-none space-y-0.5 border-l border-line p-0 text-[13px] leading-snug">
       {sections.map((s) => {
         const current = s.id === active;
         return (
@@ -50,7 +50,7 @@ function SectionLinks({
               href={`#${s.id}`}
               onClick={onPick}
               aria-current={current ? "location" : undefined}
-              className={`-ml-px block border-l py-1 pl-3 text-[13px] leading-snug hover:text-ink ${
+              className={`-ml-px block border-l py-1 pl-3 hover:text-ink ${
                 current ? "border-ink font-medium text-ink" : "border-transparent text-muted"
               }`}
             >
@@ -105,7 +105,7 @@ export function SectionNav({ sections, action }: SectionMenuProps) {
   return (
     <>
       <nav ref={navRef} aria-label="On this page" className="sticky top-20">
-        <p className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">On this page</p>
+        <p className="m-0 mb-2 text-[11px] eyebrow text-muted">On this page</p>
         <SectionLinks sections={sections} active={active} />
       </nav>
       {/* No left/right: a fixed box keeps its in-flow horizontal position, so it
@@ -159,7 +159,7 @@ export function FloatingSectionMenu({ sections, action }: SectionMenuProps) {
         aria-label="On this page"
         className="absolute bottom-12 right-0 z-10 max-h-[60vh] w-56 overflow-y-auto rounded-xl border border-line bg-surface p-4 shadow-lg"
       >
-        <p className="m-0 mb-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">On this page</p>
+        <p className="m-0 mb-2 text-[11px] eyebrow text-muted">On this page</p>
         <SectionLinks sections={sections} active={active} onPick={() => setOpen(false)} />
       </nav>
       <button

@@ -1,5 +1,8 @@
 import { examplesByLanguage } from "@/lib/agents-md-examples";
+import { examplesByFramework } from "@/lib/agents-md-frameworks";
+import { ADOPTION } from "@/lib/agents-md-report";
 import { CHECK_CONTENT } from "@/lib/check-content";
+import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { REGISTRIES } from "@/lib/clients/registries";
 import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getTopPackagesByRegistry } from "@/lib/db";
@@ -8,10 +11,12 @@ import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH } from "@/lib/topics";
-import { checkPath, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { formatDay } from "@/lib/utils/format";
 import { OTHER_LANGUAGES_PATH } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
+import { REPORT_CSV_PATH, REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
 import {
   ACTION_REPO_URL,
   APP_DESCRIPTION,
@@ -53,6 +58,12 @@ export function GET(): Response {
   const languageLinks = examplesByLanguage(getAgentsMdExamples())
     .map((l) => `[${l.label.replace(/[[\]()\n]/g, "")}](${APP_URL}${languageExamplesPath(l.slug)})`)
     .join(", ");
+  const frameworkLinks = examplesByFramework(getAgentsMdExamples())
+    .map((f) => `[${f.guide.label}](${APP_URL}${frameworkExamplesPath(f.guide.slug)})`)
+    .join(", ");
+  const vsLines = Object.entries(VS_AGENTS_MD)
+    .map(([id, c]) => `- [${c.name} vs AGENTS.md](${APP_URL}${checkSubPath(id, "vs-agents-md")}): ${c.description}`)
+    .join("\n");
   const hasTopics = getTopicGroups().length > 0;
 
   const body = `# ${APP_NAME}
@@ -75,10 +86,13 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 - [About](${APP_URL}/about): Who built this, why, and the project's independence statement
 - [Action](${APP_URL}/action): GitHub Action that comments on each pull request with the score change — install snippet, FAQ
 - [Changelog](${APP_URL}/changelog): What shipped per release
+- [Guide: make a repo ready for AI coding agents](${APP_URL}/guide): The checks grouped into what to do, with leaderboard pass rates and links to every check, agent file and tool
+- [${REPORT_TITLE}](${APP_URL}${REPORT_PATH}): Share of leaderboard repos with AGENTS.md or CLAUDE.md, from snapshots on most days since ${formatDay(ADOPTION.points[0].date)}; today's split by language and other agent files; CSV (${APP_URL}${REPORT_CSV_PATH})
 - [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check, with what it looks for, how to pass it and how many leaderboard repos do
 - [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent, from each agent's docs, with how many leaderboard repos have each file
 - [AGENTS.md vs CLAUDE.md](${APP_URL}${checkSubPath("agents_md", "vs-claude-md")}): Which one to use, which agents read each, and what Claude Code does when a repo has both
-- [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score${languageLinks ? `; by language: ${languageLinks}` : ""}
+${vsLines}
+- [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score${languageLinks ? `; by language: ${languageLinks}` : ""}${frameworkLinks ? `; by framework, with what to put in the file: ${frameworkLinks}` : ""}
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
 - [Other languages](${APP_URL}${OTHER_LANGUAGES_PATH}): Repos in languages too small for their own hub, grouped by language
 ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations

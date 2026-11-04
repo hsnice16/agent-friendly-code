@@ -41,6 +41,10 @@ const ALLOW = ["/", "/api/repos"];
 // Petal Search (Huawei) crawls heavily for an engine that sends next to no visitors.
 const BLOCKED = ["PetalBot"];
 
+// Parallel's index feeds AI agents, so the guides stay open to it; its sweeps of
+// the per-repo and per-topic pages cost more origin transfer than they return.
+const SHAPBOT_DISALLOW = [...DISALLOW, "/repo/", "/topic/"];
+
 export default function robots(): MetadataRoute.Robots {
   return {
     sitemap: `${APP_URL}/sitemap.xml`,
@@ -48,6 +52,7 @@ export default function robots(): MetadataRoute.Robots {
       { userAgent: "*", allow: ALLOW, disallow: DISALLOW },
       { userAgent: AI_CRAWLERS, allow: ALLOW, disallow: DISALLOW },
       { userAgent: LINK_PREVIEW, allow: ALLOW, disallow: PREVIEW_DISALLOW },
+      { userAgent: "ShapBot", allow: ALLOW, disallow: SHAPBOT_DISALLOW },
       { userAgent: BLOCKED, disallow: "/" },
     ],
   };

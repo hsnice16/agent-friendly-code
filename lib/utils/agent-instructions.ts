@@ -30,13 +30,16 @@ export function hasAgentFile(s: { pass: number; matchedPath?: string | null }): 
 // The agents_md check's candidates, in its lookup order.
 const MAIN_FILES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"];
 
-const OTHERS: { id: string; name: string }[] = [
-  { id: "gemini_md", name: "GEMINI.md" },
-  { id: "cursor_rules", name: ".cursor/rules" },
-  { id: "openhands_setup", name: ".openhands/setup.sh" },
-  { id: "aider_conf", name: ".aider.conf.yml" },
-  { id: "agent_skills", name: ".agents/skills" },
-];
+/** The other agent-file checks. `name` is what a repo page lists as absent, `label` every form the check accepts, `key` the adoption series' field. */
+export const OTHER_FILES = [
+  { signalId: "gemini_md", key: "geminiMd", name: "GEMINI.md", label: "GEMINI.md" },
+  { signalId: "cursor_rules", key: "cursorRules", name: ".cursor/rules", label: ".cursor/rules or .cursorrules" },
+  { signalId: "openhands_setup", key: "openhandsSetup", name: ".openhands/setup.sh", label: ".openhands/setup.sh" },
+  { signalId: "aider_conf", key: "aiderConf", name: ".aider.conf.yml", label: ".aider.conf.yml" },
+  { signalId: "agent_skills", key: "agentSkills", name: ".agents/skills", label: ".agents/skills" },
+] as const;
+
+export const AGENT_FILE_SIGNAL_IDS: string[] = ["agents_md", ...OTHER_FILES.map((f) => f.signalId)];
 
 const NUMBER = new Intl.NumberFormat("en-US");
 
@@ -85,8 +88,8 @@ export function agentInstructions(signals: SignalResult[], share: AgentFileShare
 
   const others: AgentFile[] = [];
   const absentOthers: string[] = [];
-  for (const o of OTHERS) {
-    const s = byId.get(o.id);
+  for (const o of OTHER_FILES) {
+    const s = byId.get(o.signalId);
     if (!s) continue;
     const found = other(s);
     if (found) others.push(found);

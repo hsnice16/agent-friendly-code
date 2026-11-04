@@ -7,6 +7,7 @@ import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
+import { LINK } from "@/components/link-class";
 import { Panel, PanelHeading } from "@/components/Panel";
 import {
   type AgentsMdExamples,
@@ -14,17 +15,25 @@ import {
   examplesTitle,
   LANGUAGE_EXAMPLES_MIN,
 } from "@/lib/agents-md-examples";
+import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath, checkSlug, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
+import {
+  checkPath,
+  checkSlug,
+  checkSubPath,
+  frameworkExamplesPath,
+  languageExamplesPath,
+} from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
+import { REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const SIGNAL_ID = "agents_md";
@@ -32,7 +41,6 @@ const PATH = checkSubPath(SIGNAL_ID, "examples");
 const TOP_STARRED = 20;
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink hover:text-ink-soft";
 
 // Only AGENTS.md is common enough to fill an examples page; every other slug is a 404.
 export const dynamicParams = false;
@@ -89,6 +97,7 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
   }
 
   const ex = getAgentsMdExamples();
+  const frameworks = examplesByFramework(ex);
   const readers = MODELS.map((m) => ({ m, weight: m.weights[SIGNAL_ID] ?? 0 }))
     .filter((r) => r.weight > 0)
     .sort((a, b) => b.weight - a.weight);
@@ -111,10 +120,14 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
         <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink-dim">
           {ex.rows.length} of {ex.boardSize} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
           {ex.passing} are long enough (800+ characters) to pass the{" "}
-          <Link href={checkPath(SIGNAL_ID)} className={LINK}>
+          <Link href={checkPath(SIGNAL_ID)} className="prose-link">
             AGENTS.md check
           </Link>{" "}
-          in full. Each file name links to the file.
+          in full. Each file name links to the file. How that share has grown:{" "}
+          <Link href={REPORT_PATH} className="prose-link">
+            {REPORT_TITLE}
+          </Link>
+          .
         </p>
       </section>
 
@@ -156,7 +169,7 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
           <p className={PROSE}>
             The check reads the first of AGENTS.md, CLAUDE.md and AGENT.md with content, so a repo with both counts
             under AGENTS.md unless its AGENTS.md is empty. Either name passes.{" "}
-            <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={LINK}>
+            <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className="prose-link">
               Which one to use
             </Link>
             .
@@ -177,7 +190,7 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
           </ul>
           <p className="mt-3 mb-0 text-[13px] text-muted">
             The{" "}
-            <Link href="/methodology" className={LINK}>
+            <Link href="/methodology" className="prose-link">
               methodology
             </Link>{" "}
             links the docs behind each weight.
@@ -213,6 +226,19 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
                 </li>
               ))}
             </ul>
+            {frameworks.length > 0 && (
+              <p className="mt-3 mb-0 text-[14px] text-ink-dim">
+                By framework, with what to put in the file:{" "}
+                {frameworks.map((f, i) => (
+                  <span key={f.guide.slug}>
+                    {i > 0 && " · "}
+                    <Link href={frameworkExamplesPath(f.guide.slug)} className={LINK}>
+                      {f.guide.label}
+                    </Link>
+                  </span>
+                ))}
+              </p>
+            )}
           </Panel>
         </div>
       )}

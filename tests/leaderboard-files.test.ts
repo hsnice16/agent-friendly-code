@@ -4,7 +4,7 @@ import assert from "node:assert/strict";
 import { after, describe, it } from "node:test";
 
 import { db, saveScoredRepo } from "../lib/db";
-import { getInstructionFileCounts } from "../lib/leaderboard-files";
+import { getInstructionFileCounts, reposWithBoth } from "../lib/leaderboard-files";
 import type { SignalResult } from "../lib/scoring/signals";
 
 const signal = (id: string, pass: number, matchedPath?: string): SignalResult => ({
@@ -43,5 +43,17 @@ describe("getInstructionFileCounts", () => {
     assert.equal(count("CLAUDE.md"), 1);
     assert.equal(count("GEMINI.md"), 1);
     assert.equal(files[0].file, "AGENTS.md");
+  });
+});
+
+describe("reposWithBoth", () => {
+  it("counts a check's file only with content, and only beside an instructions file with content", () => {
+    // "upper" has both; "claude"'s GEMINI.md is empty.
+    assert.equal(reposWithBoth("gemini_md"), 1);
+    save("gemini-only", [signal("agents_md", 0), signal("gemini_md", 1, "GEMINI.md")]);
+    save("gemini-empty-agents", [signal("agents_md", 0.2, "AGENTS.md"), signal("gemini_md", 1, "GEMINI.md")]);
+    assert.equal(reposWithBoth("gemini_md"), 1);
+    save("gemini-claude", [signal("agents_md", 1, "CLAUDE.md"), signal("gemini_md", 1, "GEMINI.md")]);
+    assert.equal(reposWithBoth("gemini_md"), 2);
   });
 });

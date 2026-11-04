@@ -14,7 +14,7 @@ export function signalIdFromSlug(slug: string): string | null {
   return checkSlug(id) === slug && Object.hasOwn(SIGNAL_BY_ID, id) ? id : null;
 }
 
-export type CheckSubPage = "examples" | "vs-claude-md";
+export type CheckSubPage = "examples" | "vs-claude-md" | "vs-agents-md";
 
 export function checkSubPath(signalId: string, page: CheckSubPage): string {
   return `${checkPath(signalId)}/${page}`;
@@ -22,4 +22,9 @@ export function checkSubPath(signalId: string, page: CheckSubPage): string {
 
 export function languageExamplesPath(languageSlug: string): string {
   return `${checkSubPath("agents_md", "examples")}/${languageSlug}`;
+}
+
+// Shares the language pages' segment; tests/agents-md-frameworks.test.ts keeps the slugs apart.
+export function frameworkExamplesPath(frameworkSlug: string): string {
+  return languageExamplesPath(frameworkSlug);
 }

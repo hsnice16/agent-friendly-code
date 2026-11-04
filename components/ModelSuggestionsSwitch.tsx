@@ -3,20 +3,18 @@
 import { useEffect, useState } from "react";
 
 import { track } from "@/lib/analytics-events";
-import type { ImprovementSuggestion } from "@/lib/scoring/scorer";
+import type { FixText, SwitchAgent } from "@/lib/utils/suggestion-switch";
 
 import { Panel, PanelHeading } from "./Panel";
 import { pillClass } from "./pill-class";
 import { SuggestionItem } from "./SuggestionItem";
-
-type Agent = { id: string; label: string; suggestions: ImprovementSuggestion[] };
 
 /**
  * Buttons, not `?model=` links: a crawlable URL per agent, all canonical to
  * this page, only spends crawl budget. Reading the query in the browser keeps
  * old `?model=` links working on a static page.
  */
-export function ModelSuggestionsSwitch({ agents }: { agents: Agent[] }) {
+export function ModelSuggestionsSwitch({ agents, text }: { agents: SwitchAgent[]; text: Record<string, FixText> }) {
   const [selected, setSelected] = useState(agents[0].id);
 
   useEffect(() => {
@@ -48,7 +46,7 @@ export function ModelSuggestionsSwitch({ agents }: { agents: Agent[] }) {
               pick(a.id);
               track({ name: "select_agent", agent: a.id });
             }}
-            className={`${pillClass(a.id === agent.id)} cursor-pointer`}
+            className={pillClass(a.id === agent.id)}
           >
             {a.label}
           </button>
@@ -59,17 +57,15 @@ export function ModelSuggestionsSwitch({ agents }: { agents: Agent[] }) {
       <p role="status" className="sr-only">
         Showing fixes for {agent.label}
       </p>
-      <div>
-        {agent.suggestions.length === 0 ? (
-          <div className="text-muted">Nothing to fix — this repo already has everything {agent.label} looks for.</div>
-        ) : (
-          <ol className="m-0 list-none p-0">
-            {agent.suggestions.map((s, i) => (
-              <SuggestionItem key={s.signalId} suggestion={s} index={i} />
-            ))}
-          </ol>
-        )}
-      </div>
+      {agent.fixes.length === 0 ? (
+        <div className="text-muted">Nothing to fix — this repo already has everything {agent.label} looks for.</div>
+      ) : (
+        <ol className="m-0 list-none divide-y divide-line p-0">
+          {agent.fixes.map(([signalId, scoreGain], i) => (
+            <SuggestionItem key={signalId} suggestion={{ ...text[signalId], scoreGain }} index={i} />
+          ))}
+        </ol>
+      )}
     </Panel>
   );
 }

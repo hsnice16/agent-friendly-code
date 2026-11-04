@@ -78,7 +78,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
           {hub.rows.length} {hub.label} repos, ranked by overall score (the average across agents). They average{" "}
           <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
-          <Link href={repoPath(hub.top)} className="text-ink hover:text-ink-soft">
+          <Link href={repoPath(hub.top)} className="prose-link">
             {hub.top.owner}/{hub.top.name}
           </Link>{" "}
           leads with <strong className="text-ink">{(hub.top.score ?? 0).toFixed(1)}</strong>.
@@ -86,7 +86,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         {examples && (
           <p className="mt-2 mb-0 max-w-[72ch] text-[15.5px] text-ink-dim">
             {examples.rows.length} of them have an AGENTS.md or CLAUDE.md:{" "}
-            <Link href={languageExamplesPath(hub.slug)} className="text-ink hover:text-ink-soft">
+            <Link href={languageExamplesPath(hub.slug)} className="prose-link">
               {hub.label} AGENTS.md examples
             </Link>
             .
@@ -110,7 +110,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             </ul>
             <p className="mt-3 mb-0 text-[13px] text-muted">
               Leaves out checks only one agent reads, which almost no repo passes. The{" "}
-              <Link href="/methodology" className="text-ink-dim hover:text-ink-soft">
+              <Link href="/methodology" className="prose-link">
                 methodology
               </Link>{" "}
               explains each check.

@@ -157,7 +157,7 @@ describe("examplesByLanguage", () => {
   });
 
   it("names Go the way people search for it", () => {
-    assert.match(languageExamplesDescription(langs[0]), /Go \(Golang\) repos/);
+    assert.match(languageExamplesDescription(langs[0]), /Go \(Golang\) repo/);
   });
 
   it("groups spellings of one language onto one page", () => {

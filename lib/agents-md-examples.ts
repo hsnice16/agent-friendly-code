@@ -1,6 +1,9 @@
+import type { AgentsMdGuide } from "./framework-guides/types";
+import { LANGUAGE_GUIDES } from "./language-guides";
 import type { LeaderboardRow, SignalFile } from "./types/db";
 import { fileLength, hasAgentFile } from "./utils/agent-instructions";
 import { groupByLanguage, isHub, languageSlug } from "./utils/language";
+import { median } from "./utils/median";
 import { repoOwnership } from "./utils/own-repo";
 import { fitDescription } from "./utils/page-title";
 import { repoFileUrl } from "./utils/repo-file-url";
@@ -31,7 +34,14 @@ export const LENGTH_LIST_LIMIT = 5;
 /** Fewer files than this make a thin page that adds nothing to the full list. */
 export const LANGUAGE_EXAMPLES_MIN = 5;
 
-export type LanguageExamples = { slug: string; label: string; rows: ExampleRow[]; total: number; passing: number };
+export type LanguageExamples = {
+  slug: string;
+  label: string;
+  rows: ExampleRow[];
+  total: number;
+  passing: number;
+  guide: AgentsMdGuide | null;
+};
 
 // People search "golang agents.md"; the board labels the language "Go".
 const SEARCH_NAMES: Record<string, string> = { go: "Go (Golang)" };
@@ -97,13 +107,6 @@ export function buildAgentsMdExamples(board: LeaderboardRow[], files: SignalFile
   };
 }
 
-function median(values: number[]): number | null {
-  if (values.length === 0) return null;
-  const sorted = [...values].sort((a, b) => a - b);
-  const mid = Math.floor(sorted.length / 2);
-  return sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2);
-}
-
 export function examplesTitle(count: number): string {
   return `AGENTS.md examples: ${count} real files from open source repos`;
 }
@@ -122,17 +125,33 @@ export function examplesByLanguage(ex: Pick<AgentsMdExamples, "rows" | "language
     .filter((l) => l.withFile >= LANGUAGE_EXAMPLES_MIN)
     .map((l) => {
       const rows = ex.rows.filter((r) => r.language != null && languageSlug(r.language) === l.slug);
-      return { slug: l.slug, label: l.label, rows, total: l.total, passing: rows.filter((r) => r.pass >= 1).length };
+      return {
+        slug: l.slug,
+        label: l.label,
+        rows,
+        total: l.total,
+        passing: rows.filter((r) => r.pass >= 1).length,
+        guide: LANGUAGE_GUIDES[l.slug] ?? null,
+      };
     })
     .sort((a, b) => b.rows.length - a.rows.length);
 }
 
-export function languageExamplesTitle(lang: Pick<LanguageExamples, "slug" | "label" | "rows">): string {
-  return `${SEARCH_NAMES[lang.slug] ?? lang.label} AGENTS.md examples: ${lang.rows.length} open source repos`;
+export function languageExamplesTitle(lang: Pick<LanguageExamples, "slug" | "label" | "rows" | "guide">): string {
+  const name = SEARCH_NAMES[lang.slug] ?? lang.label;
+  return lang.guide
+    ? `AGENTS.md for ${name}: guide and ${lang.rows.length} real examples`
+    : `${name} AGENTS.md examples: ${lang.rows.length} open source repos`;
 }
 
 export function languageExamplesDescription(lang: LanguageExamples): string {
   const name = SEARCH_NAMES[lang.slug] ?? lang.label;
+  if (lang.guide) {
+    return fitDescription(
+      `What to put in an AGENTS.md for a ${name} repo: the commands, layout and rules agents get wrong.`,
+      `Plus ${lang.rows.length} real files from ${lang.label} repos.`,
+    );
+  }
   return fitDescription(
     `Real AGENTS.md and CLAUDE.md files from ${lang.rows.length} ${name} repos, linked at their source.`,
     `${lang.passing} pass our check in full.`,

@@ -1,11 +1,12 @@
 import type { ImprovementSuggestion } from "@/lib/scoring/scorer";
 
-export function SuggestionItem({ index, suggestion }: { index: number; suggestion: ImprovementSuggestion }) {
+type Suggestion = Pick<ImprovementSuggestion, "label" | "suggestion" | "scoreGain">;
+
+/** Goes in a `divide-y divide-line` list. */
+export function SuggestionItem({ index, suggestion }: { index: number; suggestion: Suggestion }) {
   return (
-    <li className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-3.5 gap-y-1 border-b border-line py-3.5 last:border-b-0 sm:grid-cols-[22px_minmax(0,1fr)_auto]">
-      <div className="mt-0.5 flex h-[22px] w-[22px] items-center justify-center rounded-full bg-accent text-[11.5px] font-bold text-bg">
-        {index + 1}
-      </div>
+    <li className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-3.5 gap-y-1 py-3.5 sm:grid-cols-[22px_minmax(0,1fr)_auto]">
+      <div className="glyph mt-0.5 size-[22px] bg-accent text-[11.5px] font-bold text-bg">{index + 1}</div>
 
       {/* Fix text like `.cursor/rules/*.mdc` has no break point; without these the
           row outgrows a phone screen and pushes the points off the edge. */}

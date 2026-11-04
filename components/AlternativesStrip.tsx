@@ -29,16 +29,14 @@ export function AlternativesStrip({ heading = "Similar repos", language, alterna
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-3">
         {alternatives.map((a) => (
-          <li key={a.id} className="relative rounded-lg border border-line bg-surface-2 px-3.5 py-3">
+          <li key={a.id} className="relative tile">
             <div className="flex items-start justify-between gap-2">
               <Link
                 href={repoPath(a)}
                 aria-label={`View ${a.owner}/${a.name} details`}
-                className="min-w-0 font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
+                className="min-w-0 truncate font-medium text-ink hover:text-ink-soft cover-link"
               >
-                <span className="block truncate">
-                  {a.owner}/{a.name}
-                </span>
+                {a.owner}/{a.name}
               </Link>
 
               <ScoreNumber score={a.score ?? 0} size="sm" />

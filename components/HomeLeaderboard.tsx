@@ -28,7 +28,12 @@ export function HomeLeaderboard({ view, stats }: Props) {
           Which public repos are easiest for AI coding agents to work in?
         </h1>
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
-          Repos from {HOSTS_TEXT}, scored on what each agent looks for, then ranked.
+          {/* Visitors click this line expecting a link. */}
+          Repos from {HOSTS_TEXT},{" "}
+          <Link href="/methodology" className="prose-link">
+            scored on what each agent looks for
+          </Link>
+          , then ranked.
         </p>
 
         {/* LiveScoreForm stacks below `sm`; the copy around it stays short so the board is still near the fold on a phone. */}

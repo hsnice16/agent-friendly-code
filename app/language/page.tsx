@@ -47,10 +47,7 @@ export default function LanguagesPage() {
         {hubs.map((g) => (
           <li key={g.slug} className="relative rounded-lg border border-line bg-surface px-4 py-3.5">
             <div className="flex items-start justify-between gap-2">
-              <Link
-                href={hubPath(g.slug)}
-                className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
-              >
+              <Link href={hubPath(g.slug)} className="font-medium text-ink hover:text-ink-soft cover-link">
                 {g.label}
               </Link>
               <ScoreNumber score={averageScore(g.rows)} size="sm" />

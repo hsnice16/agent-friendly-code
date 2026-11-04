@@ -7,9 +7,11 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
+import { LINK } from "@/components/link-class";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
+import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
@@ -19,12 +21,12 @@ import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
+import { REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink hover:text-ink-soft";
 
 export const dynamicParams = false;
 
@@ -140,7 +142,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           </ul>
           <p className="mt-3 mb-0 text-[13px] text-muted">
             How checks become a score:{" "}
-            <Link href="/methodology" className="text-ink-dim hover:text-ink-soft">
+            <Link href="/methodology" className="prose-link">
               methodology
             </Link>
             .
@@ -198,7 +200,20 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           <Link href={checkSubPath(id, "vs-claude-md")} className={LINK}>
             AGENTS.md vs CLAUDE.md
           </Link>
-          : which to use.
+          : which to use.{" "}
+          <Link href={REPORT_PATH} className={LINK}>
+            {REPORT_TITLE}
+          </Link>
+          : how many repos have one, over time.
+        </p>
+      )}
+
+      {Object.hasOwn(VS_AGENTS_MD, id) && (
+        <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
+          <Link href={checkSubPath(id, "vs-agents-md")} className={LINK}>
+            {VS_AGENTS_MD[id].name} vs AGENTS.md
+          </Link>
+          : which to use, and how to keep one source.
         </p>
       )}
 
@@ -220,9 +235,17 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         </div>
       )}
 
+      <p className="mt-6 mb-0 text-[13px] text-muted">
+        Every check, grouped into what to do first:{" "}
+        <Link href="/guide" className="prose-link">
+          how to make your repo ready for AI coding agents
+        </Link>
+        .
+      </p>
+
       <nav
         aria-label="Other checks"
-        className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-muted"
+        className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[13px] text-muted"
       >
         <span>Other checks:</span>
         {SIGNALS.filter((s) => s.id !== id).map((s) => (

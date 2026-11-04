@@ -16,13 +16,15 @@
   --color-ink: #0a0a0a;
   --color-ink-soft: #262626;
   --color-ink-dim: #525252;
-  --color-muted: #737373;
+  --color-muted: #6b6b6b;
   --color-accent: #0a0a0a;
   --color-accent-ink: #ffffff;
 
-  --color-ok: #16a34a;
-  --color-warn: #b45309;
-  --color-bad: #dc2626;
+  /* Small text in these clears 4.5:1 (WCAG AA) on surface-2; ok, warn and
+     bad also on their own /15 tint over surface (info and tip don't). */
+  --color-ok: #137336;
+  --color-warn: #a14a08;
+  --color-bad: #c01f1f;
   --color-info: #2563eb;
   --color-tip: #0f766e;
 
@@ -78,6 +80,67 @@
     --color-bad: #db7676;
     --color-info: #b8cbed;
     --color-tip: #ccfbf1;
+  }
+}
+
+/* ---------- shared patterns ----------
+   When one belongs here: the Tailwind line in AGENTS.md. */
+@utility glyph {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+}
+
+@utility tile {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background-color: var(--color-surface-2);
+  padding: calc(var(--spacing) * 3) calc(var(--spacing) * 3.5);
+}
+
+@utility eyebrow {
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Stretches a link over its nearest positioned ancestor, so the whole card is clickable. */
+@utility cover-link {
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+  }
+}
+
+/* The colors differ per state; see components/pill-class.ts. */
+@utility pill {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1.5);
+  border-radius: calc(infinity * 1px);
+  border-width: 1px;
+  padding: calc(var(--spacing) * 1.5) calc(var(--spacing) * 3);
+  font-size: 13px;
+  font-weight: var(--font-weight-medium);
+
+  /* A 44px tap target on touch-sized screens; desktop keeps the compact pill. */
+  @media (width < 40rem) {
+    min-height: 44px;
+  }
+}
+
+@utility prose-link {
+  border-bottom: 1px dotted color-mix(in oklab, var(--color-ink-dim) 60%, transparent);
+  color: var(--color-ink-dim);
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: var(--color-ink-soft);
+      color: var(--color-ink-soft);
+    }
   }
 }
 

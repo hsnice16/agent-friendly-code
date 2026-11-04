@@ -64,10 +64,7 @@ export default function NotFound() {
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           We only have pages for repos and packages we track. An old link, or a repo that was never on the list, ends up
           here.{" "}
-          <Link
-            href="/score"
-            className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-          >
+          <Link href="/score" className="prose-link">
             Live Score
           </Link>{" "}
           scores any public GitHub repo right away, even one we don&apos;t track.

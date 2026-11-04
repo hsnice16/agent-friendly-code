@@ -52,10 +52,7 @@ export default function PackageIndexPage() {
           <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
             {EXAMPLES.map(({ registry, name }) => (
               <li key={`${registry}/${name}`}>
-                <Link
-                  href={`/package/${registry}/${name}`}
-                  className="block rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
-                >
+                <Link href={`/package/${registry}/${name}`} className="block tile text-ink">
                   <span className="font-mono text-[13px] text-muted">{registry}</span>
                   <span className="mx-1.5 text-muted">/</span>
                   <span className="font-medium">{name}</span>
@@ -89,7 +86,7 @@ export default function PackageIndexPage() {
                 <li key={`${row.registry}/${row.name}`}>
                   <Link
                     href={`/package/${row.registry}/${encodeURIComponent(row.name)}`}
-                    className="flex items-center justify-between rounded-lg border border-line bg-surface-2 px-3.5 py-3 text-ink"
+                    className="flex items-center justify-between tile text-ink"
                   >
                     <span className="truncate">
                       <span className="font-mono text-[13px] text-muted">{row.registry}</span>

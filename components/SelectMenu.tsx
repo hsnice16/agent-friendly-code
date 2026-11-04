@@ -102,7 +102,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         aria-controls={`${id}-list`}
         onKeyDown={onTriggerKey}
         onClick={() => (open ? setOpen(false) : openMenu())}
-        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[13px] text-ink-dim hover:text-ink-soft"
+        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[13px] text-ink-dim hover:text-ink-soft max-sm:min-h-[44px]"
       >
         <span className="whitespace-nowrap">{current.shortLabel ?? current.label}</span>
         <CaretDown size={11} weight="bold" aria-hidden="true" className="text-muted" />

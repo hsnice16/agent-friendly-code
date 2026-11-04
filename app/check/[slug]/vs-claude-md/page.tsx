@@ -5,9 +5,11 @@ import { notFound } from "next/navigation";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { LINK } from "@/components/link-class";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AGENT_READS, type AgentsMdUse, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
+import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { AGENTS_VS_CLAUDE_MD } from "@/lib/page-meta";
@@ -26,7 +28,6 @@ const CLAUDE_DOCS = "https://code.claude.com/docs/en/memory#agents-md";
 const { title: TITLE, description: DESCRIPTION } = AGENTS_VS_CLAUDE_MD;
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink hover:text-ink-soft";
 const CODE = "font-mono text-[13px] text-ink";
 
 const AGENTS_MD_CELL: Record<AgentsMdUse, string> = {
@@ -87,6 +88,7 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
             { "@type": "Thing", name: "AGENTS.md" },
             { "@type": "Thing", name: "CLAUDE.md" },
           ],
+          datePublished: "2026-10-21",
           ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
@@ -114,7 +116,8 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
 
       <Panel>
         <PanelHeading>Which agents read AGENTS.md and which read CLAUDE.md?</PanelHeading>
-        <div className="overflow-x-auto">
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+        <section className="overflow-x-auto" tabIndex={0} aria-label="Agents and the files they read">
           <table className="w-full border-collapse text-left text-[14px]">
             <caption className="sr-only">Whether each AI coding agent reads AGENTS.md and CLAUDE.md</caption>
             <thead>
@@ -144,7 +147,7 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
               ))}
             </tbody>
           </table>
-        </div>
+        </section>
         <p className={`${PROSE} mt-3 text-[13px]`}>
           <Link href="/agents" className={LINK}>
             Every file each agent reads
@@ -188,14 +191,26 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
           </p>
           <p className={`${PROSE} mt-3`}>
             Our{" "}
-            <Link href={checkPath(SIGNAL_ID)} className={LINK}>
+            <Link href={checkPath(SIGNAL_ID)} className="prose-link">
               AGENTS.md check
             </Link>{" "}
             passes either name; the choice only changes which agents find it.{" "}
-            <Link href={checkSubPath(SIGNAL_ID, "examples")} className={LINK}>
+            <Link href={checkSubPath(SIGNAL_ID, "examples")} className="prose-link">
               Read both kinds
             </Link>{" "}
             in popular repos.
+          </p>
+          <p className={`${PROSE} mt-3`}>
+            For other agents:{" "}
+            {Object.entries(VS_AGENTS_MD).map(([id, c], i) => (
+              <span key={id}>
+                {i > 0 && ", "}
+                <Link href={checkSubPath(id, "vs-agents-md")} className={LINK}>
+                  {c.name} vs AGENTS.md
+                </Link>
+              </span>
+            ))}
+            .
           </p>
         </Panel>
       </div>

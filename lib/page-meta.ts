@@ -4,6 +4,7 @@ import { SIGNALS } from "./scoring/signals";
 import { MODELS } from "./scoring/weights";
 import { UNKNOWN_LANGUAGE } from "./utils/language";
 import { fitDescription, pageTitle } from "./utils/page-title";
+import { REPORT_PATH, REPORT_TITLE } from "./utils/report-path";
 import { APP_NAME, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "./version";
 
 type Copy = { title: string; description: string; type: "website" | "article" };
@@ -27,6 +28,12 @@ export const PAGE_COPY = {
     title: "Which files does each AI coding agent read?",
     description:
       "AGENTS.md, CLAUDE.md, GEMINI.md or .cursor/rules: the repo files Claude Code, Codex, Cursor, Gemini CLI and other agents read, per their docs.",
+    type: "article",
+  },
+  "/guide": {
+    title: "How to make your codebase agent-friendly for AI agents",
+    description:
+      "Make a codebase work with AI coding agents like Claude Code, Codex and Cursor: AGENTS.md, tests, CI, setup and per-agent files, with real pass rates.",
     type: "article",
   },
   "/check": {
@@ -90,6 +97,12 @@ export const PAGE_COPY = {
     title: "GitHub Action: AI agent readiness check on every PR",
     description:
       "A GitHub Action that checks AI agent readiness on every pull request and comments with how it moves the score for each coding agent. Runs only in your CI.",
+    type: "article",
+  },
+  [REPORT_PATH]: {
+    title: `${REPORT_TITLE} in open source`,
+    description:
+      "How many popular open source repos have an AGENTS.md or CLAUDE.md, from snapshots on most days since April 2026: the trend, by language, and a CSV to cite.",
     type: "article",
   },
 } as const satisfies Record<string, Copy>;

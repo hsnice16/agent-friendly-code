@@ -70,7 +70,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
 
       <Panel>
         {/* Not a heading: it would come before the h1. */}
-        <p className="m-0 mb-3.5 text-xs font-semibold uppercase tracking-[0.08em] text-muted">Package</p>
+        <p className="m-0 mb-3.5 text-xs eyebrow text-muted">Package</p>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-mono text-[13px] text-muted">{registry}</span>

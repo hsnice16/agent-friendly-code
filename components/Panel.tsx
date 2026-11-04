@@ -24,16 +24,13 @@ export function Panel({
   children: React.ReactNode;
 }) {
   const borderClass = tone ? TONE_BORDER[tone] : "border-line";
+  const cls = ["rounded-xl border bg-surface", borderClass, padding && "p-5", className].filter(Boolean).join(" ");
 
-  return (
-    <section className={`rounded-xl border ${borderClass} bg-surface ${padding ? "px-5 py-5" : ""} ${className}`}>
-      {children}
-    </section>
-  );
+  return <section className={cls}>{children}</section>;
 }
 
 export function PanelHeading({ children, tone }: { children: React.ReactNode; tone?: PanelTone }) {
   const toneClass = tone ? TONE_HEADING[tone] : "text-muted";
 
-  return <h2 className={`mb-3.5 text-xs font-semibold uppercase tracking-[0.08em] ${toneClass}`}>{children}</h2>;
+  return <h2 className={`mb-3.5 text-xs eyebrow ${toneClass}`}>{children}</h2>;
 }

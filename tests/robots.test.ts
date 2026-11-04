@@ -19,6 +19,12 @@ describe("robots", () => {
     }
   });
 
+  it("keeps ShapBot off repo and topic pages but not the guides", () => {
+    const shap = [ruleFor("ShapBot")?.disallow].flat();
+    for (const path of ["/repo/", "/topic/", "/api/", "/score/"]) assert.ok(shap.includes(path), path);
+    assert.ok(!shap.includes("/"));
+  });
+
   it("lets link unfurlers read Live Score pages that search crawlers can't", () => {
     assert.ok([ruleFor("*")?.disallow].flat().includes("/score/"));
     const preview = [ruleFor("Twitterbot")?.disallow].flat();

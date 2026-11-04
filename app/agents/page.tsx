@@ -5,6 +5,7 @@ import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { LINK } from "@/components/link-class";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AGENT_READS, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
@@ -23,7 +24,6 @@ export const metadata: Metadata = staticPageMetadata("/agents");
 
 const PATH = "/agents";
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const LINK = "text-ink hover:text-ink-soft";
 const CODE = "font-mono text-[13px] text-ink";
 
 export default function AgentsPage() {
@@ -42,6 +42,7 @@ export default function AgentsPage() {
           url: `${APP_URL}${PATH}`,
           image: `${APP_URL}${DEFAULT_OG_IMAGE.url}`,
           about: MODELS.map((m) => ({ "@type": "SoftwareApplication", name: m.label })),
+          datePublished: "2026-10-21",
           ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
@@ -59,7 +60,8 @@ export default function AgentsPage() {
 
       <Panel>
         <PanelHeading>Which files does each agent read?</PanelHeading>
-        <div className="overflow-x-auto">
+        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+        <section className="overflow-x-auto" tabIndex={0} aria-label="Files each agent reads">
           <table className="w-full min-w-[620px] border-collapse text-left text-[14px]">
             <caption className="sr-only">Repo files each AI coding agent reads</caption>
             <thead>
@@ -109,7 +111,7 @@ export default function AgentsPage() {
               })}
             </tbody>
           </table>
-        </div>
+        </section>
       </Panel>
 
       <div className="mt-3.5">
@@ -118,7 +120,7 @@ export default function AgentsPage() {
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               Write it in <code className={CODE}>AGENTS.md</code> at the repo root.{" "}
-              <Link href={checkPath("agents_md")} className={LINK}>
+              <Link href={checkPath("agents_md")} className="prose-link">
                 What to put in it
               </Link>
               .
@@ -126,7 +128,7 @@ export default function AgentsPage() {
             <li>
               If you keep a CLAUDE.md, start it with <code className={CODE}>@AGENTS.md</code>, or Claude Code skips
               AGENTS.md.{" "}
-              <Link href={checkSubPath("agents_md", "vs-claude-md")} className={LINK}>
+              <Link href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
                 AGENTS.md vs CLAUDE.md
               </Link>
               .
@@ -143,7 +145,7 @@ export default function AgentsPage() {
             <li>
               Longer task steps go in <code className={CODE}>.agents/skills/</code>, which every agent here but Claude
               Code and Aider loads when a task matches.{" "}
-              <Link href={checkPath("agent_skills")} className={LINK}>
+              <Link href={checkPath("agent_skills")} className="prose-link">
                 Agent skills
               </Link>
               .
@@ -169,7 +171,7 @@ export default function AgentsPage() {
           </ul>
           <p className={`${PROSE} mt-3 text-[13px]`}>
             A repo with both files counts under AGENTS.md unless it is empty; empty files don&apos;t count.{" "}
-            <Link href={checkSubPath("agents_md", "examples")} className={LINK}>
+            <Link href={checkSubPath("agents_md", "examples")} className="prose-link">
               Read the files
             </Link>
             .
@@ -179,10 +181,14 @@ export default function AgentsPage() {
 
       <p className="mt-5 mb-0 text-[13px] text-muted">
         Agent names link to their boards. The{" "}
-        <Link href="/methodology" className={LINK}>
+        <Link href="/methodology" className="prose-link">
           methodology
         </Link>{" "}
-        has every weight.
+        has every weight; the{" "}
+        <Link href="/guide" className="prose-link">
+          guide
+        </Link>{" "}
+        covers the rest of an agent-ready repo.
       </p>
     </>
   );

@@ -24,7 +24,7 @@ export function ModelSuggestions({ basePath, selected, suggestions }: Props) {
           Nothing to fix — this repo already has everything {MODEL_BY_ID[selected].label} looks for.
         </div>
       ) : (
-        <ol className="m-0 list-none p-0">
+        <ol className="m-0 list-none divide-y divide-line p-0">
           {suggestions.map((s, i) => (
             <SuggestionItem key={s.signalId} suggestion={s} index={i} />
           ))}

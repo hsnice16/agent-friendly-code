@@ -1,6 +1,15 @@
 "use client";
 
-import { type MouseEvent, type ReactNode, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import {
+  type MouseEvent,
+  type ReactNode,
+  startTransition,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 
 import { track } from "@/lib/analytics-events";
 import {
@@ -20,10 +29,8 @@ import type { ModelId } from "@/lib/scoring/weights";
 import { prefetchBoardData, useBoardData } from "@/lib/use-board-data";
 import { leaderboardHref } from "@/lib/utils/leaderboard-href";
 import { BoardAgentPills } from "./BoardAgentPills";
-import { BoardNotice } from "./BoardNotice";
+import { BoardResults } from "./BoardResults";
 import { HostSelect } from "./HostSelect";
-import { LeaderboardTable } from "./LeaderboardTable";
-import { Pagination } from "./Pagination";
 import { SearchBar } from "./SearchBar";
 import { SortSelect } from "./SortSelect";
 import { SEARCH_SETTLE_MS, useBoardPopState, useResultAnnouncement, useSearchTracking } from "./use-board-feedback";
@@ -75,7 +82,7 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
   );
 
   let view: ShownPage = server;
-  let notice: ReactNode = null;
+  let notice: "stale" | "error" | null = null;
   let pending = false;
   let busy = false;
   if (needsData) {
@@ -84,9 +91,9 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
     } else {
       view = lastView.current;
       if (stale) {
-        notice = <BoardNotice reason="stale" />;
+        notice = "stale";
       } else if (status === "error") {
-        notice = <BoardNotice reason="error" />;
+        notice = "error";
       } else if (openedRecut) {
         pending = true;
       } else {
@@ -104,7 +111,8 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
   useLayoutEffect(() => {
     const read = readBoardLocation();
     const recut = isRecut(read) || read.page !== server.page;
-    setQuery(read);
+    // An equal query keeps its identity, or hydration is followed by a render of every row.
+    setQuery((prev) => (leaderboardHref({ model, ...prev }) === leaderboardHref({ model, ...read }) ? prev : read));
     setInput(read.q);
     setSettledQ(read.q);
     setOpenedRecut(recut);
@@ -171,9 +179,11 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
     setSettledQ(q);
   }
 
+  // In a transition, so the control answers before the rows re-render, and a
+  // keystroke that lands first drops the render for the one before it.
   function apply(next: BoardQuery) {
     settleSearch(next.q);
-    setQuery(next);
+    startTransition(() => setQuery(next));
     write(next, "replace");
   }
 
@@ -181,7 +191,7 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
     const q = cleanQuery(value);
     const next = { ...query, q, page: q === query.q ? query.page : 1 };
     setInput(value);
-    setQuery(next);
+    startTransition(() => setQuery(next));
     clearTimeout(searchTimer.current);
     searchTimer.current = setTimeout(() => {
       searchTimer.current = undefined;
@@ -229,17 +239,24 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
     scrollToBoard();
   }
 
+  // Stable for BoardResults' memo; they call whichever handlers the latest render made.
+  const handlers = useRef({ clearSearch, onPageClick });
+  useLayoutEffect(() => {
+    handlers.current = { clearSearch, onPageClick };
+  });
+  const stable = useMemo(
+    () => ({
+      clearSearch: () => handlers.current.clearSearch(),
+      onPageClick: (page: number, e: MouseEvent) => handlers.current.onPageClick(page, e),
+    }),
+    [],
+  );
+
   const searching = input.trim() !== "" && needsData && !computed && !notice;
 
   return (
     <div>
-      <BoardAgentPills
-        agents={agents}
-        selected={model}
-        // A re-cut address changes with every keystroke; only the plain boards are worth fetching ahead.
-        prefetch={!recut}
-        hrefFor={(id) => leaderboardHref({ ...query, model: id, page: 1 })}
-      />
+      <BoardAgentPills agents={agents} selected={model} query={query} />
 
       {intro}
 
@@ -265,35 +282,18 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
         {announcement}
       </p>
 
-      <LeaderboardTable
-        q={query.q}
-        host={query.host}
-        page={view.page}
-        rows={view.rows}
-        startIdx={view.startIdx}
-        totalPages={view.totalPages}
+      <BoardResults
+        model={model}
+        query={query}
+        view={view}
         activeLabel={activeLabel}
-        clearSearchHref={leaderboardHref({ ...query, model, q: "", page: 1 })}
-        onClearSearch={clearSearch}
+        summary={summary}
         busy={busy}
         loading={pending}
         notice={notice}
+        onClearSearch={stable.clearSearch}
+        onPageClick={stable.onPageClick}
       />
-
-      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        {summary}
-
-        <div data-board-pager className={notice || view.rows.length === 0 ? "invisible" : undefined}>
-          <Pagination
-            page={view.page}
-            size="compact"
-            totalPages={view.totalPages}
-            label="Leaderboard pages"
-            hrefFor={(p) => leaderboardHref({ ...query, model, page: p })}
-            onPageClick={onPageClick}
-          />
-        </div>
-      </div>
     </div>
   );
 }

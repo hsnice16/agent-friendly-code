@@ -17,12 +17,26 @@ describe("sitemap", async () => {
     assert.ok(urls.includes(`${APP_URL}/language/other`));
   });
 
+  it("lists the guide and the vs AGENTS.md pages", () => {
+    for (const path of ["/guide", "/check/cursor-rules/vs-agents-md", "/check/gemini-md/vs-agents-md"]) {
+      assert.ok(urls.includes(`${APP_URL}${path}`), path);
+    }
+  });
+
   it("has no topic pages while no repo has topics", () => {
     assert.ok(!urls.some((u) => u.includes("/topic")));
   });
 
   it("leaves out llms.txt", () => {
     assert.ok(!urls.some((u) => u.endsWith("/llms.txt")));
+  });
+
+  it("dates the report no earlier than its series' last point", async () => {
+    const { ADOPTION } = await import("../lib/agents-md-report");
+    const { REPORT_PATH } = await import("../lib/utils/report-path");
+    const last = ADOPTION.points[ADOPTION.points.length - 1].date;
+    const at = sitemap().find((e) => e.url === `${APP_URL}${REPORT_PATH}`)?.lastModified;
+    assert.ok(at && new Date(at).toISOString().slice(0, 10) >= last);
   });
 
   it("dates the methodology and changelog", () => {

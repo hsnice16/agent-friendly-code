@@ -32,11 +32,12 @@ export function ModelLeaderboard({ model, view, stats, panel }: Props) {
         </h1>
 
         <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
+          {panel.why && `${panel.why} `}
           Repos from {HOSTS_TEXT}, ranked by their {label} score.
           {top && (
             <>
               {" "}
-              <Link href={repoPath(top)} className="text-ink hover:text-ink-soft">
+              <Link href={repoPath(top)} className="prose-link">
                 {top.owner}/{top.name}
               </Link>{" "}
               leads with <strong className="text-ink">{(top.score ?? 0).toFixed(1)}</strong>.

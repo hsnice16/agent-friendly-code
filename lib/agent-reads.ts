@@ -35,8 +35,8 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     files: [".cursor/rules/*.mdc", "AGENTS.md", "CLAUDE.md", ".agents/skills/"],
     agentsMd: "always",
     claudeMd: true,
-    note: "Project rules live in `.cursor/rules/`, subfolders included, and in a `.cursor/rules/` in any subdirectory; a plain `.md` there is ignored. The CLI also reads a root CLAUDE.md. Its current docs no longer mention `.cursorrules`.",
-    sources: ["https://cursor.com/docs/cli/using", "https://cursor.com/docs/cli/changelog"],
+    note: "Project rules are `.mdc` files in `.cursor/rules/`, subfolders included; a plain `.md` there is ignored. AGENTS.md is read at the root and in subdirectories, combined, the more specific winning. The CLI also reads a root CLAUDE.md. Its current docs no longer mention `.cursorrules`.",
+    sources: ["https://cursor.com/docs/context/rules", "https://cursor.com/docs/cli/using"],
   },
   devin: {
     files: ["AGENTS.md", "CLAUDE.md", ".cursor/rules/*.mdc", ".devin/blueprint.yaml", ".agents/skills/"],
@@ -83,4 +83,9 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
 /** MODELS order, filtered to the agents that use AGENTS.md in the given way. */
 export function agentsUsingAgentsMd(use: AgentsMdUse): string[] {
   return MODELS.filter((m) => AGENT_READS[m.id].agentsMd === use).map((m) => m.label);
+}
+
+/** MODELS order, filtered to the agents whose docs say they read the given repo file. */
+export function agentsReading(file: string): string[] {
+  return MODELS.filter((m) => AGENT_READS[m.id].files.includes(file)).map((m) => m.label);
 }

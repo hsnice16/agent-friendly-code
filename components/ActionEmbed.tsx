@@ -56,10 +56,7 @@ jobs:
         {showSecretLink && (
           <>
             {" "}
-            <Link
-              href="/action#set-secret"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href="/action#set-secret" className="prose-link">
               Where do I add it?
             </Link>
           </>

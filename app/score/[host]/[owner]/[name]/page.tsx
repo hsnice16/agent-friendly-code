@@ -237,14 +237,16 @@ export default async function LiveScorePage({
           <HashDetails
             id="all-checks"
             summary={
-              <h2 className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+              <h2 className="m-0 text-xs eyebrow text-muted">
                 All {score.signals.length} checks · {score.signals.filter((s) => s.pass >= 1).length} passed
               </h2>
             }
           >
-            {score.signals.map((s) => (
-              <SignalRow key={s.id} signal={s} repo={repo} />
-            ))}
+            <div className="divide-y divide-line">
+              {score.signals.map((s) => (
+                <SignalRow key={s.id} signal={s} repo={repo} />
+              ))}
+            </div>
           </HashDetails>
         </Section>
 

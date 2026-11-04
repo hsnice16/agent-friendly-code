@@ -150,10 +150,7 @@ export default function PrivacyPage() {
             United Kingdom, or California, you nonetheless have the right to request information about, correct, delete,
             export, or object to the processing of any personal data we may hold about you. To exercise these rights,
             email{" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <a href={`mailto:${CONTACT_EMAIL}`} className="prose-link">
               {CONTACT_EMAIL}
             </a>
             .
@@ -197,17 +194,11 @@ export default function PrivacyPage() {
           <PanelHeading>Contact</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             Questions, requests, or concerns about this policy:{" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <a href={`mailto:${CONTACT_EMAIL}`} className="prose-link">
               {CONTACT_EMAIL}
             </a>
             . See also our{" "}
-            <Link
-              href="/terms"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href="/terms" className="prose-link">
               Terms of Use
             </Link>
             .

@@ -11,7 +11,7 @@ export function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section id={id} className={`mt-3.5 scroll-mt-20 ${className}`}>
+    <section id={id} className={className ? `mt-3.5 scroll-mt-20 ${className}` : "mt-3.5 scroll-mt-20"}>
       {children}
     </section>
   );

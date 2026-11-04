@@ -1,7 +1,7 @@
 // Linguist spellings, which GitHub and GitLab return. Bitbucket lowercases
 // its own ("c++", "java"), and a second spelling of a language is a second
 // row in every per-language count until something folds them back together.
-const LINGUIST_NAMES = [
+export const LINGUIST_NAMES = [
   "ActionScript",
   "Ada",
   "Assembly",

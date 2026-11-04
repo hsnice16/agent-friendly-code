@@ -6,7 +6,7 @@ export type AnalyticsEvent =
   | { name: "live_score_result"; outcome: LiveScoreOutcome; tier?: ScoreTier }
   | { name: "share_score"; network: ShareNetwork }
   | { name: "badge_copy"; page: "repo" | "live_score" }
-  | { name: "copy_install"; tool: "skill" | "skill_hook" | "action" }
+  | { name: "copy_install"; tool: "skill" | "skill_hook" | "action" | "starter_agents_md" }
   | { name: "package_lookup"; registry: string }
   | { name: "select_agent"; agent: string }
   // GA4's recommended name: its built-in "Search term" dimension reads `search_term`.

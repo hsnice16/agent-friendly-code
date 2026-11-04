@@ -11,14 +11,16 @@ concurrency:
 
 permissions:
   contents: read
-  issues: write
 
 jobs:
+  # Runs dependency code, so read-only; the issue job holds the write token.
   audit:
     runs-on: ubuntu-latest
     timeout-minutes: 15
-    env:
-      GH_REPO: ${{ github.repository }}
+    permissions:
+      contents: read
+    outputs:
+      code: ${{ steps.audit.outputs.code }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -38,41 +40,70 @@ jobs:
         run: bun install --frozen-lockfile
 
       # Exit 1 means findings, 2 means the audit itself broke. Only findings
-      # become an issue; anything else fails the job below without one.
+      # become an issue; anything else fails this job and skips the issue job.
       - name: Audit seeds
         id: audit
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           set +e
-          bun run audit-seeds --report "$RUNNER_TEMP/seed-audit.md"
+          mkdir -p "$RUNNER_TEMP/seed-audit"
+          bun run audit-seeds --report "$RUNNER_TEMP/seed-audit/seed-audit.md"
           echo "code=$?" >> "$GITHUB_OUTPUT"
+
+      - if: steps.audit.outputs.code == '1'
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: seed-audit
+          path: ${{ runner.temp }}/seed-audit/
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Fail on a broken audit
+        if: steps.audit.outputs.code != '0' && steps.audit.outputs.code != '1'
+        run: exit 1
+
+  # No checkout and no install: nothing but gh runs beside the write token.
+  issue:
+    needs: audit
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      issues: write
+    env:
+      GH_REPO: ${{ github.repository }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - if: needs.audit.outputs.code == '1'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: seed-audit
+          path: ${{ runner.temp }}/seed-audit
 
       # One issue, edited in place: a new issue per week would bury the list
       # under its own duplicates.
       - name: Open or update the findings issue
-        if: steps.audit.outputs.code == '1'
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: needs.audit.outputs.code == '1'
         run: |
+          # An issue body stops at 65,536 characters; a longer one fails the edit.
+          f="$RUNNER_TEMP/seed-audit/seed-audit.md"
+          head -c 60000 "$f" > "$f.capped"
           gh label create seed-audit --description "Findings from the weekly seed audit" --color D93F0B --force
           existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
-            gh issue edit "$existing" --body-file "$RUNNER_TEMP/seed-audit.md"
+            gh issue edit "$existing" --body-file "$f.capped"
           else
-            gh issue create --title "Seed audit: findings need a decision" --label seed-audit --body-file "$RUNNER_TEMP/seed-audit.md"
+            gh issue create --title "Seed audit: findings need a decision" --label seed-audit --body-file "$f.capped"
           fi
 
       - name: Close the findings issue once clean
-        if: steps.audit.outputs.code == '0'
-        env:
-          GH_TOKEN: ${{ github.token }}
+        if: needs.audit.outputs.code == '0'
         run: |
           existing=$(gh issue list --label seed-audit --state open --json number --jq '.[0].number // empty')
           if [ -n "$existing" ]; then
             gh issue close "$existing" --comment "The seed audit is clean."
           fi
 
-      - name: Fail on findings or a broken audit
-        if: steps.audit.outputs.code != '0'
+      - name: Fail on findings
+        if: needs.audit.outputs.code == '1'
         run: exit 1

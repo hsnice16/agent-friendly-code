@@ -53,7 +53,7 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
                 {sourceLabel(url)}
               </ExternalLink>
             ))}
-            <Link href={`/methodology#model-${model.id}`} className="text-ink-dim hover:text-ink-soft">
+            <Link href={`/methodology#model-${model.id}`} className="prose-link">
               all weights
             </Link>
           </p>

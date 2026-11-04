@@ -20,3 +20,6 @@ export const STRENGTHS_GAPS_VISIBLE_LIMIT = 5;
 
 export const CHECK_EXAMPLES_LIMIT = 12;
 export const CHECK_MISSING_LIMIT = 8;
+
+// How many of the most-weighted checks /check and /guide single out.
+export const START_WITH_CHECKS = 3;

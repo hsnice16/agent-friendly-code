@@ -40,10 +40,7 @@ export default function TopicsPage() {
               key={t.slug}
               className="relative flex items-baseline justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3"
             >
-              <Link
-                href={topicPath(t.slug)}
-                className="font-medium text-ink hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
-              >
+              <Link href={topicPath(t.slug)} className="font-medium text-ink hover:text-ink-soft cover-link">
                 {/* Labels stay lowercase for use mid-sentence; a tile starts one. */}
                 <span>{t.label}</span>
               </Link>

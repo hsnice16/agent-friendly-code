@@ -1,7 +1,10 @@
 import type { MetadataRoute } from "next";
 
 import { examplesByLanguage } from "@/lib/agents-md-examples";
+import { examplesByFramework } from "@/lib/agents-md-frameworks";
+import { ADOPTION } from "@/lib/agents-md-report";
 import { LATEST_RELEASE_DATE } from "@/lib/changelog";
+import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
@@ -9,13 +12,17 @@ import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicPath } from "@/lib/topics";
-import { checkPath, checkSubPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { dayEpoch } from "@/lib/utils/format";
 import { hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
+import { REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_URL } from "@/lib/version";
 
 const LEGAL_LAST_UPDATED = new Date("2026-10-10");
+// The framework pages' guide text changes with no row moving; bump this when it does.
+const FRAMEWORK_GUIDES_UPDATED = new Date("2026-11-04");
 
 function newest(rows: { content_changed_at: number | null }[]): Date | undefined {
   const changed = Math.max(0, ...rows.map((r) => r.content_changed_at ?? 0));
@@ -30,6 +37,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Methodology and changelog change only in a release; no other static page has a dated source.
   const released = new Date(LATEST_RELEASE_DATE);
   const board = listLeaderboardOverall();
+  // The report's series moves with its last point, its language and other-file panels with the live board.
+  const seriesEnd = dayEpoch(ADOPTION.points[ADOPTION.points.length - 1].date) * 1000;
+  const reportChanged = new Date(Math.max(seriesEnd, contentChanged?.getTime() ?? 0));
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {
@@ -119,6 +129,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: contentChanged,
     },
     {
+      priority: 0.9,
+      changeFrequency: "weekly",
+      url: `${APP_URL}/guide`,
+      lastModified: contentChanged,
+    },
+    {
+      priority: 0.8,
+      changeFrequency: "daily",
+      url: `${APP_URL}${REPORT_PATH}`,
+      lastModified: reportChanged,
+    },
+    ...Object.keys(VS_AGENTS_MD).map((id) => ({
+      priority: 0.8,
+      changeFrequency: "weekly" as const,
+      url: `${APP_URL}${checkSubPath(id, "vs-agents-md")}`,
+      lastModified: contentChanged,
+    })),
+    {
       priority: 0.8,
       changeFrequency: "weekly",
       url: `${APP_URL}/agents`,
@@ -175,11 +203,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${APP_URL}${modelPath(m.id)}`,
   }));
 
-  const examplesRoutes: MetadataRoute.Sitemap = examplesByLanguage(getAgentsMdExamples()).map((l) => ({
+  const examples = getAgentsMdExamples();
+  const examplesRoutes: MetadataRoute.Sitemap = [
+    ...examplesByLanguage(examples).map((l) => ({ url: languageExamplesPath(l.slug), lastModified: newest(l.rows) })),
+    ...examplesByFramework(examples).map((f) => ({
+      url: frameworkExamplesPath(f.guide.slug),
+      lastModified: new Date(Math.max(newest(f.rows)?.getTime() ?? 0, FRAMEWORK_GUIDES_UPDATED.getTime())),
+    })),
+  ].map((e) => ({
     priority: 0.7,
     changeFrequency: "weekly",
-    url: `${APP_URL}${languageExamplesPath(l.slug)}`,
-    lastModified: newest(l.rows),
+    url: `${APP_URL}${e.url}`,
+    lastModified: e.lastModified,
   }));
 
   const checkRoutes: MetadataRoute.Sitemap = SIGNALS.map((s) => ({

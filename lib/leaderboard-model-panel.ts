@@ -1,6 +1,6 @@
 import type { PassCounts } from "./check-stats";
 import { SIGNAL_BY_ID, SIGNALS } from "./scoring/signals";
-import { MODELS, type ModelProfile } from "./scoring/weights";
+import { MODELS, type ModelId, type ModelProfile } from "./scoring/weights";
 
 export const MODEL_PANEL_CHECKS = 4;
 
@@ -15,7 +15,19 @@ type ModelPanelFile = {
   total: number;
 };
 
-export type ModelPanel = { checks: ModelPanelCheck[]; sources: string[]; file: ModelPanelFile | null };
+export type ModelPanel = {
+  checks: ModelPanelCheck[];
+  sources: string[];
+  file: ModelPanelFile | null;
+  /** Answers the board's question before the list does. */
+  why: string | null;
+};
+
+// Hand-written; tests/model-panel.test.ts holds each to the agent's top weights.
+export const RANK_REASON: Partial<Record<ModelId, string>> = {
+  "claude-code":
+    "Those with a CLAUDE.md or AGENTS.md, tests it can run and a reproducible dev setup, the checks it weighs most.",
+};
 
 /** Highest weight first; a tie keeps SIGNALS order, so the list never depends on object key order. */
 export function topWeightedChecks(model: ModelProfile, limit = MODEL_PANEL_CHECKS): { id: string; weight: number }[] {
@@ -60,7 +72,7 @@ export function buildModelPanel(model: ModelProfile, { countsOf, claudeMd }: Inp
     file = { id: "claude_md", label: "CLAUDE.md", present: claudeMd, total };
   }
 
-  return { checks, sources: model.sources, file };
+  return { checks, sources: model.sources, file, why: RANK_REASON[model.id] ?? null };
 }
 
 /** "host/last-path-segment", the short form /methodology shows for a docs link. */
@@ -69,6 +81,17 @@ export function sourceLabel(url: string): string {
   const lastSeg = parsed.pathname.replace(/\/+$/, "").split("/").filter(Boolean).pop() ?? "";
   const host = parsed.hostname.replace(/^www\./, "");
   return lastSeg ? `${host}/${lastSeg}` : host;
+}
+
+/** `sourceLabel` for each, adding the parent segment where two would read the same. */
+export function distinctSourceLabels(urls: string[]): string[] {
+  const labels = urls.map(sourceLabel);
+  return urls.map((url, i) => {
+    if (labels.indexOf(labels[i]) === labels.lastIndexOf(labels[i])) return labels[i];
+    const parsed = new URL(url);
+    const segs = parsed.pathname.split("/").filter(Boolean).slice(-2).join("/");
+    return `${parsed.hostname.replace(/^www\./, "")}/${segs}`;
+  });
 }
 
 /**

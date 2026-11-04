@@ -11,7 +11,7 @@ bun run dev             # http://localhost:3000
 bun run test            # Node ≥ 22
 ```
 
-`data/rank.db` is committed and rewritten on `main` daily by `.github/workflows/scheduled-rescore.yml`. Don't commit a local re-seed unless the change needs it; on a conflict, take `main`'s copy (`git checkout --theirs -- data/rank.db`) and re-seed.
+`data/rank.db` is committed and rewritten on `main` daily by `.github/workflows/scheduled-rescore.yml`. Don't commit a local re-seed unless the change needs it; on a conflict, take `main`'s copy (`git checkout --theirs -- data/rank.db`) and re-seed. `data/agents-md-adoption.json` is rewritten with it: on a conflict take `main`'s copy or rerun `bun run agents-md-adoption`.
 
 ## Changing the seed list
 

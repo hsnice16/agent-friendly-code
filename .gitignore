@@ -11,3 +11,5 @@ coverage/
 next-env.d.ts
 tsconfig.tsbuildinfo
 .claude/scheduled_tasks.lock
+.claude/worktrees/
+.claude/settings.local.json

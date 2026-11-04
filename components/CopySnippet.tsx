@@ -25,14 +25,21 @@ export function CopySnippet({
   text,
   highlight = false,
   event,
+  wrap = false,
+  label = "Code snippet",
 }: {
   text: string;
   highlight?: SnippetTone;
   /** Sent on a successful copy. */
   event?: AnalyticsEvent;
+  /** Wrap long lines: for prose, where scrolling sideways hides the sentence. */
+  wrap?: boolean;
+  /** Names the scroll region a multi-line snippet becomes. */
+  label?: string;
 }) {
   const [copied, setCopied] = useState(false);
   const isMultiLine = text.includes("\n");
+  const scrolls = isMultiLine && !wrap;
 
   async function onCopy() {
     try {
@@ -51,8 +58,10 @@ export function CopySnippet({
       <pre
         // A one-line command wraps instead of scrolling, so none of it hides under the copy button on a phone.
         className={`m-0 overflow-x-auto rounded-md border bg-surface-2 px-3 py-2 pr-11 text-[12px] leading-relaxed ${
-          isMultiLine ? "" : "whitespace-pre-wrap break-all"
+          wrap ? "whitespace-pre-wrap break-words" : isMultiLine ? "" : "whitespace-pre-wrap break-all"
         } ${highlight ? PRE_TONE[highlight] : "border-line"}`}
+        // A keyboard user can only scroll a region that takes focus.
+        {...(scrolls ? { tabIndex: 0, role: "region", "aria-label": label } : {})}
       >
         <code>{text}</code>
       </pre>
@@ -62,7 +71,8 @@ export function CopySnippet({
         onClick={onCopy}
         aria-live="polite"
         aria-label={copied ? "Copied to clipboard" : "Copy snippet to clipboard"}
-        className={`absolute right-1.5 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border bg-surface ${
+        // The after: inset grows the hit area to 44px without growing the button.
+        className={`absolute right-1.5 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border bg-surface after:absolute after:-inset-2 ${
           isMultiLine ? "top-1.5" : "top-1/2 -translate-y-1/2"
         } ${highlight ? BTN_TONE[highlight] : "border-line text-muted hover:text-ink"}`}
       >

@@ -35,6 +35,11 @@ type Props = {
   notice?: ReactNode;
 };
 
+// On the body, not each row: the board's HTML repeats a row's classes per row.
+// Not on the notice row, whose cell keeps its own padding.
+const ROW_CELLS =
+  "*:[&>td]:border-b *:[&>td]:border-line *:[&>td]:px-3 *:[&>td]:py-[13px] *:[&>td]:text-[15px] *:hover:[&>td]:bg-surface-hover *:last:[&>td]:border-b-0 sm:*:[&>td]:px-[18px]";
+
 export function LeaderboardTable({
   q,
   host,
@@ -88,7 +93,7 @@ export function LeaderboardTable({
           </tr>
         </thead>
 
-        <tbody data-board-rows>
+        <tbody data-board-rows className={notice || rows.length === 0 ? undefined : ROW_CELLS}>
           {notice ? (
             <tr>
               <td colSpan={5} className="p-11 text-center text-[13px] text-muted">
@@ -125,7 +130,7 @@ export function LeaderboardTable({
                 <tr
                   // biome-ignore lint/suspicious/noArrayIndexKey: stable position keeps ScoreBar mounted so width transitions animate across re-renders
                   key={i}
-                  className="relative cursor-pointer [&>td]:border-b [&>td]:border-line [&>td]:px-3 [&>td]:py-[13px] [&>td]:text-[15px] hover:[&>td]:bg-surface-hover last:[&>td]:border-b-0 sm:[&>td]:px-[18px]"
+                  className="relative cursor-pointer"
                 >
                   <td className="tabular-nums text-muted">
                     <Medal rank={rank} />
@@ -134,7 +139,7 @@ export function LeaderboardTable({
                     <Link
                       href={repoPath(r)}
                       aria-label={`View ${r.owner}/${r.name} details`}
-                      className="font-medium text-ink [overflow-wrap:anywhere] hover:text-ink-soft before:absolute before:inset-0 before:content-['']"
+                      className="font-medium text-ink [overflow-wrap:anywhere] hover:text-ink-soft cover-link"
                     >
                       {r.owner}/{r.name}
                     </Link>

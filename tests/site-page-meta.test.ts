@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { examplesDescription, examplesTitle } from "../lib/agents-md-examples";
+import { VS_AGENTS_MD } from "../lib/check-content/vs-agents-md";
 import { AGENTS_VS_CLAUDE_MD, OTHER_LANGUAGES_TITLE, otherLanguagesDescription, PAGE_COPY } from "../lib/page-meta";
 import { hubTitle } from "../lib/utils/language";
 import { MAX_DESCRIPTION_LENGTH, MAX_TITLE_LENGTH, pageTitle } from "../lib/utils/page-title";
@@ -17,9 +18,14 @@ describe("static page copy", () => {
   });
 
   it("gives every page its own title and description", () => {
-    const pages = [...Object.values(PAGE_COPY), { title: OTHER_LANGUAGES_TITLE, description: "" }];
+    const pages = [
+      ...Object.values(PAGE_COPY),
+      AGENTS_VS_CLAUDE_MD,
+      ...Object.values(VS_AGENTS_MD),
+      { title: OTHER_LANGUAGES_TITLE, description: "" },
+    ];
     assert.equal(new Set(pages.map((p) => pageTitle(p.title).absolute)).size, pages.length);
-    const descriptions = Object.values(PAGE_COPY).map((p) => p.description);
+    const descriptions = pages.map((p) => p.description).filter(Boolean);
     assert.equal(new Set(descriptions).size, descriptions.length);
   });
 

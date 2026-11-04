@@ -25,6 +25,7 @@ bun run audit-seeds    # forks / mirrors / archived / renamed / gone / stale see
 bun run parity-check   # live-score path must equal `bun run score` (--pr for the PR subset)
 bun run check-db-leaks # local paths / tokens in data/rank.db — run before committing it
 bun run indexnow       # submit sitemap URLs to IndexNow (--since <ISO time>, --dry-run)
+bun run agents-md-adoption # rebuild data/agents-md-adoption.json from every committed rank.db (not in a shallow clone)
 ```
 
 Set `RANK_DB_PATH` to work on a copy of the database; `data/rank.db` is rewritten on `main` daily.
@@ -38,9 +39,11 @@ lib/
   scoring/    signals (one file each), weights.ts (MODELS), scorer.ts — pure, vendored by the siblings
   live-score/ /score/…: host tree API → materialized directory → scoreRepo
   clients/    git clone, host APIs, package registries, language names
-  db.ts       the only import path for queries; re-exports the db-*.ts modules (schema in db-schema.ts)
+  db.ts       the only import path for queries; re-exports the db-*.ts modules (schema in db-schema.ts),
+              except db-snapshot.ts, which reads old rank.db copies read-only (importing db.ts migrates rank.db)
   utils/      URL builders, page titles, formatting, repo-page builders
   check-content/  prose for each /check/<slug> page, keyed by signal id
+  framework-guides/, language-guides/  per-framework and per-language AGENTS.md guide content
   version.ts  app and sibling constants (APP_URL, SIBLING_VERSION, install snippets, OG defaults)
   changelog.ts, roadmap.ts  what /changelog and /roadmap render
 scripts/      CLI entry points (run with tsx)
@@ -48,6 +51,7 @@ proxy.ts      /language/<spelling> → canonical hub redirect
 tests/        node --test suites; fixtures/repo-meta/ holds recorded host API responses
 tasks/        per-version task files
 data/rank.db  committed database, refreshed by .github/workflows/scheduled-rescore.yml
+data/agents-md-adoption.json  AGENTS.md adoption series, rebuilt from rank.db's git history by the same workflow
 ```
 
 ## I/O boundary
@@ -60,14 +64,14 @@ data/rank.db  committed database, refreshed by .github/workflows/scheduled-resco
 
 - **Exact-pinned deps** (no `^`, no `latest`) — scoring must be deterministic.
 - **Server components by default.** Prefer `<Link>` and query params over client state. Exceptions, both because the page is prerendered: repo pages never read `?model=` (`ModelSuggestionsSwitch` reads it in the browser), and the boards never read search params: search, filter and sort run in `BoardClient` over `/api/board`, an internal payload whose order must match `listLeaderboard` (`tests/board.test.ts`).
-- **One place per URL shape.** Build repo URLs with `lib/utils/repo-path.ts`, check URLs with `check-path.ts`, board URLs with `leaderboard-href.ts`, links to a file on its host with `repo-file-url.ts`.
+- **One place per URL shape.** Build repo URLs with `lib/utils/repo-path.ts`, check URLs with `check-path.ts`, board URLs with `leaderboard-href.ts`, links to a file on its host with `repo-file-url.ts`, report URLs with `report-path.ts`.
 - **Page metadata.** Static-page titles and descriptions live in `PAGE_COPY` (`lib/page-meta.ts`); length caps come from `lib/utils/page-title.ts`. Next.js shallow-merges `openGraph` / `twitter`, so a page that sets either re-spreads `OG_DEFAULTS` / `TWITTER_DEFAULTS` and sets an image (`DEFAULT_OG_IMAGE` or its own).
 - **Indexing.** A board page is `/`, `/model/<id>` or `…/page/<n>`; a searched, filtered or sorted view is the same prerendered page re-cut in the browser, so its canonical is the board. Never a robots.txt `Disallow` for them, which would hide the canonical. Package pages are noindex and stay out of the sitemap.
 - **Signal IDs** (`agents_md`, `tests`, …) are stable. Renaming one is a migration.
 - **Path lookups** in signals go through `firstExisting` / `resolveRelative` / `resolveAllRelative` (`helpers.ts`), never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
 - **An empty AGENTS.md / CLAUDE.md** (`agents_md` pass 0.2) does not count as having one wherever a share is shown.
 - **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`, `analytics-consent.ts`) wrapped in try/catch, read after mount so server HTML matches.
-- **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`.
+- **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`. A pattern repeated in 3+ components may get a plain-CSS `@utility` in `globals.css` (`glyph`, `tile`, `pill`, `prose-link`…): every class string ships twice per page, in the HTML and the RSC payload.
 - **Comments say why, never what.** The shallow-clone note in `lib/clients/git.ts` is the model.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines (pre-commit enforced). `scripts/` is exempt.
 - **Brand**: "Agent Friendly Code" in UI copy; `agent-friendly-code` as slug and `User-Agent`.

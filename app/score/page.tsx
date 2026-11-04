@@ -103,10 +103,7 @@ function Answer({ entry }: { entry: FaqEntry }) {
   return (
     <>
       {entry.a.slice(0, at)}
-      <Link
-        href={entry.link.href}
-        className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-      >
+      <Link href={entry.link.href} className="prose-link">
         {entry.link.phrase}
       </Link>
       {entry.a.slice(at + entry.link.phrase.length)}

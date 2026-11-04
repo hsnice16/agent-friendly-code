@@ -6,7 +6,6 @@ import { checkSubPath } from "@/lib/utils/check-path";
 import { CodeText } from "./CodeText";
 import { Panel, PanelHeading } from "./Panel";
 
-const LINK = "text-ink hover:text-ink-soft";
 const NUMBER = new Intl.NumberFormat("en-US");
 
 export function AgentsMdGuide({ medianLength, files }: { medianLength: number | null; files: number }) {
@@ -34,7 +33,7 @@ export function AgentsMdGuide({ medianLength, files }: { medianLength: number | 
       {medianLength != null && (
         <p className="mt-3 mb-0 text-[13.5px] text-ink-dim">
           The median of the {files} on the leaderboard is {NUMBER.format(medianLength)} characters.{" "}
-          <Link href={examples} className={LINK}>
+          <Link href={examples} className="prose-link">
             Read them
           </Link>
           .

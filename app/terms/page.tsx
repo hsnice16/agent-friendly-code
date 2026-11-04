@@ -138,17 +138,11 @@ export default function TermsPage() {
           <PanelHeading>Contact</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             Questions or notices regarding these Terms:{" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <a href={`mailto:${CONTACT_EMAIL}`} className="prose-link">
               {CONTACT_EMAIL}
             </a>
             . See also our{" "}
-            <Link
-              href="/privacy"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href="/privacy" className="prose-link">
               Privacy Policy
             </Link>
             .

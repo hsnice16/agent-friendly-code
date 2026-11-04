@@ -12,8 +12,10 @@ type Props = {
   onPageClick?: (page: number, e: MouseEvent) => void;
 };
 
-const BASE_DEFAULT = "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-medium";
-const BASE_COMPACT = "inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-[13px] font-medium";
+const BASE_DEFAULT =
+  "inline-flex items-center gap-1.5 rounded-md border px-3 py-1.5 text-[13px] font-medium max-sm:min-h-[44px]";
+const BASE_COMPACT =
+  "inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-[13px] font-medium max-sm:min-h-[44px]";
 
 const ACTIVE = "border-line bg-surface text-ink-dim hover:text-ink-soft";
 const DISABLED = "cursor-not-allowed border-line/60 bg-transparent text-muted/60";

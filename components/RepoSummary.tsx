@@ -11,8 +11,8 @@ const GRID_COLS: Record<number, string> = {
 
 export function Stat({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-line bg-surface-2 px-3.5 py-3">
-      <dt className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{label}</dt>
+    <div className="tile">
+      <dt className="text-[11px] eyebrow text-muted">{label}</dt>
       <dd className="m-0 mt-1.5 text-[18px] font-semibold leading-tight tracking-tight text-ink">{value}</dd>
       {note && <dd className="m-0 mt-1 text-[13px] text-muted">{note}</dd>}
     </div>

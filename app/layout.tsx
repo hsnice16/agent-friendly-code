@@ -14,8 +14,10 @@ import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { SkillsShBadge } from "@/components/SkillsShBadge";
 import { VersionPill } from "@/components/VersionPill";
+import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
 import { getLanguageGroups } from "@/lib/language-hubs";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { checkSubPath } from "@/lib/utils/check-path";
 import { isHub } from "@/lib/utils/language";
@@ -101,6 +103,7 @@ export const viewport: Viewport = {
 const NAV_LINKS = [
   { href: "/skill", label: "Agent Skill" },
   { href: "/action", label: "GitHub Action" },
+  { href: "/guide", label: "Guide" },
   { href: "/score", label: "Live Score" },
   { href: "/methodology", label: "Methodology" },
 ];
@@ -109,6 +112,7 @@ const FOOTER_LINKS_PRIMARY = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About" },
   { href: "/methodology", label: "Methodology" },
+  { href: "/guide", label: "Guide" },
   { href: checkSubPath("agents_md", "examples"), label: "AGENTS.md examples" },
   { href: "/roadmap", label: "Roadmap" },
   { href: "/changelog", label: "Changelog" },
@@ -126,13 +130,13 @@ const FOOTER_LINKS_LEGAL = [
   { href: "/terms", label: "Terms" },
 ];
 
-const FOOTER_LINK_CLASS =
-  "border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft";
+// On the row, not each link: one class string instead of one per link.
+const FOOTER_LINKS_CLASS = "[&_a]:prose-link";
 
 // No prefetch: the footer is on every page, and each prefetched link is a billed ISR read.
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} prefetch={false} className={FOOTER_LINK_CLASS}>
+    <Link href={href} prefetch={false}>
       {children}
     </Link>
   );
@@ -185,7 +189,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <footer className="mt-12 border-t border-line pt-8 text-[13px] leading-[1.7] text-muted">
-            <FooterDirectory hubs={getLanguageGroups().filter(isHub)} topics={getTopicGroups()} />
+            <FooterDirectory
+              hubs={getLanguageGroups().filter(isHub)}
+              topics={getTopicGroups()}
+              frameworks={examplesByFramework(getAgentsMdExamples()).map((f) => f.guide)}
+            />
 
             <p className="m-0">
               Scores come from checking files in each repo. No agent is actually run. What each agent looks for comes
@@ -199,16 +207,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <ProductHuntBadge />
             </div>
 
-            <div className="mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8">
+            <div
+              className={`mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8 ${FOOTER_LINKS_CLASS}`}
+            >
               <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] sm:order-1">
                 <span>
                   © {new Date().getFullYear()}{" "}
-                  <a
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href="https://github.com/hsnice16"
-                    className={FOOTER_LINK_CLASS}
-                  >
+                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/hsnice16">
                     Himanshu Singh
                   </a>
                 </span>
@@ -216,18 +221,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <span aria-hidden="true">·</span>
                 <span>
                   also made{" "}
-                  <a target="_blank" rel="noopener" href="https://usetu.la/" className={FOOTER_LINK_CLASS}>
+                  <a target="_blank" rel="noopener" href="https://usetu.la/">
                     tula — crypto liquidation risk CLI
                   </a>
                 </span>
 
                 <span aria-hidden="true">·</span>
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`${REPO_URL}/blob/main/LICENSE`}
-                  className={FOOTER_LINK_CLASS}
-                >
+                <a target="_blank" rel="noopener noreferrer" href={`${REPO_URL}/blob/main/LICENSE`}>
                   MIT
                 </a>
 

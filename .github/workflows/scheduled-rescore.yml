@@ -28,9 +28,12 @@ jobs:
     outputs:
       started-at: ${{ steps.started.outputs.at }}
     steps:
+      # Full history: the AGENTS.md adoption series is rebuilt from every
+      # committed rank.db.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+          fetch-depth: 0
 
       - name: Setup Bun
         uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
@@ -76,10 +79,25 @@ jobs:
           sqlite3 data/rank.db "PRAGMA wal_checkpoint(TRUNCATE);"
           cp data/rank.db /tmp/rescore/rank.db
 
+      # A broken series must not cost the day's scores: on failure the
+      # committed file is staged unchanged.
+      - name: Rebuild the AGENTS.md adoption series
+        id: adoption
+        continue-on-error: true
+        run: bun run agents-md-adoption
+
+      # continue-on-error leaves the run green, so a stale series would go unnoticed.
+      - name: Warn if the adoption series was not rebuilt
+        if: steps.adoption.outcome == 'failure'
+        run: echo "::warning::AGENTS.md adoption series not rebuilt"
+
+      - name: Stage the adoption series
+        run: cp data/agents-md-adoption.json /tmp/rescore/agents-md-adoption.json
+
       # Here, not in publish: it runs dependency code, which must not share a
       # job with the write token.
       - name: Check the database for leaks
-        run: bun run check-db-leaks
+        run: bun run check-db-leaks data/rank.db data/agents-md-adoption.json
 
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -112,6 +130,7 @@ jobs:
         id: commit
         run: |
           cp /tmp/rescore/rank.db data/rank.db
+          cp /tmp/rescore/agents-md-adoption.json data/agents-md-adoption.json
           sqlite3 data/rank.db "SELECT url, overall_score, badge_embedded, language, description, topics FROM repo ORDER BY url;" > /tmp/state-after.txt
           if diff -q /tmp/rescore/state-before.txt /tmp/state-after.txt > /dev/null; then
             echo "No repo, score, badge-adoption or metadata changes — skipping commit (last_scored_at churn ignored)."
@@ -119,7 +138,7 @@ jobs:
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add data/rank.db
+          git add data/rank.db data/agents-md-adoption.json
           git commit -m "chore: scheduled rescore $(date -u +%Y-%m-%dT%H:%MZ)"
           echo "committed=true" >> "$GITHUB_OUTPUT"
 

@@ -25,6 +25,7 @@ import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constant
 import { getModelScores } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
+import { starterAgentsMd } from "@/lib/starter-agents-md";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { reposSharingTopics, topicLabel, topicLinks } from "@/lib/topics";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
@@ -42,6 +43,7 @@ import { repoJsonLd, repoMetadata } from "@/lib/utils/repo-page-meta";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
 import { buildRepoReport } from "@/lib/utils/repo-report";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
+import { suggestionSwitchProps } from "@/lib/utils/suggestion-switch";
 import { ACTION_USES, APP_URL } from "@/lib/version";
 
 type Params = { slug: string[] };
@@ -99,6 +101,10 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     ? buildRepoReport({ repo, summary, board, signals, rates: checkRates(signals, repo.language) })
     : null;
   const instructions = agentInstructions(signals, agentFileShare(repo.language));
+  const starter =
+    instructions && (!instructions.main || instructions.main.state === "empty")
+      ? starterAgentsMd({ ...repo, description: about.description }, signals)
+      : null;
 
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
   const hubs = groupByLanguage(board).filter(isHub);
@@ -170,7 +176,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
         </Section>
 
         <Section id="fix-first">
-          <ModelSuggestionsSwitch agents={agents} />
+          <ModelSuggestionsSwitch {...suggestionSwitchProps(agents)} />
         </Section>
 
         <Section id="agent-scores">
@@ -179,7 +185,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
 
         {instructions && (
           <Section id="agent-instructions">
-            <AgentInstructions data={instructions} slug={slug} repo={repo} />
+            <AgentInstructions data={instructions} slug={slug} repo={repo} starter={starter} />
           </Section>
         )}
 
@@ -188,14 +194,16 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           <HashDetails
             id="all-checks"
             summary={
-              <h2 className="m-0 text-xs font-semibold uppercase tracking-[0.08em] text-muted">
+              <h2 className="m-0 text-xs eyebrow text-muted">
                 All {signals.length} checks · {signals.filter((s) => s.pass >= 1).length} passed
               </h2>
             }
           >
-            {signals.map((s) => (
-              <SignalRow key={s.id} signal={s} repo={repo} />
-            ))}
+            <div className="divide-y divide-line">
+              {signals.map((s) => (
+                <SignalRow key={s.id} signal={s} repo={repo} />
+              ))}
+            </div>
           </HashDetails>
         </Section>
 

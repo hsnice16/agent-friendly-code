@@ -5,6 +5,7 @@ import type { AgentFile, AgentInstructionsData } from "@/lib/utils/agent-instruc
 import { checkSubPath } from "@/lib/utils/check-path";
 import { repoFileUrl } from "@/lib/utils/repo-file-url";
 
+import { CopySnippet } from "./CopySnippet";
 import { Panel, PanelHeading } from "./Panel";
 
 type RepoLocation = Parameters<typeof repoFileUrl>[0];
@@ -110,7 +111,7 @@ function HowCommon({ data }: { data: AgentInstructionsData }) {
       )}
       {has} of {total} repos on the leaderboard
       <span className="text-muted"> · </span>
-      <Link href={checkSubPath("agents_md", "examples")} className="text-ink-dim hover:text-ink-soft">
+      <Link href={checkSubPath("agents_md", "examples")} className="prose-link">
         See examples →
       </Link>
     </>
@@ -122,10 +123,13 @@ export function AgentInstructions({
   data,
   slug,
   repo,
+  starter,
 }: {
   data: AgentInstructionsData;
   slug: string;
   repo: RepoLocation;
+  /** A starter AGENTS.md, for a repo without a usable one. */
+  starter?: string | null;
 }) {
   return (
     <Panel>
@@ -145,6 +149,16 @@ export function AgentInstructions({
           <HowCommon data={data} />
         </Row>
       </dl>
+      {starter && (
+        <details>
+          {/* Padding, not flex, for the 44px tap target: a flex summary loses its disclosure marker. */}
+          <summary className="cursor-pointer py-2.5 text-[13px] font-medium text-ink">Get a starter AGENTS.md</summary>
+          <p className="m-0 mb-2 text-[13px] text-muted">
+            From the files the checks found. Fill in the commands, then commit it at the root.
+          </p>
+          <CopySnippet wrap text={starter} event={{ name: "copy_install", tool: "starter_agents_md" }} />
+        </details>
+      )}
     </Panel>
   );
 }

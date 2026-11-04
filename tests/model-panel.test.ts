@@ -1,12 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
-
 import type { PassCounts } from "../lib/check-stats";
 import {
   buildModelPanel,
   checksBySummedWeight,
+  distinctSourceLabels,
   exclusiveSignal,
   MODEL_PANEL_CHECKS,
+  RANK_REASON,
   sourceLabel,
   topWeightedChecks,
 } from "../lib/leaderboard-model-panel";
@@ -73,6 +74,18 @@ describe("buildModelPanel", () => {
   });
 });
 
+describe("RANK_REASON", () => {
+  it("names Claude Code's three heaviest checks", () => {
+    const cc = MODEL_BY_ID["claude-code"];
+    assert.deepEqual(
+      topWeightedChecks(cc, 3).map((c) => c.id),
+      ["agents_md", "tests", "dev_env"],
+    );
+    assert.equal(buildModelPanel(cc, inputs).why, RANK_REASON["claude-code"]);
+    assert.equal(buildModelPanel(MODEL_BY_ID.cursor, inputs).why, null);
+  });
+});
+
 describe("checksBySummedWeight", () => {
   it("is sorted by the weight summed across every agent", () => {
     const all = checksBySummedWeight();
@@ -87,5 +100,18 @@ describe("sourceLabel", () => {
   it("shortens a docs URL to host and last segment", () => {
     assert.equal(sourceLabel("https://www.example.com/docs/en/memory/"), "example.com/memory");
     assert.equal(sourceLabel("https://example.com"), "example.com");
+  });
+});
+
+describe("distinctSourceLabels", () => {
+  it("adds the parent segment only where labels collide", () => {
+    assert.deepEqual(
+      distinctSourceLabels([
+        "https://cursor.com/docs/context/rules",
+        "https://cursor.com/help/customization/rules",
+        "https://cursor.com/docs/cli/using",
+      ]),
+      ["cursor.com/context/rules", "cursor.com/customization/rules", "cursor.com/using"],
+    );
   });
 });

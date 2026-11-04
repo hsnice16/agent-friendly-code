@@ -56,7 +56,7 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
   if (!isOpen) return null;
 
   return (
-    <aside
+    <div
       // Not a dialog: it steals no focus and blocks nothing, so it must not
       // announce itself as one. `status` reads it out without interrupting.
       role="status"
@@ -89,6 +89,6 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
       <Link href="/changelog" onClick={dismiss} className="mt-2.5 inline-block text-[13px] text-ink-dim hover:text-ink">
         See what shipped →
       </Link>
-    </aside>
+    </div>
   );
 }

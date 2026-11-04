@@ -77,10 +77,7 @@ export default function AboutPage() {
             Not a test of how well agents perform. Scores come from <strong className="text-ink">file checks</strong>,
             and no agent is run. Weights follow each agent&apos;s docs but aren&apos;t yet measured against real runs.
             The{" "}
-            <Link
-              href="/methodology"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href="/methodology" className="prose-link">
               methodology
             </Link>{" "}
             has the plan to measure them.
@@ -101,20 +98,14 @@ export default function AboutPage() {
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             A weekly audit flags repos on the list that were renamed, archived, deleted or made private, that are forks
             or mirrors, or whose score stopped refreshing; each is fixed or accepted on purpose. Scoring a repo with{" "}
-            <Link
-              href="/score"
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href="/score" className="prose-link">
               Live Score
             </Link>{" "}
             never adds it. To suggest one, open an issue or a pull request that edits the list.
           </p>
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             This site&apos;s own repo,{" "}
-            <Link
-              href={repoPath(OWN_REPO)}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <Link href={repoPath(OWN_REPO)} className="prose-link">
               {OWN_REPO.owner}/{OWN_REPO.name}
             </Link>
             , and the author&apos;s other repos are on the list and scored by the same rules. They are labelled
@@ -142,10 +133,7 @@ export default function AboutPage() {
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             Open an issue or discussion on <ExternalLink href={`${REPO_URL}/issues`}>GitHub</ExternalLink>. For anything
             private, email{" "}
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
-              className="border-b border-dotted border-ink-dim/60 text-ink-dim hover:border-ink-soft hover:text-ink-soft"
-            >
+            <a href={`mailto:${CONTACT_EMAIL}`} className="prose-link">
               {CONTACT_EMAIL}
             </a>
             .

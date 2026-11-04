@@ -45,6 +45,7 @@ export function percent(part: number, total: number): string {
 }
 
 const DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+const MONTH = new Intl.DateTimeFormat("en-GB", { month: "short", timeZone: "UTC" });
 const DATE_TIME = new Intl.DateTimeFormat("en-GB", {
   day: "numeric",
   month: "short",
@@ -59,4 +60,18 @@ const DATE_TIME = new Intl.DateTimeFormat("en-GB", {
 // and browsers, so a date formatted during hydration can mismatch the static HTML.
 export function formatDate(epochSec: number, { time = false }: { time?: boolean } = {}): string {
   return (time ? DATE_TIME : DATE).format(new Date(epochSec * 1000));
+}
+
+export function formatMonth(epochSec: number): string {
+  return MONTH.format(new Date(epochSec * 1000));
+}
+
+/** A YYYY-MM-DD day as epoch seconds at its UTC midnight. */
+export function dayEpoch(date: string): number {
+  return Date.parse(`${date}T00:00:00Z`) / 1000;
+}
+
+/** A YYYY-MM-DD day as `formatDate` writes it. */
+export function formatDay(date: string): string {
+  return formatDate(dayEpoch(date));
 }

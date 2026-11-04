@@ -25,7 +25,7 @@ function mark(pass: number): { key: keyof typeof MARK_CLASSES; ch: string } {
 
 type RepoLocation = Parameters<typeof repoFileUrl>[0];
 
-/** With `repo`, the matched path links to it on the default branch. */
+/** With `repo`, the matched path links to it on the default branch. Rows go in a `divide-y divide-line` list. */
 export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoLocation }) {
   const m = mark(signal.pass);
   const { cls, label } = MARK_CLASSES[m.key];
@@ -33,21 +33,17 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
   const href = path && repo ? repoFileUrl(repo, path, matchesDirectory(signal)) : null;
 
   return (
-    <div className="flex items-start gap-3.5 border-b border-line py-3 last:border-b-0">
-      <div
-        role="img"
-        aria-label={label}
-        className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${cls}`}
-      >
-        <span aria-hidden="true">{m.ch}</span>
+    <div className="flex items-start gap-3.5 py-3">
+      <div role="img" aria-label={label} className={`glyph mt-0.5 size-6 text-xs font-bold ${cls}`}>
+        {m.ch}
       </div>
 
       <div className="flex-1">
-        <div className="text-[14.5px] font-medium">
-          <Link href={checkPath(signal.id)} className="text-ink hover:text-ink-soft">
+        <div className="text-[14.5px]">
+          <Link href={checkPath(signal.id)} className="font-medium text-ink hover:text-ink-soft">
             {signal.label}
           </Link>
-          <span className="ml-1.5 text-xs font-normal tabular-nums text-muted">· {percent(signal.pass, 1)} pass</span>
+          <span className="ml-1.5 text-xs tabular-nums text-muted">· {percent(signal.pass, 1)} pass</span>
         </div>
 
         <div className="mt-0.5 text-[13.5px] text-ink-dim">{signal.detail}</div>
