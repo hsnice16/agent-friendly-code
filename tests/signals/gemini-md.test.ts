@@ -68,4 +68,55 @@ describe("geminiMd signal", () => {
     fixture = makeFixture({ "Gemini.md": "x".repeat(1200) });
     assert.equal(geminiMd.check(fixture).pass, 1);
   });
+
+  test("matches the former single-regex expansion on generated files", () => {
+    // The pattern the line scan replaced, kept as the reference.
+    const OLD =
+      /^[ \t]*(?:```|~~~)[^\n]*\n[\s\S]*?^[ \t]*(?:```|~~~)[ \t]*\r?$|^[ \t]*@(?:\.\/)?([^\s/]+\.md)[ \t]*\r?$/gim;
+    const agents = "a".repeat(250);
+    const expected = (text: string) =>
+      text.replace(OLD, (m, name?: string) => (name?.toLowerCase() === "agents.md" ? agents : m)).trim().length;
+    const parts = [
+      "```js",
+      "```",
+      "~~~",
+      "  ```",
+      "@AGENTS.md",
+      "@./agents.md",
+      "@docs/x.md",
+      "text",
+      "",
+      "  @AGENTS.md  ",
+    ];
+    let seed = 7;
+    const rand = (n: number) => {
+      seed = (seed * 1103515245 + 12345) % 2 ** 31;
+      return seed % n;
+    };
+
+    for (let k = 0; k < 400; k++) {
+      const eol = rand(3) === 0 ? "\r\n" : "\n";
+      const text = Array.from({ length: 1 + rand(12) }, () => parts[rand(parts.length)]).join(eol);
+      fixture = makeFixture({ "GEMINI.md": text, "AGENTS.md": agents });
+      const detail = geminiMd.check(fixture).detail;
+      const len = expected(text);
+      assert.ok(
+        len === 0 ? /empty/.test(detail) : detail.includes(`(${len.toLocaleString("en-US")} characters)`),
+        `${JSON.stringify(text)}: ${detail}`,
+      );
+      removeFixture(fixture);
+      fixture = "";
+    }
+  });
+
+  test("stays fast on a hostile file", () => {
+    const start = performance.now();
+    fixture = makeFixture({ "GEMINI.md": "```x\n".repeat(200_000), "AGENTS.md": "x".repeat(100_000) });
+    geminiMd.check(fixture);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ "GEMINI.md": "@AGENTS.md\n".repeat(90_000), "AGENTS.md": "x".repeat(1_000_000) });
+    assert.equal(geminiMd.check(fixture).pass, 1);
+    assert.ok(performance.now() - start < 3000, `took ${performance.now() - start} ms`);
+  });
 });
