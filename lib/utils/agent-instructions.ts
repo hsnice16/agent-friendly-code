@@ -45,7 +45,7 @@ const NUMBER = new Intl.NumberFormat("en-US");
 
 /** Characters after trimming, as the check measured them; null when its detail has no count. */
 export function fileLength(detail: string | null): number | null {
-  // "(14688 chars)" is the older form still in rows not rescored since.
+  // "(14688 chars)" is the older form, still in the rank.db snapshots the adoption series reads.
   const m = detail?.match(/\(([\d,]+) (?:characters|chars)\)/);
   return m ? Number(m[1].replaceAll(",", "")) : null;
 }

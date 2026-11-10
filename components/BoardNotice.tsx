@@ -5,7 +5,6 @@ const BUTTON = "text-ink-dim hover:text-ink-soft";
 /** Shown in place of the rows when a re-cut can't be computed. */
 export function BoardNotice({ reason }: { reason: "error" | "stale" }) {
   if (reason === "stale") {
-    // The data came from a newer deploy that no longer has this board.
     return (
       <>
         The leaderboard was just updated.{" "}

@@ -33,11 +33,11 @@ The harness emits a versioned weights JSON consumed by every downstream:
 
 ```
 agent-friendly-bench (this task) ──emits──▶ agent-friendly-weights (npm)
-                                                      │
-                                  ┌───────────────────┼───────────────────┐
-                                  ▼                   ▼                   ▼
-                       agent-friendly-code   agent-friendly-action   agent-friendly-scorer
-                          (web app)         (CI Marketplace action)   (default weights bundled)
+                                                            │
+         ┌─────────────────────────┬────────────────────────┼────────────────────────┐
+         ▼                         ▼                        ▼                        ▼
+agent-friendly-code      agent-friendly-action    agent-friendly-skill     agent-friendly-scorer
+     (web app)           (CI Marketplace action)      (agent skill)        (default weights bundled)
 ```
 
 Keep the **scorer pure** — it takes the model profiles (which carry their weights) as a parameter, never imports them transitively. Agent SDKs (`@anthropic-ai/sdk`, OpenAI, etc.) and sandbox infra live only in this harness; they never reach the scorer, the action, or the web app.

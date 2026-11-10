@@ -60,7 +60,7 @@ export function summarizeRepo(
     return null;
   }
 
-  // By slug: rows scored before canonicalLanguage keep the host's casing ("Java", "java").
+  // By slug, so a second spelling never splits the group.
   const slug = repo.language ? languageSlug(repo.language) : "";
   const sameLanguage = slug ? leaderboard.filter((r) => r.language && languageSlug(r.language) === slug) : [];
 

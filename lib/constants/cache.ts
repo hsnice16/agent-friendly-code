@@ -4,3 +4,6 @@ export const BOARD_CACHE_CONTROL = "public, max-age=3600, s-maxage=86400, stale-
 
 // Live scores and registry lookups change without a deploy.
 export const LIVE_CACHE_CONTROL = "public, max-age=3600, s-maxage=3600";
+
+// A failed live score is a rate limit or host blip, not a verdict.
+export const RETRY_CACHE_CONTROL = "public, max-age=60, s-maxage=60";

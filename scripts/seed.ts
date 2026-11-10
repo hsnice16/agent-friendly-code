@@ -7,7 +7,7 @@ import { SEEDS } from "./seed-list";
 import { seedPackages } from "./seed-packages";
 
 // More removals than this in one run is treated as a broken seed list, and the
-// run aborts with no row changed. Raise it for a deliberate bulk removal.
+// run aborts with no row changed. Set SEED_MAX_PRUNE for a deliberate bulk removal.
 const override = process.env.SEED_MAX_PRUNE?.trim();
 const MAX_PRUNE = override && /^\d+$/.test(override) ? Number(override) : 10;
 

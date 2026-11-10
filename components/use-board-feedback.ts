@@ -13,8 +13,8 @@ import { boardBasePath } from "@/lib/utils/leaderboard-href";
 export const SEARCH_SETTLE_MS = 350;
 
 /**
- * One `search` event per settled query, counted once the rows exist, like the
- * server-side count it replaces: a host or sort change re-counts but isn't a new search.
+ * One `search` event per settled query, counted once the rows exist: a filter
+ * or sort change re-counts but isn't a new search.
  */
 export function useSearchTracking(
   settledQ: string,
@@ -33,7 +33,7 @@ export function useSearchTracking(
   }, [settledQ, rows, model, queryRef]);
 }
 
-/** Rows change in place now, with no page load to tell a screen reader. */
+/** Rows change in place, with no page load to tell a screen reader. */
 export function useResultAnnouncement(recut: boolean, total: number | undefined): string {
   const [text, setText] = useState("");
   useEffect(() => {

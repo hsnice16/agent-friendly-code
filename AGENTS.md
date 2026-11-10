@@ -39,8 +39,9 @@ lib/
   scoring/    signals (one file each), weights.ts (MODELS), scorer.ts — pure, vendored by the siblings
   live-score/ /score/…: host tree API → materialized directory → scoreRepo
   clients/    git clone, host APIs, package registries, language names
-  db.ts       the only import path for queries; re-exports the db-*.ts modules (schema in db-schema.ts),
-              except db-snapshot.ts, which reads old rank.db copies read-only (importing db.ts migrates rank.db)
+  constants/  hosts, board and sort keys, page sizes, cache headers
+  db.ts       the only import path for queries; re-exports the query modules (schema in db-schema.ts);
+              db-snapshot.ts reads old rank.db copies read-only (importing db.ts migrates rank.db)
   utils/      URL builders, page titles, formatting, repo-page builders
   check-content/  prose for each /check/<slug> page, keyed by signal id
   framework-guides/, language-guides/  per-framework and per-language AGENTS.md guide content
@@ -110,14 +111,14 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 ## Adding a host
 
 1. `parseRepoUrl` in `lib/repo-url.ts`.
-2. `fetchRepoMetaOrPrivate`: the host's API (token from `process.env.<HOST>_TOKEN`), language through `canonicalLanguage` / `primaryLanguage`, description and topics through `sanitizeDescription` / `sanitizeTopics`, `"private"` for non-public repos, and a recorded response in `tests/fixtures/repo-meta/`.
+2. `fetchRepoMetaOrPrivate` (`lib/clients/github.ts`): the host's API (token from `process.env.<HOST>_TOKEN`), language through `canonicalLanguage` / `primaryLanguage`, description and topics through `sanitizeDescription` / `sanitizeTopics`, `"private"` for non-public repos, and a recorded response in `tests/fixtures/repo-meta/`.
 3. A seed in `scripts/seed-list.ts`; label and domain in `lib/constants/hosts.ts`.
 4. Live Score: URL builders in `lib/live-score/hosts.ts`, a fixture in `scripts/parity-check.ts`, and only once parity is green the id in `SUPPORTED_HOSTS` (`lib/live-score/supported.ts`). `/score/[host]/[owner]/[name]` takes one segment per field, so nested namespaces need a route change.
 
 ## Security
 
 - Clones are `git clone --depth 1 --single-branch`, no submodules. Nothing from a clone is ever executed or installed.
-- Repo contents are untrusted. The scorer never follows a symlink out of the tree, reads only regular files, and stops at `MAX_READ_BYTES` (1 MiB); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
+- Repo contents are untrusted. The scorer never follows a symlink out of the tree, reads only regular files, stops at `MAX_READ_BYTES` (1 MiB), and keeps every pattern linear on a hostile file (`gemini-md.ts` says why); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
 - `/score/[host]/[owner]/[name]`, its OG card and the badge for a repo off the board turn visitor input into host API calls and a temp directory. `parseLiveTarget` (`lib/live-score/cached.ts`) and `safeAbsolute` (`lib/live-score/materialize.ts`) are the guards; `tests/live-*.test.ts` and `tests/symlink-containment.test.ts` cover them. Never weaken either.
 - Private repos are never scored, live or by CLI, even when the token can read them.
 - `dangerouslySetInnerHTML` appears only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped) and `BoardPendingScript.tsx` (a constant string). Owner-written repo descriptions and topics reach JSON-LD only after `lib/utils/repo-about.ts` sanitises them, and never reach OG images.
@@ -135,7 +136,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 ## Claude Code hooks and skills
 
 - `SessionStart` prints the release and the changelog rule.
-- `Stop` runs `.claude/hooks/stop-guard.sh`: if watched source paths changed, it blocks once until the `post-change-check` skill has run (docs sync, then `code-review`, then `quality-check`).
+- `Stop` runs `.claude/hooks/stop-guard.sh`: if watched source paths changed, it blocks once per distinct uncommitted diff and asks for the `post-change-check` skill (docs sync, then `code-review`, then `quality-check`).
 
 ## Before you finish
 
@@ -143,7 +144,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 
 <!-- BEGIN:nextjs-agent-rules -->
 
-# This is NOT the Next.js you know
+## This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
 

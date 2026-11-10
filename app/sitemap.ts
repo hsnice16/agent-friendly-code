@@ -177,7 +177,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }));
 
   const topics = getTopicGroups();
-  // Empty until a rescore stores topics; /topics is noindex until then.
+  // /topics is noindex while no topic has a page.
   const topicRoutes: MetadataRoute.Sitemap =
     topics.length === 0
       ? []

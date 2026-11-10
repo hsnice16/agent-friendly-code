@@ -9,7 +9,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 
 ## Tailwind
 
-- **Prefer utilities over custom classes.** If a pattern can be expressed with existing Tailwind utilities, use them. Don't add a custom class in `app/globals.css` unless the pattern repeats 3+ times with the same composition.
+- **Prefer utilities over custom classes.** A plain-CSS `@utility` in `app/globals.css` only for a pattern repeated in 3+ components (AGENTS.md → Conventions says why).
 - **Use the `@theme` tokens** (`bg-surface`, `text-ink`, `border-line`, etc.) — never hardcode hex in JSX.
 - **No `style={{ ... }}`** unless the value is dynamic (e.g. `width: ${pct}%`). Static styling belongs in className.
 - **No `@apply`** in `globals.css` (Tailwind 4 best practice — put the utilities on the element instead, or extract a React component).

@@ -8,8 +8,7 @@ import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPIC_PAGE_MIN_REPOS, TOPICS_PATH, topicPath } from "@/lib/topics";
 import { hubPath, isHub } from "@/lib/utils/language";
 
-// Until a rescore stores topics there are no topic pages, and an empty index
-// is not worth a search result.
+// With no topic pages, an empty index is not worth a search result.
 export function generateMetadata(): Metadata {
   const meta = staticPageMetadata(TOPICS_PATH);
   return getTopicGroups().length > 0 ? meta : { ...meta, robots: { index: false, follow: true } };

@@ -1,4 +1,4 @@
-import { BOARD_CACHE_CONTROL, LIVE_CACHE_CONTROL } from "@/lib/constants/cache";
+import { BOARD_CACHE_CONTROL, LIVE_CACHE_CONTROL, RETRY_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getModelScores, getRepoByHostOwnerName } from "@/lib/db";
 import { cachedLiveScore, parseLiveTarget } from "@/lib/live-score/cached";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
@@ -19,9 +19,8 @@ const HEADERS = {
 
 const BOARD_HEADERS = { ...HEADERS, "Cache-Control": BOARD_CACHE_CONTROL };
 
-// A failed live score is a rate limit or host blip, not a verdict: README
-// proxies would otherwise pin "not scored" for the full hour.
-const RETRY_HEADERS = { ...HEADERS, "Cache-Control": "public, max-age=60, s-maxage=60" };
+// README proxies would otherwise pin "not scored" for the full hour.
+const RETRY_HEADERS = { ...HEADERS, "Cache-Control": RETRY_CACHE_CONTROL };
 const FAILED = Symbol("failed");
 
 type Scores = { overall: number | null; byModel: () => { modelId: string; score: number }[]; onBoard: boolean };

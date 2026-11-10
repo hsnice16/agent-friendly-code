@@ -5,7 +5,7 @@ description: Orchestrates the end-of-turn review after non-trivial edits to app/
 
 # Post-change check — docs sync + code review + quality sweep
 
-Run this when a turn has made code changes and you're about to report done. It's the one stop that verifies **the work is coherent** (docs and code aligned) **and correct** (conventions followed).
+Run this when a turn has made code changes and you're about to report done.
 
 ## When to run
 
@@ -21,7 +21,7 @@ Work the four phases **in order**. Don't skip ahead — the docs phase often sur
 
 1. `git status --short` — see what moved.
 2. `git diff --stat HEAD` — scope.
-3. `git diff HEAD -- app/ components/ lib/ scripts/` — the actual changes.
+3. `git diff HEAD -- app/ components/ lib/ scripts/`, plus every untracked file from step 1 — the actual changes.
 
 Keep a mental list of: touched files, added/removed exports, new deps, new env vars, new routes.
 
@@ -99,6 +99,6 @@ If every phase is clean, say so plainly in one line. Don't invent findings to lo
 
 ## What this skill does NOT do
 
-- It does not run tests, biome, or tsc — those are the pre-commit hook's job (`lefthook.yml`).
+- It does not run tests, biome or tsc; AGENTS.md → Before you finish does.
 - It does not push, commit, or open PRs.
 - It does not modify the codebase beyond the docs updates in Phase 2 (tasks / roadmap / AGENTS / README).

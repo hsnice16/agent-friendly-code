@@ -10,8 +10,7 @@ export function languageSlug(language: string): string {
   return SLUG_OVERRIDES[lower] ?? lower.replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
 }
 
-// Rows scored before canonicalLanguage keep the host's casing ("Java", "java").
-// Group by slug; label with the most common spelling.
+// Group by slug so two spellings never split a hub; label with the most common one.
 export function groupByLanguage<T extends { language: string | null }>(rows: T[]): LanguageGroup<T>[] {
   const groups = new Map<string, { rows: T[]; spellings: Map<string, number> }>();
 
