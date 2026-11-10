@@ -8,6 +8,7 @@ export type LeaderboardHrefParts = {
   page: number;
   sort: SortKey;
   host: Host | "all";
+  badge?: boolean;
   model: ModelId | "overall";
 };
 
@@ -30,6 +31,9 @@ export function leaderboardHref(parts: LeaderboardHrefParts): string {
   // Defaults stay out of the URL so each board has one address.
   if (parts.host !== "all") {
     p.set("host", parts.host);
+  }
+  if (parts.badge) {
+    p.set("badge", "1");
   }
   if (parts.q) {
     p.set("q", parts.q);

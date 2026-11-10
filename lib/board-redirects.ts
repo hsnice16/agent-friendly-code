@@ -1,3 +1,4 @@
+import { RECUT_KEYS } from "./constants/board";
 import { MODELS } from "./scoring/weights";
 
 // Boards are prerendered, so their pages moved from `?page=N` to `/page/N` and
@@ -11,7 +12,7 @@ const query = (key: string, value?: string) => ({ type: "query" as const, key, .
 
 const MODEL = `(?<model>${MODELS.map((m) => m.id).join("|")})`;
 export const PAGE_2_PLUS = "(?<page>[2-9]|[1-9]\\d+)";
-const RECUT_MISSING = ["q", "host", "sort", "dir"].map((key) => query(key));
+const RECUT_MISSING = RECUT_KEYS.map((key) => query(key));
 
 export const BOARD_REDIRECTS = [
   // Before the model-only rule, so a legacy link with both takes one hop.

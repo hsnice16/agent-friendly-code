@@ -99,6 +99,14 @@ describe("browser board", () => {
     assert.equal(last.startIdx, (last.page - 1) * LEADERBOARD_PAGE_SIZE);
     assert.equal(viewBoard(all, { ...DEFAULT_QUERY, q: "nothing" }).total, 0);
   });
+
+  it("keeps only badge repos when the badge filter is on", () => {
+    const all = boardRows(data, "overall");
+    const badged = viewBoard(all, { ...DEFAULT_QUERY, badge: true });
+    assert.equal(badged.total, all.filter((r) => r.badge_embedded === 1).length);
+    assert.ok(badged.total > 0 && badged.total < all.length);
+    assert.ok(badged.rows.every((r) => r.badge_embedded === 1));
+  });
 });
 
 describe("parseBoardQuery", () => {
@@ -107,5 +115,11 @@ describe("parseBoardQuery", () => {
     assert.deepEqual(q, { ...DEFAULT_QUERY, q: "axios" });
     assert.equal(isRecut(q), true);
     assert.equal(isRecut(parseBoardQuery(new URLSearchParams("sort=score&dir=desc&page=4"))), false);
+  });
+
+  it("reads the badge filter only from badge=1", () => {
+    assert.equal(parseBoardQuery(new URLSearchParams("badge=1")).badge, true);
+    assert.equal(parseBoardQuery(new URLSearchParams("badge=true")).badge, false);
+    assert.equal(isRecut(parseBoardQuery(new URLSearchParams("badge=1"))), true);
   });
 });

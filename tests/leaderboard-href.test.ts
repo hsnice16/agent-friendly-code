@@ -24,6 +24,15 @@ describe("leaderboardHref", () => {
       "/model/cursor?host=github&q=next&page=3",
     );
   });
+
+  it("carries the badge filter as badge=1 and leaves it out when off", () => {
+    assert.equal(leaderboardHref({ ...DEFAULTS, badge: true, page: 2 }), "/?badge=1&page=2");
+    assert.equal(leaderboardHref({ ...DEFAULTS, badge: false, page: 2 }), "/page/2");
+    assert.equal(
+      leaderboardHref({ ...DEFAULTS, host: "gitlab", badge: true, q: "x", sort: "stars" }),
+      "/?host=gitlab&badge=1&q=x&sort=stars",
+    );
+  });
 });
 
 describe("isModelId", () => {

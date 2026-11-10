@@ -35,6 +35,10 @@ const URLS = [
   "/?q=re",
   "/?host=svn",
   "/?host=gitlab",
+  "/?badge=1",
+  "/?badge=true",
+  "/model/aider?badge=1",
+  "/page/2?badge=1",
   "/?page=abc",
   "/?page=1",
   "/page/3",
@@ -103,5 +107,14 @@ describe("board redirects", () => {
   it("sends a legacy agent + page link to its page in one hop", () => {
     const [first] = BOARD_REDIRECTS;
     assert.equal(first.destination, "/model/:model/page/:page");
+  });
+
+  it("leaves every re-cut page link alone, badge included", () => {
+    for (const r of BOARD_REDIRECTS.filter((r) => "missing" in r)) {
+      assert.deepEqual(
+        r.missing?.map((m) => m.key),
+        ["q", "host", "badge", "sort", "dir"],
+      );
+    }
   });
 });

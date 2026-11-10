@@ -21,6 +21,7 @@ type Props = {
   loading: boolean;
   notice: "stale" | "error" | null;
   onClearSearch: () => void;
+  onClearBadge: () => void;
   onPageClick: (page: number, e: MouseEvent) => void;
 };
 
@@ -39,6 +40,7 @@ export const BoardResults = memo(function BoardResults({
   loading,
   notice,
   onClearSearch,
+  onClearBadge,
   onPageClick,
 }: Props) {
   return (
@@ -46,6 +48,7 @@ export const BoardResults = memo(function BoardResults({
       <LeaderboardTable
         q={query.q}
         host={query.host}
+        badge={query.badge}
         page={view.page}
         rows={view.rows}
         startIdx={view.startIdx}
@@ -53,6 +56,8 @@ export const BoardResults = memo(function BoardResults({
         activeLabel={activeLabel}
         clearSearchHref={leaderboardHref({ ...query, model, q: "", page: 1 })}
         onClearSearch={onClearSearch}
+        clearBadgeHref={leaderboardHref({ ...query, model, badge: false, page: 1 })}
+        onClearBadge={onClearBadge}
         busy={busy}
         loading={loading}
         notice={notice && <BoardNotice reason={notice} />}

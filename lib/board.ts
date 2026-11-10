@@ -35,15 +35,30 @@ export type BoardData = {
   }[];
 };
 
-export type BoardQuery = { q: string; host: Host | "all"; sort: SortKey; dir: SortDir; page: number };
+export type BoardQuery = {
+  q: string;
+  host: Host | "all";
+  /** Only repos that show the badge in their README. */
+  badge: boolean;
+  sort: SortKey;
+  dir: SortDir;
+  page: number;
+};
 
-export const DEFAULT_QUERY: BoardQuery = { q: "", host: "all", sort: DEFAULT_SORT, dir: DEFAULT_DIR, page: 1 };
+export const DEFAULT_QUERY: BoardQuery = {
+  q: "",
+  host: "all",
+  badge: false,
+  sort: DEFAULT_SORT,
+  dir: DEFAULT_DIR,
+  page: 1,
+};
 
 export function cleanQuery(raw: string | null | undefined): string {
   return (raw ?? "").trim().slice(0, MAX_SEARCH_LENGTH);
 }
 
-/** Lenient like the server always was: unknown values fall back to the default. */
+/** Lenient: unknown values fall back to the default. */
 export function parseBoardQuery(params: URLSearchParams): BoardQuery {
   const host = params.get("host");
   const sort = params.get("sort");
@@ -52,6 +67,7 @@ export function parseBoardQuery(params: URLSearchParams): BoardQuery {
   return {
     q: cleanQuery(params.get("q")),
     host: isHost(host) ? host : "all",
+    badge: params.get("badge") === "1",
     sort: isSortKey(sort) ? sort : DEFAULT_SORT,
     dir: isSortDir(dir) ? dir : DEFAULT_DIR,
     page: Number.isFinite(page) && page >= 1 ? Math.floor(page) : 1,
@@ -59,7 +75,9 @@ export function parseBoardQuery(params: URLSearchParams): BoardQuery {
 }
 
 export function isRecut(query: BoardQuery): boolean {
-  return query.q !== "" || query.host !== "all" || query.sort !== DEFAULT_SORT || query.dir !== DEFAULT_DIR;
+  return (
+    query.q !== "" || query.host !== "all" || query.badge || query.sort !== DEFAULT_SORT || query.dir !== DEFAULT_DIR
+  );
 }
 
 export function defaultRepoUrl(r: { host: string; owner: string; name: string }): string {
@@ -119,7 +137,7 @@ export function sortRows(rows: BoardRow[], sort: SortKey, dir: SortDir): BoardRo
   });
 }
 
-export function matchesQuery(row: { owner: string; name: string }, q: string): boolean {
+function matchesQuery(row: { owner: string; name: string }, q: string): boolean {
   return `${row.owner}/${row.name}`.toLowerCase().includes(q.toLowerCase());
 }
 
@@ -127,7 +145,8 @@ export type BoardView = { rows: BoardRow[]; startIdx: number; page: number; tota
 
 export function viewBoard(all: BoardRow[], query: BoardQuery): BoardView {
   const hosted = query.host === "all" ? all : all.filter((r) => r.host === query.host);
-  const matched = query.q ? hosted.filter((r) => matchesQuery(r, query.q)) : hosted;
+  const badged = query.badge ? hosted.filter((r) => r.badge_embedded === 1) : hosted;
+  const matched = query.q ? badged.filter((r) => matchesQuery(r, query.q)) : badged;
   const sorted = sortRows(matched, query.sort, query.dir);
   const { page, totalPages, startIdx } = pageSlice(sorted.length, query.page);
   return {

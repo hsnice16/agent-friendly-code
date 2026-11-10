@@ -2,7 +2,7 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
 import type { BoardRow } from "@/lib/board";
-import type { Host } from "@/lib/constants/hosts";
+import { HOST_LABELS, type Host } from "@/lib/constants/hosts";
 import { compactStars } from "@/lib/utils/format";
 import { sanitizeDescription } from "@/lib/utils/repo-about";
 import { repoPath } from "@/lib/utils/repo-path";
@@ -22,11 +22,14 @@ type Props = {
   totalPages: number;
   activeLabel: string;
   host: Host | "all";
+  badge?: boolean;
   /** Rank of `rows[0]` on the full board — rows are already the current page's slice. */
   startIdx: number;
   clearSearchHref: string;
   /** Clears the search in place instead of following `clearSearchHref`. */
   onClearSearch?: () => void;
+  clearBadgeHref?: string;
+  onClearBadge?: () => void;
   /** Rows are about to be replaced by a re-cut that is still loading. */
   busy?: boolean;
   /** Rows show as placeholders until the re-cut loads (styled by `data-board-pending`). */
@@ -43,6 +46,7 @@ const ROW_CELLS =
 export function LeaderboardTable({
   q,
   host,
+  badge = false,
   page,
   rows,
   startIdx,
@@ -50,16 +54,20 @@ export function LeaderboardTable({
   activeLabel,
   clearSearchHref,
   onClearSearch,
+  clearBadgeHref,
+  onClearBadge,
   busy = false,
   loading = false,
   notice,
 }: Props) {
-  const clearSearch = onClearSearch
-    ? (e: MouseEvent) => {
-        e.preventDefault();
-        onClearSearch();
-      }
-    : undefined;
+  const inPlace = (fn?: () => void) =>
+    fn
+      ? (e: MouseEvent) => {
+          e.preventDefault();
+          fn();
+        }
+      : undefined;
+  const clearSearch = inPlace(onClearSearch);
 
   return (
     <div
@@ -70,6 +78,7 @@ export function LeaderboardTable({
         <caption className="sr-only">
           Leaderboard — page {page} of {totalPages} for {activeLabel}
           {host !== "all" ? `, host=${host}` : ""}
+          {badge ? ", only repos showing the badge" : ""}
           {q ? `, filtered by "${q}"` : ""}
         </caption>
 
@@ -114,6 +123,19 @@ export function LeaderboardTable({
                       Clear search
                     </Link>
                     .
+                  </>
+                ) : badge ? (
+                  <>
+                    No {host === "all" ? "" : `${HOST_LABELS[host]} `}repo on this board shows the badge yet.{" "}
+                    {clearBadgeHref ? (
+                      <Link
+                        href={clearBadgeHref}
+                        onClick={inPlace(onClearBadge)}
+                        className="text-ink-dim hover:text-ink-soft"
+                      >
+                        Show every repo
+                      </Link>
+                    ) : null}
                   </>
                 ) : (
                   <>

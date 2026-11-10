@@ -156,6 +156,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/pnpm/pnpm", note: "pnpm — disk-efficient package manager" },
   { url: "https://github.com/immerjs/immer", note: "Immer — immutable state updates" },
   { url: "https://github.com/mermaid-js/mermaid", note: "Mermaid — diagrams from text" },
+  {
+    url: "https://github.com/Doka-NT/Taviraq",
+    note: "Taviraq — macOS Electron terminal with an AI assistant",
+  },
 
   // --- GitHub, Python ---
   {

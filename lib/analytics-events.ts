@@ -11,7 +11,7 @@ export type AnalyticsEvent =
   | { name: "select_agent"; agent: string }
   // GA4's recommended name: its built-in "Search term" dimension reads `search_term`.
   | { name: "search"; search_term: string; results: number; board: string }
-  | { name: "leaderboard_filter"; filter: "host" | "sort"; option: string }
+  | { name: "leaderboard_filter"; filter: "host" | "badge" | "sort"; option: string }
   | { name: "score_nudge_click" };
 
 export type ShareNetwork = "x" | "linkedin" | "bluesky" | "copy_link";

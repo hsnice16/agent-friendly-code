@@ -1,11 +1,12 @@
 import type { MouseEvent } from "react";
 
 import { type BoardQuery, parseBoardQuery } from "@/lib/board";
+import { RECUT_KEYS } from "@/lib/constants/board";
 
 // Browser-only helpers for the board's address; call them from effects and handlers.
 
 /** The board's own params, plus `model`, which a legacy redirect leaves behind. */
-const BOARD_KEYS = new Set(["q", "host", "sort", "dir", "page", "model"]);
+const BOARD_KEYS = new Set<string>([...RECUT_KEYS, "page", "model"]);
 
 function pageFromPath(pathname: string): number {
   const m = /\/page\/(\d+)$/.exec(pathname);

@@ -23,16 +23,13 @@ import {
   viewBoard,
 } from "@/lib/board";
 import { isPlainClick, readBoardLocation, writeBoardLocation } from "@/lib/board-location";
-import type { Host } from "@/lib/constants/hosts";
-import type { SortDir, SortKey } from "@/lib/constants/sort";
 import type { ModelId } from "@/lib/scoring/weights";
 import { prefetchBoardData, useBoardData } from "@/lib/use-board-data";
 import { leaderboardHref } from "@/lib/utils/leaderboard-href";
 import { BoardAgentPills } from "./BoardAgentPills";
+import { BoardFilters, type FilterChange } from "./BoardFilters";
 import { BoardResults } from "./BoardResults";
-import { HostSelect } from "./HostSelect";
 import { SearchBar } from "./SearchBar";
-import { SortSelect } from "./SortSelect";
 import { SEARCH_SETTLE_MS, useBoardPopState, useResultAnnouncement, useSearchTracking } from "./use-board-feedback";
 
 type BoardId = ModelId | "overall";
@@ -205,14 +202,13 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
     apply({ ...query, q: "", page: 1 });
   }
 
-  function onHost(host: Host | "all") {
-    apply({ ...query, host, page: 1 });
-    track({ name: "leaderboard_filter", filter: "host", option: host });
+  function clearBadge() {
+    apply({ ...query, badge: false, page: 1 });
   }
 
-  function onSort(sort: SortKey, dir: SortDir) {
-    apply({ ...query, sort, dir, page: 1 });
-    track({ name: "leaderboard_filter", filter: "sort", option: `${sort}-${dir}` });
+  function onFilter({ patch, filter, option }: FilterChange) {
+    apply({ ...query, ...patch, page: 1 });
+    track({ name: "leaderboard_filter", filter, option });
   }
 
   function onPageClick(page: number, e: MouseEvent) {
@@ -240,13 +236,14 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
   }
 
   // Stable for BoardResults' memo; they call whichever handlers the latest render made.
-  const handlers = useRef({ clearSearch, onPageClick });
+  const handlers = useRef({ clearSearch, clearBadge, onPageClick });
   useLayoutEffect(() => {
-    handlers.current = { clearSearch, onPageClick };
+    handlers.current = { clearSearch, clearBadge, onPageClick };
   });
   const stable = useMemo(
     () => ({
       clearSearch: () => handlers.current.clearSearch(),
+      clearBadge: () => handlers.current.clearBadge(),
       onPageClick: (page: number, e: MouseEvent) => handlers.current.onPageClick(page, e),
     }),
     [],
@@ -272,10 +269,7 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
       >
         <SearchBar value={input} onChange={onSearch} busy={searching} />
 
-        <div className="flex flex-wrap items-center gap-2">
-          <HostSelect value={query.host} onChange={onHost} />
-          <SortSelect sort={query.sort} dir={query.dir} onChange={onSort} />
-        </div>
+        <BoardFilters query={query} onChange={onFilter} />
       </div>
 
       <p aria-live="polite" className="sr-only">
@@ -292,6 +286,7 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
         loading={pending}
         notice={notice}
         onClearSearch={stable.clearSearch}
+        onClearBadge={stable.clearBadge}
         onPageClick={stable.onPageClick}
       />
     </div>
