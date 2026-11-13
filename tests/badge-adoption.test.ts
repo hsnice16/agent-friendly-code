@@ -3,7 +3,7 @@ import { symlinkSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, test } from "node:test";
 
-import { detectBadgeEmbed } from "../lib/badge-adoption";
+import { detectBadgeEmbed, selfBadgeRepos } from "../lib/badge-adoption";
 import { makeFixture, removeFixture } from "./_helpers";
 
 const SLUG = "github/honojs/hono";
@@ -84,5 +84,46 @@ describe("detectBadgeEmbed", () => {
     } finally {
       removeFixture(outside);
     }
+  });
+});
+
+describe("selfBadgeRepos", () => {
+  const badge = (slug: string) => `[![Agent Friendly](https://agentfriendlycode.com/api/badge/github/${slug}.svg)]`;
+
+  test("counts a repo whose root README shows its own badge, once", () => {
+    const hits = [
+      { repo: "axios/axios", fork: false, path: "README.md", fragments: [badge("axios/axios")] },
+      { repo: "Axios/Axios", fork: false, path: "README.md", fragments: [badge("axios/axios")] },
+    ];
+    assert.deepEqual(selfBadgeRepos(hits), ["axios/axios"]);
+  });
+
+  test("ignores vendored copies, renamed copies, forks and other files", () => {
+    const hits = [
+      { repo: "someone/app", fork: false, path: "node_modules/axios/README.md", fragments: [badge("axios/axios")] },
+      { repo: "someone/axios", fork: false, path: "README.md", fragments: [badge("axios/axios")] },
+      { repo: "someone/hono", fork: true, path: "README.md", fragments: [badge("someone/hono")] },
+      { repo: "someone/docs", fork: false, path: "notes.md", fragments: [badge("someone/docs")] },
+    ];
+    assert.deepEqual(selfBadgeRepos(hits), []);
+  });
+
+  test("doesn't read the badge of hono-extra as one for hono", () => {
+    const hits = [{ repo: "honojs/hono", fork: false, path: "README.md", fragments: [badge("honojs/hono-extra")] }];
+    assert.deepEqual(selfBadgeRepos(hits), []);
+  });
+});
+
+describe("selfBadgeRepos .github README", () => {
+  test("counts a README under .github/, which GitHub shows on the repo page", () => {
+    const hits = [
+      {
+        repo: "o/r",
+        fork: false,
+        path: ".github/README.md",
+        fragments: ["https://agentfriendlycode.com/api/badge/github/o/r.svg"],
+      },
+    ];
+    assert.deepEqual(selfBadgeRepos(hits), ["o/r"]);
   });
 });

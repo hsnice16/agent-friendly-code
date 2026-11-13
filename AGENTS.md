@@ -22,6 +22,7 @@ bun run score <url|path>
 bun run seed           # reconcile data/rank.db with scripts/seed-list.ts, then rescore every seed
 bun run init-db        # optional: migrate an older DB (the schema also applies on open)
 bun run audit-seeds    # forks / mirrors / archived / renamed / gone / stale seeds (needs GITHUB_TOKEN)
+bun run badge-adopters # repos whose README shows their own badge, on or off the board (needs GITHUB_TOKEN)
 bun run parity-check   # live-score path must equal `bun run score` (--pr for the PR subset)
 bun run check-db-leaks # local paths / tokens in data/rank.db — run before committing it
 bun run indexnow       # submit sitemap URLs to IndexNow (--since <ISO time>, --dry-run)
