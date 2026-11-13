@@ -4,18 +4,20 @@ import { ArrowRight } from "@phosphor-icons/react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { track } from "@/lib/analytics-events";
+import { findBoardRepo } from "@/lib/board";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { parseRepoUrl } from "@/lib/repo-url";
+import { loadBoardData } from "@/lib/use-board-data";
 import { hostLabel } from "@/lib/utils/format";
-import { liveScorePath } from "@/lib/utils/repo-path";
+import { liveScorePath, repoPath } from "@/lib/utils/repo-path";
 
-export function LiveScoreForm() {
+export function LiveScoreForm({ className = "mt-5" }: { className?: string }) {
   const router = useRouter();
   const [value, setValue] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
-  function submit(e: React.FormEvent) {
+  async function submit(e: React.FormEvent) {
     e.preventDefault();
 
     const parsed = parseRepoUrl(value);
@@ -25,6 +27,19 @@ export function LiveScoreForm() {
     }
 
     if (!SUPPORTED_HOSTS.includes(parsed.host)) {
+      // Live Score can't read this host, but the board may already have the
+      // repo; /api/board is the static list the boards re-cut anyway.
+      setError(null);
+      setPending(true);
+      const onBoard = await loadBoardData().then(
+        (data) => findBoardRepo(data, parsed),
+        () => null,
+      );
+      if (onBoard) {
+        router.push(repoPath(onBoard));
+        return;
+      }
+      setPending(false);
       setError(`${hostLabel(parsed.host)} is coming soon. GitHub repos work today.`);
       return;
     }
@@ -36,7 +51,7 @@ export function LiveScoreForm() {
   }
 
   return (
-    <form onSubmit={submit} className="mt-5">
+    <form onSubmit={submit} className={className}>
       <div className="flex flex-col gap-2.5 sm:flex-row">
         <input
           type="text"
@@ -55,13 +70,9 @@ export function LiveScoreForm() {
             setValue(e.target.value);
             if (error) setError(null);
           }}
-          className="min-w-0 flex-1 rounded-lg border border-line bg-surface px-3.5 py-2.5 text-[15px] text-ink placeholder:text-muted focus:border-ink-dim focus:outline-none"
+          className="field flex-1"
         />
-        <button
-          type="submit"
-          disabled={pending || value.trim() === ""}
-          className="inline-flex shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg border border-line bg-ink px-4 py-2.5 text-[15px] font-medium text-accent-ink hover:bg-ink-soft disabled:cursor-not-allowed disabled:opacity-50"
-        >
+        <button type="submit" disabled={pending || value.trim() === ""} className="btn-primary shrink-0">
           {pending ? "Scoring…" : "Score"}
           {!pending && <ArrowRight size={15} weight="bold" aria-hidden="true" />}
         </button>

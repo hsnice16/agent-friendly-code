@@ -3,11 +3,11 @@ import Link from "next/link";
 
 import { AdoptionChart } from "@/components/AdoptionChart";
 import { AdoptionTable } from "@/components/AdoptionTable";
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SERIES_LABEL } from "@/lib/agents-md-adoption";
 import { ADOPTION, adoptionDatasetJsonLd } from "@/lib/agents-md-report";
@@ -31,7 +31,7 @@ const pts = (d: number) => `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d)} pt
 function Stat({ label, value, note }: { label: string; value: string; note: React.ReactNode }) {
   return (
     <Panel className="h-full">
-      <p className="eyebrow m-0 mb-2 text-xs text-muted">{label}</p>
+      <p className="eyebrow m-0 mb-2 text-[12.5px] text-muted">{label}</p>
       <p className="m-0 text-[28px] font-bold leading-none tracking-tight text-ink">{value}</p>
       <p className="mt-2 mb-0 text-[13px] leading-snug text-ink-dim">{note}</p>
     </Panel>
@@ -61,18 +61,19 @@ export default function AgentsMdReportPage() {
   return (
     <>
       <JsonLd data={adoptionDatasetJsonLd()} />
-      <BreadcrumbJsonLd current={{ name: REPORT_TITLE, path: REPORT_PATH }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY[REPORT_PATH].title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          <strong>
-            {percent(last.agentsMd, last.repos)} of the {last.repos} popular open source repos we track have an
-            AGENTS.md
-          </strong>{" "}
-          ({last.agentsMd} repos, empty files not counted), as of {asOf}.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ current: { name: REPORT_TITLE, path: REPORT_PATH } }}
+        title={PAGE_COPY[REPORT_PATH].title}
+        lead={
+          <>
+            <strong className="text-ink">
+              {percent(last.agentsMd, last.repos)} of the {last.repos} popular open source repos we track have an
+              AGENTS.md
+            </strong>{" "}
+            ({last.agentsMd} repos, empty files not counted), as of {asOf}.
+          </>
+        }
+      />
 
       <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2 lg:grid-cols-4">
         {cohort && (
@@ -138,37 +139,38 @@ export default function AgentsMdReportPage() {
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <Panel className="h-full">
           <PanelHeading>Other agent files</PanelHeading>
-          <table className="w-full border-collapse text-left text-[14px] tabular-nums">
-            <caption className="sr-only">
-              Repos with each other agent file, and how many also have an instructions file
-            </caption>
-            <thead>
-              <tr className="border-b border-line text-[12.5px] text-muted">
-                <th scope="col" className="py-2 pr-3 font-medium">
-                  File
-                </th>
-                <th scope="col" className="py-2 pr-3 text-right font-medium">
-                  Repos
-                </th>
-                <th scope="col" className="py-2 text-right font-medium">
-                  With instructions file
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-ink-dim">
-              {others.map((o) => (
-                <tr key={o.label} className="border-b border-line last:border-b-0">
-                  <th scope="row" className="py-2 pr-3 font-normal">
-                    <code className="break-words font-mono text-[13px] text-ink">{o.label}</code>
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+          <section className="table-wrap" tabIndex={0} aria-label="Other agent files">
+            <table className="data-table text-[14px] tabular-nums">
+              <caption className="sr-only">
+                Repos with each other agent file, and how many also have an instructions file
+              </caption>
+              <thead>
+                <tr>
+                  <th scope="col">File</th>
+                  <th scope="col" className="text-right">
+                    Repos
                   </th>
-                  <td className="whitespace-nowrap py-2 pr-3 text-right">
-                    {o.count} <span className="text-muted">({percent(o.count, counts.total)})</span>
-                  </td>
-                  <td className="py-2 text-right">{o.withInstructions}</td>
+                  <th scope="col" className="text-right">
+                    With instructions file
+                  </th>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+              </thead>
+              <tbody className="text-ink-dim">
+                {others.map((o) => (
+                  <tr key={o.label}>
+                    <th scope="row" className="font-normal">
+                      <code className="break-words font-mono text-[13px] text-ink">{o.label}</code>
+                    </th>
+                    <td className="whitespace-nowrap text-right">
+                      {o.count} <span className="text-muted">({percent(o.count, counts.total)})</span>
+                    </td>
+                    <td className="text-right">{o.withInstructions}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </section>
           <p className={`${PROSE} mt-3 text-[13px]`}>
             A repo with both AGENTS.md and CLAUDE.md counts under AGENTS.md: the check stops at the first file with
             content, so how many have both isn&apos;t measured.{" "}

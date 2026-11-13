@@ -3,7 +3,7 @@ import "./_temp-db";
 import assert from "node:assert/strict";
 import { after, describe, it } from "node:test";
 
-import { boardRows, DEFAULT_QUERY, isRecut, parseBoardQuery, sortRows, viewBoard } from "../lib/board";
+import { boardRows, DEFAULT_QUERY, findBoardRepo, isRecut, parseBoardQuery, sortRows, viewBoard } from "../lib/board";
 import { buildBoardData } from "../lib/board-data";
 import { HOST_DOMAINS, HOSTS } from "../lib/constants/hosts";
 import { LEADERBOARD_PAGE_SIZE } from "../lib/constants/scoring";
@@ -98,6 +98,35 @@ describe("browser board", () => {
     assert.equal(last.page, Math.ceil(30 / LEADERBOARD_PAGE_SIZE));
     assert.equal(last.startIdx, (last.page - 1) * LEADERBOARD_PAGE_SIZE);
     assert.equal(viewBoard(all, { ...DEFAULT_QUERY, q: "nothing" }).total, 0);
+  });
+
+  it("ranks a re-cut's rows by their place on the uncut board", () => {
+    for (const model of BOARDS) {
+      const all = boardRows(data, model);
+      const rankOf = new Map(listLeaderboard({ model }).map((r, i) => [r.id, i + 1]));
+      const views = [
+        viewBoard(all, { ...DEFAULT_QUERY, dir: "asc" }),
+        viewBoard(all, { ...DEFAULT_QUERY, sort: "stars" }),
+        viewBoard(all, { ...DEFAULT_QUERY, q: "zeta/" }),
+        viewBoard(all, { ...DEFAULT_QUERY, host: HOSTS[1] }),
+      ];
+      for (const v of views) {
+        assert.ok(v.rows.length > 0);
+        for (const r of v.rows) assert.equal(r.rank, rankOf.get(r.id), `${model} ${r.owner}/${r.name}`);
+      }
+      assert.notEqual(views[0].rows[0].rank, 1);
+    }
+  });
+
+  it("finds a repo by host and name in any casing, and only on its own host", () => {
+    const [host, other] = [HOSTS[0], HOSTS[1]];
+    assert.deepEqual(findBoardRepo(data, { host, owner: "ACME", name: "REPO-0" }), {
+      host,
+      owner: "Acme",
+      name: "repo-0",
+    });
+    assert.equal(findBoardRepo(data, { host: other, owner: "Acme", name: "repo-0" }), null);
+    assert.equal(findBoardRepo(data, { host, owner: "Acme", name: "nope" }), null);
   });
 
   it("keeps only badge repos when the badge filter is on", () => {

@@ -12,12 +12,9 @@ export function ScoreBar({ score, width = 100, className }: { score: number; wid
       aria-valuemax={100}
       aria-valuenow={Math.round(score)}
       aria-label={`Score ${score.toFixed(1)} out of 100`}
-      className={`relative h-[7px] overflow-hidden rounded-sm bg-line${className ? ` ${className}` : ""}`}
+      className={className ? `relative bar-track ${className}` : "relative bar-track"}
     >
-      <div
-        style={{ width: `${pct}%` }}
-        className={`h-full rounded-sm transition-[width] duration-300 ease-out ${TIER_BG_CLASS[tier]}`}
-      />
+      <div style={{ width: `${pct}%` }} className={`bar-fill ${TIER_BG_CLASS[tier]}`} />
     </div>
   );
 }

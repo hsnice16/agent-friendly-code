@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import type { LeaderboardRow } from "../lib/types/db";
-import { similarNote, similarRepos } from "../lib/utils/similar-repos";
+import { similarAndTopicRepos, similarNote, similarRepos } from "../lib/utils/similar-repos";
 
 function row(id: number, score: number, language: string | null, host = "github"): LeaderboardRow {
   return {
@@ -95,5 +95,23 @@ describe("similarNote", () => {
 
   it("treats every row as a score match when the repo has no language", () => {
     assert.equal(similarNote(row(1, 70, null), [row(2, 70, null)]), "The repos closest to it in overall score.");
+  });
+});
+
+describe("similarAndTopicRepos", () => {
+  const tagged = (r: LeaderboardRow, topics: string[]) => ({ ...r, topics: JSON.stringify(topics) });
+
+  it("keeps the same-language picks when topic matches take places", () => {
+    const repo = tagged(row(1, 75, "Go"), ["http-client"]);
+    const leaders = [80, 79, 78, 77].map((score, i) => row(10 + i, score, "Rust"));
+    const topicMates = [60, 59, 58].map((score, i) => tagged(row(20 + i, score, "Python"), ["http-client"]));
+    const filler = Array.from({ length: 60 }, (_, i) => tagged(row(100 + i, 10, "C"), [`t${i}`]));
+    const board = [...leaders, repo, ...topicMates, row(30, 30, "Go"), row(31, 29, "Go"), ...filler];
+
+    const { similar, byTopic } = similarAndTopicRepos(repo, board);
+    assert.deepEqual(byTopic.map((t) => t.row.id).sort(), [20, 21, 22]);
+    assert.ok(ids(similar).includes(30) && ids(similar).includes(31), "both Go repos kept");
+    assert.equal(similar.length + byTopic.length, 6);
+    assert.equal(new Set([...ids(similar), ...byTopic.map((t) => t.row.id)]).size, 6);
   });
 });

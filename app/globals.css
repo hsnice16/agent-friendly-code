@@ -1,11 +1,8 @@
 @import "tailwindcss";
 
 /* ---------- design tokens ----------
-   Light values live in @theme (so they're discoverable + the default).
-   Dark values override the CSS custom properties via
-   `@media (prefers-color-scheme: dark)`. No JSX change needed — all Tailwind
-   utilities (`bg-surface`, `text-ink`, etc.) just pick up whichever value
-   the media query currently resolves to. */
+   Light values in @theme; dark ones override the same properties below, so
+   no utility needs a `dark:` variant. */
 @theme {
   --color-bg: #ffffff;
   --color-surface: #fafafa;
@@ -79,7 +76,7 @@
     --color-warn: #d9b864;
     --color-bad: #db7676;
     --color-info: #b8cbed;
-    --color-tip: #ccfbf1;
+    --color-tip: #6cc9bb;
   }
 }
 
@@ -140,6 +137,459 @@
     &:hover {
       border-color: var(--color-ink-soft);
       color: var(--color-ink-soft);
+    }
+  }
+}
+
+/* Each below stands for one repeated class string, declaration for
+   declaration. Don't pair one with a class that sets the same property:
+   Tailwind, not this file, decides which rule comes last. */
+
+/* Border colour and padding stay classes: tones and callers set their own. */
+@utility card {
+  border-radius: var(--radius-xl);
+  border-style: var(--tw-border-style);
+  border-width: 1px;
+  background-color: var(--color-surface);
+}
+
+/* The colour stays a class: tones set their own. */
+@utility card-title {
+  margin-bottom: calc(var(--spacing) * 3.5);
+  /* The one eyebrow size; a title louder than the body competes with it. */
+  font-size: 12.5px;
+  line-height: 1.4;
+  font-weight: var(--font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+@utility ink-link {
+  color: var(--color-ink);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-ink-soft);
+    }
+  }
+}
+
+@utility score-num {
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+    var(--tw-numeric-fraction,);
+}
+
+/* Pass / partial / fail marks: a glyph's tint and colour. */
+@utility tint-ok {
+  background-color: color-mix(in oklab, var(--color-ok) 15%, transparent);
+  color: var(--color-ok);
+}
+
+@utility tint-warn {
+  background-color: color-mix(in oklab, var(--color-warn) 15%, transparent);
+  color: var(--color-warn);
+}
+
+@utility tint-bad {
+  background-color: color-mix(in oklab, var(--color-bad) 15%, transparent);
+  color: var(--color-bad);
+}
+
+/* glyph at the three mark sizes. */
+@utility mark-sm {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  width: 18px;
+  height: 18px;
+  font-size: 10px;
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+}
+
+@utility mark-md {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  width: 22px;
+  height: 22px;
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+}
+
+@utility mark-lg {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  width: calc(var(--spacing) * 6);
+  height: calc(var(--spacing) * 6);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-font-weight: var(--font-weight-bold);
+  font-weight: var(--font-weight-bold);
+}
+
+@utility check-row {
+  display: flex;
+  align-items: flex-start;
+  gap: calc(var(--spacing) * 3.5);
+  padding-block: calc(var(--spacing) * 3);
+}
+
+@utility check-pass {
+  margin-left: calc(var(--spacing) * 1.5);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+    var(--tw-numeric-fraction,);
+  color: var(--color-muted);
+}
+
+@utility check-detail {
+  margin-top: calc(var(--spacing) * 0.5);
+  font-size: 13.5px;
+  color: var(--color-ink-dim);
+}
+
+@utility check-path {
+  margin-top: calc(var(--spacing) * 1);
+  word-break: break-all;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+  color: var(--color-muted);
+}
+
+@utility agent-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  column-gap: calc(var(--spacing) * 4);
+  row-gap: calc(var(--spacing) * 1);
+  padding-block: calc(var(--spacing) * 3);
+
+  @media (width >= 40rem) {
+    grid-template-columns: 150px 1fr auto;
+  }
+}
+
+@utility agent-checks {
+  order: 4;
+  grid-column: span 2 / span 2;
+  margin: 0;
+  display: flex;
+  list-style-type: none;
+  flex-wrap: wrap;
+  align-items: center;
+  column-gap: calc(var(--spacing) * 4);
+  row-gap: calc(var(--spacing) * 1.5);
+  padding: 0;
+  font-size: 14px;
+  color: var(--color-ink-dim);
+
+  & > * {
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 2);
+  }
+
+  @media (width >= 40rem) {
+    grid-column-start: 2;
+  }
+}
+
+/* A score bar in an agent-row: under the name on phones, its own column from sm. */
+@utility bar-place {
+  order: 3;
+  grid-column: span 2 / span 2;
+
+  @media (width >= 40rem) {
+    order: 0;
+    grid-column: span 1 / span 1;
+  }
+}
+
+@utility bar-track {
+  height: 7px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background-color: var(--color-line);
+}
+
+@utility bar-fill {
+  height: 100%;
+  border-radius: var(--radius-sm);
+  transition-property: width;
+  --tw-ease: var(--ease-out);
+  transition-timing-function: var(--ease-out);
+  --tw-duration: 0.3s;
+  transition-duration: 0.3s;
+}
+
+@utility stat-value {
+  margin: 0;
+  margin-top: calc(var(--spacing) * 1.5);
+  font-size: 18px;
+  --tw-font-weight: var(--font-weight-semibold);
+  font-weight: var(--font-weight-semibold);
+  --tw-leading: var(--leading-tight);
+  line-height: var(--leading-tight);
+  --tw-tracking: var(--tracking-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-ink);
+}
+
+/* The colours stay classes: they mark the current section. */
+@utility nav-link {
+  margin-left: -1px;
+  display: block;
+  border-left-style: var(--tw-border-style);
+  border-left-width: 1px;
+  padding-block: calc(var(--spacing) * 1);
+  padding-left: calc(var(--spacing) * 3);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-ink);
+    }
+  }
+}
+
+@utility pill-off {
+  border-color: var(--color-line);
+  background-color: transparent;
+  color: var(--color-ink-dim);
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: var(--color-surface-hover);
+      color: var(--color-ink);
+    }
+  }
+}
+
+@utility dir-row {
+  display: grid;
+  gap: calc(var(--spacing) * 1);
+
+  @media (width >= 40rem) {
+    grid-template-columns: 96px 1fr;
+    gap: calc(var(--spacing) * 4);
+  }
+}
+
+@utility dir-list {
+  margin: 0;
+  display: flex;
+  list-style-type: none;
+  flex-wrap: wrap;
+  /* 22px lines plus this gap make a 44px row for tap-target links on phones. */
+  row-gap: 22px;
+  padding: 0;
+
+  @media (width >= 40rem) {
+    row-gap: calc(var(--spacing) * 1);
+  }
+
+  & > :not(:last-child) {
+    --tw-divide-x-reverse: 0;
+    border-inline-style: var(--tw-border-style);
+    border-inline-start-width: calc(1px * var(--tw-divide-x-reverse));
+    border-inline-end-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)));
+    border-color: var(--color-line);
+    margin-right: calc(var(--spacing) * 3);
+    padding-right: calc(var(--spacing) * 3);
+  }
+}
+
+/* ---------- controls ----------
+   One height for buttons and fields, so a form row lines up and every one
+   is a 44px tap target. Width, display and placement stay classes. */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing) * 1.5);
+  min-height: 44px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-accent);
+  background-color: var(--color-accent);
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 4);
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-accent-ink);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      border-color: var(--color-ink-soft);
+      background-color: var(--color-ink-soft);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+@utility btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: calc(var(--spacing) * 1.5);
+  min-height: 44px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line-strong);
+  background-color: transparent;
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 4);
+  font-size: 15px;
+  line-height: 1.25;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      background-color: var(--color-surface-hover);
+    }
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* No focus style, deliberately: the caret marks a focused field. */
+@utility field {
+  min-width: 0;
+  min-height: 44px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-line);
+  background-color: var(--color-surface);
+  padding: calc(var(--spacing) * 1) calc(var(--spacing) * 3.5);
+  font-size: 15px;
+  line-height: 1.25;
+  color: var(--color-ink);
+
+  &::placeholder {
+    color: var(--color-muted);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* The Live Score prompt, on the home page and repo pages. */
+@utility callout {
+  border-radius: var(--radius-xl);
+  border: 1px solid color-mix(in oklab, var(--color-tip) 40%, transparent);
+  background-color: color-mix(in oklab, var(--color-tip) 5%, transparent);
+  padding: calc(var(--spacing) * 4);
+}
+
+/* ---------- consistency pass: links, tables, chips, tap targets ---------- */
+
+/* "See all →" and friends, standalone or ending a sentence. The arrow must not
+   wrap onto a line of its own. */
+@utility arrow-link {
+  white-space: nowrap;
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-ink-soft);
+    }
+  }
+}
+
+/* The leaderboard's table look (components/LeaderboardTable.tsx), for every
+   other data table. Cell padding lives here, so cells set none. */
+@utility data-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  /* On the table, not the cells: a th's own text-right must still win. */
+  text-align: left;
+
+  & thead th {
+    border-bottom: 1px solid var(--color-line);
+    background-color: var(--color-surface-2);
+    padding: calc(var(--spacing) * 3) calc(var(--spacing) * 2);
+    font-size: 11.5px;
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-muted);
+  }
+
+  & tbody > tr > * {
+    border-bottom: 1px solid var(--color-line);
+    padding: 13px calc(var(--spacing) * 2);
+  }
+
+  & tbody > tr:last-child > * {
+    border-bottom-width: 0;
+  }
+
+  @media (width >= 40rem) {
+    & thead th,
+    & tbody > tr > * {
+      padding-inline: 18px;
+    }
+  }
+}
+
+@utility table-wrap {
+  /* Contains absolutely positioned sr-only text, which otherwise widens the page. */
+  position: relative;
+  overflow-x: auto;
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--color-line);
+}
+
+/* Tags, topics and versions. Colours stay classes (an ok-tinted tag sets its
+   own); a status-type tag adds `eyebrow`. */
+@utility chip {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 1);
+  border-radius: var(--radius-sm);
+  border-width: 1px;
+  padding: 1px calc(var(--spacing) * 2);
+  font-size: 11.5px;
+  line-height: 1.5;
+}
+
+/* A 44px hit area on touch-sized screens without growing the element. In a
+   wrapped list, the caller's row gap must leave room, or neighbours overlap. */
+@utility tap-target {
+  @media (width < 40rem) {
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: max(100%, 44px);
+      height: max(100%, 44px);
+      translate: -50% -50%;
     }
   }
 }

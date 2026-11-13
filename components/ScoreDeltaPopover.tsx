@@ -104,7 +104,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
           open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
         }`}
       >
-        <div className="mb-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Score history</div>
+        <div className="mb-2 text-[12.5px] eyebrow text-muted">Score history</div>
         <dl className="space-y-1">
           <div className="flex justify-between gap-2">
             <dt className="text-muted">Now</dt>

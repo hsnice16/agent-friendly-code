@@ -21,7 +21,7 @@ export const SKILL_LISTING_URL = "https://www.skills.sh/hsnice16/agent-friendly-
 export const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://agentfriendlycode.com";
 export const APP_HOST = new URL(APP_URL).host;
 export const APP_DESCRIPTION =
-  "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, a live score by URL, an agent skill and a GitHub Action.";
+  "Scores how ready a repo is for AI coding agents, one score per agent. Ranked public repos, Live Score for any repo URL, an agent skill and a GitHub Action.";
 
 export const TWITTER_DEFAULTS = { card: "summary_large_image" } as const;
 export const OG_DEFAULTS = { locale: "en_US", siteName: APP_NAME } as const;

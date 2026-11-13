@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { SkillsShRail } from "@/components/SkillsShRail";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
@@ -25,13 +26,6 @@ const FAQ_JSON_LD = {
 
 const APPLICATION_JSON_LD = {
   "@graph": [
-    {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-        { "@type": "ListItem", position: 2, name: "Agent Skill", item: `${APP_URL}/skill` },
-      ],
-    },
     {
       "@type": "SoftwareApplication",
       "@id": `${APP_URL}/skill#app`,
@@ -57,18 +51,14 @@ export default function SkillPage() {
       <JsonLd data={FAQ_JSON_LD} />
       <SkillsShRail />
 
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent Friendly Skill: score the repo you&apos;re in
-        </h1>
+      <PageHeader
+        crumbs={{ current: { name: "Agent Skill", path: "/skill" } }}
+        title="Agent Friendly Skill: score the repo you're in"
+        lead={`Scores the repo you're in for ${MODELS.length} agents, locally and offline, and suggests a model class.`}
+      />
 
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Scores the repo you&apos;re in for {MODELS.length} agents, locally and offline, and suggests a model class.
-        </p>
-      </section>
-
-      <Panel tone="warn">
-        <PanelHeading tone="warn">Install</PanelHeading>
+      <Panel tone="tip">
+        <PanelHeading tone="tip">Install</PanelHeading>
         <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
           The{" "}
           <ExternalLink href="https://github.com/vercel-labs/skills" tone="ink">
@@ -77,7 +67,7 @@ export default function SkillPage() {
           CLI adds the skill to every agent you have set up.
         </p>
 
-        <CopySnippet text={SKILL_INSTALL_CMD} highlight="warn" event={{ name: "copy_install", tool: "skill" }} />
+        <CopySnippet text={SKILL_INSTALL_CMD} highlight="tip" event={{ name: "copy_install", tool: "skill" }} />
 
         <p className="mt-3 text-[12.5px] text-muted">
           Then run <code className="text-ink-dim">/agent-friendly</code> (or however your agent runs skills) from the
@@ -117,11 +107,11 @@ export default function SkillPage() {
             <code className="text-ink-dim">/model</code> (or your agent&apos;s equivalent).
           </p>
 
-          <div className="overflow-x-auto rounded-md border border-line">
-            <table className="w-full border-separate border-spacing-0 text-[13.5px]">
+          <div className="table-wrap">
+            <table className="data-table text-[13.5px]">
               <caption className="sr-only">Suggested model class for each score band</caption>
               <thead>
-                <tr className="bg-surface-2 [&>th]:border-b [&>th]:border-line [&>th]:px-2 [&>th]:py-2 sm:[&>th]:px-3 [&>th]:text-left [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted">
+                <tr>
                   <th scope="col">Band</th>
                   <th scope="col">Score</th>
                   <th scope="col">Suggested model</th>
@@ -130,10 +120,7 @@ export default function SkillPage() {
 
               <tbody>
                 {SCORE_BANDS.map((b) => (
-                  <tr
-                    key={b.band}
-                    className="[&>td]:border-b [&>td]:border-line [&>td]:px-2 [&>td]:py-2.5 sm:[&>td]:px-3 last:[&>td]:border-b-0"
-                  >
+                  <tr key={b.band}>
                     <td className="font-medium text-ink">{b.band}</td>
                     <td className="tabular-nums text-ink-dim">{b.range}</td>
                     <td className="text-ink-dim">{b.recommendation}</td>

@@ -1,16 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound, permanentRedirect } from "next/navigation";
-import { ActionEmbed } from "@/components/ActionEmbed";
-import { ActionEmbedReveal } from "@/components/ActionEmbedReveal";
 import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
-import { BadgeEmbed } from "@/components/BadgeEmbed";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HashDetails } from "@/components/HashDetails";
 import { ModelSuggestions } from "@/components/ModelSuggestions";
 import { Panel } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RecordScore } from "@/components/RecordScore";
+import { RepoAddOns } from "@/components/RepoAddOns";
 import { RepoHero } from "@/components/RepoHero";
 import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
@@ -36,7 +35,7 @@ import { liveScorePath, repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
 import { scoreTier } from "@/lib/utils/score";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
-import { ACTION_USES, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 // lib/live-score/score.ts and http.ts time out inside this cap.
 export const maxDuration = 60;
@@ -48,7 +47,13 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const parsed = parseLiveTarget(target);
   if (!parsed) return {};
   const { host, owner, name } = target;
-  const title = `${owner}/${name} — Live Score`;
+  // The same cached lookup the page makes, so a missing repo's tab doesn't name it as scored.
+  // Skipped for board repos: the page only redirects those, and scoring them cold is the expensive case.
+  const missing =
+    SUPPORTED_HOSTS.includes(parsed.host) &&
+    !getRepoByHostOwnerName(host, owner, name) &&
+    (await cachedLiveScore(parsed).catch(() => true)) === null;
+  const title = missing ? "Couldn't score this repo" : `${owner}/${name} — Live Score`;
   const description = `How ready ${owner}/${name} is for AI coding agents, scored from its latest commit.`;
   const path = liveScorePath({ host, owner, name });
   // The card 404s for a host outside SUPPORTED_HOSTS.
@@ -85,7 +90,7 @@ function Unsupported({ host }: { host: string }) {
         {`This page can't yet stay within ${label}'s API limits, and a wrong score is worse than none. GitHub repos work today.`}
       </p>
       <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
-        ← try a GitHub repo
+        ← Try a GitHub repo
       </Link>
     </Panel>
   );
@@ -98,7 +103,7 @@ function Unavailable({ reason, outcome }: { reason: string; outcome: "not_found"
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">{reason}</p>
       <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
-        ← try another repo
+        ← Try another repo
       </Link>
     </Panel>
   );
@@ -187,18 +192,12 @@ export default async function LiveScorePage({
     instructions && { id: "agent-instructions", label: "Agent instructions" },
     { id: "all-checks", label: "All checks" },
     { id: "similar", label: "Similar repos" },
-    { id: "embed-badge", label: "Add a badge" },
-    host === "github" && { id: "pr-action", label: "Check every PR" },
+    { id: "embed-badge", label: "Add to your repo" },
   ].filter((x): x is NavSection => Boolean(x));
 
   return (
     <>
-      <Link
-        href="/score"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
-      >
-        ← score another repo
-      </Link>
+      <Breadcrumbs parents={[{ name: "Live Score", path: "/score" }]} current={{ name: `${owner}/${name}`, path }} />
 
       <RecordScore host={host} owner={owner} name={name} score={score.overall} />
       <TrackEvent event={{ name: "live_score_result", outcome: "scored", tier: scoreTier(score.overall) }} />
@@ -237,7 +236,7 @@ export default async function LiveScorePage({
           <HashDetails
             id="all-checks"
             summary={
-              <h2 className="m-0 text-xs eyebrow text-muted">
+              <h2 className="m-0 text-[12.5px] eyebrow text-muted">
                 All {score.signals.length} checks · {score.signals.filter((s) => s.pass >= 1).length} passed
               </h2>
             }
@@ -259,25 +258,16 @@ export default async function LiveScorePage({
         </Section>
 
         <Section id="embed-badge">
-          <BadgeEmbed
-            highlight="tip"
+          <RepoAddOns
             appUrl={APP_URL}
-            name={name}
             host={host}
             owner={owner}
+            name={name}
             repoPagePath={path}
             score={score.overall}
             page="live_score"
           />
         </Section>
-
-        {host === "github" && (
-          <Section id="pr-action">
-            <ActionEmbedReveal>
-              <ActionEmbed actionUses={ACTION_USES} branch={score.defaultBranch} showSecretLink highlight="info" />
-            </ActionEmbedReveal>
-          </Section>
-        )}
 
         <SectionRail
           sections={sections}

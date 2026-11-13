@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CodeText } from "@/components/CodeText";
-import { LINK } from "@/components/link-class";
+import { LINK_STRONG } from "@/components/link-class";
+import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getCheckStats } from "@/lib/check-stats";
 import { START_WITH_CHECKS } from "@/lib/constants/scoring";
@@ -11,7 +11,7 @@ import { checksBySummedWeight } from "@/lib/leaderboard-model-panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath, checkSubPath } from "@/lib/utils/check-path";
+import { CHECKS_CRUMB, checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 
 export const metadata: Metadata = staticPageMetadata("/check");
@@ -22,18 +22,12 @@ export default function ChecksPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Checks", path: "/check" }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent-ready codebase checklist: {SIGNALS.length} checks and their pass rates
-        </h1>
-        <p className="m-0 mb-3 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          An agent-ready codebase is one where an AI coding agent can learn the project and check its own work from the
-          files alone: an AGENTS.md or CLAUDE.md that explains it, a README, tests it can run, CI and linter config that
-          show what a change must pass, a reproducible dev setup, and a size it can read.
-        </p>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
+      <PageHeader
+        crumbs={{ current: CHECKS_CRUMB }}
+        title={`Agent-ready codebase checklist: ${SIGNALS.length} checks and their pass rates`}
+        lead="An agent-ready codebase is one where an AI coding agent can learn the project and check its own work from the files alone: an AGENTS.md or CLAUDE.md that explains it, a README, tests it can run, CI and linter config that show what a change must pass, a reproducible dev setup, and a size it can read."
+      >
+        <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Every score here comes from these {SIGNALS.length} file checks. Each has a page: what it looks for, why agents
           need it, how to pass it, and how many of the {total} leaderboard repos do. The{" "}
           <Link href="/methodology" className="prose-link">
@@ -45,11 +39,11 @@ export default function ChecksPage() {
           </Link>{" "}
           groups the checks into what to do.
         </p>
-      </section>
+      </PageHeader>
 
       <div className="mb-5">
-        <Panel tone="warn">
-          <PanelHeading tone="warn">Start with these {START_WITH_CHECKS}</PanelHeading>
+        <Panel tone="tip">
+          <PanelHeading tone="tip">Start with these {START_WITH_CHECKS}</PanelHeading>
           <p className="m-0 mb-2.5 text-[13.5px] text-ink-dim">
             The most weight summed across all {MODELS.length} agents, so each fix moves every agent&apos;s score:
           </p>
@@ -58,7 +52,7 @@ export default function ChecksPage() {
               const stats = getCheckStats(c.id);
               return (
                 <li key={c.id}>
-                  <Link href={checkPath(c.id)} className={`font-medium ${LINK}`}>
+                  <Link href={checkPath(c.id)} className={LINK_STRONG}>
                     {SIGNAL_BY_ID[c.id].label}
                   </Link>{" "}
                   · summed weight {c.sum.toFixed(1)} · {percent(stats.full, stats.total)} of repos pass
@@ -83,9 +77,9 @@ export default function ChecksPage() {
         {SIGNALS.map((s) => {
           const stats = getCheckStats(s.id);
           return (
-            <li key={s.id} className="relative rounded-lg border border-line bg-surface px-4 py-3.5">
+            <li key={s.id} className="relative tile">
               <div className="flex items-start justify-between gap-3">
-                <Link href={checkPath(s.id)} className={`font-medium cover-link ${LINK}`}>
+                <Link href={checkPath(s.id)} className={`cover-link ${LINK_STRONG}`}>
                   {s.label}
                 </Link>
                 <span className="shrink-0 text-[13px] tabular-nums text-ink-dim">

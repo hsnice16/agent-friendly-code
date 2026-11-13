@@ -2,9 +2,9 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 
 type ExternalLinkTone = "dim" | "ink";
 
-const TONE_TEXT: Record<ExternalLinkTone, string> = {
-  ink: "text-ink",
-  dim: "text-ink-dim",
+const TONE_CLASS: Record<ExternalLinkTone, string> = {
+  ink: "border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft",
+  dim: "prose-link",
 };
 
 type ExternalLinkProps = {
@@ -22,9 +22,10 @@ export function ExternalLink({ href, title, children, tone = "dim", iconSize = 1
       title={title}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex items-center gap-0.5 border-b border-dotted border-ink-dim/60 ${TONE_TEXT[tone]} hover:border-ink-soft hover:text-ink-soft`}
+      className={`inline-flex items-center gap-0.5 ${TONE_CLASS[tone]}`}
     >
       {children} <ArrowUpRight size={iconSize} weight="bold" aria-hidden="true" />
+      <span className="sr-only"> (new tab)</span>
     </a>
   );
 }

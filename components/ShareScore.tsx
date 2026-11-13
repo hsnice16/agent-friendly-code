@@ -32,6 +32,7 @@ export function ShareScore({ slug, score, url, align }: Props) {
   const [copied, setCopied] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
+  const menuRef = useRef<HTMLDivElement>(null);
   const text = `${slug} scores ${score.toFixed(1)}/100 for AI coding agents.`;
 
   const networks: { id: Exclude<Network, "copy_link">; label: string; href: string; logo: React.ReactNode }[] = [
@@ -76,6 +77,12 @@ export function ShareScore({ slug, score, url, align }: Props) {
     };
   }, [open]);
 
+  // `inert` on the closed menu would drop focus held inside it to <body>.
+  function closeFromMenu() {
+    if (menuRef.current?.contains(document.activeElement)) btnRef.current?.focus();
+    setOpen(false);
+  }
+
   async function copyLink() {
     try {
       await navigator.clipboard.writeText(url);
@@ -83,7 +90,7 @@ export function ShareScore({ slug, score, url, align }: Props) {
       setCopied(true);
       setTimeout(() => {
         setCopied(false);
-        setOpen(false);
+        closeFromMenu();
       }, RESET_MS);
     } catch {
       setCopied(false);
@@ -106,6 +113,7 @@ export function ShareScore({ slug, score, url, align }: Props) {
       </button>
 
       <div
+        ref={menuRef}
         id={menuId}
         inert={!open}
         className={`absolute bottom-full z-30 mb-2 w-[200px] ${MENU_POSITION[align]} rounded-xl border border-line bg-surface p-1.5 shadow-lg transition duration-150 ease-out ${
@@ -122,7 +130,7 @@ export function ShareScore({ slug, score, url, align }: Props) {
             aria-label={`Share on ${n.label} (new tab)`}
             onClick={() => {
               track({ name: "share_score", network: n.id });
-              setOpen(false);
+              closeFromMenu();
             }}
           >
             <span className={TILE}>{n.logo}</span>

@@ -70,7 +70,7 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
       />
 
       <div className="flex items-start justify-between gap-3">
-        <p className="m-0 text-[11px] font-semibold uppercase tracking-[0.1em] text-warn">
+        <p className="m-0 text-[12.5px] eyebrow text-info">
           New in <span className="normal-case">v{version}</span>
         </p>
 
@@ -78,7 +78,7 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
           type="button"
           onClick={dismiss}
           aria-label="Dismiss what's new"
-          className="-mr-1 -mt-1 inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:bg-surface-hover hover:text-ink"
+          className="tap-target -mr-1 -mt-1 inline-flex h-6 w-6 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted hover:bg-surface-hover hover:text-ink"
         >
           <X size={13} weight="bold" aria-hidden="true" />
         </button>
@@ -86,7 +86,7 @@ export function ReleaseAnnouncement({ version, title, placement = "above" }: Pro
 
       <p className="m-0 mt-1.5 text-[14.5px] font-semibold leading-snug tracking-tight text-ink">{title}</p>
 
-      <Link href="/changelog" onClick={dismiss} className="mt-2.5 inline-block text-[13px] text-ink-dim hover:text-ink">
+      <Link href="/changelog" onClick={dismiss} className="tap-target mt-2.5 inline-block text-[13px] arrow-link">
         See what shipped →
       </Link>
     </div>

@@ -13,7 +13,7 @@ export function CheckRepoList({ rows }: { rows: LeaderboardRow[] }) {
       {rows.map((r) => (
         <li key={r.id} className="relative tile">
           <div className="flex items-start justify-between gap-2">
-            <Link href={repoPath(r)} className="min-w-0 truncate font-medium text-ink hover:text-ink-soft cover-link">
+            <Link href={repoPath(r)} className="min-w-0 truncate font-medium ink-link cover-link">
               {r.owner}/{r.name}
             </Link>
 

@@ -17,15 +17,11 @@ export default function LiveScoreError({ retry }: { error: Error; retry: () => v
       </p>
 
       <div className="mt-3.5 flex flex-wrap items-center gap-4">
-        <button
-          type="button"
-          onClick={retry}
-          className="cursor-pointer rounded-lg border border-line bg-ink px-4 py-2 text-[14px] font-medium text-accent-ink hover:bg-ink-soft"
-        >
+        <button type="button" onClick={retry} className="btn-primary">
           Try again
         </button>
         <Link href="/score" className="text-[14px] text-ink-dim hover:text-ink">
-          ← score another repo
+          ← Score another repo
         </Link>
       </div>
     </Panel>

@@ -1,17 +1,15 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-import { ActionEmbed } from "@/components/ActionEmbed";
-import { ActionEmbedReveal } from "@/components/ActionEmbedReveal";
 import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
-import { BadgeEmbed } from "@/components/BadgeEmbed";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HashDetails } from "@/components/HashDetails";
 import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreNudge } from "@/components/LiveScoreNudge";
 import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { PerModelScores } from "@/components/PerModelScores";
+import { RepoAddOns } from "@/components/RepoAddOns";
 import { RepoHero } from "@/components/RepoHero";
 import { RepoReport } from "@/components/RepoReport";
 import { Section, SectionRail } from "@/components/RepoSections";
@@ -21,13 +19,13 @@ import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRow } from "@/components/SignalRow";
 
 import { checkRates } from "@/lib/check-rates";
-import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
+import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getModelScores } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
 import { starterAgentsMd } from "@/lib/starter-agents-md";
 import { getTopicGroups } from "@/lib/topic-pages";
-import { reposSharingTopics, topicLabel, topicLinks } from "@/lib/topics";
+import { topicLabel, topicLinks } from "@/lib/topics";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { groupByLanguage, hubPath, isHub, languageSlug } from "@/lib/utils/language";
 import {
@@ -42,9 +40,9 @@ import {
 import { repoJsonLd, repoMetadata } from "@/lib/utils/repo-page-meta";
 import { repoIdentity, repoPath } from "@/lib/utils/repo-path";
 import { buildRepoReport } from "@/lib/utils/repo-report";
-import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
+import { similarAndTopicRepos, similarNote } from "@/lib/utils/similar-repos";
 import { suggestionSwitchProps } from "@/lib/utils/suggestion-switch";
-import { ACTION_USES, APP_URL } from "@/lib/version";
+import { APP_URL } from "@/lib/version";
 
 type Params = { slug: string[] };
 
@@ -87,13 +85,9 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const summary = loadSummary(repo);
   const about = loadAbout(repo);
   const board = loadBoard();
-  const alternatives = similarRepos({ ...repo, score: repo.overall_score }, board, ALTERNATIVES_LIMIT);
-  const byTopic = reposSharingTopics(
-    { ...repo, score: repo.overall_score },
-    board,
-    new Set(alternatives.map((a) => a.id)),
-    ALTERNATIVES_LIMIT,
-  ).map(({ row, shared }) => ({
+  const strip = similarAndTopicRepos({ ...repo, score: repo.overall_score }, board);
+  const alternatives = strip.similar;
+  const byTopic = strip.byTopic.map(({ row, shared }) => ({
     ...row,
     detail: `${row.language ?? "—"} · ${shared.map(topicLabel).join(", ")}`,
   }));
@@ -115,9 +109,6 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     getTopicGroups(),
     hubs.map((g) => ({ slug: g.slug, href: hubPath(g.slug) })),
   );
-  // The Action is a GitHub workflow; it cannot run on other hosts.
-  const onGitHub = repo.host === "github";
-
   const agents = MODELS.map((m) => ({ id: m.id, label: m.label, suggestions: topImprovements(m.id, signals) }));
   const strengths = signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
@@ -135,9 +126,8 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     { id: "all-checks", label: "All checks" },
     report && { id: "compare", label: "How it compares" },
     { id: "similar", label: "Similar repos" },
-    byTopic.length > 0 && { id: "same-topics", label: "Same topics" },
-    { id: "embed-badge", label: "Add a badge" },
-    onGitHub && { id: "pr-action", label: "Check every PR" },
+    // The id predates the Action joining this card; links to it still land.
+    { id: "embed-badge", label: "Add to your repo" },
   ].filter((x): x is NavSection => Boolean(x));
 
   const jsonLd = repoJsonLd(repo, { signals, summary, about });
@@ -194,7 +184,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           <HashDetails
             id="all-checks"
             summary={
-              <h2 className="m-0 text-xs eyebrow text-muted">
+              <h2 className="m-0 text-[12.5px] eyebrow text-muted">
                 All {signals.length} checks · {signals.filter((s) => s.pass >= 1).length} passed
               </h2>
             }
@@ -217,42 +207,27 @@ export default async function Page({ params }: { params: Promise<Params> }) {
           <AlternativesStrip
             language={hub?.label ?? repo.language}
             hubHref={hubHref}
-            alternatives={alternatives}
-            note={similarNote(repo, alternatives)}
+            alternatives={[...alternatives, ...byTopic]}
+            note={[
+              similarNote(repo, alternatives),
+              byTopic.length > 0 && "Then repos tagged with the same GitHub topics.",
+            ]
+              .filter(Boolean)
+              .join(" ")}
           />
         </Section>
 
-        {byTopic.length > 0 && (
-          <Section id="same-topics">
-            <AlternativesStrip
-              heading="Same topics, any language"
-              language={repo.language}
-              alternatives={byTopic}
-              note="Repos tagged with the same GitHub topics, most shared first."
-            />
-          </Section>
-        )}
-
         <Section id="embed-badge">
-          <BadgeEmbed
-            highlight="tip"
+          <RepoAddOns
             appUrl={APP_URL}
-            name={repo.name}
             host={repo.host}
             owner={repo.owner}
+            name={repo.name}
             repoPagePath={path}
             score={repo.overall_score}
             page="repo"
           />
         </Section>
-
-        {onGitHub && (
-          <Section id="pr-action">
-            <ActionEmbedReveal>
-              <ActionEmbed actionUses={ACTION_USES} branch={repo.default_branch} showSecretLink highlight="info" />
-            </ActionEmbedReveal>
-          </Section>
-        )}
 
         <SectionRail sections={sections} />
       </div>

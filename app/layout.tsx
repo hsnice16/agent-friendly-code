@@ -16,11 +16,8 @@ import { SkillsShBadge } from "@/components/SkillsShBadge";
 import { VersionPill } from "@/components/VersionPill";
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
-import { getLanguageGroups } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { getTopicGroups } from "@/lib/topic-pages";
 import { checkSubPath } from "@/lib/utils/check-path";
-import { isHub } from "@/lib/utils/language";
 import { BRAND_SUFFIX } from "@/lib/utils/page-title";
 import { APP_DESCRIPTION, APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -135,7 +132,7 @@ const FOOTER_LINKS_CLASS = "[&_a]:prose-link";
 // No prefetch: the footer is on every page, and each prefetched link is a billed ISR read.
 function FooterLink({ href, children }: { href: string; children: React.ReactNode }) {
   return (
-    <Link href={href} prefetch={false}>
+    <Link href={href} prefetch={false} className="tap-target">
       {children}
     </Link>
   );
@@ -144,7 +141,9 @@ function FooterLink({ href, children }: { href: string; children: React.ReactNod
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     // The board's pending mark is set on <html> before hydration (BoardPendingScript).
-    <html lang="en" suppressHydrationWarning>
+    // data-scroll-behavior lets Next pause globals.css's smooth scroll on navigation: left
+    // gliding, its reset to the top is unfinished when checked, and the h1 lands under the header.
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <BoardPendingScript />
       </head>
@@ -156,19 +155,18 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
           <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-3 py-3 sm:px-6">
-            <div className="flex items-center gap-2.5">
-              <div
+            <Link
+              href="/"
+              className="tap-target flex items-center gap-2.5 text-[15px] font-semibold tracking-tight ink-link"
+            >
+              <span
                 aria-hidden="true"
                 className="flex h-7 w-7 items-center justify-center rounded-md bg-ink text-[13px] font-bold text-accent-ink"
               >
                 A
-              </div>
-              <div className="text-[15px] font-semibold tracking-tight">
-                <Link href="/" className="text-ink hover:text-ink-soft">
-                  {APP_NAME}
-                </Link>
-              </div>
-            </div>
+              </span>
+              {APP_NAME}
+            </Link>
 
             <nav aria-label="Primary" className="hidden items-center gap-4 text-[13.5px] md:flex">
               {NAV_LINKS.map((l) => (
@@ -188,11 +186,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             {children}
           </main>
           <footer className="mt-12 border-t border-line pt-8 text-[13px] leading-[1.7] text-muted">
-            <FooterDirectory
-              hubs={getLanguageGroups().filter(isHub)}
-              topics={getTopicGroups()}
-              frameworks={examplesByFramework(getAgentsMdExamples()).map((f) => f.guide)}
-            />
+            <FooterDirectory frameworks={examplesByFramework(getAgentsMdExamples()).map((f) => f.guide)} />
 
             <p className="m-0">
               Scores come from checking files in each repo. No agent is actually run. What each agent looks for comes
@@ -201,7 +195,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             <SkillsShBadge className="mt-5" />
 
-            <div className="mt-4 flex flex-wrap items-start gap-4">
+            <div className="mt-4 flex flex-wrap items-center gap-4">
               <PeerlistBadge />
               <ProductHuntBadge />
             </div>
@@ -209,37 +203,51 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <div
               className={`mt-12 flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between sm:gap-8 ${FOOTER_LINKS_CLASS}`}
             >
-              <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-1 text-[12px] sm:order-1">
+              {/* Each separator trails its item, so a wrapped line never starts with one. */}
+              <p className="m-0 order-2 flex flex-wrap items-center gap-x-1.5 gap-y-[24px] text-[12px] sm:order-1 sm:gap-y-1">
                 <span>
                   © {new Date().getFullYear()}{" "}
-                  <a target="_blank" rel="noopener noreferrer" href="https://github.com/hsnice16">
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href="https://github.com/hsnice16"
+                    className="tap-target"
+                  >
                     Himanshu Singh
                   </a>
+                  <span aria-hidden="true"> ·</span>
                 </span>
 
-                <span aria-hidden="true">·</span>
                 <span>
                   also made{" "}
-                  <a target="_blank" rel="noopener" href="https://usetu.la/">
+                  <a target="_blank" rel="noopener" href="https://usetu.la/" className="tap-target">
                     tula — crypto liquidation risk CLI
                   </a>
+                  <span aria-hidden="true"> ·</span>
                 </span>
 
-                <span aria-hidden="true">·</span>
-                <a target="_blank" rel="noopener noreferrer" href={`${REPO_URL}/blob/main/LICENSE`}>
-                  MIT
-                </a>
+                <span>
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={`${REPO_URL}/blob/main/LICENSE`}
+                    className="tap-target"
+                  >
+                    MIT
+                  </a>
+                  <span aria-hidden="true"> ·</span>
+                </span>
 
-                {FOOTER_LINKS_LEGAL.map((l) => (
-                  <span key={l.href} className="contents">
-                    <span aria-hidden="true">·</span>
+                {FOOTER_LINKS_LEGAL.map((l, i) => (
+                  <span key={l.href}>
                     <FooterLink href={l.href}>{l.label}</FooterLink>
+                    {i < FOOTER_LINKS_LEGAL.length - 1 && <span aria-hidden="true"> ·</span>}
                   </span>
                 ))}
               </p>
 
               <nav aria-label="Secondary" className="order-1 grid grid-cols-2 gap-x-12 sm:order-2 sm:gap-x-16">
-                <div className="flex flex-col items-start gap-1">
+                <div className="flex flex-col items-start gap-[22px] sm:gap-1">
                   {FOOTER_LINKS_PRIMARY.map((l) => (
                     <FooterLink key={l.href} href={l.href}>
                       {l.label}
@@ -247,7 +255,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   ))}
                 </div>
 
-                <div className="flex flex-col items-start gap-1">
+                <div className="flex flex-col items-start gap-[22px] sm:gap-1">
                   {FOOTER_LINKS_TOOLS.map((l) => (
                     <FooterLink key={l.href} href={l.href}>
                       {l.label}

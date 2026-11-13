@@ -13,7 +13,7 @@ import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreCell } from "./ScoreCell";
 
 /** What a row shows; both a database row and a browser board row fit it. */
-type TableRow = Omit<BoardRow, "id" | "description"> & { description?: string | null };
+type TableRow = Omit<BoardRow, "id" | "description"> & { description?: string | null; rank?: number };
 
 type Props = {
   q: string;
@@ -23,7 +23,7 @@ type Props = {
   activeLabel: string;
   host: Host | "all";
   badge?: boolean;
-  /** Rank of `rows[0]` on the full board — rows are already the current page's slice. */
+  /** Where `rows` (already the page's slice) start, for rows that carry no `rank`. */
   startIdx: number;
   clearSearchHref: string;
   /** Clears the search in place instead of following `clearSearchHref`. */
@@ -77,7 +77,7 @@ export function LeaderboardTable({
       <table className="w-full border-separate border-spacing-0">
         <caption className="sr-only">
           Leaderboard — page {page} of {totalPages} for {activeLabel}
-          {host !== "all" ? `, host=${host}` : ""}
+          {host !== "all" ? `, ${HOST_LABELS[host]} repos` : ""}
           {badge ? ", only repos showing the badge" : ""}
           {q ? `, filtered by "${q}"` : ""}
         </caption>
@@ -133,7 +133,7 @@ export function LeaderboardTable({
                         onClick={inPlace(onClearBadge)}
                         className="text-ink-dim hover:text-ink-soft"
                       >
-                        Show every repo
+                        Show every {host === "all" ? "" : `${HOST_LABELS[host]} `}repo
                       </Link>
                     ) : null}
                   </>
@@ -146,7 +146,7 @@ export function LeaderboardTable({
             </tr>
           ) : (
             rows.map((r, i) => {
-              const rank = startIdx + i + 1;
+              const rank = r.rank ?? startIdx + i + 1;
               const description = sanitizeDescription(r.description);
               return (
                 <tr

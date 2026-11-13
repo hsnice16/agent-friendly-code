@@ -49,7 +49,7 @@
   },
   "overrides": [
     {
-      "includes": ["components/BadgeEmbed.tsx", "components/PeerlistBadge.tsx", "components/ProductHuntBadge.tsx"],
+      "includes": ["components/BadgePreview.tsx", "components/PeerlistBadge.tsx", "components/ProductHuntBadge.tsx"],
       "linter": { "rules": { "performance": { "noImgElement": "off" } } }
     }
   ],

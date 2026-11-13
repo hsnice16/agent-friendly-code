@@ -3,7 +3,7 @@ import { getModelScores, getRepoByHostOwnerName } from "@/lib/db";
 import { cachedLiveScore, parseLiveTarget } from "@/lib/live-score/cached";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { MODEL_BY_ID } from "@/lib/scoring/weights";
-import { badgeSvg } from "@/lib/utils/badge";
+import { BADGE_LABEL, badgeSvg } from "@/lib/utils/badge";
 import { isModelId } from "@/lib/utils/model-id";
 import { repoIdentity } from "@/lib/utils/repo-path";
 
@@ -48,19 +48,19 @@ export async function GET(req: Request, ctx: { params: Promise<{ slug: string[] 
   const scores =
     identity && (await scoresFor(identity.host.toLowerCase(), identity.owner, identity.name.replace(/\.svg$/i, "")));
   if (!scores || scores === FAILED) {
-    return new Response(badgeSvg("agent friendly", "not scored", null), {
+    return new Response(badgeSvg(BADGE_LABEL, "not scored", null), {
       headers: scores === FAILED ? RETRY_HEADERS : HEADERS,
     });
   }
 
-  let label = "agent friendly";
+  let label = BADGE_LABEL;
   let score = scores.overall;
 
   if (isModelId(modelParam)) {
     const ms = scores.byModel().find((s) => s.modelId === modelParam);
 
     score = ms ? ms.score : null;
-    label = `agent friendly · ${MODEL_BY_ID[modelParam].label.toLowerCase()}`;
+    label = `${BADGE_LABEL} · ${MODEL_BY_ID[modelParam].label.toLowerCase()}`;
   }
 
   const value = score == null ? "—" : score.toFixed(1);

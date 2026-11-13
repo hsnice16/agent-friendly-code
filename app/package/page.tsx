@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { PackageLookupForm } from "@/components/PackageLookupForm";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { staticPageMetadata } from "@/lib/page-meta";
@@ -26,17 +26,14 @@ export default function PackageIndexPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Packages", path: "/package" }} />
+      <PageHeader
+        crumbs={{ current: { name: "Packages", path: "/package" } }}
+        title="Packages"
+        lead="Type an npm, PyPI or crates.io package name to see how ready its source repo is for AI coding agents."
+      />
 
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Packages</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Type an npm, PyPI or crates.io package name to see how ready its source repo is for AI coding agents.
-        </p>
-      </section>
-
-      <Panel tone="warn">
-        <PanelHeading tone="warn">Look up a package</PanelHeading>
+      <Panel tone="tip">
+        <PanelHeading tone="tip">Look up a package</PanelHeading>
 
         <PackageLookupForm />
 

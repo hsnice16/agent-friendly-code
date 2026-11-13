@@ -3,11 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentsMdGuide } from "@/components/AgentsMdGuide";
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
@@ -16,7 +16,7 @@ import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
-import { checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
+import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
@@ -70,10 +70,6 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
   return (
     <>
-      <BreadcrumbJsonLd
-        parent={{ name: "Checks", path: "/check" }}
-        current={{ name: signal.label, path: checkPath(id) }}
-      />
       {/* dateModified is when the pass counts last moved; the prose has no tracked edit history, so no datePublished. */}
       <JsonLd
         data={{
@@ -89,19 +85,11 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         }}
       />
 
-      <Link
-        href="/check"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
-      >
-        ← all checks
-      </Link>
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{content.title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink-dim">
-          <CodeText text={content.what} />
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ parents: [CHECKS_CRUMB], current: checkCrumb(id) }}
+        title={content.title}
+        lead={<CodeText text={content.what} />}
+      />
 
       <Panel>
         <PanelHeading>{questions.pass}</PanelHeading>

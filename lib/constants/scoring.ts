@@ -11,6 +11,9 @@ export const LEADERBOARD_PAGE_SIZE = 12;
 
 export const DEFAULT_SUGGESTION_LIMIT = 3;
 export const ALTERNATIVES_LIMIT = 6;
+// similarRepos always fills ALTERNATIVES_LIMIT, so topic matches get reserved
+// places in the repo page's strip or they would never show.
+export const TOPIC_MATCHES_LIMIT = 3;
 
 // Below this a hub is a near-empty list, which reads to search engines as a
 // thin page; those languages are listed on /language instead.

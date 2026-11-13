@@ -2,10 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AGENT_READS, type AgentsMdUse, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
@@ -13,9 +13,8 @@ import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { AGENTS_VS_CLAUDE_MD } from "@/lib/page-meta";
-import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
-import { checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
+import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
@@ -94,55 +93,52 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      <Breadcrumbs
-        parents={[
-          { name: "Checks", path: "/check" },
-          { name: SIGNAL_BY_ID[SIGNAL_ID].label, path: checkPath(SIGNAL_ID) },
-        ]}
-        current={{ name: "AGENTS.md vs CLAUDE.md", path: PATH }}
-      />
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{TITLE}</h1>
-        <p className="m-0 mb-3 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          Use AGENTS.md: {agentsMdReaders.length} of the {MODELS.length} agents we score read it, and Claude Code falls
-          back to it. If you also need a CLAUDE.md, start it with <code className={CODE}>@AGENTS.md</code>, or Claude
-          Code skips AGENTS.md.
-        </p>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
+      <PageHeader
+        crumbs={{
+          parents: [CHECKS_CRUMB, checkCrumb(SIGNAL_ID)],
+          current: { name: "AGENTS.md vs CLAUDE.md", path: PATH },
+        }}
+        title={TITLE}
+        lead={
+          <>
+            Use AGENTS.md: {agentsMdReaders.length} of the {MODELS.length} agents we score read it, and Claude Code
+            falls back to it. If you also need a CLAUDE.md, start it with <code className={CODE}>@AGENTS.md</code>, or
+            Claude Code skips AGENTS.md.
+          </>
+        }
+      >
+        <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Both hold the same content. AGENTS.md is the shared name; CLAUDE.md is Claude Code&apos;s.
         </p>
-      </section>
+      </PageHeader>
 
       <Panel>
         <PanelHeading>Which agents read AGENTS.md and which read CLAUDE.md?</PanelHeading>
         {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
-        <section className="overflow-x-auto" tabIndex={0} aria-label="Agents and the files they read">
-          <table className="w-full border-collapse text-left text-[14px]">
+        <section className="table-wrap" tabIndex={0} aria-label="Agents and the files they read">
+          <table className="data-table text-[14px]">
             <caption className="sr-only">Whether each AI coding agent reads AGENTS.md and CLAUDE.md</caption>
             <thead>
-              <tr className="border-b border-line text-[12.5px] text-muted">
-                <th scope="col" className="py-2 pr-4 font-medium">
-                  Agent
+              <tr>
+                <th scope="col">Agent</th>
+                <th scope="col">
+                  <span className="normal-case">AGENTS.md</span>
                 </th>
-                <th scope="col" className="py-2 pr-4 font-medium">
-                  AGENTS.md
-                </th>
-                <th scope="col" className="py-2 font-medium">
-                  CLAUDE.md
+                <th scope="col">
+                  <span className="normal-case">CLAUDE.md</span>
                 </th>
               </tr>
             </thead>
             <tbody className="text-ink-dim">
               {MODELS.map((m) => (
-                <tr key={m.id} className="border-b border-line last:border-b-0">
-                  <th scope="row" className="py-2 pr-4 font-medium">
+                <tr key={m.id}>
+                  <th scope="row" className="font-medium">
                     <Link href={modelPath(m.id)} className={LINK}>
                       {m.label}
                     </Link>
                   </th>
-                  <td className="py-2 pr-4">{AGENTS_MD_CELL[AGENT_READS[m.id].agentsMd]}</td>
-                  <td className="py-2">{AGENT_READS[m.id].claudeMd ? "Yes" : "No"}</td>
+                  <td>{AGENTS_MD_CELL[AGENT_READS[m.id].agentsMd]}</td>
+                  <td>{AGENT_READS[m.id].claudeMd ? "Yes" : "No"}</td>
                 </tr>
               ))}
             </tbody>

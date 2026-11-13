@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AGENT_READS, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
@@ -48,46 +48,41 @@ export default function AgentsPage() {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      <BreadcrumbJsonLd current={{ name: "Agents", path: PATH }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY[PATH].title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          Most agents read AGENTS.md: {agentList(always)}. Claude Code reads CLAUDE.md and falls back to AGENTS.md.{" "}
-          {agentList(viaSetting)} read their own files, and AGENTS.md only when configured to.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ current: { name: "Agents", path: PATH } }}
+        title={PAGE_COPY[PATH].title}
+        lead={
+          <>
+            Most agents read AGENTS.md: {agentList(always)}. Claude Code reads CLAUDE.md and falls back to AGENTS.md.{" "}
+            {agentList(viaSetting)} read their own files, and AGENTS.md only when configured to.
+          </>
+        }
+      />
 
       <Panel>
-        <PanelHeading>Which files does each agent read?</PanelHeading>
+        <PanelHeading>Files each agent reads</PanelHeading>
         {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
-        <section className="overflow-x-auto" tabIndex={0} aria-label="Files each agent reads">
-          <table className="w-full min-w-[620px] border-collapse text-left text-[14px]">
+        <section className="table-wrap" tabIndex={0} aria-label="Files each agent reads">
+          <table className="data-table min-w-[620px] text-[14px]">
             <caption className="sr-only">Repo files each AI coding agent reads</caption>
             <thead>
-              <tr className="border-b border-line text-[12.5px] text-muted">
-                <th scope="col" className="py-2 pr-4 font-medium">
-                  Agent
-                </th>
-                <th scope="col" className="py-2 pr-4 font-medium">
-                  Reads from the repo
-                </th>
-                <th scope="col" className="py-2 font-medium">
-                  Notes
-                </th>
+              <tr>
+                <th scope="col">Agent</th>
+                <th scope="col">Reads from the repo</th>
+                <th scope="col">Notes</th>
               </tr>
             </thead>
             <tbody>
               {MODELS.map((m) => {
                 const reads = AGENT_READS[m.id];
                 return (
-                  <tr key={m.id} className="border-b border-line align-top last:border-b-0">
-                    <th scope="row" className="py-2.5 pr-4 font-medium">
+                  <tr key={m.id} className="align-top">
+                    <th scope="row" className="font-medium">
                       <Link href={modelPath(m.id)} className={LINK}>
                         {m.label}
                       </Link>
                     </th>
-                    <td className="py-2.5 pr-4">
+                    <td>
                       <ul className="m-0 list-none p-0">
                         {reads.files.map((f) => (
                           <li key={f}>
@@ -96,7 +91,7 @@ export default function AgentsPage() {
                         ))}
                       </ul>
                     </td>
-                    <td className="py-2.5 text-ink-dim">
+                    <td className="text-ink-dim">
                       <CodeText text={reads.note} />{" "}
                       {[...m.sources, ...(reads.sources ?? [])].map((url) => (
                         <span key={url} className="mr-2 text-[12.5px]">

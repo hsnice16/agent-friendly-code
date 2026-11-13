@@ -53,18 +53,10 @@ export function ConsentBanner() {
       </p>
 
       <div className="mt-3 flex gap-2">
-        <button
-          type="button"
-          onClick={() => choose("granted")}
-          className="flex-1 cursor-pointer rounded-md border border-line px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
-        >
+        <button type="button" onClick={() => choose("granted")} className="btn-secondary flex-1">
           Accept
         </button>
-        <button
-          type="button"
-          onClick={() => choose("denied")}
-          className="flex-1 cursor-pointer rounded-md border border-line px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
-        >
+        <button type="button" onClick={() => choose("denied")} className="btn-secondary flex-1">
           Decline
         </button>
       </div>

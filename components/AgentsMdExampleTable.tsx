@@ -8,11 +8,8 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreNumber } from "./ScoreNumber";
 
-const TH =
-  "[&>th]:border-b [&>th]:border-line [&>th]:px-2 sm:[&>th]:px-3 [&>th]:py-2.5 [&>th]:text-[11.5px] [&>th]:font-semibold [&>th]:uppercase [&>th]:tracking-[0.08em] [&>th]:text-muted";
 // On a phone the file link and its length are the point; the rest is on the repo page.
 const WIDE_ONLY = "hidden sm:table-cell";
-const TD = "[&>td]:border-b [&>td]:border-line [&>td]:px-2 sm:[&>td]:px-3 [&>td]:py-2.5 last:[&>td]:border-b-0";
 
 export function AgentsMdExampleTable({
   rows,
@@ -25,11 +22,11 @@ export function AgentsMdExampleTable({
   showLanguage?: boolean;
 }) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-line">
-      <table className="w-full border-separate border-spacing-0 text-[14px]">
+    <div className="table-wrap">
+      <table className="data-table text-[14px]">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className={`bg-surface-2 text-left ${TH}`}>
+          <tr>
             <th scope="col">Repo</th>
             <th scope="col">File</th>
             <th scope="col" className="text-right">
@@ -50,9 +47,9 @@ export function AgentsMdExampleTable({
         </thead>
         <tbody>
           {rows.map((r) => (
-            <tr key={r.id} className={TD}>
+            <tr key={r.id}>
               <td className="[overflow-wrap:anywhere] sm:min-w-[9rem]">
-                <Link href={repoPath(r)} className="font-medium text-ink hover:text-ink-soft">
+                <Link href={repoPath(r)} className="font-medium ink-link">
                   {r.owner}/{r.name}
                 </Link>
                 <OwnRepoTag repo={r} />

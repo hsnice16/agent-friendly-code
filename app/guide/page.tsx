@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
-import { LINK } from "@/components/link-class";
+import { LINK, LINK_STRONG } from "@/components/link-class";
+import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
@@ -76,16 +76,19 @@ export default function GuidePage() {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      <BreadcrumbJsonLd current={{ name: "Guide", path: PATH }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{title}</h1>
-        <p className="m-0 mb-3 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          An agent-friendly codebase writes down what the code doesn&apos;t say and gives the agent a way to check its
-          work: an AGENTS.md with your exact commands, tests it can run, and CI and lint config that show what a change
-          must pass.
-        </p>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
+      {/* The meta title adds "for AI agents" for search; on the page it only repeats "agent-friendly". */}
+      <PageHeader
+        crumbs={{ current: { name: "Guide", path: PATH } }}
+        title="How to make your codebase agent-friendly"
+        lead={
+          <>
+            An agent-friendly codebase writes down what the code doesn&apos;t say and gives the agent a way to check its
+            work: an AGENTS.md with your exact commands, tests it can run, and CI and lint config that show what a
+            change must pass.
+          </>
+        }
+      >
+        <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Of {agentsMd.total} popular repos on our leaderboard, {percent(agentsMd.present, agentsMd.total)} have an
           AGENTS.md or CLAUDE.md (
           <Link href={REPORT_PATH} className="prose-link">
@@ -94,7 +97,7 @@ export default function GuidePage() {
           ), {passRate("tests")} pass our tests check and {passRate("ci")} our CI check. Below are the {SIGNALS.length}{" "}
           checks we score, grouped by what they do for an agent; the {START_WITH} marked count most across agents.
         </p>
-      </section>
+      </PageHeader>
 
       <div className="flex flex-col gap-3.5">
         {GUIDE_THEMES.map((theme) => (
@@ -107,11 +110,11 @@ export default function GuidePage() {
                 return (
                   <li key={c.id} className="flex flex-col gap-x-4 sm:flex-row sm:items-baseline sm:justify-between">
                     <span>
-                      <Link href={checkPath(c.id)} className={`font-medium ${LINK}`}>
+                      <Link href={checkPath(c.id)} className={LINK_STRONG}>
                         {SIGNAL_BY_ID[c.id].label}
                       </Link>
                       {startHere.has(c.id) && (
-                        <span className="ml-2 text-[12.5px] font-medium text-warn">start here</span>
+                        <span className="ml-2 text-[12.5px] font-medium text-tip">start here</span>
                       )}
                       <span className="block">
                         <CodeText text={c.action} />

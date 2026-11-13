@@ -40,15 +40,20 @@ function pypiRepo(info: Record<string, unknown>): ParsedRepo | null {
   return null;
 }
 
+class PackageMissing extends Error {}
+
 async function getJson(url: string): Promise<Record<string, unknown> | null> {
   const res = await fetch(url, {
     headers: { "User-Agent": "agent-friendly-code" },
     signal: AbortSignal.timeout(REGISTRY_TIMEOUT_MS),
   });
+  // Only a 404 says the package doesn't exist; a 5xx or rate limit says nothing about it.
+  if (res.status === 404) throw new PackageMissing();
   return res.ok ? obj(await res.json()) : null;
 }
 
-export async function resolvePackageToRepo(registry: Registry, name: string): Promise<ParsedRepo | null> {
+/** `"missing"` when the registry has no such package; null when it lists no repo we can read, or didn't answer. */
+export async function resolvePackageToRepo(registry: Registry, name: string): Promise<ParsedRepo | "missing" | null> {
   try {
     const pkg = encodeURIComponent(name);
 
@@ -67,7 +72,9 @@ export async function resolvePackageToRepo(registry: Registry, name: string): Pr
       const j = await getJson(`https://crates.io/api/v1/crates/${pkg}`);
       return j && normalizeToRepoUrl(obj(j.crate).repository);
     }
-  } catch {}
+  } catch (e) {
+    if (e instanceof PackageMissing) return "missing";
+  }
 
   return null;
 }

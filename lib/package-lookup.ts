@@ -24,7 +24,8 @@ type PackageLookup =
       registry: Registry;
       contact_url: string;
       status: "unresolved";
-    };
+    }
+  | { package: string; registry: Registry; status: "not_found" };
 
 // Each registry's own naming rule and length cap (npm 214, crates.io 64; PyPI
 // sets none, so npm's). Anything else can't exist, so it costs no registry call.
@@ -40,7 +41,7 @@ export function isValidPackageName(registry: Registry, pkg: string): boolean {
 
 export async function lookupPackage(registry: Registry, pkg: string): Promise<PackageLookup> {
   if (!isValidPackageName(registry, pkg)) {
-    return { registry, package: pkg, status: "unresolved", contact_url: packageRequestIssueUrl({ registry, pkg }) };
+    return { registry, package: pkg, status: "not_found" };
   }
 
   const cachedUrl = getPackageAlias(registry, pkg);
@@ -48,7 +49,9 @@ export async function lookupPackage(registry: Registry, pkg: string): Promise<Pa
 
   const isFresh = !parsed;
   if (!parsed) {
-    parsed = await resolvePackageToRepo(registry, pkg);
+    const resolved = await resolvePackageToRepo(registry, pkg);
+    if (resolved === "missing") return { registry, package: pkg, status: "not_found" };
+    parsed = resolved;
   }
 
   if (!parsed) {

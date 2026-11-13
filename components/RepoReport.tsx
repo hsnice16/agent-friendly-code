@@ -41,7 +41,9 @@ export function RepoReport({ slug, report }: { slug: string; report: RepoReportD
 
   return (
     <Panel>
-      <PanelHeading>How {slug} compares</PanelHeading>
+      <PanelHeading>
+        How <span className="normal-case">{slug}</span> compares
+      </PanelHeading>
 
       <dl className="m-0 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         {comparisons.map((c) => (

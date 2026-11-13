@@ -3,12 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CodeText } from "@/components/CodeText";
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { agentsReading, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
@@ -17,10 +17,9 @@ import { getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts, reposWithBoth } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
-import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { agentList } from "@/lib/utils/agent-list";
-import { checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
+import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 import { pageTitle } from "@/lib/utils/page-title";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
@@ -111,20 +110,11 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      <Breadcrumbs
-        parents={[
-          { name: "Checks", path: "/check" },
-          { name: SIGNAL_BY_ID[id].label, path: checkPath(id) },
-        ]}
-        current={{ name: `${c.name} vs AGENTS.md`, path }}
+      <PageHeader
+        crumbs={{ parents: [CHECKS_CRUMB, checkCrumb(id)], current: { name: `${c.name} vs AGENTS.md`, path } }}
+        title={c.title}
+        lead={<CodeText text={c.answer} />}
       />
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">{c.title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          <CodeText text={c.answer} />
-        </p>
-      </section>
 
       <Panel>
         <PanelHeading>How do they differ?</PanelHeading>

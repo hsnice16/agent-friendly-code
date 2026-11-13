@@ -14,6 +14,19 @@ export function signalIdFromSlug(slug: string): string | null {
   return checkSlug(id) === slug && Object.hasOwn(SIGNAL_BY_ID, id) ? id : null;
 }
 
+export const CHECKS_CRUMB = { name: "Checks", path: "/check" };
+
+// A spaced slash in a crumb reads as one more level of the trail.
+const CRUMB_LABEL: Record<string, string> = {
+  agents_md: "AGENTS.md",
+  linter: "Linter config",
+  pre_commit: "Pre-commit hooks",
+};
+
+export function checkCrumb(signalId: string): { name: string; path: string } {
+  return { name: CRUMB_LABEL[signalId] ?? SIGNAL_BY_ID[signalId].label, path: checkPath(signalId) };
+}
+
 export type CheckSubPage = "examples" | "vs-claude-md" | "vs-agents-md";
 
 export function checkSubPath(signalId: string, page: CheckSubPage): string {

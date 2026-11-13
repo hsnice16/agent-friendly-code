@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { LANGUAGE_HUB_MIN_REPOS } from "@/lib/constants/scoring";
@@ -24,30 +24,31 @@ export default function LanguagesPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Languages", path: "/language" }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY["/language"].title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          The leaderboard by language: each page ranks its repos and shows the checks they most often miss.
-          {hasTopics && (
-            <>
-              {" "}
-              Or browse by{" "}
-              <Link href={TOPICS_PATH} className="text-ink hover:text-ink-soft">
-                topics
-              </Link>
-              .
-            </>
-          )}
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ current: { name: "Languages", path: "/language" } }}
+        title={PAGE_COPY["/language"].title}
+        lead={
+          <>
+            The leaderboard by language: each page ranks its repos and shows the checks they most often miss.
+            {hasTopics && (
+              <>
+                {" "}
+                Or browse by{" "}
+                <Link href={TOPICS_PATH} className="prose-link">
+                  topics
+                </Link>
+                .
+              </>
+            )}
+          </>
+        }
+      />
 
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2 md:grid-cols-3">
         {hubs.map((g) => (
-          <li key={g.slug} className="relative rounded-lg border border-line bg-surface px-4 py-3.5">
+          <li key={g.slug} className="relative tile">
             <div className="flex items-start justify-between gap-2">
-              <Link href={hubPath(g.slug)} className="font-medium text-ink hover:text-ink-soft cover-link">
+              <Link href={hubPath(g.slug)} className="font-medium ink-link cover-link">
                 {g.label}
               </Link>
               <ScoreNumber score={averageScore(g.rows)} size="sm" />
@@ -62,7 +63,7 @@ export default function LanguagesPage() {
           <Panel>
             <PanelHeading>Other languages</PanelHeading>
             <p className="m-0 mb-2.5 text-[14px] text-ink-dim">
-              <Link href={OTHER_LANGUAGES_PATH} className="font-medium text-ink hover:text-ink-soft">
+              <Link href={OTHER_LANGUAGES_PATH} className="font-medium ink-link">
                 {otherCount} repos in other languages
               </Link>
               : languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos here, or none detected.

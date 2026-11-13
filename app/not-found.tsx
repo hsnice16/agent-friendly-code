@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { APP_NAME, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -54,13 +55,10 @@ const DESTINATIONS = [
 export default function NotFound() {
   return (
     <>
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Page not found</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">There is no page at this address.</p>
-      </section>
+      <PageHeader title="Page not found" lead="There is no page at this address." />
 
-      <Panel tone="info">
-        <PanelHeading tone="info">Looking for a repo?</PanelHeading>
+      <Panel tone="tip">
+        <PanelHeading tone="tip">Looking for a repo?</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           We only have pages for repos and packages we track. An old link, or a repo that was never on the list, ends up
           here.{" "}
@@ -77,7 +75,7 @@ export default function NotFound() {
           <ul className="m-0 grid list-none gap-2.5 p-0">
             {DESTINATIONS.map((d) => (
               <li key={d.href} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                <Link href={d.href} className="min-w-[9rem] text-[14.5px] font-semibold text-ink hover:text-ink-soft">
+                <Link href={d.href} className="tap-target min-w-[9rem] text-[14.5px] font-semibold ink-link">
                   {d.label}
                 </Link>
                 <span className="text-[14px] leading-relaxed text-muted">{d.blurb}</span>

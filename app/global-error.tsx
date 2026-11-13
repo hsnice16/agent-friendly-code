@@ -15,11 +15,7 @@ export default function GlobalError({ retry }: { error: Error & { digest?: strin
           </p>
 
           <div className="mt-3.5 flex flex-wrap items-center gap-4">
-            <button
-              type="button"
-              onClick={retry}
-              className="cursor-pointer rounded-lg border border-line bg-ink px-4 py-2 text-[14px] font-medium text-accent-ink hover:bg-ink-soft"
-            >
+            <button type="button" onClick={retry} className="btn-primary">
               Try again
             </button>
             {/* A full load, not <Link>: client navigation would reuse the layout that just threw. */}

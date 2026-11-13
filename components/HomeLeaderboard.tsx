@@ -9,9 +9,10 @@ import { APP_VERSION } from "@/lib/version";
 import { HomeJsonLd } from "./HomeJsonLd";
 import { LeaderboardBoard } from "./LeaderboardBoard";
 import { LiveScoreForm } from "./LiveScoreForm";
+import { PAGE_LEAD, PageHeader } from "./PageHeader";
 import { ReleaseAnnouncement } from "./ReleaseAnnouncement";
 
-const CTA = "border-b border-dotted border-warn/60 text-warn hover:border-warn hover:text-warn";
+const CTA = "border-b border-dotted border-tip/60 text-tip hover:border-tip";
 
 type Props = {
   view: LeaderboardView;
@@ -23,11 +24,17 @@ export function HomeLeaderboard({ view, stats }: Props) {
     <>
       <HomeJsonLd view={view} contentChangedAt={stats.contentChangedAt} />
 
-      <section className="mb-5">
-        <h1 className="mb-3 text-[26px] font-bold leading-[1.2] tracking-tight sm:text-[32px] sm:leading-[1.18]">
-          Which public repos are easiest for AI coding agents to work in?
-        </h1>
-        <p className="m-0 max-w-[68ch] text-[15px] text-ink-dim sm:text-base">
+      <PageHeader title="Which public repos are easiest for AI coding agents to work in?">
+        {/* Under the h1, not the subtitle: heatmaps showed the form below it went unseen.
+            It stacks below `sm`, so the copy stays short to keep the board near the fold. */}
+        <div className="callout mt-3 max-w-[640px]">
+          <p className="m-0 text-[15px] font-semibold text-ink">
+            Is your repo ready for AI agents? Paste a GitHub URL to score it.
+          </p>
+          <LiveScoreForm className="mt-3" />
+        </div>
+
+        <p className={`mt-4 ${PAGE_LEAD}`}>
           {/* Visitors click this line expecting a link. */}
           Repos from {HOSTS_TEXT},{" "}
           <Link href="/methodology" className="prose-link">
@@ -35,16 +42,6 @@ export function HomeLeaderboard({ view, stats }: Props) {
           </Link>
           , then ranked.
         </p>
-
-        {/* LiveScoreForm stacks below `sm`; the copy around it stays short so the board is still near the fold on a phone. */}
-        <div className="relative mt-4 max-w-[640px] rounded-xl border border-line bg-surface px-4 pt-3 pb-4">
-          <p className="m-0 text-[14.5px] font-medium text-ink">
-            Is your repo ready for AI agents? Paste a GitHub URL.
-          </p>
-          <div className="-mt-2">
-            <LiveScoreForm />
-          </div>
-        </div>
 
         <p className="mt-3 max-w-[68ch] text-[13px] text-muted">
           Or check an{" "}
@@ -65,7 +62,7 @@ export function HomeLeaderboard({ view, stats }: Props) {
           </Link>{" "}
           from popular repos.
         </p>
-      </section>
+      </PageHeader>
 
       {/* Announced only once the release it describes is the one deployed —
           otherwise a version bump ahead of the changelog entry (or behind it)

@@ -9,12 +9,13 @@ export function BadgeFilterToggle({ value, onChange }: { value: boolean; onChang
       aria-pressed={value}
       title="Only repos that show the Agent Friendly Code badge in their README"
       onClick={() => onChange(!value)}
-      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1.5 text-[13px] max-sm:min-h-[44px] ${
+      aria-label="Only repos showing the badge"
+      className={`inline-flex min-h-[44px] items-center gap-1.5 rounded-lg border px-3 text-[13px] ${
         value ? "border-ok/40 bg-ok/10 text-ok" : "border-line bg-surface text-ink-dim hover:text-ink-soft"
       }`}
     >
       <CheckCircle size={13} weight={value ? "fill" : "regular"} aria-hidden="true" />
-      <span className="sr-only">Only repos showing the </span>Badge
+      Badge
     </button>
   );
 }

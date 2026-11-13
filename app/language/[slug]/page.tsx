@@ -2,8 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
+import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
@@ -63,28 +63,22 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
 
   return (
     <>
-      <BreadcrumbJsonLd parent={{ name: "Languages", path: "/language" }} current={{ name: hub.label, path }} />
-
-      <Link
-        href="/language"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
+      <PageHeader
+        crumbs={{ parents: [{ name: "Languages", path: "/language" }], current: { name: hub.label, path } }}
+        title={hubTitle(hub.label)}
+        lead={
+          <>
+            {hub.rows.length} {hub.label} repos, ranked by overall score (the average across agents). They average{" "}
+            <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
+            <Link href={repoPath(hub.top)} className="prose-link">
+              {hub.top.owner}/{hub.top.name}
+            </Link>{" "}
+            leads with <strong className="text-ink">{(hub.top.score ?? 0).toFixed(1)}</strong>.
+          </>
+        }
       >
-        ← all languages
-      </Link>
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{hubTitle(hub.label)}</h1>
-
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          {hub.rows.length} {hub.label} repos, ranked by overall score (the average across agents). They average{" "}
-          <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
-          <Link href={repoPath(hub.top)} className="prose-link">
-            {hub.top.owner}/{hub.top.name}
-          </Link>{" "}
-          leads with <strong className="text-ink">{(hub.top.score ?? 0).toFixed(1)}</strong>.
-        </p>
         {examples && (
-          <p className="mt-2 mb-0 max-w-[72ch] text-[15.5px] text-ink-dim">
+          <p className={`mt-2.5 ${PAGE_LEAD}`}>
             {examples.rows.length} of them have an AGENTS.md or CLAUDE.md:{" "}
             <Link href={languageExamplesPath(hub.slug)} className="prose-link">
               {hub.label} AGENTS.md examples
@@ -92,7 +86,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             .
           </p>
         )}
-      </section>
+      </PageHeader>
 
       {hub.gaps.length > 0 && (
         <div className="mb-3.5">
@@ -101,7 +95,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
               {hub.gaps.map((g) => (
                 <li key={g.id}>
-                  <Link href={checkPath(g.id)} className="font-medium text-ink hover:text-ink-soft">
+                  <Link href={checkPath(g.id)} className="font-medium ink-link">
                     {g.label}
                   </Link>
                   : {Math.round(g.rate * 100)}% pass rate

@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { ACTION_REPO_URL, ACTION_USES, APP_URL } from "@/lib/version";
@@ -48,13 +49,6 @@ const FAQ_JSON_LD = {
 const APPLICATION_JSON_LD = {
   "@graph": [
     {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-        { "@type": "ListItem", position: 2, name: "GitHub Action", item: `${APP_URL}/action` },
-      ],
-    },
-    {
       "@type": "SoftwareApplication",
       "@id": `${APP_URL}/action#app`,
       url: ACTION_REPO_URL,
@@ -77,18 +71,19 @@ export default function ActionPage() {
       <JsonLd data={APPLICATION_JSON_LD} />
       <JsonLd data={FAQ_JSON_LD} />
 
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Agent Friendly Action: score every pull request
-        </h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Comments on every pull request with how it changes your score for each agent, for example &ldquo;this PR drops
-          your Claude Code score by 4.1 points because it removed CI config&rdquo;. It runs in your CI, and one secret
-          turns it on.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ current: { name: "GitHub Action", path: "/action" } }}
+        title="Agent Friendly Action: score every pull request"
+        lead={
+          <>
+            Comments on every pull request with how it changes your score for each agent, for example &ldquo;this PR
+            drops your Claude Code score by 4.1 points because it removed CI config&rdquo;. It runs in your CI, and one
+            secret turns it on.
+          </>
+        }
+      />
 
-      <ActionEmbed actionUses={ACTION_USES} highlight="warn" />
+      <ActionEmbed actionUses={ACTION_USES} highlight="tip" />
 
       <div id="set-secret" className="mt-3.5 scroll-mt-20">
         <Panel>

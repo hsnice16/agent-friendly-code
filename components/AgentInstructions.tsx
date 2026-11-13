@@ -111,7 +111,7 @@ function HowCommon({ data }: { data: AgentInstructionsData }) {
       )}
       {has} of {total} repos on the leaderboard
       <span className="text-muted"> · </span>
-      <Link href={checkSubPath("agents_md", "examples")} className="prose-link">
+      <Link href={checkSubPath("agents_md", "examples")} className="arrow-link">
         See examples →
       </Link>
     </>
@@ -133,7 +133,9 @@ export function AgentInstructions({
 }) {
   return (
     <Panel>
-      <PanelHeading>Does {slug} have agent instructions?</PanelHeading>
+      <PanelHeading>
+        Does <span className="normal-case">{slug}</span> have agent instructions?
+      </PanelHeading>
       <p className="m-0 mb-1 max-w-[75ch] text-[14px] leading-relaxed text-muted">
         An AGENTS.md (or CLAUDE.md) at the root tells AI coding agents how to build, test and work in the repo. A few
         agents also read a file of their own.

@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { weightsChangedText } from "@/lib/changelog";
 import { sourceLabel } from "@/lib/leaderboard-model-panel";
@@ -29,17 +29,15 @@ const FAQ_JSON_LD = {
 export default function MethodologyPage() {
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Methodology", path: "/methodology" }} />
       <JsonLd data={FAQ_JSON_LD} />
 
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">How {APP_NAME} scores repos</h1>
-
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          How we work out each score, what we check, and what we can&apos;t check yet.
-        </p>
+      <PageHeader
+        crumbs={{ current: { name: "Methodology", path: "/methodology" } }}
+        title={`How ${APP_NAME} scores repos`}
+        lead="How we work out each score, what we check, and what we can't check yet."
+      >
         <p className="mt-2 mb-0 text-[13px] text-muted">{weightsChangedText()}</p>
-      </section>
+      </PageHeader>
 
       <Panel tone="warn">
         <PanelHeading tone="warn">Weights from docs, not yet tested</PanelHeading>
@@ -48,7 +46,7 @@ export default function MethodologyPage() {
           Scores come from <strong className="text-ink">file checks</strong>: whether a file exists, and how long it is.
           No agent is run. Each agent&apos;s weights follow <strong className="text-ink">its own docs</strong> (Sources,
           under each agent) but aren&apos;t yet measured against real runs; that is v1.0.0 on the{" "}
-          <Link href="/roadmap" className="text-ink-dim hover:text-ink-soft">
+          <Link href="/roadmap" className="prose-link">
             roadmap
           </Link>
           . Treat scores as a guide, not a verdict.
@@ -90,7 +88,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                 className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0 sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
               >
                 <div>
-                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium text-ink hover:text-ink-soft">
+                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium ink-link">
                     {s.label}
                   </Link>
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
@@ -141,7 +139,8 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                 )}
 
                 <details className="mt-2 text-[13px] text-muted">
-                  <summary className="cursor-pointer">Weights</summary>
+                  {/* The padding makes a 44px tap target; the margin gives the space back. */}
+                  <summary className="-my-2.5 cursor-pointer py-2.5">Weights</summary>
 
                   <pre className="mt-2 overflow-x-auto rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs leading-relaxed">
                     {Object.entries(m.weights)

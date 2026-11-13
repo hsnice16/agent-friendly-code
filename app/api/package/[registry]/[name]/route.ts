@@ -37,5 +37,5 @@ export async function GET(_req: Request, ctx: { params: Promise<{ registry: stri
     );
   }
 
-  return NextResponse.json(result, { headers: HEADERS });
+  return NextResponse.json(result, { headers: HEADERS, status: result.status === "not_found" ? 404 : 200 });
 }

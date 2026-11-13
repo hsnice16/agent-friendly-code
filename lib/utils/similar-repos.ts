@@ -1,3 +1,5 @@
+import { ALTERNATIVES_LIMIT, TOPIC_MATCHES_LIMIT } from "@/lib/constants/scoring";
+import { reposSharingTopics, type TopicNeighbour } from "@/lib/topics";
 import type { LeaderboardRow, RepoRow } from "@/lib/types/db";
 import { languageSlug } from "@/lib/utils/language";
 
@@ -40,6 +42,21 @@ export function similarRepos(repo: LeaderboardRow, board: LeaderboardRow[], limi
   }
 
   return board.filter((r) => r.id !== repo.id && picked.has(r.id));
+}
+
+/**
+ * The repo page's strip: topic matches take their places first, then the
+ * closest repos fill the rest. Cutting `similarRepos` down afterwards would
+ * drop by leaderboard position, losing the nearest and same-language picks.
+ */
+export function similarAndTopicRepos(
+  repo: LeaderboardRow,
+  board: LeaderboardRow[],
+): { similar: LeaderboardRow[]; byTopic: TopicNeighbour<LeaderboardRow>[] } {
+  const byTopic = reposSharingTopics(repo, board, new Set(), TOPIC_MATCHES_LIMIT);
+  const taken = new Set(byTopic.map((t) => t.row.id));
+  const rest = board.filter((r) => !taken.has(r.id));
+  return { similar: similarRepos(repo, rest, ALTERNATIVES_LIMIT - byTopic.length), byTopic };
 }
 
 /**

@@ -25,15 +25,6 @@ export function AgentsMdFrameworkGuide({
 
   return (
     <>
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">
-          What to put in an AGENTS.md for {guide.label}
-        </h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink">
-          <CodeText text={guide.intro} />
-        </p>
-      </section>
-
       <AgentsMdGuidePanels guide={guide} />
 
       <div className="mt-3.5">

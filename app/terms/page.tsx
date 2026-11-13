@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
@@ -14,15 +14,13 @@ export const metadata: Metadata = staticPageMetadata("/terms");
 export default function TermsPage() {
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Terms of Use", path: "/terms" }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Terms of Use</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          What {APP_NAME} is, how you may use it, and the limits of the information it provides.
-        </p>
+      <PageHeader
+        crumbs={{ current: { name: "Terms of use", path: "/terms" } }}
+        title="Terms of use"
+        lead={`What ${APP_NAME} is, how you may use it, and the limits of the information it provides.`}
+      >
         <p className="mt-2 text-[13px] text-muted">Last updated: {LAST_UPDATED}.</p>
-      </section>
+      </PageHeader>
 
       <Panel>
         <PanelHeading>Acceptance</PanelHeading>

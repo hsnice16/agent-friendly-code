@@ -84,6 +84,17 @@ export function defaultRepoUrl(r: { host: string; owner: string; name: string })
   return `https://${isHost(r.host) ? HOST_DOMAINS[r.host] : r.host}/${r.owner}/${r.name}`;
 }
 
+/** The board's spelling of a repo, matched as hosts match names: case-insensitively. */
+export function findBoardRepo(
+  data: BoardData,
+  { host, owner, name }: { host: string; owner: string; name: string },
+): { host: string; owner: string; name: string } | null {
+  const o = owner.toLowerCase();
+  const n = name.toLowerCase();
+  const r = data.repos.find((x) => x.h === host && x.o.toLowerCase() === o && x.n.toLowerCase() === n);
+  return r ? { host: r.h, owner: r.o, name: r.n } : null;
+}
+
 /** Which slice of a board `page` shows. Clamped, so a stale or hand-typed page still lands on rows. */
 export function pageSlice(total: number, page: number): { page: number; totalPages: number; startIdx: number } {
   const totalPages = Math.max(1, Math.ceil(total / LEADERBOARD_PAGE_SIZE));
@@ -141,7 +152,27 @@ function matchesQuery(row: { owner: string; name: string }, q: string): boolean 
   return `${row.owner}/${row.name}`.toLowerCase().includes(q.toLowerCase());
 }
 
-export type BoardView = { rows: BoardRow[]; startIdx: number; page: number; totalPages: number; total: number };
+export type BoardView = {
+  /** `rank` is absent on the prerendered page, whose rows sit at their rank. */
+  rows: (BoardRow & { rank?: number })[];
+  startIdx: number;
+  page: number;
+  totalPages: number;
+  total: number;
+};
+
+// A row's place on the uncut board, which a sorted or filtered cut must still
+// show: medals belong to the real top three, not whoever lists first.
+const ranksByBoard = new WeakMap<BoardRow[], Map<number, number>>();
+
+function boardRanks(all: BoardRow[]): Map<number, number> {
+  let ranks = ranksByBoard.get(all);
+  if (!ranks) {
+    ranks = new Map(sortRows(all, DEFAULT_SORT, DEFAULT_DIR).map((r, i) => [r.id, i + 1]));
+    ranksByBoard.set(all, ranks);
+  }
+  return ranks;
+}
 
 export function viewBoard(all: BoardRow[], query: BoardQuery): BoardView {
   const hosted = query.host === "all" ? all : all.filter((r) => r.host === query.host);
@@ -149,11 +180,14 @@ export function viewBoard(all: BoardRow[], query: BoardQuery): BoardView {
   const matched = query.q ? badged.filter((r) => matchesQuery(r, query.q)) : badged;
   const sorted = sortRows(matched, query.sort, query.dir);
   const { page, totalPages, startIdx } = pageSlice(sorted.length, query.page);
+  const ranks = boardRanks(all);
   return {
     page,
     startIdx,
     totalPages,
     total: sorted.length,
-    rows: sorted.slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE),
+    rows: sorted
+      .slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE)
+      .map((r, i) => ({ ...r, rank: ranks.get(r.id) ?? startIdx + i + 1 })),
   };
 }

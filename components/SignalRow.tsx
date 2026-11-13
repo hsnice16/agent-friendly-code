@@ -6,9 +6,9 @@ import { hostLabel, percent } from "@/lib/utils/format";
 import { matchesDirectory, repoFileUrl } from "@/lib/utils/repo-file-url";
 
 const MARK_CLASSES = {
-  ok: { cls: "bg-ok/15 text-ok", label: "Pass" },
-  bad: { cls: "bg-bad/15 text-bad", label: "Fail" },
-  partial: { cls: "bg-warn/15 text-warn", label: "Partial" },
+  ok: { cls: "tint-ok", label: "Pass" },
+  bad: { cls: "tint-bad", label: "Fail" },
+  partial: { cls: "tint-warn", label: "Partial" },
 } as const;
 
 function mark(pass: number): { key: keyof typeof MARK_CLASSES; ch: string } {
@@ -33,22 +33,22 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
   const href = path && repo ? repoFileUrl(repo, path, matchesDirectory(signal)) : null;
 
   return (
-    <div className="flex items-start gap-3.5 py-3">
-      <div role="img" aria-label={label} className={`glyph mt-0.5 size-6 text-xs font-bold ${cls}`}>
+    <div className="check-row">
+      <div role="img" aria-label={label} className={`mark-lg mt-0.5 ${cls}`}>
         {m.ch}
       </div>
 
       <div className="flex-1">
         <div className="text-[14.5px]">
-          <Link href={checkPath(signal.id)} className="font-medium text-ink hover:text-ink-soft">
+          <Link href={checkPath(signal.id)} className="font-medium ink-link">
             {signal.label}
           </Link>
-          <span className="ml-1.5 text-xs tabular-nums text-muted">· {percent(signal.pass, 1)} pass</span>
+          <span className="check-pass">· {percent(signal.pass, 1)} pass</span>
         </div>
 
-        <div className="mt-0.5 text-[13.5px] text-ink-dim">{signal.detail}</div>
+        <div className="check-detail">{signal.detail}</div>
         {path && (
-          <div className="mt-1 break-all font-mono text-xs text-muted">
+          <div className="check-path">
             {href ? (
               <a
                 href={href}

@@ -8,7 +8,6 @@ import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
 
 type Props = {
-  heading?: string;
   language: string | null;
   /** `detail` replaces the language-and-stars line under the name. */
   alternatives: (AlternativeRow & { detail?: string })[];
@@ -16,14 +15,14 @@ type Props = {
   hubHref?: string;
 };
 
-export function AlternativesStrip({ heading = "Similar repos", language, alternatives, note, hubHref }: Props) {
+export function AlternativesStrip({ language, alternatives, note, hubHref }: Props) {
   if (alternatives.length === 0) {
     return null;
   }
 
   return (
     <Panel>
-      <PanelHeading>{heading}</PanelHeading>
+      <PanelHeading>Similar repos</PanelHeading>
 
       <p className="m-0 mb-3 text-[13px] text-muted">{note}</p>
 
@@ -34,7 +33,7 @@ export function AlternativesStrip({ heading = "Similar repos", language, alterna
               <Link
                 href={repoPath(a)}
                 aria-label={`View ${a.owner}/${a.name} details`}
-                className="min-w-0 truncate font-medium text-ink hover:text-ink-soft cover-link"
+                className="min-w-0 truncate font-medium ink-link cover-link"
               >
                 {a.owner}/{a.name}
               </Link>
@@ -55,7 +54,7 @@ export function AlternativesStrip({ heading = "Similar repos", language, alterna
       </ul>
 
       {hubHref && language && (
-        <Link href={hubHref} className="mt-3 inline-block text-[13px] text-ink-dim hover:text-ink-soft">
+        <Link href={hubHref} className="mt-3 inline-block text-[13px] arrow-link">
           All {language} repos →
         </Link>
       )}

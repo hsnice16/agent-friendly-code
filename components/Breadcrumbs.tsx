@@ -9,7 +9,7 @@ export function Breadcrumbs({ current, parents }: { current: Crumb; parents: Cru
   return (
     <>
       <BreadcrumbJsonLd current={current} parent={parents} />
-      <nav aria-label="Breadcrumb" className="my-5 text-[13px] text-muted">
+      <nav aria-label="Breadcrumb" className="mb-3 text-[13px] text-muted">
         <ol className="m-0 flex list-none flex-wrap items-center gap-x-1.5 gap-y-1 p-0">
           {trail.map((c, i) => (
             <li key={c.path} className="flex min-w-0 items-center gap-1.5">
@@ -19,7 +19,7 @@ export function Breadcrumbs({ current, parents }: { current: Crumb; parents: Cru
                   {c.name}
                 </span>
               ) : (
-                <Link href={c.path} className="text-muted no-underline hover:text-ink hover:no-underline">
+                <Link href={c.path} className="tap-target text-muted no-underline hover:text-ink hover:no-underline">
                   {c.name}
                 </Link>
               )}

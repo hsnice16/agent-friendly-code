@@ -9,7 +9,8 @@ function serve(body: unknown): void {
   globalThis.fetch = (async () => Response.json(body)) as unknown as typeof fetch;
 }
 
-const slug = (p: { host: string; owner: string; name: string } | null) => p && `${p.host}/${p.owner}/${p.name}`;
+const slug = (p: { host: string; owner: string; name: string } | "missing" | null) =>
+  p && p !== "missing" ? `${p.host}/${p.owner}/${p.name}` : p;
 
 describe("normalizeToRepoUrl", () => {
   test("reads the URL forms package manifests use", () => {
@@ -55,6 +56,15 @@ describe("resolvePackageToRepo", () => {
   test("PyPI: falls back to any link that is a repo", async () => {
     serve({ info: { project_urls: { Tracker: "https://gitlab.com/g/sub/p/-/issues" } } });
     assert.equal(slug(await resolvePackageToRepo("pypi", "p")), "gitlab/g/sub/p");
+  });
+
+  test("only a 404 says the package doesn't exist", async () => {
+    globalThis.fetch = (async () => new Response("Not Found", { status: 404 })) as unknown as typeof fetch;
+    for (const registry of ["npm", "pypi", "cargo"] as const) {
+      assert.equal(await resolvePackageToRepo(registry, "no-such-pkg"), "missing", registry);
+    }
+    globalThis.fetch = (async () => new Response("", { status: 503 })) as unknown as typeof fetch;
+    assert.equal(await resolvePackageToRepo("npm", "x"), null);
   });
 
   test("a malformed body resolves to nothing instead of throwing", async () => {

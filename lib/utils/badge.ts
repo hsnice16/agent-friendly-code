@@ -21,6 +21,11 @@ function escapeXml(s: string): string {
 }
 
 export const BADGE_HEIGHT = 20;
+export const BADGE_LABEL = "agent friendly";
+
+export function badgeMarkdown(appUrl: string, slug: string, repoPagePath: string): string {
+  return `[![Agent Friendly](${appUrl}/api/badge/${slug}.svg)](${appUrl}${repoPagePath})`;
+}
 
 /** The rendered width, so an <img> of the badge can reserve its space. */
 export function badgeWidth(label: string, value: string): number {

@@ -6,9 +6,8 @@ import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { percent } from "@/lib/utils/format";
 
 import { ExternalLink } from "./ExternalLink";
+import { LINK_STRONG } from "./link-class";
 import { Panel, PanelHeading } from "./Panel";
-
-const LINK = "font-medium text-ink hover:text-ink-soft";
 
 export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: ModelPanel }) {
   const { checks, sources, file } = panel;
@@ -25,7 +24,7 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
         <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1.5 p-0 text-[14px] text-ink-dim sm:grid-cols-2">
           {checks.map((c) => (
             <li key={c.id} className="flex items-baseline justify-between gap-3">
-              <Link href={checkPath(c.id)} className={LINK}>
+              <Link href={checkPath(c.id)} className={LINK_STRONG}>
                 {c.label}
               </Link>
               <span className="shrink-0 tabular-nums">
@@ -37,7 +36,7 @@ export function ModelReadsPanel({ model, panel }: { model: ModelProfile; panel: 
 
         {file && (
           <p className="mt-3 mb-0 text-[14px] text-ink-dim">
-            <Link href={claudeMd ? checkSubPath("agents_md", "examples") : checkPath(file.id)} className={LINK}>
+            <Link href={claudeMd ? checkSubPath("agents_md", "examples") : checkPath(file.id)} className={LINK_STRONG}>
               {file.label}
             </Link>{" "}
             is in {file.present} of {file.total} leaderboard repos

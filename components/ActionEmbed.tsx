@@ -1,29 +1,19 @@
-import Link from "next/link";
-
 import { CopySnippet, type SnippetTone } from "./CopySnippet";
 import { Panel, PanelHeading } from "./Panel";
 
 type Props = {
   actionUses: string;
-  branch?: string | null;
   highlight?: SnippetTone;
-  showSecretLink?: boolean;
 };
 
-// A branch name may hold `,`, `]`, `{` or quotes, which would split or break
-// the flow sequence in the copied YAML.
-export function yamlBranch(branch: string): string {
-  return /^[A-Za-z0-9._/-]+$/.test(branch) ? branch : JSON.stringify(branch);
-}
-
-export function ActionEmbed({ actionUses, branch, showSecretLink = false, highlight = false }: Props) {
+export function ActionEmbed({ actionUses, highlight = false }: Props) {
   const tone = highlight || undefined;
   const yaml = `# .github/workflows/agent-friendly.yml
 name: Agent-friendly score diff
 
 on:
   pull_request:
-    branches: [${yamlBranch(branch || "main")}]
+    branches: [main]
 
 permissions:
   contents: read
@@ -53,14 +43,6 @@ jobs:
       <p className="mt-3 text-[12.5px] text-muted">
         Add <code className="text-ink-dim mr-0.5">AGENTS_BADGE_TOKEN</code> to the repo&apos;s secrets to turn the
         comment on. Without it, the action does nothing.
-        {showSecretLink && (
-          <>
-            {" "}
-            <Link href="/action#set-secret" className="prose-link">
-              Where do I add it?
-            </Link>
-          </>
-        )}
       </p>
     </Panel>
   );

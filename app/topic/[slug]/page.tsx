@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { JsonLd } from "@/components/JsonLd";
 import { LeaderboardTable } from "@/components/LeaderboardTable";
+import { PageHeader } from "@/components/PageHeader";
 import { getTopicGroups, getTopicPage, type TopicPage } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicDescription, topicPath, topicTitle } from "@/lib/topics";
 import { rowsItemList } from "@/lib/utils/board-item-list";
@@ -62,16 +62,17 @@ export default async function TopicPageView({ params }: { params: Promise<Params
   return (
     <>
       <JsonLd data={rowsItemList(t.rows, hubTitle(t.label))} />
-      <Breadcrumbs parents={[{ name: "Topics", path: TOPICS_PATH }]} current={{ name: t.label, path }} />
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{hubTitle(t.label)}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          {t.rows.length} repos tagged {t.label} average <strong className="text-ink">{t.average.toFixed(1)}</strong>,{" "}
-          {vs} the leaderboard&apos;s {t.boardAverage.toFixed(1)}, and {percent(t.withAgentFile, t.rows.length)} of them
-          have an AGENTS.md or CLAUDE.md.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ parents: [{ name: "Topics", path: TOPICS_PATH }], current: { name: t.label, path } }}
+        title={hubTitle(t.label)}
+        lead={
+          <>
+            {t.rows.length} repos tagged {t.label} average <strong className="text-ink">{t.average.toFixed(1)}</strong>,{" "}
+            {vs} the leaderboard&apos;s {t.boardAverage.toFixed(1)}, and {percent(t.withAgentFile, t.rows.length)} of
+            them have an AGENTS.md or CLAUDE.md.
+          </>
+        }
+      />
 
       <LeaderboardTable
         q=""
@@ -95,7 +96,7 @@ export default async function TopicPageView({ params }: { params: Promise<Params
               {g.label}
             </Link>
           ))}
-          <Link href={TOPICS_PATH} className="text-ink-dim hover:text-ink-soft">
+          <Link href={TOPICS_PATH} className="arrow-link">
             All topics →
           </Link>
         </nav>

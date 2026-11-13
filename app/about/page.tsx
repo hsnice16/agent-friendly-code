@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
@@ -38,13 +38,9 @@ export default function AboutPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "About", path: "/about" }} />
-
       <JsonLd data={ABOUT_JSON_LD} />
 
-      <section className="my-3 mb-7">
-        <h1 className="m-0 text-[30px] font-bold leading-[1.18] tracking-tight">Who builds {APP_NAME}, and why</h1>
-      </section>
+      <PageHeader crumbs={{ current: { name: "About", path: "/about" } }} title={`Who builds ${APP_NAME}, and why`} />
 
       <Panel>
         <PanelHeading>Who</PanelHeading>
@@ -60,8 +56,8 @@ export default function AboutPage() {
       </Panel>
 
       <div className="mt-3.5">
-        <Panel tone="warn">
-          <PanelHeading tone="warn">Why it exists</PanelHeading>
+        <Panel>
+          <PanelHeading>Why it exists</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             A README alone doesn&apos;t help an AI coding agent get work done, and nothing public showed which repos do
             more. {APP_NAME} shows it per agent, because agents read different files: Claude Code loads CLAUDE.md,

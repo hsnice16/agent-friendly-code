@@ -6,5 +6,5 @@ export function ScoreNumber({ score, size = "base" }: { score: number; size?: "s
   const sizeClass =
     size === "xl" ? "text-[42px] leading-none tracking-tight" : size === "sm" ? "text-sm" : "text-[15px]";
 
-  return <span className={`font-semibold tabular-nums ${sizeClass} ${TIER_TEXT_CLASS[tier]}`}>{score.toFixed(1)}</span>;
+  return <span className={`score-num ${sizeClass} ${TIER_TEXT_CLASS[tier]}`}>{score.toFixed(1)}</span>;
 }

@@ -4,10 +4,10 @@ import { notFound } from "next/navigation";
 
 import { AgentsMdExampleTable } from "@/components/AgentsMdExampleTable";
 import { AgentsMdFrameworkGuide, AgentsMdGuidePanels } from "@/components/AgentsMdFrameworkGuide";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import {
   examplesByLanguage,
@@ -23,8 +23,9 @@ import {
 } from "@/lib/agents-md-frameworks";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import {
+  CHECKS_CRUMB,
+  checkCrumb,
   checkPath,
   checkSlug,
   checkSubPath,
@@ -153,18 +154,19 @@ function jsonLd(lang: LanguageExamples) {
 
 export default async function LanguageExamplesPage({ params }: { params: Params }) {
   const examplesPath = checkSubPath(SIGNAL_ID, "examples");
+  const trail = [CHECKS_CRUMB, checkCrumb(SIGNAL_ID)];
   const framework = await frameworkOf(params);
   if (framework) {
     return (
       <>
         <JsonLd data={frameworkJsonLd(framework)} />
-        <Breadcrumbs
-          parents={[
-            { name: "Checks", path: "/check" },
-            { name: SIGNAL_BY_ID[SIGNAL_ID].label, path: checkPath(SIGNAL_ID) },
-            { name: "Examples", path: examplesPath },
-          ]}
-          current={{ name: framework.guide.label, path: frameworkExamplesPath(framework.guide.slug) }}
+        <PageHeader
+          crumbs={{
+            parents: [...trail, { name: "Examples", path: examplesPath }],
+            current: { name: framework.guide.label, path: frameworkExamplesPath(framework.guide.slug) },
+          }}
+          title={`What to put in an AGENTS.md for ${framework.guide.label}`}
+          lead={<CodeText text={framework.guide.intro} />}
         />
         <AgentsMdFrameworkGuide
           framework={framework}
@@ -184,25 +186,18 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
   return (
     <>
       <JsonLd data={jsonLd(lang)} />
-      <Breadcrumbs
-        parents={[
-          { name: "Checks", path: "/check" },
-          { name: SIGNAL_BY_ID[SIGNAL_ID].label, path: checkPath(SIGNAL_ID) },
-          { name: "Examples", path: examplesPath },
-        ]}
-        current={{ name: lang.label, path: languageExamplesPath(lang.slug) }}
-      />
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">
-          {lang.guide
+      <PageHeader
+        crumbs={{
+          parents: [...trail, { name: "Examples", path: examplesPath }],
+          current: { name: lang.label, path: languageExamplesPath(lang.slug) },
+        }}
+        title={
+          lang.guide
             ? `What to put in an AGENTS.md for a ${lang.label} repo`
-            : `${lang.label} AGENTS.md examples from ${lang.rows.length} open source repos`}
-        </h1>
-        <p className={`m-0 max-w-[72ch] text-[15.5px] leading-relaxed ${lang.guide ? "text-ink" : "text-ink-dim"}`}>
-          {lang.guide ? <CodeText text={lang.guide.intro} /> : <ExamplesSummary lang={lang} />}
-        </p>
-      </section>
+            : `${lang.label} AGENTS.md examples from ${lang.rows.length} open source repos`
+        }
+        lead={lang.guide ? <CodeText text={lang.guide.intro} /> : <ExamplesSummary lang={lang} />}
+      />
 
       {lang.guide && <AgentsMdGuidePanels guide={lang.guide} />}
 

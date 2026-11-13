@@ -74,13 +74,13 @@ export const PAGE_COPY = {
     type: "article",
   },
   "/privacy": {
-    title: "Privacy Policy",
+    title: "Privacy policy",
     description: `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`,
     type: "article",
   },
   "/terms": {
-    title: "Terms of Use",
-    description: `Terms of Use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`,
+    title: "Terms of use",
+    description: `Terms of use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`,
     type: "article",
   },
   "/package": {

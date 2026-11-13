@@ -54,7 +54,7 @@ export function RepoHero({
             target="_blank"
             href={repo.url}
             rel="noopener noreferrer"
-            className="mt-1 block break-all text-sm text-muted"
+            className="tap-target mt-1 block break-all text-sm text-muted"
             aria-label={`${repo.owner}/${repo.name} on ${repo.host} (new tab)`}
           >
             {repo.url}
@@ -75,7 +75,7 @@ export function RepoHero({
                   {language ? (
                     <Link
                       href={language.href}
-                      className="border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft"
+                      className="tap-target border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft"
                     >
                       {language.label}
                     </Link>
@@ -132,7 +132,7 @@ export function RepoHero({
               scoredAt={repo.last_scored_at ? formatDate(repo.last_scored_at, { time: true }) : null}
             />
           )}
-          <div className="mt-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Overall</div>
+          <div className="mt-2 text-[12.5px] eyebrow text-muted">Overall</div>
         </div>
       </div>
     </Panel>

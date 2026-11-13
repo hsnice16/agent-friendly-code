@@ -53,7 +53,8 @@ export function MobileNav({ links }: { links: NavLink[] }) {
         aria-controls="mobile-nav-menu"
         onClick={() => setOpen((v) => !v)}
         aria-label={open ? "Close menu" : "Open menu"}
-        className="inline-flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface-2 text-ink-dim hover:bg-surface-hover hover:text-ink"
+        // The after: inset makes a 44px tap target without growing the button.
+        className="relative inline-flex h-7 w-7 items-center justify-center rounded-md border border-line bg-surface-2 text-ink-dim after:absolute after:-inset-1.5 hover:bg-surface-hover hover:text-ink"
       >
         {open ? <X size={16} weight="bold" aria-hidden="true" /> : <List size={16} weight="bold" aria-hidden="true" />}
       </button>
@@ -69,7 +70,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
               href={l.href}
               onClick={() => setOpen(false)}
               ref={i === 0 ? firstLinkRef : undefined}
-              className="block px-3.5 py-2 text-[13px] text-ink-dim hover:bg-surface-hover hover:text-ink"
+              className="block px-3.5 py-2.5 text-[13px] text-ink-dim hover:bg-surface-hover hover:text-ink"
             >
               {l.label}
             </Link>

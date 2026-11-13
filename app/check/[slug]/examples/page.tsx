@@ -3,11 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentsMdExampleTable } from "@/components/AgentsMdExampleTable";
-import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import {
   type AgentsMdExamples,
@@ -19,9 +19,10 @@ import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import {
+  CHECKS_CRUMB,
+  checkCrumb,
   checkPath,
   checkSlug,
   checkSubPath,
@@ -105,31 +106,24 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
   return (
     <>
       <JsonLd data={jsonLd(ex, getLeaderboardStats().contentChangedAt)} />
-      <Breadcrumbs
-        parents={[
-          { name: "Checks", path: "/check" },
-          { name: SIGNAL_BY_ID[SIGNAL_ID].label, path: checkPath(SIGNAL_ID) },
-        ]}
-        current={{ name: "Examples", path: PATH }}
+      <PageHeader
+        crumbs={{ parents: [CHECKS_CRUMB, checkCrumb(SIGNAL_ID)], current: { name: "Examples", path: PATH } }}
+        title={`AGENTS.md examples from ${ex.rows.length} open source repos`}
+        lead={
+          <>
+            {ex.rows.length} of {ex.boardSize} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
+            {ex.passing} are long enough (800+ characters) to pass the{" "}
+            <Link href={checkPath(SIGNAL_ID)} className="prose-link">
+              AGENTS.md check
+            </Link>{" "}
+            in full. Each file name links to the file. How that share has grown:{" "}
+            <Link href={REPORT_PATH} className="prose-link">
+              {REPORT_TITLE}
+            </Link>
+            .
+          </>
+        }
       />
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[28px] font-bold leading-[1.18] tracking-tight">
-          AGENTS.md examples from {ex.rows.length} open source repos
-        </h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] leading-relaxed text-ink-dim">
-          {ex.rows.length} of {ex.boardSize} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
-          {ex.passing} are long enough (800+ characters) to pass the{" "}
-          <Link href={checkPath(SIGNAL_ID)} className="prose-link">
-            AGENTS.md check
-          </Link>{" "}
-          in full. Each file name links to the file. How that share has grown:{" "}
-          <Link href={REPORT_PATH} className="prose-link">
-            {REPORT_TITLE}
-          </Link>
-          .
-        </p>
-      </section>
 
       <Panel>
         <PanelHeading>Most-starred repos with an AGENTS.md or CLAUDE.md</PanelHeading>

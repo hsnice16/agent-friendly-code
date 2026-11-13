@@ -1,9 +1,10 @@
 "use client";
 
 import { ListBullets, X } from "@phosphor-icons/react";
-import { type RefObject, useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
+import { type RefObject, useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState } from "react";
 
 import { useBeforeFooter, useViewportUpdate } from "@/lib/use-viewport-update";
+import { activeSectionId } from "@/lib/utils/active-section";
 
 export type NavSection = { id: string; label: string };
 
@@ -11,6 +12,8 @@ export type NavSection = { id: string; label: string };
 // A jump leaves it at its 80px scroll-margin plus its own top margin, so the
 // line sits a little below that, or the section you just jumped to isn't lit.
 const ACTIVE_LINE_PX = 128;
+// Scroll positions land on fractional pixels, so "at the bottom" allows a few.
+const BOTTOM_SLACK_PX = 4;
 
 function useActiveSection(ids: string[]): string | null {
   const [active, setActive] = useState<string | null>(null);
@@ -19,12 +22,10 @@ function useActiveSection(ids: string[]): string | null {
   // IntersectionObserver: a jump, or a panel opening on arrival, can skip
   // past every threshold without firing it.
   const update = useCallback(() => {
-    let current: string | null = null;
-    for (const id of ids) {
-      const el = document.getElementById(id);
-      if (el && el.getBoundingClientRect().top <= ACTIVE_LINE_PX) current = id;
-    }
-    setActive(current ?? ids[0] ?? null);
+    const tops = ids.map((id) => ({ id, top: document.getElementById(id)?.getBoundingClientRect().top ?? null }));
+    const root = document.documentElement;
+    const atBottom = window.scrollY + window.innerHeight >= root.scrollHeight - BOTTOM_SLACK_PX;
+    setActive(activeSectionId(tops, ACTIVE_LINE_PX, atBottom));
   }, [ids]);
   useViewportUpdate(update);
 
@@ -40,8 +41,18 @@ function SectionLinks({
   active: string | null;
   onPick?: () => void;
 }) {
+  const listRef = useRef<HTMLUListElement>(null);
+  const marker = useMarker(listRef, active);
+
   return (
-    <ul className="m-0 list-none space-y-0.5 border-l border-line p-0 text-[13px] leading-snug">
+    <ul ref={listRef} className="relative m-0 list-none space-y-0.5 border-l border-line p-0 text-[13px] leading-snug">
+      {marker && (
+        <span
+          aria-hidden="true"
+          className={`absolute -left-px top-0 w-px bg-ink ${marker.animate ? "transition-[transform,height] duration-300 ease-out" : ""}`}
+          style={{ height: marker.height, transform: `translateY(${marker.top}px)` }}
+        />
+      )}
       {sections.map((s) => {
         const current = s.id === active;
         return (
@@ -50,9 +61,8 @@ function SectionLinks({
               href={`#${s.id}`}
               onClick={onPick}
               aria-current={current ? "location" : undefined}
-              className={`-ml-px block border-l py-1 pl-3 hover:text-ink ${
-                current ? "border-ink font-medium text-ink" : "border-transparent text-muted"
-              }`}
+              data-section={s.id}
+              className={`nav-link border-transparent ${current ? "font-medium text-ink" : "text-muted"}`}
             >
               {s.label}
             </a>
@@ -61,6 +71,46 @@ function SectionLinks({
       })}
     </ul>
   );
+}
+
+type Marker = { top: number; height: number; animate: boolean };
+
+// One bar that slides to the current link instead of a border per link, which
+// jumped. Measured, not computed, because labels wrap to two lines.
+function useMarker(listRef: RefObject<HTMLUListElement | null>, active: string | null): Marker | null {
+  const [marker, setMarker] = useState<Marker | null>(null);
+  const activeRef = useRef(active);
+  activeRef.current = active;
+  // Slides only from a spot the reader saw: not on first placement, and not
+  // when the floating menu reopens after the section changed while it was shut.
+  const shown = useRef(false);
+
+  const measure = useCallback(() => {
+    const id = activeRef.current;
+    const link = id ? listRef.current?.querySelector<HTMLElement>(`[data-section="${id}"]`) : null;
+    // Zero-sized while the floating menu is closed.
+    if (!link || link.offsetHeight === 0) {
+      shown.current = false;
+      return;
+    }
+    const next = { top: link.offsetTop, height: link.offsetHeight, animate: shown.current };
+    shown.current = true;
+    setMarker((prev) => (prev && prev.top === next.top && prev.height === next.height ? prev : next));
+  }, [listRef]);
+
+  // biome-ignore lint/correctness/useExhaustiveDependencies: `measure` reads `active` through a ref.
+  useLayoutEffect(measure, [measure, active]);
+
+  // Opening the floating menu and late font loads change the layout without changing `active`.
+  useEffect(() => {
+    const list = listRef.current;
+    if (!list) return;
+    const observer = new ResizeObserver(measure);
+    observer.observe(list);
+    return () => observer.disconnect();
+  }, [listRef, measure]);
+
+  return marker;
 }
 
 type SectionMenuProps = {
@@ -96,16 +146,38 @@ function useRailActionVisible(navRef: RefObject<HTMLElement | null>, enabled: bo
   return visible;
 }
 
+// Past the last section the rail's box ends and pushes it up the screen, under
+// the sticky header, which it shows through; it fades out once it starts to move.
+function useRailPushed(navRef: RefObject<HTMLElement | null>): boolean {
+  const [pushed, setPushed] = useState(false);
+
+  const update = useCallback(() => {
+    const nav = navRef.current;
+    const rect = nav?.getBoundingClientRect();
+    // Zero-sized below the rail breakpoint.
+    if (!nav || !rect || rect.width === 0) return setPushed(false);
+    setPushed(rect.top < Number.parseFloat(getComputedStyle(nav).top) - 1);
+  }, [navRef]);
+  useViewportUpdate(update);
+
+  return pushed;
+}
+
 /** Sticky rail for the page margin; the links work without JS, which only adds the highlight. */
 export function SectionNav({ sections, action }: SectionMenuProps) {
   const active = useActiveSection(useMemo(() => sections.map((s) => s.id), [sections]));
   const navRef = useRef<HTMLElement>(null);
   const actionVisible = useRailActionVisible(navRef, Boolean(action));
+  const pushed = useRailPushed(navRef);
 
   return (
     <>
-      <nav ref={navRef} aria-label="On this page" className="sticky top-20">
-        <p className="m-0 mb-2 text-[11px] eyebrow text-muted">On this page</p>
+      <nav
+        ref={navRef}
+        aria-label="On this page"
+        className={`sticky top-20 transition-[opacity,visibility] duration-200 ${pushed ? "invisible opacity-0" : ""}`}
+      >
+        <p className="m-0 mb-2 text-[12.5px] eyebrow text-muted">On this page</p>
         <SectionLinks sections={sections} active={active} />
       </nav>
       {/* No left/right: a fixed box keeps its in-flow horizontal position, so it
@@ -159,7 +231,7 @@ export function FloatingSectionMenu({ sections, action }: SectionMenuProps) {
         aria-label="On this page"
         className="absolute bottom-12 right-0 z-10 max-h-[60vh] w-56 overflow-y-auto rounded-xl border border-line bg-surface p-4 shadow-lg"
       >
-        <p className="m-0 mb-2 text-[11px] eyebrow text-muted">On this page</p>
+        <p className="m-0 mb-2 text-[12.5px] eyebrow text-muted">On this page</p>
         <SectionLinks sections={sections} active={active} onPick={() => setOpen(false)} />
       </nav>
       <button

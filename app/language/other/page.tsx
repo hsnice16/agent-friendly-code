@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { JsonLd } from "@/components/JsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { LANGUAGE_HUB_MIN_REPOS } from "@/lib/constants/scoring";
 import { listLeaderboardOverall } from "@/lib/db";
@@ -41,10 +40,6 @@ export default function OtherLanguagesPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd
-        parent={{ name: "Languages", path: "/language" }}
-        current={{ name: "Other languages", path: OTHER_LANGUAGES_PATH }}
-      />
       <JsonLd
         data={{
           "@type": "ItemList",
@@ -59,20 +54,14 @@ export default function OtherLanguagesPage() {
         }}
       />
 
-      <Link
-        href="/language"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
-      >
-        ← all languages
-      </Link>
-
-      <section className="mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{OTHER_LANGUAGES_TITLE}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          {rows.length} repos in languages with fewer than {LANGUAGE_HUB_MIN_REPOS} repos here, or with none detected.
-          Grouped by language, highest score first.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{
+          parents: [{ name: "Languages", path: "/language" }],
+          current: { name: "Other languages", path: OTHER_LANGUAGES_PATH },
+        }}
+        title={OTHER_LANGUAGES_TITLE}
+        lead={`${rows.length} repos in languages with fewer than ${LANGUAGE_HUB_MIN_REPOS} repos here, or with none detected. Grouped by language, highest score first.`}
+      />
 
       <div className="flex flex-col gap-3.5">
         {all.map((g) => (

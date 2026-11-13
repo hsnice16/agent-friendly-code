@@ -1,7 +1,7 @@
 "use client";
 
 import { CaretDown, Check } from "@phosphor-icons/react";
-import { type KeyboardEvent, useEffect, useId, useRef, useState } from "react";
+import { type KeyboardEvent, useEffect, useId, useLayoutEffect, useRef, useState } from "react";
 
 export type SelectMenuOption = {
   label: string;
@@ -16,11 +16,15 @@ type Props = {
   onChange: (value: string) => void;
 };
 
+// Keeps an opened menu this far inside the viewport's edge.
+const EDGE_PX = 8;
+
 // The ARIA listbox pattern: focus moves to the list, and aria-activedescendant
 // names the highlighted option, so screen readers announce option and selection.
 export function SelectMenu({ label, options, value, onChange }: Props) {
   const [open, setOpen] = useState(false);
   const [active, setActive] = useState(0);
+  const [alignEnd, setAlignEnd] = useState(true);
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
@@ -30,6 +34,16 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
     options.findIndex((o) => o.value === value),
   );
   const current = options[selectedIndex];
+
+  // Right-aligned under its trigger unless that runs off the left edge, as the
+  // first control in a wrapped toolbar on a phone would; a fixed side overflows
+  // one edge or the other at some width.
+  useLayoutEffect(() => {
+    const wrap = wrapRef.current;
+    const list = listRef.current;
+    if (!open || !wrap || !list) return;
+    setAlignEnd(wrap.getBoundingClientRect().right - list.offsetWidth >= EDGE_PX);
+  }, [open]);
 
   useEffect(() => {
     if (!open) {
@@ -102,7 +116,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         aria-controls={`${id}-list`}
         onKeyDown={onTriggerKey}
         onClick={() => (open ? setOpen(false) : openMenu())}
-        className="inline-flex cursor-pointer items-center gap-2 rounded-md border border-line bg-surface px-2.5 py-1.5 text-[13px] text-ink-dim hover:text-ink-soft max-sm:min-h-[44px]"
+        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 text-[13px] text-ink-dim hover:text-ink-soft"
       >
         <span className="whitespace-nowrap">{current.shortLabel ?? current.label}</span>
         <CaretDown size={11} weight="bold" aria-hidden="true" className="text-muted" />
@@ -122,9 +136,9 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         onBlur={(e) => {
           if (!wrapRef.current?.contains(e.relatedTarget as Node | null)) setOpen(false);
         }}
-        className={`absolute left-0 top-full z-30 mt-1 min-w-[220px] origin-top-left overflow-hidden rounded-md border border-line bg-surface shadow-md outline-none transition duration-150 ease-out sm:left-auto sm:right-0 sm:origin-top-right ${
-          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
-        }`}
+        className={`absolute top-full z-30 mt-1 min-w-[220px] overflow-hidden rounded-md border border-line bg-surface shadow-md outline-none transition duration-150 ease-out ${
+          alignEnd ? "right-0 origin-top-right" : "left-0 origin-top-left"
+        } ${open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"}`}
       >
         {options.map((o, i) => {
           const selected = o.value === value;

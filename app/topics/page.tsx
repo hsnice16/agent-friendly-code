@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { PageHeader } from "@/components/PageHeader";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { getTopicGroups } from "@/lib/topic-pages";
@@ -22,24 +22,17 @@ export default function TopicsPage() {
 
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Topics", path: TOPICS_PATH }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">{PAGE_COPY[TOPICS_PATH].title}</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          The leaderboard by the topics owners tag their repos with. A topic gets a page once {TOPIC_PAGE_MIN_REPOS}{" "}
-          repos share it.
-        </p>
-      </section>
+      <PageHeader
+        crumbs={{ current: { name: "Topics", path: TOPICS_PATH } }}
+        title={PAGE_COPY[TOPICS_PATH].title}
+        lead={`The leaderboard by the topics owners tag their repos with. A topic gets a page once ${TOPIC_PAGE_MIN_REPOS} repos share it.`}
+      />
 
       {topics.length > 0 ? (
         <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2 md:grid-cols-3">
           {topics.map((t) => (
-            <li
-              key={t.slug}
-              className="relative flex items-baseline justify-between gap-2 rounded-lg border border-line bg-surface px-4 py-3"
-            >
-              <Link href={topicPath(t.slug)} className="font-medium text-ink hover:text-ink-soft cover-link">
+            <li key={t.slug} className="relative flex items-baseline justify-between gap-2 tile">
+              <Link href={topicPath(t.slug)} className="font-medium ink-link cover-link">
                 {/* Labels stay lowercase for use mid-sentence; a tile starts one. */}
                 <span>{t.label}</span>
               </Link>
@@ -62,7 +55,7 @@ export default function TopicsPage() {
               {g.label}
             </Link>
           ))}
-          <Link href="/language" className={LINK_CLASS}>
+          <Link href="/language" className="arrow-link">
             All languages →
           </Link>
         </nav>

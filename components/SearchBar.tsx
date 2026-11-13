@@ -25,7 +25,7 @@ export function SearchBar({ value, onChange, busy = false, placeholder = "Search
         size={14}
         weight="bold"
         aria-hidden="true"
-        className={`pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 text-muted ${busy ? "animate-spin" : ""}`}
+        className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-muted ${busy ? "animate-spin" : ""}`}
       />
 
       <input
@@ -38,7 +38,7 @@ export function SearchBar({ value, onChange, busy = false, placeholder = "Search
         maxLength={MAX_SEARCH_LENGTH}
         placeholder={placeholder}
         onChange={(e) => onChange(e.target.value)}
-        className="block w-full rounded-md border border-line bg-surface py-1.5 pl-8 pr-3 text-[13px] max-sm:min-h-[44px] text-ink placeholder:text-muted outline-none focus:border-ink-dim"
+        className="field block w-full pl-9!"
       />
     </search>
   );

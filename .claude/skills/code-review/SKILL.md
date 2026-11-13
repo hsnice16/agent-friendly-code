@@ -9,7 +9,8 @@ Run through this checklist on any diff. Flag violations with the specific line a
 
 ## Tailwind
 
-- **Prefer utilities over custom classes.** A plain-CSS `@utility` in `app/globals.css` only for a pattern repeated in 3+ components (AGENTS.md → Conventions says why).
+- **Prefer utilities over custom classes.** A plain-CSS `@utility` in `app/globals.css` only for a class string repeated as AGENTS.md → Conventions allows.
+- **Shared UI first** (AGENTS.md → Shared UI): flag a page without `PageHeader`, a hand-styled button, field, table or chip, or a Panel tone used against its meaning.
 - **Use the `@theme` tokens** (`bg-surface`, `text-ink`, `border-line`, etc.) — never hardcode hex in JSX.
 - **No `style={{ ... }}`** unless the value is dynamic (e.g. `width: ${pct}%`). Static styling belongs in className.
 - **No `@apply`** in `globals.css` (Tailwind 4 best practice — put the utilities on the element instead, or extract a React component).

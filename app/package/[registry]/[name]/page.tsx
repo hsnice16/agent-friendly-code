@@ -2,7 +2,8 @@ import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
+import { cache } from "react";
+import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HostPill } from "@/components/HostPill";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
@@ -11,20 +12,24 @@ import { lookupPackage } from "@/lib/package-lookup";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
+// Metadata and the page both need the answer; one registry call serves both.
+const lookup = cache(lookupPackage);
+
 export async function generateMetadata({
   params,
 }: {
   params: Promise<{ registry: string; name: string }>;
 }): Promise<Metadata> {
   const { registry, name } = await params;
+  // Here too, or the 404 keeps this page's title.
+  if (!isRegistry(registry) || (await lookup(registry, name)).status === "not_found") {
+    notFound();
+  }
+
   const title = `${registry}/${name}`;
   // A scoped npm name holds a slash, which unencoded would be two path segments.
   const path = `/package/${registry}/${encodeURIComponent(name)}`;
   const description = `How ready the ${registry} package "${name}" and its source repo are for AI coding agents.`;
-
-  if (!isRegistry(registry)) {
-    return { title, description, robots: { index: false, follow: true } };
-  }
 
   // Never indexed, scored or not: the page is a pointer to the source repo's
   // page, and filling it with that repo's numbers would only make a near-copy
@@ -53,24 +58,21 @@ export default async function Page({ params }: { params: Promise<{ registry: str
     notFound();
   }
 
-  const result = await lookupPackage(registry, name);
+  const result = await lookup(registry, name);
+  if (result.status === "not_found") {
+    notFound();
+  }
 
   return (
     <>
-      <BreadcrumbJsonLd
-        parent={{ name: "Packages", path: "/package" }}
+      <Breadcrumbs
+        parents={[{ name: "Packages", path: "/package" }]}
         current={{ name: `${registry}/${name}`, path: `/package/${registry}/${encodeURIComponent(name)}` }}
       />
-      <Link
-        href="/package"
-        className="my-5 inline-flex items-center gap-1.5 text-sm text-muted no-underline hover:text-ink hover:no-underline"
-      >
-        ← all packages
-      </Link>
 
       <Panel>
         {/* Not a heading: it would come before the h1. */}
-        <p className="m-0 mb-3.5 text-xs eyebrow text-muted">Package</p>
+        <p className="m-0 mb-3.5 text-[12.5px] eyebrow text-muted">Package</p>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
           <span className="font-mono text-[13px] text-muted">{registry}</span>
@@ -93,7 +95,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
 
                 <Link
                   href={repoPath(result.repo)}
-                  className="mt-2 inline-flex items-center gap-1 text-sm text-ink-dim hover:text-ink-soft"
+                  className="tap-target mt-2 inline-flex items-center gap-1 text-sm text-ink-dim hover:text-ink-soft"
                 >
                   See the full score <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
                 </Link>

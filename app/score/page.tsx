@@ -4,6 +4,7 @@ import Link from "next/link";
 import { CheckChecklist } from "@/components/CheckChecklist";
 import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreForm } from "@/components/LiveScoreForm";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { RecentScores } from "@/components/RecentScores";
 import { getCheckStats } from "@/lib/check-stats";
@@ -63,13 +64,6 @@ const FAQ: FaqEntry[] = [
 const JSON_LD = {
   "@graph": [
     {
-      "@type": "BreadcrumbList",
-      itemListElement: [
-        { "@type": "ListItem", position: 1, name: "Home", item: `${APP_URL}/` },
-        { "@type": "ListItem", position: 2, name: "Live Score", item: `${APP_URL}/score` },
-      ],
-    },
-    {
       "@type": "WebApplication",
       "@id": `${APP_URL}/score#app`,
       url: `${APP_URL}/score`,
@@ -122,19 +116,15 @@ export default function ScoreIndexPage() {
     <>
       <JsonLd data={JSON_LD} />
 
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">
-          Is your repo ready for AI coding agents?
-        </h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          Paste a public GitHub repo link to get a score for each agent and the one the repo is best set up for. Same
-          checks and weights as the leaderboard; nothing is saved.
-        </p>
-
+      <PageHeader
+        crumbs={{ current: { name: "Live Score", path: "/score" } }}
+        title="Is your repo ready for AI coding agents?"
+        lead="Paste a public GitHub repo link to get a score for each agent and the one the repo is best set up for. Same checks and weights as the leaderboard; nothing is saved."
+      >
         <LiveScoreForm />
 
         <p className="mt-3 text-[13px] text-muted">GitLab and Bitbucket are coming soon.</p>
-      </section>
+      </PageHeader>
 
       <RecentScores
         past={examples.map((r) => ({ id: r.id, host: r.host, owner: r.owner, name: r.name, score: r.score ?? 0 }))}

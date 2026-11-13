@@ -18,13 +18,13 @@ const VARIANTS = {
     glyph: "✓",
     ariaLabel: "Pass",
     heading: "What it has",
-    chipClass: "bg-ok/15 text-ok",
+    chipClass: "tint-ok",
   },
   gap: {
     glyph: "✗",
     heading: "What it's missing",
     ariaLabel: "Missing",
-    chipClass: "bg-bad/15 text-bad",
+    chipClass: "tint-bad",
   },
 } as const;
 
@@ -41,14 +41,10 @@ export function SignalListCard({ variant, items, empty }: Props) {
         ) : (
           items.map((s) => (
             <li key={s.id} className="flex items-center gap-3 py-2">
-              <span
-                role="img"
-                aria-label={v.ariaLabel}
-                className={`glyph size-[22px] text-xs font-bold ${v.chipClass}`}
-              >
+              <span role="img" aria-label={v.ariaLabel} className={`mark-md ${v.chipClass}`}>
                 {v.glyph}
               </span>
-              <Link href={checkPath(s.id)} className="text-ink hover:text-ink-soft">
+              <Link href={checkPath(s.id)} className="ink-link">
                 {s.label}
               </Link>
             </li>
@@ -64,7 +60,7 @@ function EmptyRow({ chip, children }: { chip: "ok" | "bad"; children: React.Reac
 
   return (
     <li className="flex items-center gap-3 py-2 text-muted">
-      <span aria-hidden="true" className={`glyph size-[22px] text-xs font-bold ${v.chipClass}`}>
+      <span aria-hidden="true" className={`mark-md ${v.chipClass}`}>
         {v.glyph}
       </span>
       <span>{children}</span>

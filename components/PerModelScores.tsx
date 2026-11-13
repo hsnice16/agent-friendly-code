@@ -12,12 +12,10 @@ import { ScoreNumber } from "./ScoreNumber";
 type ModelScoreRow = { modelId: string; score: number };
 
 const MARK = {
-  ok: { cls: "bg-ok/15 text-ok", ch: "✓", label: "Has" },
-  partial: { cls: "bg-warn/15 text-warn", ch: "~", label: "Partly has" },
-  bad: { cls: "bg-bad/15 text-bad", ch: "✗", label: "Missing" },
+  ok: { cls: "tint-ok", ch: "✓", label: "Has" },
+  partial: { cls: "tint-warn", ch: "~", label: "Partly has" },
+  bad: { cls: "tint-bad", ch: "✗", label: "Missing" },
 } as const;
-
-const BAR_PLACE = "order-3 col-span-2 sm:order-none sm:col-span-1";
 
 function mark(pass: number) {
   return pass >= 1 ? MARK.ok : pass > 0 ? MARK.partial : MARK.bad;
@@ -37,7 +35,7 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
 
       <p className="m-0 mb-1 text-[13.5px] text-muted">
         Each agent weighs the checks by its own docs. Under each score are its top three.{" "}
-        <Link href="/methodology#agents" className="prose-link">
+        <Link href="/methodology#agents" className="arrow-link">
           How each agent is scored →
         </Link>
       </p>
@@ -47,16 +45,9 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
           .map((m) => ({ model: m, score: modelScores.find((x) => x.modelId === m.id)?.score ?? null }))
           .sort((a, b) => (b.score ?? -1) - (a.score ?? -1))
           .map(({ model: m, score: s }) => (
-            <div
-              key={m.id}
-              className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 py-3 sm:grid-cols-[150px_1fr_auto]"
-            >
+            <div key={m.id} className="agent-row">
               <div className="text-[14.5px]">
-                <Link
-                  href={modelPath(m.id)}
-                  aria-label={`${m.label} leaderboard`}
-                  className="font-medium text-ink hover:text-ink-soft"
-                >
+                <Link href={modelPath(m.id)} aria-label={`${m.label} leaderboard`} className="font-medium ink-link">
                   {m.label}
                 </Link>
                 {ranks?.[m.id] && (
@@ -67,13 +58,13 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
               </div>
 
               {s === null ? (
-                <div className={`h-[7px] w-[180px] rounded-sm bg-line ${BAR_PLACE}`} aria-hidden />
+                <div className="bar-place bar-track w-[180px]" aria-hidden />
               ) : (
-                <ScoreBar score={s} width={180} className={BAR_PLACE} />
+                <ScoreBar score={s} width={180} className="bar-place" />
               )}
 
               {s === null ? (
-                <span className="text-[15px] font-semibold tabular-nums text-muted">
+                <span className="score-num text-[15px] text-muted">
                   <span aria-hidden="true">—</span>
                   <span className="sr-only">Not scored yet</span>
                 </span>
@@ -81,18 +72,14 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
                 <ScoreNumber score={s} />
               )}
 
-              <ul className="order-4 col-span-2 m-0 flex list-none flex-wrap items-center gap-x-4 gap-y-1.5 p-0 text-[14px] text-ink-dim *:inline-flex *:items-center *:gap-2 sm:col-start-2">
+              <ul className="agent-checks">
                 {keySignals(m, signals).map((sig) => {
                   const k = mark(sig.pass);
 
                   // role="img" makes the glyph presentational, so the label alone is read.
                   return (
                     <li key={sig.id}>
-                      <span
-                        role="img"
-                        aria-label={k.label}
-                        className={`glyph size-[18px] text-[10px] font-bold ${k.cls}`}
-                      >
+                      <span role="img" aria-label={k.label} className={`mark-sm ${k.cls}`}>
                         {k.ch}
                       </span>
                       {sig.label}

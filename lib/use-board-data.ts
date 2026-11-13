@@ -22,7 +22,7 @@ function set(next: Status) {
 // turns into a retry button instead of placeholders that never resolve.
 const TIMEOUT_MS = 15_000;
 
-function loadBoardData(): Promise<BoardData> {
+export function loadBoardData(): Promise<BoardData> {
   if (data) return Promise.resolve(data);
   if (inflight) return inflight;
 

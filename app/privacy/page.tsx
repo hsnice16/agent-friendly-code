@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { BreadcrumbJsonLd } from "@/components/BreadcrumbJsonLd";
 import { ConsentSettingsButton } from "@/components/ConsentSettingsButton";
 import { ExternalLink } from "@/components/ExternalLink";
+import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
 import { staticPageMetadata } from "@/lib/page-meta";
@@ -16,20 +16,22 @@ export const metadata: Metadata = staticPageMetadata("/privacy");
 export default function PrivacyPage() {
   return (
     <>
-      <BreadcrumbJsonLd current={{ name: "Privacy Policy", path: "/privacy" }} />
-
-      <section className="my-3 mb-7">
-        <h1 className="mb-2.5 text-[30px] font-bold leading-[1.18] tracking-tight">Privacy Policy</h1>
-        <p className="m-0 max-w-[72ch] text-[15.5px] text-ink-dim">
-          What information <span className="mr-0.5">{APP_NAME}</span> collects when you visit, what it deliberately
-          doesn&apos;t, and how to get in touch about your data.
-        </p>
+      <PageHeader
+        crumbs={{ current: { name: "Privacy policy", path: "/privacy" } }}
+        title="Privacy policy"
+        lead={
+          <>
+            What information <span className="mr-0.5">{APP_NAME}</span> collects when you visit, what it deliberately
+            doesn&apos;t, and how to get in touch about your data.
+          </>
+        }
+      >
         <p className="mt-2 text-[13px] text-muted">Last updated: {LAST_UPDATED}.</p>
         <p className="mt-1 text-[13px] text-muted">
           Changed on {LAST_UPDATED}: Microsoft Clarity heatmaps and session recordings, and leaderboard search terms in
           analytics.
         </p>
-      </section>
+      </PageHeader>
 
       <Panel>
         <PanelHeading>Overview</PanelHeading>

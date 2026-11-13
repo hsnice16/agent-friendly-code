@@ -1,24 +1,19 @@
 "use client";
 
 import { Check, Copy } from "@phosphor-icons/react";
-import { useState } from "react";
+import type { AnalyticsEvent } from "@/lib/analytics-events";
+import { useCopy } from "@/lib/use-copy";
 
-import { type AnalyticsEvent, track } from "@/lib/analytics-events";
-
-const RESET_MS = 1500;
-
-export type SnippetTone = false | "warn" | "info" | "tip";
+export type SnippetTone = false | "info" | "tip";
 
 const PRE_TONE: Record<Exclude<SnippetTone, false>, string> = {
   tip: "border-tip/40 text-tip",
   info: "border-info/40 text-info",
-  warn: "border-warn/40 text-warn",
 };
 
 const BTN_TONE: Record<Exclude<SnippetTone, false>, string> = {
   tip: "border-tip/40 text-tip hover:border-tip",
   info: "border-info/40 text-info hover:border-info",
-  warn: "border-warn/40 text-warn hover:border-warn",
 };
 
 export function CopySnippet({
@@ -37,21 +32,9 @@ export function CopySnippet({
   /** Names the scroll region a multi-line snippet becomes. */
   label?: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const { copied, copy } = useCopy(text, event);
   const isMultiLine = text.includes("\n");
   const scrolls = isMultiLine && !wrap;
-
-  async function onCopy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      if (event) track(event);
-
-      setCopied(true);
-      setTimeout(() => setCopied(false), RESET_MS);
-    } catch {
-      setCopied(false);
-    }
-  }
 
   return (
     <div className="relative">
@@ -68,7 +51,7 @@ export function CopySnippet({
 
       <button
         type="button"
-        onClick={onCopy}
+        onClick={copy}
         aria-live="polite"
         aria-label={copied ? "Copied to clipboard" : "Copy snippet to clipboard"}
         // The after: inset grows the hit area to 44px without growing the button.

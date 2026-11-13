@@ -12,14 +12,15 @@ export function PeerlistBadge({ className }: Props) {
     <a target="_blank" href={PEERLIST_PROJECT_URL} className={className} rel="noopener noreferrer">
       {/* Lazy: React preloads every eager <img> in the head, which put this footer badge ahead of the page's own requests. */}
       <img
-        width={240}
-        height={72}
+        width={180}
+        height={54}
         alt={PEERLIST_BADGE_ALT}
         src={PEERLIST_BADGE_SRC}
         loading="lazy"
         decoding="async"
         fetchPriority="low"
-        className="h-[72px] w-auto"
+        // Product Hunt's badge height, so the two sit as one row.
+        className="h-[54px] w-auto"
       />
     </a>
   );
