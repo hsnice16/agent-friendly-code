@@ -1,25 +1,37 @@
 import type { MetadataRoute } from "next";
 import { APP_URL } from "@/lib/version";
 
-const AI_CRAWLERS = [
-  "CCBot",
-  "GPTBot",
+// Fetch a page when someone asks an assistant, or index for its answers: the
+// visits that can cite us. The two *-Extended tokens are training opt-outs read
+// by crawlers we already admit, so allowing them costs no requests.
+const AI_ANSWER_BOTS = [
   "YouBot",
-  "Diffbot",
-  "Amazonbot",
-  "ClaudeBot",
-  "Cohere-AI",
-  "Bytespider",
-  "Claude-Web",
-  "anthropic-ai",
+  "Claude-User",
   "ChatGPT-User",
   "DuckAssistBot",
   "OAI-SearchBot",
   "PerplexityBot",
-  "Google-Extended",
   "Perplexity-User",
+  "Claude-SearchBot",
+  "Google-Extended",
   "Applebot-Extended",
+];
+
+// Model training and third-party AI indexes. The guides stay open so models
+// learn them; the repo and topic pages cost more origin transfer than they
+// return.
+const BULK_LIMITED = [
+  "CCBot",
+  "GPTBot",
+  "Diffbot",
+  "ShapBot",
+  "Amazonbot",
+  "ClaudeBot",
+  "LinkupBot",
+  "Bytespider",
+  "ExaSearchBot",
   "Meta-ExternalAgent",
+  "cohere-training-data-crawler",
 ];
 
 // /score/* is unbounded — one URL per repo that exists anywhere. Re-cut board
@@ -38,21 +50,19 @@ const PREVIEW_DISALLOW = DISALLOW.filter((path) => path !== "/score/");
 // The home Dataset's `distribution.contentUrl`; the longer rule beats `/api/`.
 const ALLOW = ["/", "/api/repos"];
 
-// Petal Search (Huawei) crawls heavily for an engine that sends next to no visitors.
-const BLOCKED = ["PetalBot"];
+// Crawl heavily for no visitors: Petal Search (Huawei) and an SEO tool's index.
+const BLOCKED = ["PetalBot", "SemrushBot"];
 
-// Parallel's index feeds AI agents, so the guides stay open to it; its sweeps of
-// the per-repo and per-topic pages cost more origin transfer than they return.
-const SHAPBOT_DISALLOW = [...DISALLOW, "/repo/", "/topic/"];
+const BULK_DISALLOW = [...DISALLOW, "/repo/", "/topic/"];
 
 export default function robots(): MetadataRoute.Robots {
   return {
     sitemap: `${APP_URL}/sitemap.xml`,
     rules: [
       { userAgent: "*", allow: ALLOW, disallow: DISALLOW },
-      { userAgent: AI_CRAWLERS, allow: ALLOW, disallow: DISALLOW },
+      { userAgent: AI_ANSWER_BOTS, allow: ALLOW, disallow: DISALLOW },
       { userAgent: LINK_PREVIEW, allow: ALLOW, disallow: PREVIEW_DISALLOW },
-      { userAgent: "ShapBot", allow: ALLOW, disallow: SHAPBOT_DISALLOW },
+      { userAgent: BULK_LIMITED, allow: ALLOW, disallow: BULK_DISALLOW },
       { userAgent: BLOCKED, disallow: "/" },
     ],
   };
