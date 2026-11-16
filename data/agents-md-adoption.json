@@ -145,6 +145,7 @@
     {"date":"2026-11-12","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":7,"cursorRules":18,"agentSkills":70,"openhandsSetup":2,"aiderConf":1},
     {"date":"2026-11-13","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":7,"cursorRules":18,"agentSkills":70,"openhandsSetup":2,"aiderConf":1},
     {"date":"2026-11-14","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":7,"cursorRules":18,"agentSkills":70,"openhandsSetup":2,"aiderConf":1},
-    {"date":"2026-11-15","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":7,"cursorRules":18,"agentSkills":71,"openhandsSetup":2,"aiderConf":1}
+    {"date":"2026-11-15","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":7,"cursorRules":18,"agentSkills":71,"openhandsSetup":2,"aiderConf":1},
+    {"date":"2026-11-16","repos":402,"withFile":226,"agentsMd":207,"claudeMd":18,"medianChars":6942,"geminiMd":6,"cursorRules":18,"agentSkills":71,"openhandsSetup":2,"aiderConf":1}
   ]
 }
