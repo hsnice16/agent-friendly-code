@@ -5,8 +5,9 @@ export const MAX_TOPIC_LENGTH = 50;
 export type RepoAboutData = { description: string | null; topics: string[] };
 
 // Bidi overrides can reorder the text a visitor sees; zero-width spaces and the
-// BOM are invisible. U+200D stays: it joins multi-part emoji.
-const INVISIBLE = /[\p{Cc}\u200B\u200E\u200F\u202A-\u202E\u2066-\u2069\uFEFF]/gu;
+// BOM are invisible; U+2028/9 break lines in editors. U+200C/D stay: Persian
+// and Indic text and multi-part emoji need them.
+export const INVISIBLE = /[\p{Cc}\u061C\u200B\u200E\u200F\u2028-\u202E\u2060-\u2064\u2066-\u2069\uFEFF]/gu;
 
 // GitHub renders these as emoji on its own pages; here they'd show as
 // ":rocket:". Bounded by whitespace so "10:30:45" and "a:b:c" survive.

@@ -20,7 +20,7 @@ function Diff({ diff }: { diff: number }) {
 // The sentence carries the number; the bar is only there to compare rows at a glance.
 function RateRow({ label, share, text }: { label: string; share: number; text: string }) {
   return (
-    <li className="grid grid-cols-1 gap-1 sm:grid-cols-[minmax(0,1fr)_160px] sm:items-center sm:gap-4">
+    <li className="rate-row">
       <div className="min-w-0">
         <span className="font-medium text-ink">{label}</span>
         <span className="text-muted"> · {text}</span>

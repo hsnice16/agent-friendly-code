@@ -15,25 +15,25 @@ type Copy = { title: string; description: string; type: "website" | "article" };
 export const PAGE_COPY = {
   "/about": {
     title: "About",
-    description: `Who built ${APP_NAME}, why, how repos are chosen, and what it is not. Independent, MIT-licensed, and not tied to any AI agent company.`,
+    description: `Who built ${APP_NAME}, why, how repos are chosen, and what it is not. Independent, MIT-licensed, tied to no AI agent company.`,
     type: "article",
   },
   "/methodology": {
     title: "Scoring methodology",
     description:
-      "How we score repos: the checks we run, how much each AI agent cares about each check, the formula, and what we don't measure yet.",
+      "How repos are scored: the checks, how much each AI agent weighs each one, the formula, and what we don't measure yet.",
     type: "article",
   },
   "/agents": {
-    title: "Which files does each AI coding agent read?",
+    title: "Does Claude Code read AGENTS.md? Files each AI agent reads",
     description:
-      "AGENTS.md, CLAUDE.md, GEMINI.md or .cursor/rules: the repo files Claude Code, Codex, Cursor, Gemini CLI and other agents read, per their docs.",
+      "Claude Code reads AGENTS.md only without a CLAUDE.md. The files Codex, Cursor, Copilot, Gemini CLI, Antigravity and other agents read, per their docs.",
     type: "article",
   },
   "/guide": {
-    title: "How to make your codebase agent-friendly for AI agents",
+    title: "Agent-friendly codebase best practices: make a repo AI-ready",
     description:
-      "Make a codebase work with AI coding agents like Claude Code, Codex and Cursor: AGENTS.md, tests, CI, setup and per-agent files, with real pass rates.",
+      "Best practices for an AI-ready, agent-friendly codebase that Claude Code, Codex and Cursor work well in: AGENTS.md, tests, CI and setup, with pass rates.",
     type: "article",
   },
   "/check": {
@@ -45,26 +45,32 @@ export const PAGE_COPY = {
     type: "website",
   },
   "/score": {
-    title: "Is your repo ready for AI coding agents? Free check",
+    title: "Agent readiness checker for GitHub repos: free, no signup",
     description:
-      "Paste a public GitHub repo URL to see if it is ready for AI coding agents: a score per agent, the one it is best set up for, and what to fix first.",
+      "Score a public GitHub repo for AI coding agents: an agent readiness score per agent, the one it is best set up for, and what to fix first. Free, no signup.",
+    type: "website",
+  },
+  "/agents-md-generator": {
+    title: "AGENTS.md generator: draft one from your repo",
+    description:
+      "Draft an AGENTS.md from a scan of your public GitHub repo: where tests, CI and lint config live, commands left for you. Plus CLAUDE.md and Gemini stubs.",
     type: "website",
   },
   "/language": {
     title: "Agent-friendly repos by language",
     description:
-      "Browse the leaderboard by programming language: TypeScript, Python, Rust, Go, Java and more, each ranked for AI coding agents like Claude Code and Cursor.",
+      "The leaderboard by programming language: TypeScript, Python, Rust, Go, Java and more, each ranked for AI coding agents like Claude Code and Cursor.",
     type: "website",
   },
   "/topics": {
     title: "Agent-friendly repos by topic",
     description:
-      "Browse the leaderboard by topic: AI, CLI tools, databases, React and more, each ranked for AI coding agents like Claude Code and Cursor.",
+      "The leaderboard by topic: AI, CLI tools, databases, React and more, each ranked for AI coding agents like Claude Code and Cursor.",
     type: "website",
   },
   "/changelog": {
     title: "Changelog",
-    description: `What each release of ${APP_NAME} shipped: the user-facing changes, newest first, from the first public release on.`,
+    description: `What each release of ${APP_NAME} shipped: user-facing changes, newest first, since the first public release.`,
     type: "article",
   },
   "/roadmap": {
@@ -75,28 +81,28 @@ export const PAGE_COPY = {
   },
   "/privacy": {
     title: "Privacy policy",
-    description: `How ${APP_NAME} handles visitor data: what we collect, what we don't, the third-party services we embed, and how to contact us about your data.`,
+    description: `How ${APP_NAME} handles visitor data: what we collect and don't, the third-party services we embed, and how to contact us about your data.`,
     type: "article",
   },
   "/terms": {
     title: "Terms of use",
-    description: `Terms of use for ${APP_NAME}: what the Service is, how you may use it, the limits of the scoring data, and the operator's disclaimers.`,
+    description: `Terms of use for ${APP_NAME}: what the Service is, how you may use it, the limits of its scoring data, and the operator's disclaimers.`,
     type: "article",
   },
   "/package": {
     title: "Packages",
-    description: "Look up an npm, PyPI, or Cargo package to see how ready its source repo is for AI coding agents.",
+    description: "Look up an npm, PyPI or Cargo package to see how ready its source repo is for AI coding agents.",
     type: "website",
   },
   "/skill": {
     title: "Agent Skill: score the repo you're in",
-    description: `An agent skill that scores the repo you're in for ${MODELS.length} coding agents, shows which one it is best set up for, and suggests a model class. Runs locally.`,
+    description: `An agent skill that scores the repo you're in for ${MODELS.length} coding agents, names the one it is best set up for, and suggests a model class. Runs locally.`,
     type: "article",
   },
   "/action": {
     title: "GitHub Action: AI agent readiness check on every PR",
     description:
-      "A GitHub Action that checks AI agent readiness on every pull request and comments with how it moves the score for each coding agent. Runs only in your CI.",
+      "A GitHub Action that checks AI agent readiness on every pull request and comments how it moves each coding agent's score. Runs only in your CI.",
     type: "article",
   },
   [REPORT_PATH]: {

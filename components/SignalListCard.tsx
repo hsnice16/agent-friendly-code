@@ -35,16 +35,16 @@ export function SignalListCard({ variant, items, empty }: Props) {
     <Panel className="h-full">
       <PanelHeading>{v.heading}</PanelHeading>
 
-      <ul className="m-0 list-none divide-y divide-line p-0 text-[14.5px]">
+      <ul className="m-0 list-none p-0 text-[14.5px]">
         {items.length === 0 ? (
           <EmptyRow chip={empty.chip}>{empty.text}</EmptyRow>
         ) : (
           items.map((s) => (
-            <li key={s.id} className="flex items-center gap-3 py-2">
+            <li key={s.id} className="flex items-center gap-3 link-row">
               <span role="img" aria-label={v.ariaLabel} className={`mark-md ${v.chipClass}`}>
                 {v.glyph}
               </span>
-              <Link href={checkPath(s.id)} className="ink-link">
+              <Link href={checkPath(s.id)} className="ink-link cover-link">
                 {s.label}
               </Link>
             </li>

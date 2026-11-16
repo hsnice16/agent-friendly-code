@@ -34,4 +34,10 @@ describe("percent", () => {
     assert.equal(percent(183, 371), "49%");
     assert.equal(percent(0, 0), "0%");
   });
+
+  it("keeps a decimal for a share that would round to all, and rounds an exact half up", () => {
+    assert.equal(percent(401, 402), "99.8%");
+    assert.equal(percent(402, 402), "100%");
+    assert.equal(percent(23, 40), "58%");
+  });
 });

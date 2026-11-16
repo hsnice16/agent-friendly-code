@@ -82,15 +82,15 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
           cancelClose();
           setOpen(true);
         }}
-        className="inline-flex cursor-pointer items-center gap-1 text-[12px] leading-none tabular-nums"
+        className="group inline-flex cursor-pointer items-center gap-1 text-[12px] leading-none tabular-nums"
         aria-label={`${down ? "Down" : "Up"} ${Math.abs(diff).toFixed(1)} points from previous overall ${previous.toFixed(1)}. Activate or focus for score history.`}
       >
         <span className={down ? "font-medium text-bad" : "font-medium text-ok"}>
           {diff > 0 ? "+" : ""}
           {diff.toFixed(1)}
         </span>
-        <span className="text-muted"> · was {previous.toFixed(1)}</span>
-        <Info size={12} aria-hidden="true" className="block shrink-0 text-muted" />
+        <span className="text-muted group-hover:text-ink"> · was {previous.toFixed(1)}</span>
+        <Info size={12} aria-hidden="true" className="block shrink-0 text-muted group-hover:text-ink" />
       </button>
 
       <div
@@ -101,7 +101,7 @@ export function ScoreDeltaPopover({ current, previous, scoredAt }: Props) {
         onMouseEnter={handleEnter}
         onMouseLeave={handleLeave}
         className={`absolute left-0 top-full z-30 mt-2 w-[220px] origin-top-left rounded-md border border-line bg-surface p-3 text-left text-[12.5px] shadow-md transition duration-150 ease-out sm:left-1/2 sm:origin-top sm:-translate-x-1/2 ${
-          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
+          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
         <div className="mb-2 text-[12.5px] eyebrow text-muted">Score history</div>

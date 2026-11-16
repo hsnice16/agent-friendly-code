@@ -4,7 +4,7 @@ export const TYPESCRIPT: AgentsMdGuide = {
   slug: "typescript",
   label: "TypeScript",
   intro:
-    "The lockfile decides the package manager: `package-lock.json` for npm, `pnpm-lock.yaml` for pnpm, `yarn.lock` for Yarn, `bun.lock` for Bun. Name it, then give the type check, linter and test runner as the scripts you run through it.",
+    "The lockfile decides the package manager: `package-lock.json` for npm, `pnpm-lock.yaml` for pnpm, `yarn.lock` for Yarn, `bun.lock` for Bun. Name it, then the type check, linter and test runner as the scripts you run through it.",
   commands: [
     { cmd: "npm ci", note: "installs exactly the lockfile; fails if it disagrees with `package.json`" },
     { cmd: "tsc --noEmit", note: "type check only, when a bundler or another tool compiles" },

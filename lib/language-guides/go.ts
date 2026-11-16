@@ -4,7 +4,7 @@ export const GO: AgentsMdGuide = {
   slug: "go",
   label: "Go",
   intro:
-    "Agents know the `go` tool. What they can't see is which files are generated, which linters you run, and whether the repo is one module or a workspace. Say those, and how to run one test.",
+    "Agents know the `go` tool, not which files are generated, which linters you run, or whether the repo is one module or a workspace. Say those, and how to run one test.",
   commands: [
     {
       cmd: "go build ./...",

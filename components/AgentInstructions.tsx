@@ -3,8 +3,10 @@ import { Fragment } from "react";
 
 import type { AgentFile, AgentInstructionsData } from "@/lib/utils/agent-instructions";
 import { checkSubPath } from "@/lib/utils/check-path";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { repoFileUrl } from "@/lib/utils/repo-file-url";
 
+import { CompanionFiles } from "./CompanionFiles";
 import { CopySnippet } from "./CopySnippet";
 import { Panel, PanelHeading } from "./Panel";
 
@@ -15,7 +17,7 @@ function FileName({ file, repo }: { file: AgentFile; repo: RepoLocation }) {
   const code = <code className="font-mono text-[13px] text-ink">{file.name}</code>;
   if (!href) return code;
   return (
-    <a href={href} target="_blank" rel="nofollow noopener noreferrer">
+    <a href={href} target="_blank" rel="nofollow noopener noreferrer" className="ink-link">
       {code}
       <span className="sr-only"> (new tab)</span>
     </a>
@@ -36,7 +38,7 @@ function Mark({ ok }: { ok: boolean }) {
 
 function Row({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="grid grid-cols-1 gap-1 border-b border-line py-3 last:border-b-0 sm:grid-cols-[180px_minmax(0,1fr)] sm:gap-4">
+    <div className="info-row">
       <dt className="text-[13px] font-medium text-muted">{label}</dt>
       <dd className="m-0 break-words text-[14.5px] text-ink-dim">{children}</dd>
     </div>
@@ -78,7 +80,7 @@ function OtherFiles({ data, repo }: { data: AgentInstructionsData; repo: RepoLoc
   return (
     <>
       {others.length > 0 && (
-        <span className="mr-3 inline-block">
+        <span className="mr-3 inline-block max-w-full [overflow-wrap:anywhere]">
           <Mark ok />
           {others.map((f, i) => (
             <Fragment key={f.path}>
@@ -124,12 +126,15 @@ export function AgentInstructions({
   slug,
   repo,
   starter,
+  companions = false,
 }: {
   data: AgentInstructionsData;
   slug: string;
   repo: RepoLocation;
   /** A starter AGENTS.md, for a repo without a usable one. */
   starter?: string | null;
+  /** Off on repo pages: crawlers read all of them, and the stubs are the same on each, so they link to one copy. */
+  companions?: boolean;
 }) {
   return (
     <Panel>
@@ -154,11 +159,23 @@ export function AgentInstructions({
       {starter && (
         <details>
           {/* Padding, not flex, for the 44px tap target: a flex summary loses its disclosure marker. */}
-          <summary className="cursor-pointer py-2.5 text-[13px] font-medium text-ink">Get a starter AGENTS.md</summary>
+          <summary className="cursor-pointer py-2.5 text-[13px] font-medium ink-link">Get a starter AGENTS.md</summary>
           <p className="m-0 mb-2 text-[13px] text-muted">
             From the files the checks found. Fill in the commands, then commit it at the root.
           </p>
           <CopySnippet wrap text={starter} event={{ name: "copy_install", tool: "starter_agents_md" }} />
+          {companions ? (
+            <>
+              <p className="mt-4 mb-2 text-[13px] font-medium text-ink">Beside it, per agent</p>
+              <CompanionFiles />
+            </>
+          ) : (
+            <p className="mt-3 mb-0 text-[13px]">
+              <Link href={GENERATOR_PATH} prefetch={false} className="prose-link">
+                What to add beside it for Claude Code, Gemini CLI and others
+              </Link>
+            </p>
+          )}
         </details>
       )}
     </Panel>

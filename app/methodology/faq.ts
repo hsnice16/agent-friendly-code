@@ -7,11 +7,11 @@ export const METHODOLOGY_FAQ = [
   },
   {
     q: "Why give each agent its own score?",
-    a: "Because each agent's docs name different files. Claude Code loads CLAUDE.md every session and Codex reads AGENTS.md before any work, so that file counts most for them. Devin works in its own machine, so a runnable dev setup counts more than CI. Cursor reads `.cursor/rules/` and AGENTS.md. One number would hide that a repo can suit one agent and not another.",
+    a: "Each agent's docs name different files. Claude Code loads CLAUDE.md every session and Codex reads AGENTS.md before any work, so that file counts most for them. Devin works on its own machine, so a runnable dev setup counts more than CI. Cursor reads `.cursor/rules/` and AGENTS.md. One number would hide that a repo can suit one agent and not another.",
   },
   {
     q: "Which AI coding agents do you score for?",
-    a: `${agentList()}. Each has its own set of weights, in lib/scoring/weights.ts.`,
+    a: `${agentList()}. Each has its own weights, in lib/scoring/weights.ts.`,
   },
   {
     q: "Does this test how well agents actually work?",
@@ -23,7 +23,7 @@ export const METHODOLOGY_FAQ = [
   },
   {
     q: "How do I stop pull requests from lowering my score?",
-    a: "Install the GitHub Action (hsnice16/agent-friendly-action). It scores each pull request against its target branch in your CI and posts one comment with what changed. An AGENTS_BADGE_TOKEN secret turns it on; every GitHub repo's page has the workflow to copy.",
+    a: "Install the GitHub Action (hsnice16/agent-friendly-action). In your CI it scores each pull request against its target branch and posts one comment with what changed. An AGENTS_BADGE_TOKEN secret turns it on; every GitHub repo's page has the workflow to copy.",
   },
   {
     q: "What is AGENTS.md or CLAUDE.md?",

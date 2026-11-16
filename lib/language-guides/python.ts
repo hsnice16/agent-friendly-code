@@ -4,7 +4,7 @@ export const PYTHON: AgentsMdGuide = {
   slug: "python",
   label: "Python",
   intro:
-    "Python tooling differs most from repo to repo, so name yours first: the package manager, linter, type checker and test runner, each as the command you run. The lockfile shows the manager: `uv.lock` for uv, `poetry.lock` for Poetry.",
+    "Python tooling varies most between repos, so name yours first: the package manager, linter, type checker and test runner, each as the command you run. The lockfile shows the manager: `uv.lock` for uv, `poetry.lock` for Poetry.",
   commands: [
     { cmd: "uv run pytest", note: "locks and syncs the environment first; no activation needed" },
     { cmd: "poetry install && poetry run pytest", note: "the Poetry way; installs the versions in `poetry.lock`" },

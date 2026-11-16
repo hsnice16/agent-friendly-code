@@ -160,6 +160,16 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/Doka-NT/Taviraq",
     note: "Taviraq — macOS Electron terminal with an AI assistant",
   },
+  {
+    url: "https://github.com/bitwarden/clients",
+    note: "Bitwarden clients — web vault, browser and desktop apps (Angular)",
+  },
+  { url: "https://github.com/NG-ZORRO/ng-zorro-antd", note: "NG-ZORRO — Ant Design components for Angular" },
+  { url: "https://github.com/taiga-family/taiga-ui", note: "Taiga UI — Angular UI kit" },
+  { url: "https://github.com/bluesky-social/social-app", note: "Bluesky — social app (React Native + Expo)" },
+  { url: "https://github.com/Expensify/App", note: "New Expensify — expense app (React Native)" },
+  { url: "https://github.com/louislam/uptime-kuma", note: "Uptime Kuma — self-hosted monitoring (Vue + Node)" },
+  { url: "https://github.com/vuetifyjs/vuetify", note: "Vuetify — Material component framework for Vue" },
 
   // --- GitHub, Python ---
   {
@@ -464,6 +474,13 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/zio/zio", note: "ZIO — async and concurrent programming for Scala" },
   { url: "https://github.com/playframework/playframework", note: "Play Framework — web framework for Java and Scala" },
   { url: "https://github.com/gatling/gatling", note: "Gatling — load testing as code (Scala)" },
+  { url: "https://github.com/halo-dev/halo", note: "Halo — website builder / CMS (Spring Boot)" },
+  { url: "https://github.com/apolloconfig/apollo", note: "Apollo — configuration management (Spring Boot)" },
+  { url: "https://github.com/alibaba/nacos", note: "Nacos — service discovery + config (Spring Boot)" },
+  { url: "https://github.com/conductor-oss/conductor", note: "Conductor — workflow orchestration (Spring Boot)" },
+  { url: "https://github.com/android/nowinandroid", note: "Now in Android — Google's reference Android app (Kotlin)" },
+  { url: "https://github.com/thunderbird/thunderbird-android", note: "Thunderbird for Android — email app (Kotlin)" },
+  { url: "https://github.com/mihonapp/mihon", note: "Mihon — Android manga reader (Kotlin)" },
 
   // --- GitHub, Swift ---
   { url: "https://github.com/swiftlang/swift", note: "Swift language", was: ["https://github.com/apple/swift"] },
@@ -481,6 +498,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/apple/swift-argument-parser", note: "swift-argument-parser — CLI parsing" },
 
   { url: "https://github.com/swiftlang/swift-format", note: "swift-format — Swift source formatter" },
+  { url: "https://github.com/mozilla-mobile/firefox-ios", note: "Firefox for iOS" },
+  { url: "https://github.com/wordpress-mobile/WordPress-iOS", note: "WordPress for iOS" },
+  { url: "https://github.com/home-assistant/iOS", note: "Home Assistant — iOS companion app" },
+  { url: "https://github.com/onevcat/Kingfisher", note: "Kingfisher — image downloading + caching for iOS" },
 
   // --- GitHub, Ruby ---
   {
@@ -501,6 +522,7 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/sidekiq/sidekiq", note: "Sidekiq — background job processing for Ruby" },
   { url: "https://github.com/fastlane/fastlane", note: "fastlane — mobile build + release automation (Ruby)" },
+  { url: "https://github.com/opf/openproject", note: "OpenProject — project management (Rails + Angular)" },
 
   // --- GitHub, Dart ---
   {
@@ -511,6 +533,11 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/serverpod/serverpod", note: "Serverpod — Dart backend framework" },
   { url: "https://github.com/localsend/localsend", note: "LocalSend — cross-platform file sharing" },
   { url: "https://github.com/rrousselGit/riverpod", note: "Riverpod — Flutter state management" },
+  { url: "https://github.com/hiddify/hiddify-app", note: "Hiddify — multi-protocol proxy client (Flutter)" },
+  { url: "https://github.com/lichess-org/mobile", note: "Lichess mobile app (Flutter)" },
+  { url: "https://github.com/openfoodfacts/smooth-app", note: "Open Food Facts mobile app (Flutter)" },
+  { url: "https://github.com/flutter/packages", note: "Flutter team's first-party packages and plugins" },
+  { url: "https://github.com/cfug/dio", note: "dio — HTTP client for Dart" },
 
   // --- GitHub, .NET / C# ---
   {
@@ -540,6 +567,10 @@ export const SEEDS: Seed[] = [
   },
 
   { url: "https://github.com/files-community/Files", note: "Files — modern Windows file manager (C#)" },
+  { url: "https://github.com/bitwarden/server", note: "Bitwarden server — API and identity (ASP.NET Core)" },
+  { url: "https://github.com/Sonarr/Sonarr", note: "Sonarr — TV series PVR (.NET)" },
+  { url: "https://github.com/OrchardCMS/OrchardCore", note: "Orchard Core — modular CMS (ASP.NET Core)" },
+  { url: "https://github.com/MudBlazor/MudBlazor", note: "MudBlazor — Material components for Blazor" },
 
   // --- GitHub, PHP ---
   { url: "https://github.com/laravel/laravel", note: "Laravel — PHP web framework starter" },
@@ -560,6 +591,8 @@ export const SEEDS: Seed[] = [
 
   { url: "https://github.com/laravel/framework", note: "Laravel framework core (PHP)" },
   { url: "https://github.com/nextcloud/server", note: "Nextcloud server — self-hosted file sync (PHP)" },
+  { url: "https://github.com/koel/koel", note: "Koel — personal music streaming (Laravel)" },
+  { url: "https://github.com/bagisto/bagisto", note: "Bagisto — e-commerce platform (Laravel)" },
 
   // --- GitHub, Elixir / Phoenix ---
   {

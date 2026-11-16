@@ -27,6 +27,15 @@ export function hasAgentFile(s: { pass: number; matchedPath?: string | null }): 
   return s.pass >= HAS_FILE_PASS && !!s.matchedPath;
 }
 
+/**
+ * The name a matched path counts under wherever repos with AGENTS.md or CLAUDE.md
+ * are counted: the root file only, in any case, as the adoption series counts.
+ */
+export function rootInstructionFile(matchedPath: string): "AGENTS.md" | "CLAUDE.md" | null {
+  const p = matchedPath.toLowerCase();
+  return p === "agents.md" ? "AGENTS.md" : p === "claude.md" ? "CLAUDE.md" : null;
+}
+
 // The agents_md check's candidates, in its lookup order.
 const MAIN_FILES = ["AGENTS.md", "CLAUDE.md", "AGENT.md", ".claude/CLAUDE.md", ".claude/AGENTS.md"];
 

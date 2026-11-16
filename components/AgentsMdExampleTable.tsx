@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import Link from "next/link";
 
 import type { ExampleRow } from "@/lib/agents-md-examples";
@@ -22,7 +21,8 @@ export function AgentsMdExampleTable({
   showLanguage?: boolean;
 }) {
   return (
-    <div className="table-wrap">
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region
+    <section className="table-wrap" tabIndex={0} aria-label={caption}>
       <table className="data-table text-[14px]">
         <caption className="sr-only">{caption}</caption>
         <thead>
@@ -48,9 +48,11 @@ export function AgentsMdExampleTable({
         <tbody>
           {rows.map((r) => (
             <tr key={r.id}>
-              <td className="[overflow-wrap:anywhere] sm:min-w-[9rem]">
-                <Link href={repoPath(r)} className="font-medium ink-link">
-                  {r.owner}/{r.name}
+              <td className="repo-cell">
+                {/* The hub lists every repo: scrolling past them would prefetch each repo page, a billed ISR read apiece. */}
+                <Link href={repoPath(r)} prefetch={false} className="font-medium ink-link cover-link">
+                  {r.owner}/<wbr />
+                  {r.name}
                 </Link>
                 <OwnRepoTag repo={r} />
               </td>
@@ -61,9 +63,9 @@ export function AgentsMdExampleTable({
                     target="_blank"
                     rel="nofollow noopener noreferrer"
                     aria-label={`${r.file} in ${r.owner}/${r.name} (new tab)`}
-                    className="inline-flex items-center gap-0.5 text-ink-dim hover:text-ink-soft"
+                    className="inline-flex items-center gap-0.5 dim-link"
                   >
-                    {r.file} <ArrowUpRight size={11} weight="bold" aria-hidden="true" />
+                    {r.file} <span aria-hidden="true" className="icon-out" />
                   </a>
                 ) : (
                   <span className="text-ink-dim">{r.file}</span>
@@ -90,6 +92,6 @@ export function AgentsMdExampleTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   );
 }

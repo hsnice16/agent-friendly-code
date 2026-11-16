@@ -16,7 +16,7 @@ export const FASTAPI: FrameworkGuide = {
   ],
   frameworkRepo: "github/fastapi/fastapi",
   intro:
-    "FastAPI is often one service in a larger repo, so say where it lives and how to start it alone. Then the two choices an agent can't infer: how handlers reach the database, and whether they may block.",
+    "FastAPI is often one service in a larger repo, so say where it lives and how to start it alone. Then two choices an agent can't infer: how handlers reach the database, and whether they may block.",
   commands: [
     { cmd: 'uv add "fastapi[standard]"', note: "installs the CLI, Uvicorn and httpx for tests" },
     { cmd: "fastapi dev", note: "auto-reload, listens on 127.0.0.1" },

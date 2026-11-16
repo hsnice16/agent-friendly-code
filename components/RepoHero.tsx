@@ -54,7 +54,7 @@ export function RepoHero({
             target="_blank"
             href={repo.url}
             rel="noopener noreferrer"
-            className="tap-target mt-1 block break-all text-sm text-muted"
+            className="tap-target mt-1 block break-all text-sm text-muted hover:text-ink"
             aria-label={`${repo.owner}/${repo.name} on ${repo.host} (new tab)`}
           >
             {repo.url}
@@ -73,10 +73,7 @@ export function RepoHero({
                 <dt className="inline">Language: </dt>
                 <dd className="inline font-medium text-ink">
                   {language ? (
-                    <Link
-                      href={language.href}
-                      className="tap-target border-b border-dotted border-ink-dim/60 text-ink hover:border-ink-soft hover:text-ink-soft"
-                    >
+                    <Link href={language.href} className="tap-target font-medium ink-link">
                       {language.label}
                     </Link>
                   ) : (

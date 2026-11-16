@@ -59,30 +59,31 @@ export function MobileNav({ links }: { links: NavLink[] }) {
         {open ? <X size={16} weight="bold" aria-hidden="true" /> : <List size={16} weight="bold" aria-hidden="true" />}
       </button>
 
-      {open && (
-        <div
-          id="mobile-nav-menu"
-          className="absolute right-0 top-full z-30 mt-2 min-w-[180px] overflow-hidden rounded-lg border border-line bg-surface shadow-lg"
-        >
-          {links.map((l, i) => (
-            <Link
-              key={l.href}
-              href={l.href}
-              onClick={() => setOpen(false)}
-              ref={i === 0 ? firstLinkRef : undefined}
-              className="block px-3.5 py-2.5 text-[13px] text-ink-dim hover:bg-surface-hover hover:text-ink"
-            >
-              {l.label}
-            </Link>
-          ))}
+      {/* Always mounted so closing can fade too; `invisible` takes it out of the tab order. */}
+      <div
+        id="mobile-nav-menu"
+        className={`absolute right-0 top-full z-30 mt-2 min-w-[180px] origin-top-right overflow-hidden rounded-lg border border-line bg-surface shadow-lg transition-[opacity,scale,visibility] duration-150 ease-out motion-reduce:transition-none ${
+          open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
+        }`}
+      >
+        {links.map((l, i) => (
+          <Link
+            key={l.href}
+            href={l.href}
+            onClick={() => setOpen(false)}
+            ref={i === 0 ? firstLinkRef : undefined}
+            className="block px-3.5 py-2.5 text-[13px] text-ink-dim hover:bg-surface-hover hover:text-ink"
+          >
+            {l.label}
+          </Link>
+        ))}
 
-          <div aria-hidden="true" className="border-t border-line" />
-          <div className="flex items-center justify-between px-3.5 py-2 text-[11.5px] text-muted">
-            <span>Build</span>
-            <VersionPill />
-          </div>
+        <div aria-hidden="true" className="border-t border-line" />
+        <div className="flex items-center justify-between px-3.5 py-2 text-[11.5px] text-muted">
+          <span>Build</span>
+          <VersionPill />
         </div>
-      )}
+      </div>
     </div>
   );
 }

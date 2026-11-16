@@ -17,7 +17,7 @@ const BASE_DEFAULT =
 const BASE_COMPACT =
   "inline-flex items-center gap-1 rounded-md border px-2.5 py-1.5 text-[13px] font-medium max-sm:min-h-[44px]";
 
-const ACTIVE = "border-line bg-surface text-ink-dim hover:text-ink-soft";
+const ACTIVE = "border-line bg-surface text-ink-dim hover:bg-surface-hover hover:text-ink";
 const DISABLED = "cursor-not-allowed border-line/60 bg-transparent text-muted/60";
 
 export function Pagination({ page, hrefFor, totalPages, label = "Pages", size = "default", onPageClick }: Props) {

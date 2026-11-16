@@ -29,7 +29,7 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
     rows: [
       {
         aspect: "Where",
-        theirs: "`.cursor/rules/*.mdc`, in folders if you like. A plain `.md` there is ignored.",
+        theirs: "`.cursor/rules/*.mdc`, subfolders allowed. A plain `.md` there is ignored.",
         agentsMd: "The repo root, and any subdirectory.",
       },
       {
@@ -39,14 +39,26 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
       },
       {
         aspect: "When Cursor applies it",
-        theirs: "Always, for matching files, when the agent judges the description relevant, or on @-mention.",
+        theirs:
+          "`alwaysApply: true`: every chat. `globs`: when a matching file is in context. Only a `description`: when the agent judges it relevant. Neither: on @-mention.",
         agentsMd: "Always. A nested one applies to work in its directory, more specific winning.",
+      },
+      {
+        aspect: "When two disagree",
+        theirs: "Team Rules, then Project Rules, then User Rules.",
+        agentsMd: "The closest file to the edited one wins; a chat prompt overrides everything.",
+      },
+      {
+        aspect: "Size",
+        theirs: "Keep each rule under 500 lines; split a large one.",
+        agentsMd: "Up to each agent: Codex reads 32 KiB combined, Devin the first 16 KiB of each.",
       },
     ],
     steps: [
       "Put the project, commands and rules every agent needs in AGENTS.md.",
-      "Add one `.mdc` rule per topic that only some files need, scoped with `globs`.",
-      "Move `.cursorrules` into a rule set to Always Apply, which matches its old behaviour, then delete it.",
+      "Add one `.mdc` rule per topic that only some files need, scoped with `globs`. `/create-rule` in Agent writes one into `.cursor/rules`.",
+      "Move `.cursorrules` into an Always Apply rule, its old behaviour, then delete it.",
+      "If a rule isn't applied, check its type: Apply Intelligently needs a `description`, Apply to Specific Files `globs` that match.",
     ],
     file: ".cursor/rules/*.mdc",
     snippet: {
@@ -58,6 +70,9 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
       "https://cursor.com/docs/context/rules",
       "https://cursor.com/help/customization/rules",
       "https://cursor.com/docs/cli/using",
+      "https://agents.md/",
+      "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
+      "https://docs.devin.ai/onboard-devin/agents-md",
     ],
   },
   gemini_md: {
@@ -67,7 +82,7 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
     description:
       "GEMINI.md is Gemini CLI's context file, sent with every prompt. Reuse AGENTS.md: list it in context.fileName, or in a one-line GEMINI.md: @AGENTS.md.",
     answer:
-      "No. Keep your instructions in AGENTS.md and point Gemini CLI at it: list it in `context.fileName`, or make GEMINI.md one line, `@AGENTS.md`.",
+      "No. Keep your instructions in AGENTS.md and point Gemini CLI at it: list it in `context.fileName`, or make GEMINI.md one line, `@AGENTS.md`. Google Antigravity reads both files with no setting.",
     rows: [
       {
         aspect: "Where",
@@ -78,19 +93,25 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
       {
         aspect: "Imports",
         theirs: "`@file.md`, relative or absolute, up to 5 levels deep.",
-        agentsMd: "None; it's plain markdown.",
+        agentsMd: "None in the spec; Claude Code and Copilot CLI expand `@path`.",
       },
       {
         aspect: "Change the file name",
         theirs: "`context.fileName` in `settings.json` takes one name or a list.",
         agentsMd: "Fixed by each agent.",
       },
+      {
+        aspect: "Google Antigravity",
+        theirs: "Reads it, or `.agents/GEMINI.md`, in the workspace folder and its parents up to the repo root.",
+        agentsMd: "Reads it from the same places, and combines it with GEMINI.md.",
+      },
     ],
     steps: [
-      "Keep the instructions in AGENTS.md.",
+      "Keep instructions in AGENTS.md.",
       "Commit `.gemini/settings.json` with the setting below; project settings override a user's.",
       "Or add a GEMINI.md containing `@AGENTS.md`, which also passes our check.",
       "Run `/memory show` in Gemini CLI to see what it loaded.",
+      "Google Antigravity needs neither: it reads AGENTS.md and GEMINI.md as they are.",
     ],
     file: "GEMINI.md",
     snippet: {
@@ -101,6 +122,7 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
       "https://geminicli.com/docs/cli/gemini-md/",
       "https://geminicli.com/docs/reference/configuration/",
       "https://geminicli.com/docs/reference/memport/",
+      "https://antigravity.google/docs/rules",
       "https://agents.md/",
     ],
   },

@@ -227,9 +227,11 @@ export function FloatingSectionMenu({ sections, action }: SectionMenuProps) {
       {/* Anchored just above the toggle, so when open it covers `action` instead of pushing it up the screen. */}
       <nav
         id={menuId}
-        hidden={!open}
         aria-label="On this page"
-        className="absolute bottom-12 right-0 z-10 max-h-[60vh] w-56 overflow-y-auto rounded-xl border border-line bg-surface p-4 shadow-lg"
+        // `invisible`, not `hidden`, so closing can fade too; both take it out of the tab order.
+        className={`absolute bottom-12 right-0 z-10 max-h-[60vh] w-56 origin-bottom-right overflow-y-auto rounded-xl border border-line bg-surface p-4 shadow-lg transition-[opacity,scale,visibility] duration-150 ease-out motion-reduce:transition-none ${
+          open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
+        }`}
       >
         <p className="m-0 mb-2 text-[12.5px] eyebrow text-muted">On this page</p>
         <SectionLinks sections={sections} active={active} onPick={() => setOpen(false)} />

@@ -26,7 +26,7 @@ const DESTINATIONS = [
   {
     href: "/score",
     label: "Live Score",
-    blurb: "Paste a public GitHub repo link and get its score from the latest commit.",
+    blurb: "Score any public GitHub repo from its latest commit.",
   },
   {
     href: "/package",
@@ -60,8 +60,7 @@ export default function NotFound() {
       <Panel tone="tip">
         <PanelHeading tone="tip">Looking for a repo?</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-          We only have pages for repos and packages we track. An old link, or a repo that was never on the list, ends up
-          here.{" "}
+          We have pages only for repos and packages we track; an old link, or a repo never on the list, ends up here.{" "}
           <Link href="/score" className="prose-link">
             Live Score
           </Link>{" "}
@@ -72,10 +71,10 @@ export default function NotFound() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Everywhere else</PanelHeading>
-          <ul className="m-0 grid list-none gap-2.5 p-0">
+          <ul className="m-0 grid list-none p-0">
             {DESTINATIONS.map((d) => (
-              <li key={d.href} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-3">
-                <Link href={d.href} className="tap-target min-w-[9rem] text-[14.5px] font-semibold ink-link">
+              <li key={d.href} className="flex flex-col gap-0.5 link-row sm:flex-row sm:items-baseline sm:gap-3">
+                <Link href={d.href} className="min-w-[9rem] text-[14.5px] font-semibold ink-link cover-link">
                   {d.label}
                 </Link>
                 <span className="text-[14px] leading-relaxed text-muted">{d.blurb}</span>

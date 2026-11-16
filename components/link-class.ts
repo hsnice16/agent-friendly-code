@@ -1,5 +1,5 @@
 // For a link in a list or on its own line. Inside ink-dim or muted prose use
-// the `prose-link` utility: its dotted rule marks the link where colour can't.
+// `prose-link`, whose weight and darker ink set it apart from the text.
 export const LINK = "ink-link";
 
 // A list item whose name is the link, among plain ink-dim text beside it.

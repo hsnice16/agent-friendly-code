@@ -32,7 +32,11 @@ export function BackToTop() {
       aria-hidden={!visible}
       aria-label="Back to top"
       tabIndex={visible ? 0 : -1}
-      onClick={() => window.scrollTo({ top: 0 })}
+      onClick={() => {
+        window.scrollTo({ top: 0 });
+        // The button hides at the top; focus left on it would fall back to <body>.
+        document.getElementById("main")?.focus({ preventScroll: true });
+      }}
       className={`fixed bottom-6 right-6 z-30 inline-flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border border-line bg-surface text-ink-dim shadow-sm hover:bg-surface-hover hover:text-ink-soft ${
         visible ? "opacity-100" : "pointer-events-none opacity-0"
       }`}

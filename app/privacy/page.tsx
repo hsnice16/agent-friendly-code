@@ -6,10 +6,11 @@ import { ExternalLink } from "@/components/ExternalLink";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
+import { legalDate, PRIVACY_UPDATED } from "@/lib/constants/legal";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL } from "@/lib/version";
 
-const LAST_UPDATED = "October 28, 2026";
+const LAST_UPDATED = legalDate(PRIVACY_UPDATED);
 
 export const metadata: Metadata = staticPageMetadata("/privacy");
 
@@ -21,8 +22,8 @@ export default function PrivacyPage() {
         title="Privacy policy"
         lead={
           <>
-            What information <span className="mr-0.5">{APP_NAME}</span> collects when you visit, what it deliberately
-            doesn&apos;t, and how to get in touch about your data.
+            What <span className="mr-0.5">{APP_NAME}</span> collects when you visit, what it deliberately doesn&apos;t,
+            and how to reach us about your data.
           </>
         }
       >
@@ -38,8 +39,8 @@ export default function PrivacyPage() {
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;) is operated by Himanshu Singh as an
           independent, MIT-licensed project. There are no user accounts. The Service scores publicly accessible source
-          repositories and ranks the ones it tracks. This policy explains the limited information that is collected when
-          you visit and how it is used.
+          repositories and ranks the ones it tracks. This policy explains the limited information collected when you
+          visit and how it is used.
         </p>
       </Panel>
 
@@ -63,8 +64,8 @@ export default function PrivacyPage() {
             </li>
             <li className="mt-2">
               <strong className="text-ink">Server logs.</strong> Our hosting provider (Vercel) may record standard
-              request metadata — IP address, user-agent, timestamps — for short retention periods, for operational and
-              security purposes.
+              request metadata — IP address, user-agent, timestamps — and keep it briefly, for operational and security
+              purposes.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Public repository data.</strong> Scores and signals shown on the Service are
@@ -99,7 +100,7 @@ export default function PrivacyPage() {
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             The Service&apos;s own code sets no cookies. Cookies may be set by Google Analytics and Microsoft Clarity,
             which we embed for usage measurement. The Service shows no advertising. You can disable or delete cookies in
-            your browser at any time; doing so will not break the Service, only analytics will be affected.
+            your browser at any time; only analytics is affected, not the Service.
           </p>
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
             For visitors from the European Economic Area, the United Kingdom, and Switzerland, Google Analytics sets no
@@ -107,9 +108,7 @@ export default function PrivacyPage() {
             no cookies for them until they accept. They can change their answer below; declining removes Clarity&apos;s
             cookies at once and stops it from loading on later pages.
           </p>
-          {ANALYTICS_ON && (
-            <ConsentSettingsButton className="mt-3 cursor-pointer rounded-md border border-line px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover" />
-          )}
+          {ANALYTICS_ON && <ConsentSettingsButton className="mt-3 btn-secondary btn-sm" />}
         </Panel>
       </div>
 

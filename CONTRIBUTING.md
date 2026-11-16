@@ -32,7 +32,7 @@ bun run test            # Node ≥ 22
 
 ## Checks
 
-Pre-commit (`lefthook.yml`): Biome (fixes and re-stages), `tsc --noEmit`, the test suite, the database leak scan when `data/*.db` is staged, and a 300-line cap on `.ts` / `.tsx` under `app/`, `components/` and `lib/`.
+Pre-commit (`lefthook.yml`): Biome (fixes and re-stages), `tsc --noEmit`, the test suite, the leak scan when a `data/*.db` or `data/*.json` file is staged, and a 300-line cap on `.ts` / `.tsx` under `app/`, `components/` and `lib/`.
 
 CI (`.github/workflows/ci.yml`) repeats Biome, tsc, tests and the leak scan, and runs a production build. `parity.yml` runs nightly, and `bun run parity-check --pr` when a PR touches the scorer, Live Score or cloning code: it scores real repos both ways and fails if Live Score and the leaderboard disagree. Fix the drift rather than re-running.
 

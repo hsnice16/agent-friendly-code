@@ -38,9 +38,13 @@ export function frameworkExamplesTitle(f: Pick<FrameworkExamples, "guide" | "row
   return `AGENTS.md for ${f.guide.label}: guide and ${f.rows.length} real examples`;
 }
 
+// By the letter, not the sound: every label read aloud starts as it is spelled,
+// except ".NET", which takes "a" either way.
+const article = (label: string) => (/^[aeiou]/i.test(label) ? "an" : "a");
+
 export function frameworkExamplesDescription(f: FrameworkExamples): string {
   return fitDescription(
-    `What to put in an AGENTS.md for a ${f.guide.label} ${f.guide.kind}: the commands, layout and rules agents get wrong.`,
+    `What to put in an AGENTS.md for ${article(f.guide.label)} ${f.guide.label} ${f.guide.kind}: the commands, layout and rules agents get wrong.`,
     `Plus ${f.rows.length} real files from ${f.guide.label} repos.`,
   );
 }

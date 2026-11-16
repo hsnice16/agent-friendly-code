@@ -52,8 +52,7 @@ export function CopySnippet({
       <button
         type="button"
         onClick={copy}
-        aria-live="polite"
-        aria-label={copied ? "Copied to clipboard" : "Copy snippet to clipboard"}
+        aria-label="Copy snippet to clipboard"
         // The after: inset grows the hit area to 44px without growing the button.
         className={`absolute right-1.5 inline-flex h-6 w-6 cursor-pointer items-center justify-center rounded-md border bg-surface after:absolute after:-inset-2 ${
           isMultiLine ? "top-1.5" : "top-1/2 -translate-y-1/2"
@@ -77,6 +76,10 @@ export function CopySnippet({
           <Check size={14} weight="bold" />
         </span>
       </button>
+      {/* A changed aria-label isn't announced; a status region is. */}
+      <span role="status" className="sr-only">
+        {copied ? "Copied to clipboard" : ""}
+      </span>
     </div>
   );
 }

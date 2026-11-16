@@ -19,7 +19,7 @@ pre-commit:
       run: bun run test
 
     - name: db-leaks
-      glob: "data/*.db"
+      glob: "data/*.{db,json}"
       run: bun run check-db-leaks {staged_files}
 
     - name: file-length

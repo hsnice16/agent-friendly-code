@@ -9,7 +9,12 @@ type Props = {
 
 export function PeerlistBadge({ className }: Props) {
   return (
-    <a target="_blank" href={PEERLIST_PROJECT_URL} className={className} rel="noopener noreferrer">
+    <a
+      target="_blank"
+      href={PEERLIST_PROJECT_URL}
+      className={`hover:opacity-80 ${className ?? ""}`}
+      rel="noopener noreferrer"
+    >
       {/* Lazy: React preloads every eager <img> in the head, which put this footer badge ahead of the page's own requests. */}
       <img
         width={180}

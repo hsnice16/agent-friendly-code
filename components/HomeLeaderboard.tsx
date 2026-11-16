@@ -12,7 +12,7 @@ import { LiveScoreForm } from "./LiveScoreForm";
 import { PAGE_LEAD, PageHeader } from "./PageHeader";
 import { ReleaseAnnouncement } from "./ReleaseAnnouncement";
 
-const CTA = "border-b border-dotted border-tip/60 text-tip hover:border-tip";
+const CTA = "font-medium text-tip hover:text-ink";
 
 type Props = {
   view: LeaderboardView;

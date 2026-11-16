@@ -1,6 +1,7 @@
 import { strict as assert } from "node:assert";
 import { afterEach, beforeEach, describe, test } from "node:test";
 
+import { legalDate } from "../lib/constants/legal";
 import { compactStars, formatDate, hostLabel, relativeTime } from "../lib/utils/format";
 
 describe("compactStars", () => {
@@ -80,5 +81,12 @@ describe("formatDate", () => {
     const t = Date.UTC(2026, 9, 14, 23, 30) / 1000;
     assert.equal(formatDate(t), "14 Oct 2026");
     assert.equal(formatDate(t, { time: true }), "14 Oct 2026, 23:30 UTC");
+  });
+});
+
+describe("legalDate", () => {
+  test("reads the ISO day in UTC, so no zone shifts it a day back", () => {
+    assert.equal(legalDate("2026-10-28"), "October 28, 2026");
+    assert.equal(legalDate("2026-01-01"), "January 1, 2026");
   });
 });

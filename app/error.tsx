@@ -18,7 +18,7 @@ export default function ErrorPage({ retry }: { error: Error & { digest?: string 
         <button type="button" onClick={retry} className="btn-primary">
           Try again
         </button>
-        <Link href="/" className="text-[14px] text-ink-dim hover:text-ink">
+        <Link href="/" className="text-[14px] dim-link">
           ← back to the leaderboard
         </Link>
       </div>

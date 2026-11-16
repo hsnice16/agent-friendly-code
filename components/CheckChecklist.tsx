@@ -13,8 +13,8 @@ export function CheckChecklist({ rows }: { rows: ChecklistRow[] }) {
       <PanelHeading>The {rows.length} checks, and how many leaderboard repos pass</PanelHeading>
       <ol className="m-0 grid list-none grid-cols-1 gap-x-8 p-0 text-[14px] sm:grid-cols-2">
         {rows.map((r) => (
-          <li key={r.id} className="flex items-baseline justify-between gap-3 border-b border-line py-1.5">
-            <Link href={checkPath(r.id)} className="ink-link">
+          <li key={r.id} className="flex items-baseline justify-between gap-3 link-row">
+            <Link href={checkPath(r.id)} className="ink-link cover-link">
               {r.label}
             </Link>
             <span className="shrink-0 tabular-nums text-ink-dim">{percent(r.full, r.total)}</span>

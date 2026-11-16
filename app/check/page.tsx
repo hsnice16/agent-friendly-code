@@ -25,7 +25,7 @@ export default function ChecksPage() {
       <PageHeader
         crumbs={{ current: CHECKS_CRUMB }}
         title={`Agent-ready codebase checklist: ${SIGNALS.length} checks and their pass rates`}
-        lead="An agent-ready codebase is one where an AI coding agent can learn the project and check its own work from the files alone: an AGENTS.md or CLAUDE.md that explains it, a README, tests it can run, CI and linter config that show what a change must pass, a reproducible dev setup, and a size it can read."
+        lead="In an agent-ready codebase, an AI coding agent can learn the project and check its own work from the files alone: an AGENTS.md or CLAUDE.md that explains it, a README, tests it can run, CI and linter config that show what a change must pass, a reproducible dev setup, and a size it can read."
       >
         <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Every score here comes from these {SIGNALS.length} file checks. Each has a page: what it looks for, why agents

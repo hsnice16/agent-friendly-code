@@ -21,7 +21,7 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 
 - Viewport sizes to verify: **320 px**, **640 px** (sm), **768 px** (md), **1080 px+** (container max).
 - **Nav**: collapses to `<MobileNav>` hamburger below md.
-- **Tables**: wrapped in `overflow-x-auto` — never force horizontal page scroll.
+- **Tables**: in `table-wrap`, which scrolls sideways — never force horizontal page scroll.
 - **Hero / headings**: scale with `sm:` or `md:` prefix.
 - **Grids**: fall back to `grid-cols-1` on narrow.
 - **Flex rows** that hold long content: `flex-col sm:flex-row` to stack on mobile.

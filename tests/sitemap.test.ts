@@ -23,6 +23,22 @@ describe("sitemap", async () => {
     }
   });
 
+  it("lists the guides, reports, comparisons and contribute pages", async () => {
+    const { GUIDES } = await import("../lib/guides");
+    const { COMPARE_PAIRS } = await import("../lib/compare-pairs");
+    const paths = [
+      ...GUIDES.map((g) => `/guide/${g.slug}`),
+      ...COMPARE_PAIRS.map((p) => `/compare/${p.slug}`),
+      "/compare",
+      "/contribute",
+      "/report/agents-md-size",
+      "/report/ai-contribution-policy",
+      "/agents-md-generator",
+    ];
+    for (const path of paths) assert.ok(urls.includes(`${APP_URL}${path}`), path);
+    assert.equal(new Set(urls).size, urls.length, "duplicate sitemap URL");
+  });
+
   it("has no topic pages while no repo has topics", () => {
     assert.ok(!urls.some((u) => u.includes("/topic")));
   });

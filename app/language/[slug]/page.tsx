@@ -6,10 +6,11 @@ import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
+import { LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { checkPath, languageExamplesPath } from "@/lib/utils/check-path";
-import { hubPath, hubTitle, isHub } from "@/lib/utils/language";
+import { hubPath, hubTitle, isHub, languageAgentsPath } from "@/lib/utils/language";
 import { fitDescription, pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
@@ -86,16 +87,23 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             .
           </p>
         )}
+        {hub.rows.length >= LANGUAGE_AGENTS_MIN_REPOS && (
+          <p className="mt-2.5 mb-0 text-[14.5px]">
+            <Link href={languageAgentsPath(hub.slug)} className="arrow-link whitespace-normal">
+              Which AI coding agent {hub.label} repos are best set up for →
+            </Link>
+          </p>
+        )}
       </PageHeader>
 
       {hub.gaps.length > 0 && (
         <div className="mb-3.5">
           <Panel>
             <PanelHeading>What {hub.label} repos most often miss</PanelHeading>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+            <ul className="link-list">
               {hub.gaps.map((g) => (
-                <li key={g.id}>
-                  <Link href={checkPath(g.id)} className="font-medium ink-link">
+                <li key={g.id} className="link-row">
+                  <Link href={checkPath(g.id)} className="font-medium ink-link cover-link">
                     {g.label}
                   </Link>
                   : {Math.round(g.rate * 100)}% pass rate
@@ -121,6 +129,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         totalPages={1}
         rows={hub.rows}
         clearSearchHref={path}
+        prefetch={false}
         activeLabel={`${hub.label} repos, overall`}
       />
     </>

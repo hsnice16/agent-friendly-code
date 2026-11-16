@@ -10,7 +10,7 @@ import { BlueskyBrandLogo, LinkedInBrandLogo, XBrandLogo } from "./BrandLogos";
 const RESET_MS = 1500;
 
 const ITEM =
-  "flex w-full cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 text-left text-[14px] text-ink no-underline hover:bg-surface-hover hover:no-underline focus-visible:bg-surface-hover";
+  "flex w-full cursor-pointer items-center gap-3 rounded-lg px-2 py-1.5 text-left text-[14px] text-ink hover:bg-surface-hover focus-visible:bg-surface-hover";
 const TILE = "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-line bg-bg";
 
 type Props = {
@@ -117,7 +117,7 @@ export function ShareScore({ slug, score, url, align }: Props) {
         id={menuId}
         inert={!open}
         className={`absolute bottom-full z-30 mb-2 w-[200px] ${MENU_POSITION[align]} rounded-xl border border-line bg-surface p-1.5 shadow-lg transition duration-150 ease-out ${
-          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"
+          open ? "scale-100 opacity-100 pointer-events-auto" : "scale-95 opacity-0 pointer-events-none"
         }`}
       >
         {networks.map((n) => (

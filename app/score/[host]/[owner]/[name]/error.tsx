@@ -20,7 +20,7 @@ export default function LiveScoreError({ retry }: { error: Error; retry: () => v
         <button type="button" onClick={retry} className="btn-primary">
           Try again
         </button>
-        <Link href="/score" className="text-[14px] text-ink-dim hover:text-ink">
+        <Link href="/score" className="text-[14px] dim-link">
           ← Score another repo
         </Link>
       </div>

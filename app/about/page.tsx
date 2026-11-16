@@ -88,12 +88,12 @@ export default function AboutPage() {
             The leaderboard is a curated list of {count} public repos on GitHub, GitLab and Bitbucket, kept in{" "}
             <ExternalLink href={`${REPO_URL}/blob/main/scripts/seed-list.ts`}>scripts/seed-list.ts</ExternalLink> and
             grouped by ecosystem: JavaScript and TypeScript, Python, Rust, Go, the JVM, other languages, and AI coding
-            agents, models and SDKs. It is rescored daily; a repo taken off the list leaves the leaderboard at the next
+            agents, models and SDKs. Rescored daily; a repo taken off the list leaves the leaderboard at the next
             rescore.
           </p>
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
-            A weekly audit flags repos on the list that were renamed, archived, deleted or made private, that are forks
-            or mirrors, or whose score stopped refreshing; each is fixed or accepted on purpose. Scoring a repo with{" "}
+            A weekly audit flags listed repos that were renamed, archived, deleted or made private, are forks or
+            mirrors, or whose score stopped refreshing; each is fixed or accepted on purpose. Scoring a repo with{" "}
             <Link href="/score" className="prose-link">
               Live Score
             </Link>{" "}
@@ -104,9 +104,8 @@ export default function AboutPage() {
             <Link href={repoPath(OWN_REPO)} className="prose-link">
               {OWN_REPO.owner}/{OWN_REPO.name}
             </Link>
-            , and the author&apos;s other repos are on the list and scored by the same rules. They are labelled
-            &ldquo;this site&apos;s own repo&rdquo; and &ldquo;by this site&apos;s author&rdquo; wherever repos are
-            listed.
+            , and the author&apos;s other repos are listed and scored by the same rules, labelled &ldquo;this
+            site&apos;s own repo&rdquo; and &ldquo;by this site&apos;s author&rdquo; wherever repos are listed.
           </p>
         </Panel>
       </div>

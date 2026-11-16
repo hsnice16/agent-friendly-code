@@ -6,41 +6,41 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why a detailed README helps AI coding agents, how we score README length, and how popular open source repos compare.",
     what: "The README is the first file anyone opens, agents included. This check looks for one at the repo root and measures its length.",
-    why: "An agent starts every task knowing nothing about the project. A README that says what it does, how to install it and how the code is laid out saves it reading file by file. Cursor's profile gives the README its top weight.",
+    why: "An agent starts every task knowing nothing about the project. A README covering what it does, how to install it and how the code is laid out saves reading file by file. Cursor's profile gives the README its top weight.",
     scoring: [
       "Full pass: a README (`.md`, `.rst`, `.txt` or no extension) with 1,000 or more characters.",
       "70%: 200 to 999 characters.",
       "30%: under 200 characters.",
       "Fail: no README at the repo root.",
     ],
-    fix: "Cover what the project does, how to install it, the commands people run most, and where the main code lives. That usually clears 1,000 characters.",
+    fix: "Cover what the project does, how to install it, the most-used commands, and where the main code lives. That usually clears 1,000 characters.",
   },
   tests: {
     title: "Test suites: why AI coding agents need tests they can find",
     description:
       "Why AI coding agents depend on a test suite, how we detect tests in a repo, and how many popular open source repos pass.",
-    what: "This check looks for tests an agent could run: a test directory, or files named like tests in each language.",
-    why: "Tests tell an agent whether its change worked. With them it can edit, run and correct itself; without them it hands back code nobody has run. Claude Code's profile weighs tests as heavily as AGENTS.md.",
+    what: "This check looks for tests an agent could run: a test directory, or test-named files in each language.",
+    why: "Tests tell an agent whether its change worked. With them it edits, runs and corrects itself; without them it hands back code nobody has run. Claude Code's profile weighs tests as heavily as AGENTS.md.",
     scoring: [
       "Full pass: a `tests/`, `test/`, `__tests__/`, `spec/`, `specs/` or `src/test/` directory.",
       "70%: no such directory, but test-named files turn up within three folder levels, such as `*.test.ts`, `test_*.py`, `*_test.go` or `*Test.java`.",
       "Fail: neither. We check that tests exist, not that they pass.",
     ],
-    fix: "Keep tests in a conventional directory and put the command that runs them in AGENTS.md. Tests next to the source score 70%, because an agent has to search for them.",
+    fix: "Keep tests in a conventional directory and put their command in AGENTS.md. Tests beside the source score 70%: an agent has to search for them.",
   },
   ci: {
     title: "CI configuration: what AI coding agents learn from your pipeline",
     metaTitle: "CI config: what AI coding agents learn from your pipeline",
     description:
       "Why a CI pipeline helps AI coding agents, which CI systems we detect, and how many popular open source repos have one.",
-    what: "This check looks for a CI pipeline defined in the repo: GitHub Actions workflows, or another CI system's config file.",
-    why: "A CI config records how the project is built and tested. An agent reads it to learn which commands a change must pass, and runs them before opening a pull request.",
+    what: "This check looks for a CI pipeline in the repo: GitHub Actions workflows, or another CI system's config.",
+    why: "A CI config records how the project is built and tested. An agent reads it for the commands a change must pass, and runs them before opening a pull request.",
     scoring: [
       "Full pass: at least one `.yml` or `.yaml` file in `.github/workflows/`.",
       "90%: a config for GitLab CI, CircleCI, Azure Pipelines, Travis CI, Jenkins or Buildkite.",
       "Fail: none of these. We do not check what the pipeline runs.",
     ],
-    fix: "Add a workflow that runs the tests and the linter on every pull request, with the same commands you document for local use.",
+    fix: "Add a workflow that runs tests and the linter on every pull request, using the commands you document for local use.",
   },
   linter: {
     title: "Linter and formatter config: instant feedback for AI coding agents",
@@ -48,12 +48,12 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why a committed linter or formatter config helps AI coding agents, which tools we detect, and how many popular open source repos have one.",
     what: "This check looks for a committed linter or formatter config: ESLint, Prettier, Biome, Ruff, rustfmt, Clippy, golangci-lint, RuboCop, clang-format and about twenty others.",
-    why: "A linter makes style checkable. The agent runs it, reads the errors and fixes them, instead of copying whatever the nearest file does. Aider lints after every edit by default, so without a config it has nothing to lint against.",
+    why: "A linter makes style checkable: the agent runs it and fixes the errors instead of copying the nearest file. Aider lints after every edit by default; without a config it has nothing to lint against.",
     scoring: [
       "Full pass: a config file for a supported tool, or a `[tool.ruff]`, `[tool.black]`, `[tool.flake8]`, `[tool.pylint]` or `[tool.mypy]` section in `pyproject.toml`.",
       "Fail: no config found. We do not run the linter.",
     ],
-    fix: "Commit the config for your language's standard tool and put the lint command in AGENTS.md. A linter run on default settings leaves no file to find.",
+    fix: "Commit your language's standard linter config and put the lint command in AGENTS.md. A linter on default settings leaves no file to find.",
   },
   deps_manifest: {
     title: "Dependency manifests: letting AI coding agents rebuild your environment",
@@ -61,12 +61,12 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why AI coding agents need a dependency manifest, which manifest files we detect, and how many popular open source repos have one.",
     what: "This check looks for a file a package manager reads to install dependencies: `package.json`, `pyproject.toml`, `Cargo.toml`, `go.mod`, `pom.xml` and their equivalents in other languages.",
-    why: "An agent in a fresh sandbox has to install everything before it can run a test. A manifest makes that one command. Without one, the agent guesses dependencies from imports and gets versions wrong.",
+    why: "An agent in a fresh sandbox must install everything before it can run a test. A manifest makes that one command; without one, the agent guesses dependencies from imports and gets versions wrong.",
     scoring: [
       "Full pass: a manifest or lockfile at the repo root.",
       "Fail: none found. A lockfile is not required to pass.",
     ],
-    fix: "Commit your package manager's manifest at the repo root, with its lockfile so an agent installs the versions you do.",
+    fix: "Commit the manifest at the repo root, with its lockfile so an agent installs the versions you do.",
   },
   dev_env: {
     title: "Reproducible dev environments: one-command setup for AI coding agents",
@@ -74,7 +74,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why AI coding agents need a reproducible dev environment, which setup files we detect, and how many popular open source repos have them.",
     what: "This check looks for files that set the project up in one command: a Makefile, devcontainer, Dockerfile or compose file, Nix files, a justfile, a Taskfile, `tox.ini`, `noxfile.py`, the Maven or Gradle wrapper, `bin/setup`, or an agent's own environment file: Devin's `.devin/blueprint.yaml` or Cursor's `.cursor/environment.json`.",
-    why: "Agents that run on their own machine must get the project working there first. Devin starts from a VM with the repo, tools and dependencies already set up, per Cognition's environment docs, and Cursor's cloud agents do the same, so Devin's profile weighs a runnable environment above CI. A setup written as a file is one an agent can run.",
+    why: "Agents on their own machine must get the project working there first. Devin starts from a VM with the repo, tools and dependencies already set up, per Cognition's environment docs, as do Cursor's cloud agents, so Devin's profile weighs a runnable environment above CI. A setup written as a file is one an agent can run.",
     scoring: [
       "Full pass: two or more of these files.",
       "70%: exactly one.",
@@ -89,7 +89,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why static types help AI coding agents, how we detect type checking in a repo, and how many popular open source repos have it.",
     what: "This check asks whether the code is statically typed: a type-checker config for JavaScript, TypeScript or Python, or a language typed by design.",
-    why: "Types tell an agent what a function takes and returns without running it. It can follow a call across files and catch a wrong argument before the tests do. Cursor's profile gives type config its top weight.",
+    why: "Types tell an agent what a function takes and returns without running it, so it can follow a call across files and catch a wrong argument before the tests do. Cursor's profile gives type config its top weight.",
     scoring: [
       "Full pass: `tsconfig.json`, `jsconfig.json`, `mypy.ini`, `pyrightconfig.json`, or a `[tool.mypy]` or `[tool.pyright]` section in `pyproject.toml`.",
       "Full pass: a build file for a typed language, namely Rust, Go, Java, Kotlin, Scala, Swift, C#, OCaml, Haskell or Zig.",
@@ -102,7 +102,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why a license file matters when AI coding agents work in a repo, which files we detect, and how many popular open source repos have one.",
     what: "This check looks for a license file at the repo root: `LICENSE`, `LICENSE.md`, `LICENSE.txt`, `COPYING` or `COPYING.md`.",
-    why: "A license tells an agent, and whoever runs it, whether the code may be copied, modified or redistributed. Every profile weighs it low, since it doesn't change how well an agent edits code.",
+    why: "A license tells an agent, and whoever runs it, whether the code may be copied, modified or redistributed. Every profile weighs it low: it doesn't change how well an agent edits code.",
     scoring: ["Full pass: a license file at the repo root.", "Fail: none. We do not read which license it is."],
     fix: "Add a `LICENSE` file at the repo root. A license named only in `package.json` or the README does not pass.",
   },
@@ -111,7 +111,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why a CONTRIBUTING guide helps AI coding agents, where we look for one, and how many popular open source repos have it.",
     what: "This check looks for `CONTRIBUTING.md`, or its `.rst` or `.adoc` form, at the repo root, in `.github/` or in `docs/`.",
-    why: "A contributing guide holds the rules a pull request is judged by: branch names, commit style, required checks. An agent that opens pull requests needs them as much as a new contributor does.",
+    why: "A contributing guide holds the rules a pull request is judged by: branch names, commit style, required checks. An agent opening pull requests needs them as much as a new contributor.",
     scoring: [
       "Full pass: a contributing guide in one of those three places.",
       "Fail: none. We do not read its content.",
@@ -124,19 +124,19 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     description:
       "Why git hooks help AI coding agents, which hook frameworks we detect, and how many popular open source repos use one.",
     what: "This check looks for a git hook framework: pre-commit (`.pre-commit-config.yaml`), Husky (`.husky/`) or Lefthook (`lefthook.yml`).",
-    why: "A hook runs the formatter and linter at commit time, so an agent learns of a problem in seconds rather than minutes later from a failed CI run.",
+    why: "A hook runs the formatter and linter at commit time, so an agent learns of a problem in seconds, not minutes later from a failed CI run.",
     scoring: [
       "Full pass: a config for pre-commit, Husky or Lefthook.",
       "Fail: none. Hooks set up any other way, such as a script that writes to `.git/hooks`, are not detected.",
     ],
-    fix: "Add one of the three and have it run the formatter and linter on staged files. Keep it fast; slow checks belong in CI.",
+    fix: "Add one of the three, running the formatter and linter on staged files. Keep it fast; slow checks belong in CI.",
   },
   size: {
     title: "Codebase size: how large repos strain AI coding agents",
     description:
       "Why very large repos are harder for AI coding agents, how we count files, and how popular open source repos are spread across the size bands.",
     what: "This check counts the repo's files, skipping dotfiles, anything `.gitignore` excludes, and vendored or build folders such as `node_modules`, `vendor`, `target`, `dist` and `build`.",
-    why: "An agent holds only part of a large codebase in context at once. The more files, the more effort goes into finding the right ones, and the easier it is to miss code a change affects.",
+    why: "An agent holds only part of a large codebase in context. The more files, the harder it is to find the right ones and the easier to miss code a change affects.",
     scoring: [
       "Full pass: 50 to 499 files.",
       "90%: under 50 files.",
@@ -144,6 +144,6 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
       "50%: 2,000 to 4,999 files.",
       "20%: 5,000 files or more.",
     ],
-    fix: "Don't shrink a project for a score. Tell the agent where to start instead: name the main entry points in AGENTS.md, and give each monorepo package its own instructions file.",
+    fix: "Don't shrink a project for a score. Tell the agent where to start: name the main entry points in AGENTS.md, and give each monorepo package its own instructions file.",
   },
 };

@@ -20,7 +20,7 @@ export const GUIDE_THEMES: GuideTheme[] = [
   {
     id: "explain",
     title: "Tell the agent what it can't read from the code",
-    intro: "An agent starts every session knowing nothing. These files are what it reads first.",
+    intro: "An agent starts every session knowing nothing. It reads these files first.",
     checks: [
       {
         id: "agents_md",
@@ -28,7 +28,7 @@ export const GUIDE_THEMES: GuideTheme[] = [
       },
       { id: "readme", action: "Say what the project does, how to install it and where the main code lives." },
       { id: "contributing", action: "Write down branch, commit and review rules; link it from AGENTS.md." },
-      { id: "license", action: "Add a LICENSE file at the root, so it's clear what the code may be used for." },
+      { id: "license", action: "Add a LICENSE at the root, so it's clear how the code may be used." },
     ],
   },
   {
@@ -40,7 +40,7 @@ export const GUIDE_THEMES: GuideTheme[] = [
         id: "tests",
         action: "Keep tests in a conventional directory, and put the command that runs one file in AGENTS.md.",
       },
-      { id: "ci", action: "Define CI in the repo, so the agent can see and run what a change must pass." },
+      { id: "ci", action: "Define CI in the repo, so the agent can run what a change must pass." },
       { id: "linter", action: "Commit the linter config, so style is checked rather than copied from nearby files." },
       { id: "type_config", action: "Commit a type-checker config: a wrong argument fails before the tests run." },
       {

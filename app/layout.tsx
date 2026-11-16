@@ -14,9 +14,7 @@ import { PeerlistBadge } from "@/components/PeerlistBadge";
 import { ProductHuntBadge } from "@/components/ProductHuntBadge";
 import { SkillsShBadge } from "@/components/SkillsShBadge";
 import { VersionPill } from "@/components/VersionPill";
-import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
-import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { checkSubPath } from "@/lib/utils/check-path";
 import { BRAND_SUFFIX } from "@/lib/utils/page-title";
 import { APP_DESCRIPTION, APP_NAME, APP_URL, OG_DEFAULTS, REPO_URL, TWITTER_DEFAULTS } from "@/lib/version";
@@ -153,11 +151,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID && <Clarity />}
         {ANALYTICS_ON && <ConsentBanner />}
 
+        <a
+          href="#main"
+          className="sr-only z-30 rounded-md bg-surface px-3 py-2 text-[14px] text-ink focus:not-sr-only focus:fixed focus:top-2 focus:left-2"
+        >
+          Skip to content
+        </a>
         <header className="sticky top-0 z-20 border-b border-line/80 bg-bg/60 backdrop-blur-md backdrop-saturate-150">
           <div className="mx-auto flex max-w-[1080px] items-center justify-between gap-3 px-3 py-3 sm:px-6">
             <Link
               href="/"
-              className="tap-target flex items-center gap-2.5 text-[15px] font-semibold tracking-tight ink-link"
+              className="tap-target flex items-center gap-2.5 text-[15px] font-semibold tracking-tight text-ink hover:opacity-80"
             >
               <span
                 aria-hidden="true"
@@ -170,7 +174,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
 
             <nav aria-label="Primary" className="hidden items-center gap-4 text-[13.5px] md:flex">
               {NAV_LINKS.map((l) => (
-                <Link key={l.href} href={l.href} className="text-ink-dim hover:text-ink-soft">
+                <Link key={l.href} href={l.href} className="dim-link">
                   {l.label}
                 </Link>
               ))}
@@ -182,11 +186,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </header>
 
         <div className="mx-auto max-w-[1080px] px-3 pb-20 pt-8 sm:px-6 sm:pt-10">
-          <main id="main" className="min-h-[60vh]">
+          <main id="main" tabIndex={-1} className="min-h-[60vh] outline-none">
             {children}
           </main>
           <footer className="mt-12 border-t border-line pt-8 text-[13px] leading-[1.7] text-muted">
-            <FooterDirectory frameworks={examplesByFramework(getAgentsMdExamples()).map((f) => f.guide)} />
+            <FooterDirectory />
 
             <p className="m-0">
               Scores come from checking files in each repo. No agent is actually run. What each agent looks for comes

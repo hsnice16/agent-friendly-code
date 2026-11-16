@@ -133,7 +133,7 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
               {MODELS.map((m) => (
                 <tr key={m.id}>
                   <th scope="row" className="font-medium">
-                    <Link href={modelPath(m.id)} className={LINK}>
+                    <Link href={modelPath(m.id)} className={`${LINK} cover-link`}>
                       {m.label}
                     </Link>
                   </th>

@@ -5,7 +5,7 @@ type Suggestion = Pick<ImprovementSuggestion, "label" | "suggestion" | "scoreGai
 /** Goes in a `divide-y divide-line` list. */
 export function SuggestionItem({ index, suggestion }: { index: number; suggestion: Suggestion }) {
   return (
-    <li className="grid grid-cols-[22px_minmax(0,1fr)] gap-x-3.5 gap-y-1 py-3.5 sm:grid-cols-[22px_minmax(0,1fr)_auto]">
+    <li className="fix-row">
       <div className="glyph mt-0.5 size-[22px] bg-accent text-[11.5px] font-bold text-bg">{index + 1}</div>
 
       {/* Fix text like `.cursor/rules/*.mdc` has no break point; without these the
@@ -16,9 +16,7 @@ export function SuggestionItem({ index, suggestion }: { index: number; suggestio
       </div>
 
       {/* Under the text on phones: a column of its own leaves the fix a word per line. */}
-      <div className="col-start-2 shrink-0 whitespace-nowrap text-[13.5px] sm:col-start-auto sm:self-center font-semibold tabular-nums text-ok">
-        +{suggestion.scoreGain.toFixed(1)} pts
-      </div>
+      <div className="fix-impact">+{suggestion.scoreGain.toFixed(1)} pts</div>
     </li>
   );
 }

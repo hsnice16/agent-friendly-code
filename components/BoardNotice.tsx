@@ -1,6 +1,6 @@
 import { prefetchBoardData } from "@/lib/use-board-data";
 
-const BUTTON = "text-ink-dim hover:text-ink-soft";
+const BUTTON = "prose-link";
 
 /** Shown in place of the rows when a re-cut can't be computed. */
 export function BoardNotice({ reason }: { reason: "error" | "stale" }) {

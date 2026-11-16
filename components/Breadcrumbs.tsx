@@ -19,7 +19,7 @@ export function Breadcrumbs({ current, parents }: { current: Crumb; parents: Cru
                   {c.name}
                 </span>
               ) : (
-                <Link href={c.path} className="tap-target text-muted no-underline hover:text-ink hover:no-underline">
+                <Link href={c.path} className="tap-target text-muted hover:text-ink">
                   {c.name}
                 </Link>
               )}

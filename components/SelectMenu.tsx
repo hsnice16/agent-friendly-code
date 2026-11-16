@@ -116,7 +116,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         aria-controls={`${id}-list`}
         onKeyDown={onTriggerKey}
         onClick={() => (open ? setOpen(false) : openMenu())}
-        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 text-[13px] text-ink-dim hover:text-ink-soft"
+        className="inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-line bg-surface px-3 text-[13px] text-ink-dim hover:bg-surface-hover hover:text-ink"
       >
         <span className="whitespace-nowrap">{current.shortLabel ?? current.label}</span>
         <CaretDown size={11} weight="bold" aria-hidden="true" className="text-muted" />
@@ -138,7 +138,7 @@ export function SelectMenu({ label, options, value, onChange }: Props) {
         }}
         className={`absolute top-full z-30 mt-1 min-w-[220px] overflow-hidden rounded-md border border-line bg-surface shadow-md outline-none transition duration-150 ease-out ${
           alignEnd ? "right-0 origin-top-right" : "left-0 origin-top-left"
-        } ${open ? "scale-100 opacity-100 pointer-events-auto" : "scale-0 opacity-0 pointer-events-none"}`}
+        } ${open ? "scale-100 opacity-100 pointer-events-auto" : "scale-95 opacity-0 pointer-events-none"}`}
       >
         {options.map((o, i) => {
           const selected = o.value === value;

@@ -13,7 +13,7 @@ export const RUST: AgentsMdGuide = {
       cmd: "cargo fmt --all -- --check",
       note: "exits non-zero if anything is unformatted; settings in `rustfmt.toml`",
     },
-    { cmd: "cargo test --all-features", note: "tests and Clippy build default features only unless told otherwise" },
+    { cmd: "cargo test --all-features", note: "tests and Clippy build only default features unless told otherwise" },
   ],
   layout: [
     "The workspace members and what each crate is for; they share one `Cargo.lock` and `target/`.",

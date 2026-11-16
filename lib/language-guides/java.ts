@@ -4,7 +4,7 @@ export const JAVA: AgentsMdGuide = {
   slug: "java",
   label: "Java",
   intro:
-    "Say whether the build is Maven or Gradle, and run it through the wrapper the repo commits (`./mvnw`, `./gradlew`), which fetches the build tool version the project pins. In a multi-module build, say how to build and test one module.",
+    "Say Maven or Gradle, and run it through the committed wrapper (`./mvnw`, `./gradlew`), which fetches the build tool version the project pins. In a multi-module build, say how to build and test one module.",
   commands: [
     { cmd: "./gradlew build", note: "assembles and runs every check, tests included" },
     { cmd: "./gradlew test --tests FooTest.bar", note: "one test class or method" },

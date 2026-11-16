@@ -26,3 +26,18 @@ export const CHECK_MISSING_LIMIT = 8;
 
 // How many of the most-weighted checks /check and /guide single out.
 export const START_WITH_CHECKS = 3;
+
+// "Best agent for <language>" ranks every agent by average; below this many repos one
+// repo's setup moves the ranking, so the page would rank noise. /contribute uses
+// it too: below it a language's top picks are most of its repos.
+export const LANGUAGE_AGENTS_MIN_REPOS = 15;
+
+export const CONTRIBUTE_TOP = 25;
+export const CONTRIBUTE_LANGUAGE_TOP = 8;
+
+// Fewer files than this give a median that one repo can swing.
+export const SIZE_GROUP_MIN = 8;
+export const SIZE_LANGUAGE_LIMIT = 6;
+
+export const GAP_LIST_LIMIT = 5;
+export const WEIGHT_GAP_LIMIT = 6;

@@ -38,10 +38,12 @@ export function hostLabel(host: string): string {
   return HOST_LABELS[host] ?? host;
 }
 
-// One decimal under 1%: rounding "1 of 371" to "0%" would read as "none".
+// One decimal within 1% of either end: "1 of 371" as "0%" would read as "none",
+// "401 of 402" as "100%" as "all". Multiplying first keeps 23 of 40 at 57.5, not 57.4999….
 export function percent(part: number, total: number): string {
-  const value = total === 0 ? 0 : (part / total) * 100;
-  return `${value > 0 && value < 1 ? value.toFixed(1) : Math.round(value)}%`;
+  const value = total === 0 ? 0 : (part * 100) / total;
+  const nearEnd = (value > 0 && value < 1) || (value > 99 && value < 100);
+  return `${nearEnd ? value.toFixed(1) : Math.round(value)}%`;
 }
 
 const DATE = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });

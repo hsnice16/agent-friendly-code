@@ -23,7 +23,7 @@ import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getModelScores } from "@/lib/db";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
-import { starterAgentsMd } from "@/lib/starter-agents-md";
+import { starterIfMissing } from "@/lib/starter-agents-md";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { topicLabel, topicLinks } from "@/lib/topics";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
@@ -95,10 +95,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     ? buildRepoReport({ repo, summary, board, signals, rates: checkRates(signals, repo.language) })
     : null;
   const instructions = agentInstructions(signals, agentFileShare(repo.language));
-  const starter =
-    instructions && (!instructions.main || instructions.main.state === "empty")
-      ? starterAgentsMd({ ...repo, description: about.description }, signals)
-      : null;
+  const starter = starterIfMissing(instructions, { ...repo, description: about.description }, signals);
 
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
   const hubs = groupByLanguage(board).filter(isHub);

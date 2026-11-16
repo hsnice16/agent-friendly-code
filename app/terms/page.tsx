@@ -4,10 +4,11 @@ import Link from "next/link";
 import { ExternalLink } from "@/components/ExternalLink";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { legalDate, TERMS_UPDATED } from "@/lib/constants/legal";
 import { staticPageMetadata } from "@/lib/page-meta";
 import { APP_NAME, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
 
-const LAST_UPDATED = "October 10, 2026";
+const LAST_UPDATED = legalDate(TERMS_UPDATED);
 
 export const metadata: Metadata = staticPageMetadata("/terms");
 
@@ -26,7 +27,7 @@ export default function TermsPage() {
         <PanelHeading>Acceptance</PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           By accessing or using <span className="mr-0.5">{APP_NAME}</span> (the &ldquo;Service&rdquo;), you agree to
-          these Terms of Use. If you do not agree, please do not use the Service.
+          these Terms of Use. If you do not agree, do not use the Service.
         </p>
       </Panel>
 
@@ -70,8 +71,8 @@ export default function TermsPage() {
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
             Scores and signal results are computed by shallow-cloning the head of public repositories and running
             heuristics over the working tree. If you maintain a repository that appears here and believe its score is
-            inaccurate, please open an issue on the{" "}
-            <ExternalLink href={`${REPO_URL}/issues`}>source repository</ExternalLink> and we will revisit it.
+            inaccurate, open an issue on the <ExternalLink href={`${REPO_URL}/issues`}>source repository</ExternalLink>{" "}
+            and we will revisit it.
           </p>
         </Panel>
       </div>
@@ -80,7 +81,7 @@ export default function TermsPage() {
         <Panel>
           <PanelHeading>Intellectual property</PanelHeading>
           <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
-            The source code of the Service is released under the MIT License (see{" "}
+            The Service&apos;s source code is released under the MIT License (see{" "}
             <ExternalLink href={`${REPO_URL}/blob/main/LICENSE`}>LICENSE</ExternalLink>). The textual content and visual
             design of this Service are © Himanshu Singh and provided for personal, non-commercial reading. All
             third-party trademarks (Claude Code, Cursor, Devin, Codex, Gemini, Kimi, Aider, OpenHands, Pi, GitHub,

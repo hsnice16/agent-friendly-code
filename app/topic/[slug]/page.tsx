@@ -82,6 +82,7 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         totalPages={1}
         rows={t.rows}
         clearSearchHref={path}
+        prefetch={false}
         activeLabel={`${t.label} repos, overall`}
       />
 
@@ -92,7 +93,7 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         >
           <span>Related topics:</span>
           {t.related.map((g) => (
-            <Link key={g.slug} href={topicPath(g.slug)} className="text-ink-dim hover:text-ink-soft">
+            <Link key={g.slug} href={topicPath(g.slug)} className="dim-link">
               {g.label}
             </Link>
           ))}

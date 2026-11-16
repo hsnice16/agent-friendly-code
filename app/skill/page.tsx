@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
+import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -54,7 +55,7 @@ export default function SkillPage() {
       <PageHeader
         crumbs={{ current: { name: "Agent Skill", path: "/skill" } }}
         title="Agent Friendly Skill: score the repo you're in"
-        lead={`Scores the repo you're in for ${MODELS.length} agents, locally and offline, and suggests a model class.`}
+        lead={`A score for each of ${MODELS.length} agents, locally and offline, and a suggested model class.`}
       />
 
       <Panel tone="tip">
@@ -167,14 +168,7 @@ export default function SkillPage() {
         <Panel>
           <PanelHeading>FAQ</PanelHeading>
 
-          <ul className="m-0 list-none p-0">
-            {SKILL_FAQ.map((entry) => (
-              <li key={entry.q} className="border-b border-line py-3 last:border-b-0">
-                <div className="text-[14.5px] font-medium text-ink">{entry.q}</div>
-                <p className="m-0 mt-1 text-[13.5px] leading-relaxed text-ink-dim">{entry.a}</p>
-              </li>
-            ))}
-          </ul>
+          <FaqList items={SKILL_FAQ.map((e) => ({ key: e.q, q: e.q, a: e.a }))} />
         </Panel>
       </div>
 

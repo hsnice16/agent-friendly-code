@@ -11,7 +11,9 @@ export function RepoAbout({ about, topicLinks = {} }: { about: RepoAboutData; to
 
   return (
     <section aria-label="About this repo" className="mt-2.5">
-      {description && <p className="m-0 max-w-[72ch] text-[14px] leading-snug text-ink-dim">{description}</p>}
+      {description && (
+        <p className="m-0 max-w-[72ch] text-[14px] leading-snug text-ink-dim [overflow-wrap:anywhere]">{description}</p>
+      )}
       {topics.length > 0 && (
         <ul
           aria-label="Topics"

@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { CHECK_CONTENT } from "../lib/check-content";
+import { VS_AGENTS_MD } from "../lib/check-content/vs-agents-md";
 import { leaderboardDescription, leaderboardTitle } from "../lib/leaderboard-meta";
 import type { LeaderboardView } from "../lib/leaderboard-view";
 import { MODELS } from "../lib/scoring/weights";
@@ -38,6 +39,13 @@ describe("check page titles", () => {
       assert.ok(c.description.length <= MAX_DESCRIPTION_LENGTH, id);
     }
   });
+
+  it("fit a search result on the vs-agents-md pages", () => {
+    for (const [id, c] of Object.entries(VS_AGENTS_MD)) {
+      assert.ok(pageTitle(c.title).absolute.length <= MAX_TITLE_LENGTH, id);
+      assert.ok(c.description.length <= MAX_DESCRIPTION_LENGTH, id);
+    }
+  });
 });
 
 describe("leaderboard metadata", () => {
@@ -48,6 +56,14 @@ describe("leaderboard metadata", () => {
         assert.ok(leaderboardTitle(v).length <= MAX_TITLE_LENGTH, leaderboardTitle(v));
         assert.ok(leaderboardDescription(v).length <= MAX_DESCRIPTION_LENGTH, leaderboardDescription(v));
       }
+    }
+  });
+
+  it("words every agent board the same, for the searches that reach it", () => {
+    for (const m of MODELS) {
+      const t = leaderboardTitle(view({ model: m.id }));
+      assert.equal(t, `Best GitHub repos for ${m.label}: ranked leaderboard`);
+      assert.match(leaderboardDescription(view({ model: m.id })), new RegExp(`^The ${m.label} leaderboard: `));
     }
   });
 

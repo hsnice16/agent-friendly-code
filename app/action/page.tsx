@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 
 import { ActionEmbed } from "@/components/ActionEmbed";
 import { ExternalLink } from "@/components/ExternalLink";
+import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -158,14 +159,7 @@ export default function ActionPage() {
         <Panel>
           <PanelHeading>FAQ</PanelHeading>
 
-          <ul className="m-0 list-none p-0">
-            {FAQ.map((entry) => (
-              <li key={entry.q} className="border-b border-line py-3 last:border-b-0">
-                <div className="text-[14.5px] font-medium text-ink">{entry.q}</div>
-                <p className="m-0 mt-1 text-[13.5px] leading-relaxed text-ink-dim">{entry.a}</p>
-              </li>
-            ))}
-          </ul>
+          <FaqList items={FAQ.map((e) => ({ key: e.q, q: e.q, a: e.a }))} />
         </Panel>
       </div>
 

@@ -61,7 +61,7 @@
     --color-bg: #0a0a0a;
     --color-surface: #131313;
     --color-surface-2: #0f0f0f;
-    --color-surface-hover: #1a1a1a;
+    --color-surface-hover: #202020;
     --color-line: #262626;
     --color-line-strong: #333333;
     --color-ink: #ededed;
@@ -90,11 +90,116 @@
   border-radius: calc(infinity * 1px);
 }
 
+/* Phosphor's Gauge (duotone) as a mask, for LiveScoreNudge: as an inline SVG it
+   shipped twice on every repo page (HTML and RSC payload); here it loads once. */
+@utility icon-gauge {
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath opacity='0.2' d='M232,152v24a8,8,0,0,1-8,8H32a8,8,0,0,1-8-8V153.13C24,95.65,70.15,48.2,127.63,48A104,104,0,0,1,232,152Z'/%3E%3Cpath d='M207.06,72.67A111.24,111.24,0,0,0,128,40h-.4C66.07,40.21,16,91,16,153.13V176a16,16,0,0,0,16,16H224a16,16,0,0,0,16-16V152A111.25,111.25,0,0,0,207.06,72.67ZM224,176H119.71l54.76-75.3a8,8,0,0,0-12.94-9.42L99.92,176H32V153.13c0-3.08.15-6.12.43-9.13H56a8,8,0,0,0,0-16H35.27c10.32-38.86,44-68.24,84.73-71.66V80a8,8,0,0,0,16,0V56.33A96.14,96.14,0,0,1,221,128H200a8,8,0,0,0,0,16h23.67c.21,2.65.33,5.31.33,8Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* The external-file arrow of the long repo tables: a mask, so each row ships a
+   class name instead of an SVG (twice, in the HTML and the RSC payload). */
+@utility icon-out {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  background-color: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z'/%3E%3C/svg%3E")
+    center / contain no-repeat;
+}
+
+/* CodeText's inline code: dozens per guide page, each class string shipped twice. */
+@utility code-chip {
+  border-radius: 0.25rem;
+  border: 1px solid var(--color-line);
+  background-color: var(--color-surface-2);
+  padding: calc(var(--spacing) * 0.5) calc(var(--spacing) * 1);
+  font-family: var(--font-mono);
+  font-size: 0.86em;
+  color: var(--color-ink);
+}
+
+/* The repo-name column of the long repo tables (examples, contribute, AI policy). */
+@utility repo-cell {
+  min-width: 7rem;
+  overflow-wrap: break-word;
+
+  @media (width >= 40rem) {
+    min-width: 9rem;
+  }
+}
+
 @utility tile {
   border-radius: var(--radius-lg);
   border: 1px solid var(--color-line);
   background-color: var(--color-surface-2);
   padding: calc(var(--spacing) * 3) calc(var(--spacing) * 3.5);
+}
+
+/* A list row that leads somewhere: the whole row is the target (pair with a
+   cover-link inside) and highlights the way a board row does. */
+@utility link-row {
+  position: relative;
+  margin-inline: calc(var(--spacing) * -2);
+  border-radius: var(--radius-md);
+  padding-inline: calc(var(--spacing) * 2);
+
+  @media (hover: hover) {
+    &:hover {
+      border-color: transparent;
+      background-color: var(--color-surface-hover);
+    }
+  }
+
+  & :is(a, button):not(.cover-link) {
+    position: relative;
+  }
+}
+
+@utility link-list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  list-style-type: none;
+  padding: 0;
+  font-size: 14.5px;
+  color: var(--color-ink-dim);
+}
+
+/* Every list of link-rows gets the same rule between rows and the same height,
+   in a layer below utilities so a row style like agent-row keeps its own. */
+@layer components {
+  .link-row {
+    padding-block: calc(var(--spacing) * 2);
+  }
+
+  .link-row:not(:last-child),
+  /* In a multi-column grid every column must end alike, so each row gets one. */
+  .grid > .link-row {
+    border-bottom: 1px solid var(--color-line);
+  }
+}
+
+/* The rules under a hovered row and under the row above it would cut through
+   the highlight, so both fade, in lists and tables alike. */
+@media (hover: hover) {
+  .link-row:has(+ .link-row:hover),
+  .data-table tbody > tr:has(.cover-link):hover > *,
+  .data-table tbody > tr:has(+ tr:has(.cover-link):hover) > *,
+  [data-board-rows] > tr:hover > td,
+  [data-board-rows] > tr:has(+ tr:hover) > td {
+    border-bottom-color: transparent;
+  }
+
+  .tile:is(a, :has(.cover-link)):hover {
+    border-color: var(--color-line-strong);
+    background-color: var(--color-surface-hover);
+    translate: 0 -1px;
+  }
 }
 
 @utility eyebrow {
@@ -129,14 +234,14 @@
   }
 }
 
+/* A link inside muted prose: set apart by weight and a darker ink, not a rule under it. */
 @utility prose-link {
-  border-bottom: 1px dotted color-mix(in oklab, var(--color-ink-dim) 60%, transparent);
-  color: var(--color-ink-dim);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-ink);
 
   @media (hover: hover) {
     &:hover {
-      border-color: var(--color-ink-soft);
-      color: var(--color-ink-soft);
+      color: var(--color-ink-dim);
     }
   }
 }
@@ -164,12 +269,24 @@
   letter-spacing: 0.08em;
 }
 
+/* Hover fades to ink-dim: ink-soft is too close to ink to show, and an underline reads as clutter. */
 @utility ink-link {
   color: var(--color-ink);
 
   @media (hover: hover) {
     &:hover {
-      color: var(--color-ink-soft);
+      color: var(--color-ink-dim);
+    }
+  }
+}
+
+/* ink-link for a secondary link in ink-dim: a nav row, or a second target in a table row. */
+@utility dim-link {
+  color: var(--color-ink-dim);
+
+  @media (hover: hover) {
+    &:hover {
+      color: var(--color-ink);
     }
   }
 }
@@ -259,6 +376,7 @@
 
 @utility check-detail {
   margin-top: calc(var(--spacing) * 0.5);
+  overflow-wrap: anywhere;
   font-size: 13.5px;
   color: var(--color-ink-dim);
 }
@@ -270,6 +388,64 @@
   font-size: var(--text-xs);
   line-height: var(--tw-leading, var(--text-xs--line-height));
   color: var(--color-muted);
+}
+
+/* Repo-page rows: each sits on all ~400 repo pages several times, so the class
+   strings live here once instead of in every row of every page's payload. */
+@utility info-row {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 1);
+  border-bottom: 1px solid var(--color-line);
+  padding-block: calc(var(--spacing) * 3);
+
+  &:last-child {
+    border-bottom-width: 0;
+  }
+
+  @media (width >= 40rem) {
+    grid-template-columns: 180px minmax(0, 1fr);
+    gap: calc(var(--spacing) * 4);
+  }
+}
+
+@utility rate-row {
+  display: grid;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: calc(var(--spacing) * 1);
+
+  @media (width >= 40rem) {
+    grid-template-columns: minmax(0, 1fr) 160px;
+    align-items: center;
+    gap: calc(var(--spacing) * 4);
+  }
+}
+
+@utility fix-row {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  column-gap: calc(var(--spacing) * 3.5);
+  row-gap: calc(var(--spacing) * 1);
+  padding-block: calc(var(--spacing) * 3.5);
+
+  @media (width >= 40rem) {
+    grid-template-columns: 22px minmax(0, 1fr) auto;
+  }
+}
+
+@utility fix-impact {
+  grid-column-start: 2;
+  flex-shrink: 0;
+  white-space: nowrap;
+  font-size: 13.5px;
+  font-weight: var(--font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--color-ok);
+
+  @media (width >= 40rem) {
+    grid-column-start: auto;
+    align-self: center;
+  }
 }
 
 @utility agent-row {
@@ -472,6 +648,32 @@
   }
 }
 
+/* A button inside a card or beside a line of text, where 44px would dwarf it.
+   Two classes so it beats the base size whatever order Tailwind emits them in;
+   phones keep a 44px hit area around the smaller box. */
+@layer utilities {
+  :is(.btn-primary, .btn-secondary).btn-sm {
+    position: relative;
+    min-height: 34px;
+    gap: calc(var(--spacing) * 1.25);
+    border-radius: var(--radius-md);
+    padding: 0 calc(var(--spacing) * 3);
+    font-size: 13.5px;
+
+    @media (width < 40rem) {
+      &::after {
+        content: "";
+        position: absolute;
+        inset: -5px 0;
+      }
+    }
+  }
+
+  :is(.btn-primary, .btn-secondary):active:not(:disabled) {
+    scale: 0.97;
+  }
+}
+
 /* No focus style, deliberately: the caret marks a focused field. */
 @utility field {
   min-width: 0;
@@ -488,6 +690,12 @@
     color: var(--color-muted);
   }
 
+  @media (hover: hover) {
+    &:hover:not(:disabled) {
+      border-color: var(--color-line-strong);
+    }
+  }
+
   &:disabled {
     cursor: not-allowed;
     opacity: 0.5;
@@ -502,18 +710,18 @@
   padding: calc(var(--spacing) * 4);
 }
 
-/* ---------- consistency pass: links, tables, chips, tap targets ---------- */
+/* ---------- links, tables, chips, tap targets ---------- */
 
 /* "See all →" and friends, standalone or ending a sentence. The arrow must not
    wrap onto a line of its own. */
 @utility arrow-link {
   white-space: nowrap;
   font-weight: var(--font-weight-medium);
-  color: var(--color-ink);
+  color: var(--color-ink-dim);
 
   @media (hover: hover) {
     &:hover {
-      color: var(--color-ink-soft);
+      color: var(--color-ink);
     }
   }
 }
@@ -545,6 +753,23 @@
 
   & tbody > tr:last-child > * {
     border-bottom-width: 0;
+  }
+
+  /* A row whose main link is a cover-link opens as a whole, like a board row;
+     its other links sit above the cover so they still work. */
+  & tbody > tr:has(.cover-link) {
+    position: relative;
+    cursor: pointer;
+  }
+
+  & tbody > tr:has(.cover-link) :is(a, button):not(.cover-link) {
+    position: relative;
+  }
+
+  @media (hover: hover) {
+    & tbody > tr:has(.cover-link):hover > * {
+      background-color: var(--color-surface-hover);
+    }
   }
 
   @media (width >= 40rem) {
@@ -617,16 +842,6 @@ body {
   overflow-x: hidden;
 }
 
-a,
-a:link,
-a:visited,
-a:hover,
-a:focus,
-a:focus-visible,
-a:active {
-  text-decoration: none !important;
-}
-
 /* Tailwind v4's preflight dropped the pointer cursor on buttons. In the base
    layer so a cursor-* utility on a button still wins. */
 @layer base {
@@ -642,12 +857,40 @@ button,
 input,
 select,
 textarea,
-.transition-surface {
+.transition-surface,
+.link-row,
+.tile,
+.data-table td,
+.data-table tbody th {
   transition:
     color 150ms ease-out,
     background-color 150ms ease-out,
     border-color 150ms ease-out,
-    opacity 150ms ease-out;
+    opacity 150ms ease-out,
+    scale 120ms ease-out,
+    translate 150ms ease-out;
+}
+
+/* <details> slides open and shut where the browser can animate to `auto`;
+   elsewhere it snaps. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (interpolate-size: allow-keywords) {
+    details {
+      interpolate-size: allow-keywords;
+    }
+
+    details::details-content {
+      block-size: 0;
+      overflow-y: clip;
+      transition:
+        block-size 200ms ease-out,
+        content-visibility 200ms allow-discrete;
+    }
+
+    details[open]::details-content {
+      block-size: auto;
+    }
+  }
 }
 
 /* In the base layer so a rounded-* utility keeps its shape when focused. */

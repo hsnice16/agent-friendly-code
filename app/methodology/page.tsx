@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
+import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -34,7 +35,7 @@ export default function MethodologyPage() {
       <PageHeader
         crumbs={{ current: { name: "Methodology", path: "/methodology" } }}
         title={`How ${APP_NAME} scores repos`}
-        lead="How we work out each score, what we check, and what we can't check yet."
+        lead="What we check, the formula, and what we can't check yet."
       >
         <p className="mt-2 mb-0 text-[13px] text-muted">{weightsChangedText()}</p>
       </PageHeader>
@@ -85,19 +86,21 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
             {SIGNALS.map((s) => (
               <li
                 key={s.id}
-                className="flex flex-col gap-2 border-b border-line py-3 last:border-b-0 sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
+                className="flex flex-col gap-2 py-3 link-row sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
               >
                 <div>
-                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium ink-link">
+                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium ink-link cover-link">
                     {s.label}
                   </Link>
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
                 </div>
 
                 <div className="min-w-0 [overflow-wrap:anywhere]">
-                  <div className="text-sm text-ink-dim">{s.description}</div>
+                  <div className="text-sm text-ink-dim">
+                    <CodeText text={s.description} />
+                  </div>
                   <div className="mt-1.5 text-[13px] text-muted">
-                    <strong className="text-ink-dim">Improve:</strong> {s.improveSuggestion}
+                    <strong className="text-ink-dim">Improve:</strong> <CodeText text={s.improveSuggestion} />
                   </div>
                 </div>
               </li>
@@ -112,7 +115,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
           <nav aria-label="Agents" className="mt-2 mb-1 flex flex-wrap gap-x-3 gap-y-1 text-[13px]">
             {MODELS.map((m) => (
-              <a key={m.id} href={`#model-${m.id}`} className="text-ink-dim hover:text-ink-soft">
+              <a key={m.id} href={`#model-${m.id}`} className="dim-link">
                 {m.label}
               </a>
             ))}
@@ -140,7 +143,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
 
                 <details className="mt-2 text-[13px] text-muted">
                   {/* The padding makes a 44px tap target; the margin gives the space back. */}
-                  <summary className="-my-2.5 cursor-pointer py-2.5">Weights</summary>
+                  <summary className="-my-2.5 cursor-pointer py-2.5 hover:text-ink">Weights</summary>
 
                   <pre className="mt-2 overflow-x-auto rounded-lg border border-line bg-surface-2 px-3 py-2 font-mono text-xs leading-relaxed">
                     {Object.entries(m.weights)
@@ -180,16 +183,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Questions</PanelHeading>
-          <dl className="m-0">
-            {METHODOLOGY_FAQ.map((entry) => (
-              <div key={entry.q} className="border-b border-line py-3.5 first:pt-0 last:border-b-0 last:pb-0">
-                <dt className="m-0 text-[14.5px] font-semibold text-ink">{entry.q}</dt>
-                <dd className="m-0 mt-1.5 text-[14px] leading-relaxed text-ink-dim">
-                  <CodeText text={entry.a} />
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <FaqList items={METHODOLOGY_FAQ.map((e) => ({ key: e.q, q: e.q, a: <CodeText text={e.a} /> }))} />
         </Panel>
       </div>
     </>

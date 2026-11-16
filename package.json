@@ -18,6 +18,7 @@
     "seed-packages": "tsx scripts/seed-packages.ts",
     "audit-seeds": "tsx scripts/audit-seeds.ts",
     "badge-adopters": "tsx scripts/badge-adopters.ts",
+    "file-census": "tsx scripts/file-census.ts",
     "init-db": "tsx scripts/init-db.ts",
     "check-db-leaks": "tsx scripts/check-db-leaks.ts",
     "indexnow": "tsx scripts/indexnow.ts",

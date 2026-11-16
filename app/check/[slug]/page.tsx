@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentsMdGuide } from "@/components/AgentsMdGuide";
+import { AgentsMdPractices } from "@/components/AgentsMdPractices";
+import { CheckPracticePanel } from "@/components/CheckPracticePanel";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
 import { JsonLd } from "@/components/JsonLd";
@@ -11,17 +13,18 @@ import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
+import { CHECK_PRACTICE } from "@/lib/check-content/practice";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
+import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
-import { REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
@@ -64,6 +67,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
   const content = CHECK_CONTENT[id];
   const questions = CHECK_QUESTIONS[id];
   const stats = getCheckStats(id);
+  const practice = Object.hasOwn(CHECK_PRACTICE, id) ? CHECK_PRACTICE[id] : null;
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
   const { contentChangedAt } = getLeaderboardStats();
   const examples = id === "agents_md" ? getAgentsMdExamples() : null;
@@ -112,9 +116,21 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         </Panel>
       </div>
 
+      {practice && (
+        <div className="mt-3.5">
+          <CheckPracticePanel practice={practice} stats={stats} />
+        </div>
+      )}
+
       {examples && (
         <div className="mt-3.5">
           <AgentsMdGuide medianLength={examples.medianLength} files={examples.rows.length} />
+        </div>
+      )}
+
+      {examples && (
+        <div className="mt-3.5">
+          <AgentsMdPractices />
         </div>
       )}
 
@@ -148,10 +164,10 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
       <div className="mt-3.5 grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
         <Panel className="h-full">
           <PanelHeading>{questions.agents}</PanelHeading>
-          <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+          <ul className="link-list">
             {stats.agents.map(({ model, share }) => (
-              <li key={model.id} className="flex items-baseline justify-between gap-3">
-                <Link href={modelPath(model.id)} className={LINK}>
+              <li key={model.id} className="flex items-baseline justify-between gap-3 link-row">
+                <Link href={modelPath(model.id)} className={`${LINK} cover-link`}>
                   {model.label}
                 </Link>
                 <span className="tabular-nums">{percent(share, 1)} of its score</span>
@@ -163,10 +179,10 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         {languages.length > 0 && (
           <Panel className="h-full">
             <PanelHeading>Pass rate by language</PanelHeading>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+            <ul className="link-list">
               {languages.map((l) => (
-                <li key={l.slug} className="flex items-baseline justify-between gap-3">
-                  <Link href={hubPath(l.slug)} className={LINK}>
+                <li key={l.slug} className="flex items-baseline justify-between gap-3 link-row">
+                  <Link href={hubPath(l.slug)} className={`${LINK} cover-link`}>
                     {l.label}
                   </Link>
                   <span className="tabular-nums">
@@ -178,23 +194,6 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           </Panel>
         )}
       </div>
-
-      {id === "agents_md" && (
-        <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
-          <Link href={checkSubPath(id, "examples")} className={LINK}>
-            AGENTS.md examples
-          </Link>
-          : every one on the leaderboard, linked to its source.{" "}
-          <Link href={checkSubPath(id, "vs-claude-md")} className={LINK}>
-            AGENTS.md vs CLAUDE.md
-          </Link>
-          : which to use.{" "}
-          <Link href={REPORT_PATH} className={LINK}>
-            {REPORT_TITLE}
-          </Link>
-          : how many repos have one, over time.
-        </p>
-      )}
 
       {Object.hasOwn(VS_AGENTS_MD, id) && (
         <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
@@ -229,6 +228,15 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           how to make your repo ready for AI coding agents
         </Link>
         .
+        {id === "contributing" && (
+          <>
+            {" "}
+            <Link href={CONTRIBUTE_PATH} className="prose-link">
+              Projects ready for agent-assisted contributions
+            </Link>
+            .
+          </>
+        )}
       </p>
 
       <nav
@@ -237,7 +245,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
       >
         <span>Other checks:</span>
         {SIGNALS.filter((s) => s.id !== id).map((s) => (
-          <Link key={s.id} href={checkPath(s.id)} className="text-ink-dim hover:text-ink-soft">
+          <Link key={s.id} href={checkPath(s.id)} className="dim-link">
             {s.label}
           </Link>
         ))}

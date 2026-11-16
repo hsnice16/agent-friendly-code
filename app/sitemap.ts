@@ -1,11 +1,15 @@
 import type { MetadataRoute } from "next";
-
+import { getAgentLanguages } from "@/lib/agent-scores-data";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ADOPTION } from "@/lib/agents-md-report";
+import { AI_POLICY } from "@/lib/ai-policy";
 import { LATEST_RELEASE_DATE } from "@/lib/changelog";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
+import { COMPARE_PAIRS } from "@/lib/compare-pairs";
+import { PRIVACY_UPDATED, TERMS_UPDATED } from "@/lib/constants/legal";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
+import { GUIDES } from "@/lib/guides";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNALS } from "@/lib/scoring/signals";
@@ -13,16 +17,19 @@ import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicPath } from "@/lib/topics";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { COMPARE_PATH, comparePath } from "@/lib/utils/compare-path";
+import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { dayEpoch } from "@/lib/utils/format";
-import { hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { guidePath } from "@/lib/utils/guide-path";
+import { hubPath, isHub, languageAgentsPath, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
-import { REPORT_PATH } from "@/lib/utils/report-path";
+import { AI_POLICY_REPORT_PATH, REPORT_PATH, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_URL } from "@/lib/version";
 
-const LEGAL_LAST_UPDATED = new Date("2026-10-10");
 // The framework pages' guide text changes with no row moving; bump this when it does.
-const FRAMEWORK_GUIDES_UPDATED = new Date("2026-11-04");
+const FRAMEWORK_GUIDES_UPDATED = new Date("2026-11-16");
 
 function newest(rows: { content_changed_at: number | null }[]): Date | undefined {
   const changed = Math.max(0, ...rows.map((r) => r.content_changed_at ?? 0));
@@ -34,7 +41,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // or rescore teaches Google to ignore it.
   const stats = getLeaderboardStats();
   const contentChanged = stats.contentChangedAt != null ? new Date(stats.contentChangedAt * 1000) : undefined;
-  // Methodology and changelog change only in a release; no other static page has a dated source.
+  // Methodology and changelog change only in a release; a page with no dated source gets no lastmod.
   const released = new Date(LATEST_RELEASE_DATE);
   const board = listLeaderboardOverall();
   // The report's series moves with its last point, its language and other-file panels with the live board.
@@ -97,13 +104,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.3,
       changeFrequency: "yearly",
       url: `${APP_URL}/privacy`,
-      lastModified: LEGAL_LAST_UPDATED,
+      lastModified: new Date(PRIVACY_UPDATED),
     },
     {
       priority: 0.3,
       url: `${APP_URL}/terms`,
       changeFrequency: "yearly",
-      lastModified: LEGAL_LAST_UPDATED,
+      lastModified: new Date(TERMS_UPDATED),
     },
     {
       priority: 0.6,
@@ -224,10 +231,45 @@ export default function sitemap(): MetadataRoute.Sitemap {
     url: `${APP_URL}${checkPath(s.id)}`,
   }));
 
+  const guideRoutes: MetadataRoute.Sitemap = GUIDES.map((g) => ({
+    priority: 0.8,
+    changeFrequency: "weekly",
+    url: `${APP_URL}${guidePath(g.slug)}`,
+    lastModified: new Date(Math.max(new Date(g.updated).getTime(), contentChanged?.getTime() ?? 0)),
+  }));
+
+  // Every one of these is built from the board, so it moves when the board does.
+  const boardPages: { path: string; priority: number }[] = [
+    { path: SIZE_REPORT_PATH, priority: 0.7 },
+    { path: CONTRIBUTE_PATH, priority: 0.7 },
+    { path: COMPARE_PATH, priority: 0.6 },
+    ...COMPARE_PAIRS.map((p) => ({ path: comparePath(p.slug), priority: 0.6 })),
+    ...getAgentLanguages().map((g) => ({ path: languageAgentsPath(g.slug), priority: 0.5 })),
+    { path: GENERATOR_PATH, priority: 0.6 },
+  ];
+  const boardPageRoutes: MetadataRoute.Sitemap = boardPages.map((p) => ({
+    priority: p.priority,
+    changeFrequency: "weekly",
+    url: `${APP_URL}${p.path}`,
+    lastModified: contentChanged,
+  }));
+  // Hand-classified on the date it records; a rescore doesn't change it.
+  const policyRoute: MetadataRoute.Sitemap = [
+    {
+      priority: 0.7,
+      changeFrequency: "monthly",
+      url: `${APP_URL}${AI_POLICY_REPORT_PATH}`,
+      lastModified: new Date(AI_POLICY.checked),
+    },
+  ];
+
   // No /package/<registry>/<name>: those pages are noindex (see their page.tsx).
   return [
     ...staticRoutes,
     ...checkRoutes,
+    ...guideRoutes,
+    ...boardPageRoutes,
+    ...policyRoute,
     ...examplesRoutes,
     ...modelRoutes,
     ...hubRoutes,

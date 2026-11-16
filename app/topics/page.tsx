@@ -14,7 +14,7 @@ export function generateMetadata(): Metadata {
   return getTopicGroups().length > 0 ? meta : { ...meta, robots: { index: false, follow: true } };
 }
 
-const LINK_CLASS = "text-ink-dim hover:text-ink-soft";
+const LINK_CLASS = "dim-link";
 
 export default function TopicsPage() {
   const topics = getTopicGroups();

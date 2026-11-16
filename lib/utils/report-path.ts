@@ -2,3 +2,5 @@
 export const REPORT_PATH = "/report/agents-md";
 export const REPORT_CSV_PATH = "/report/agents-md.csv";
 export const REPORT_TITLE = "State of AGENTS.md adoption";
+export const SIZE_REPORT_PATH = "/report/agents-md-size";
+export const AI_POLICY_REPORT_PATH = "/report/ai-contribution-policy";

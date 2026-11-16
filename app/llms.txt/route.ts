@@ -1,22 +1,35 @@
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ADOPTION } from "@/lib/agents-md-report";
+import { AI_POLICY } from "@/lib/ai-policy";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { REGISTRIES } from "@/lib/clients/registries";
 import { BOARD_CACHE_CONTROL } from "@/lib/constants/cache";
 import { getTopPackagesByRegistry } from "@/lib/db";
+import { GUIDES } from "@/lib/guides";
+import { fillStats, getGuideStats } from "@/lib/guides/stats";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH } from "@/lib/topics";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { COMPARE_PATH } from "@/lib/utils/compare-path";
+import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { formatDay } from "@/lib/utils/format";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { guidePath } from "@/lib/utils/guide-path";
 import { OTHER_LANGUAGES_PATH } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
-import { REPORT_CSV_PATH, REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
+import {
+  AI_POLICY_REPORT_PATH,
+  REPORT_CSV_PATH,
+  REPORT_PATH,
+  REPORT_TITLE,
+  SIZE_REPORT_PATH,
+} from "@/lib/utils/report-path";
 import {
   ACTION_REPO_URL,
   APP_DESCRIPTION,
@@ -38,6 +51,7 @@ const HEADERS = {
 const LLMS_TOP_PACKAGES_PER_REGISTRY = 10;
 
 export function GET(): Response {
+  const guideStats = getGuideStats();
   const topPackagesSection = REGISTRIES.map((registry) => {
     const rows = getTopPackagesByRegistry(registry, LLMS_TOP_PACKAGES_PER_REGISTRY);
     if (rows.length === 0) {
@@ -70,7 +84,7 @@ export function GET(): Response {
 
 > ${APP_DESCRIPTION}
 
-Every score comes from ${SIGNALS.length} file checks, listed below; no agent is run. Each AI coding agent weighs the checks by what its own docs say it reads, so the same repository can score differently for different agents.
+Every score comes from ${SIGNALS.length} file checks, listed below; no agent is run. Each AI coding agent weighs the checks by what its own docs say it reads, so one repository can score differently per agent.
 
 ## Agents scored for
 
@@ -83,23 +97,29 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 ## Key pages
 
 - [Leaderboard](${APP_URL}/): Public repos ranked overall and per agent, across GitHub, GitLab, and Bitbucket
-- [About](${APP_URL}/about): Who built this, why, and the project's independence statement
-- [Action](${APP_URL}/action): GitHub Action that comments on each pull request with the score change — install snippet, FAQ
+- [About](${APP_URL}/about): Who built this, why, and the independence statement
+- [Action](${APP_URL}/action): GitHub Action that comments each pull request's score change — install snippet, FAQ
 - [Changelog](${APP_URL}/changelog): What shipped per release
-- [Guide: make a repo ready for AI coding agents](${APP_URL}/guide): The checks grouped into what to do, with leaderboard pass rates and links to every check, agent file and tool
+- [Guide: make a repo ready for AI coding agents](${APP_URL}/guide): The checks grouped into what to do, with pass rates and links to every check, agent file and tool
 - [${REPORT_TITLE}](${APP_URL}${REPORT_PATH}): Share of leaderboard repos with AGENTS.md or CLAUDE.md, from snapshots on most days since ${formatDay(ADOPTION.points[0].date)}; today's split by language and other agent files; CSV (${APP_URL}${REPORT_CSV_PATH})
-- [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check, with what it looks for, how to pass it and how many leaderboard repos do
-- [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent, from each agent's docs, with how many leaderboard repos have each file
+- [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check: what it looks for, how to pass it, how many leaderboard repos do
+- [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent from its docs, with how many leaderboard repos have each file
 - [AGENTS.md vs CLAUDE.md](${APP_URL}${checkSubPath("agents_md", "vs-claude-md")}): Which one to use, which agents read each, and what Claude Code does when a repo has both
 ${vsLines}
 - [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score${languageLinks ? `; by language: ${languageLinks}` : ""}${frameworkLinks ? `; by framework, with what to put in the file: ${frameworkLinks}` : ""}
+${GUIDES.map((g) => `- [${g.name}](${APP_URL}${guidePath(g.slug)}): ${fillStats(g.description, guideStats)}`).join("\n")}
+- [Compare agents](${APP_URL}${COMPARE_PATH}): Claude Code vs Cursor, Codex vs Gemini CLI and more: how well leaderboard repos are set up for each, pair by pair (setup, not code quality)
+- [AGENTS.md sizes](${APP_URL}${SIZE_REPORT_PATH}): How long real AGENTS.md and CLAUDE.md files are, and how many pass Devin's 16 KiB and Codex's 32 KiB limits
+- [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, classified by hand
+- [Projects to contribute to](${APP_URL}${CONTRIBUTE_PATH}): Open source projects with a CONTRIBUTING guide, tests and CI, by language, ready for agent-assisted work
+- [AGENTS.md generator](${APP_URL}${GENERATOR_PATH}): A starter AGENTS.md drafted from a scan of any public GitHub repo
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
 - [Other languages](${APP_URL}${OTHER_LANGUAGES_PATH}): Repos in languages too small for their own hub, grouped by language
-${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed; signals, weights, and limitations
+${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed: signals, weights, limitations
 - [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
-- [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, including repos the leaderboard has not indexed
+- [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, on the leaderboard or not
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
-- [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, the agent your repo is best set up for, score → model class, optional SessionStart hooks for Claude Code / Codex
+- [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, the agent it is best set up for, score → model class, optional SessionStart hooks for Claude Code / Codex
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL
 
 ## Public API
@@ -108,12 +128,12 @@ ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by re
 - [\`GET /api/package/{registry}/{name}\`](${APP_URL}/api/package/npm/next): Resolve npm / PyPI / Cargo package → source-repo score
 - [\`GET /api/repos\`](${APP_URL}/api/repos): JSON array of every ranked repo: the repo row plus its overall score
 - [\`GET /api/repo/{id}\`](${APP_URL}/api/repo/1): Per-repo detail by internal id — \`{ repo, signals, modelScores }\`
-- [\`GET /api/score?host=&repo=owner/name\`](${APP_URL}/api/score?host=github&repo=vercel/next.js): Look up an indexed repo by host + owner/name — public read for external integrators (the PR-diff Action and the agent skill both vendor the scorer locally and don't call this at runtime)
+- [\`GET /api/score?host=&repo=owner/name\`](${APP_URL}/api/score?host=github&repo=vercel/next.js): Look up an indexed repo by host + owner/name — public read for integrators (the PR-diff Action and the agent skill vendor the scorer and don't call this)
 
 ## Tools
 
-- [Agent Friendly Action](${ACTION_REPO_URL}): GitHub Action that posts a per-PR score-delta comment — runs entirely inside the maintainer's CI, opt-in via \`AGENTS_BADGE_TOKEN\`, listed on the GitHub Marketplace
-- [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the user's current repo locally, no service dependency. Listed on [skills.sh](${SKILL_LISTING_URL})
+- [Agent Friendly Action](${ACTION_REPO_URL}): GitHub Action that posts a per-PR score-delta comment — runs only in the maintainer's CI, opt-in via \`AGENTS_BADGE_TOKEN\`, listed on the GitHub Marketplace
+- [Agent Friendly Skill](${SKILL_REPO_URL}): Portable agent skill (Claude Code, Codex, Cursor, Cline, Copilot, …) installable via \`${SKILL_INSTALL_CMD}\` — scores the current repo locally, no service dependency. Listed on [skills.sh](${SKILL_LISTING_URL})
 
 ## Top scored packages
 

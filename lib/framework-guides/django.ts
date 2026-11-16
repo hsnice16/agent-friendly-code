@@ -8,7 +8,7 @@ export const DJANGO: FrameworkGuide = {
   repos: ["github/PostHog/posthog", "github/getsentry/sentry", "github/wagtail/wagtail", "github/makeplane/plane"],
   frameworkRepo: "github/django/django",
   intro:
-    "An agent knows `manage.py`; what it doesn't know is your settings module, which apps are yours, and how you want migrations handled. Say those, and how to run one test.",
+    "An agent knows `manage.py`, not your settings module, which apps are yours, or how you handle migrations. Say those, and how to run one test.",
   commands: [
     { cmd: "python manage.py runserver", note: "dev server on 127.0.0.1:8000; never for production" },
     { cmd: "python manage.py makemigrations && python manage.py migrate", note: "after any model change" },
@@ -24,7 +24,7 @@ export const DJANGO: FrameworkGuide = {
     "Where the test runner is configured, if you use pytest-django instead of `manage.py test`.",
   ],
   rules: [
-    "Commit a migration with the model change that needs it, in one commit.",
+    "Commit a migration in the same commit as its model change.",
     "Generate migrations rather than writing them; say whether hand edits or squashing need a review.",
     "Use `sqlmigrate` to show the SQL of a risky migration before applying it.",
   ],

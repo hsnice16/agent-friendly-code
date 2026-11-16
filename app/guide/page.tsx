@@ -14,16 +14,22 @@ import { getCheckStats } from "@/lib/check-stats";
 import { START_WITH_CHECKS as START_WITH } from "@/lib/constants/scoring";
 import { getLeaderboardStats } from "@/lib/db";
 import { FILE_CHECKS, GUIDE_THEMES } from "@/lib/guide-content";
+import { guideExplainers } from "@/lib/guide-explainers";
+import { GUIDE_NOTES, GUIDES } from "@/lib/guides";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { checksBySummedWeight } from "@/lib/leaderboard-model-panel";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { COMPARE_PATH } from "@/lib/utils/compare-path";
+import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
-import { REPORT_PATH } from "@/lib/utils/report-path";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { GUIDE_PATH, guidePath } from "@/lib/utils/guide-path";
+import { AI_POLICY_REPORT_PATH, REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
 
-const PATH = "/guide";
+const PATH = GUIDE_PATH;
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
@@ -37,10 +43,20 @@ const AGENT_FILES = [
     label: `${c.name} vs AGENTS.md`,
     note: `for ${c.agent}`,
   })),
+  ...GUIDES.map((g) => ({ href: guidePath(g.slug), label: g.name, note: GUIDE_NOTES[g.slug] ?? "guide" })),
+];
+
+const DATA_PAGES = [
+  { href: COMPARE_PATH, label: "Compare agents", note: "how repos are set up for each, pair by pair" },
+  { href: REPORT_PATH, label: REPORT_TITLE, note: "how adoption has grown" },
+  { href: SIZE_REPORT_PATH, label: "How long AGENTS.md files are", note: "sizes of real files" },
+  { href: AI_POLICY_REPORT_PATH, label: "AI contribution policies", note: "what projects allow" },
+  { href: CONTRIBUTE_PATH, label: "Projects to contribute to", note: "ready for agent-assisted work" },
 ];
 
 const TOOLS = [
   { href: "/score", label: "Live Score", note: "paste a public GitHub URL" },
+  { href: GENERATOR_PATH, label: "AGENTS.md generator", note: "a starter drafted from the scan" },
   { href: "/skill", label: "Agent Skill", note: "scores the repo you're in, locally" },
   { href: "/action", label: "GitHub Action", note: "comments the score change on every pull request" },
 ];
@@ -76,15 +92,15 @@ export default function GuidePage() {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      {/* The meta title adds "for AI agents" for search; on the page it only repeats "agent-friendly". */}
+      {/* The meta title carries the search wording ("best practices", "AI-ready"); the heading reads as a how-to. */}
       <PageHeader
         crumbs={{ current: { name: "Guide", path: PATH } }}
         title="How to make your codebase agent-friendly"
         lead={
           <>
-            An agent-friendly codebase writes down what the code doesn&apos;t say and gives the agent a way to check its
-            work: an AGENTS.md with your exact commands, tests it can run, and CI and lint config that show what a
-            change must pass.
+            An agent-friendly, AI-ready codebase writes down what the code doesn&apos;t say and gives the agent a way to
+            check its work: an AGENTS.md with your exact commands, tests it can run, and CI and lint config that show
+            what a change must pass.
           </>
         }
       >
@@ -95,7 +111,8 @@ export default function GuidePage() {
             how that has grown
           </Link>
           ), {passRate("tests")} pass our tests check and {passRate("ci")} our CI check. Below are the {SIGNALS.length}{" "}
-          checks we score, grouped by what they do for an agent; the {START_WITH} marked count most across agents.
+          best practices we score, grouped by what they do for an agent; the {START_WITH} marked count most across
+          agents.
         </p>
       </PageHeader>
 
@@ -104,13 +121,16 @@ export default function GuidePage() {
           <Panel key={theme.id}>
             <PanelHeading>{theme.title}</PanelHeading>
             <p className={`${PROSE} mb-3`}>{theme.intro}</p>
-            <ul className="m-0 flex list-none flex-col gap-2.5 p-0 text-[14.5px] leading-relaxed text-ink-dim">
+            <ul className="m-0 flex list-none flex-col gap-0.5 p-0 text-[14.5px] leading-relaxed text-ink-dim">
               {theme.checks.map((c) => {
                 const s = getCheckStats(c.id);
                 return (
-                  <li key={c.id} className="flex flex-col gap-x-4 sm:flex-row sm:items-baseline sm:justify-between">
+                  <li
+                    key={c.id}
+                    className="flex flex-col gap-x-4 link-row sm:flex-row sm:items-baseline sm:justify-between"
+                  >
                     <span>
-                      <Link href={checkPath(c.id)} className={LINK_STRONG}>
+                      <Link href={checkPath(c.id)} className={`${LINK_STRONG} cover-link`}>
                         {SIGNAL_BY_ID[c.id].label}
                       </Link>
                       {startHere.has(c.id) && (
@@ -135,10 +155,10 @@ export default function GuidePage() {
         <div className="grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
           <Panel className="h-full">
             <PanelHeading>Which file does my agent read?</PanelHeading>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+            <ul className="link-list">
               {AGENT_FILES.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className={LINK}>
+                <li key={l.href} className="link-row">
+                  <Link href={l.href} className={`${LINK} cover-link`}>
                     {l.label}
                   </Link>
                   : {l.note}
@@ -149,10 +169,10 @@ export default function GuidePage() {
 
           <Panel className="h-full">
             <PanelHeading>How ready is my repo?</PanelHeading>
-            <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+            <ul className="link-list">
               {TOOLS.map((l) => (
-                <li key={l.href}>
-                  <Link href={l.href} className={LINK}>
+                <li key={l.href} className="link-row">
+                  <Link href={l.href} className={`${LINK} cover-link`}>
                     {l.label}
                   </Link>
                   : {l.note}
@@ -187,6 +207,33 @@ export default function GuidePage() {
             ))}
           </ul>
         </Panel>
+        <Panel>
+          <PanelHeading>What does the data say?</PanelHeading>
+          <ul className="link-list">
+            {DATA_PAGES.map((l) => (
+              <li key={l.href} className="link-row">
+                <Link href={l.href} className={`${LINK} cover-link`}>
+                  {l.label}
+                </Link>
+                : {l.note}
+              </li>
+            ))}
+          </ul>
+        </Panel>
+        <div className="grid grid-cols-1 items-stretch gap-3.5 md:grid-cols-2">
+          {guideExplainers(SIGNALS.length).map((e) => (
+            <Panel key={e.question} className="h-full">
+              <PanelHeading>{e.question}</PanelHeading>
+              <p className={PROSE}>
+                <CodeText text={e.answer} />{" "}
+                <Link href={e.link.href} className="prose-link">
+                  {e.link.label}
+                </Link>
+                .
+              </p>
+            </Panel>
+          ))}
+        </div>
       </div>
 
       <p className="mt-5 mb-0 text-[13px] text-muted">

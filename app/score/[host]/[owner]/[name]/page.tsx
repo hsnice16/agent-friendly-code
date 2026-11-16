@@ -25,6 +25,7 @@ import { TooLargeError } from "@/lib/live-score/hosts";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { topImprovements } from "@/lib/scoring/scorer";
 import type { ModelId } from "@/lib/scoring/weights";
+import { starterIfMissing } from "@/lib/starter-agents-md";
 import type { RepoRow } from "@/lib/types/db";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { hostLabel } from "@/lib/utils/format";
@@ -89,7 +90,7 @@ function Unsupported({ host }: { host: string }) {
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">
         {`This page can't yet stay within ${label}'s API limits, and a wrong score is worse than none. GitHub repos work today.`}
       </p>
-      <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
+      <Link href="/score" className="mt-3.5 inline-block text-[14px] dim-link">
         ← Try a GitHub repo
       </Link>
     </Panel>
@@ -102,7 +103,7 @@ function Unavailable({ reason, outcome }: { reason: string; outcome: "not_found"
       <TrackEvent event={{ name: "live_score_result", outcome }} />
       <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo</h1>
       <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">{reason}</p>
-      <Link href="/score" className="mt-3.5 inline-block text-[14px] text-ink-dim hover:text-ink">
+      <Link href="/score" className="mt-3.5 inline-block text-[14px] dim-link">
         ← Try another repo
       </Link>
     </Panel>
@@ -138,7 +139,7 @@ export default async function LiveScorePage({
       return (
         <Unavailable
           outcome="too_large"
-          reason="This repo is too big to score here. Score it on your own computer with the agent skill."
+          reason="Too big to score here. Score it on your own computer with the agent skill."
         />
       );
     }
@@ -181,6 +182,8 @@ export default async function LiveScorePage({
   const alternatives = similarRepos({ ...repo, score: score.overall }, listLeaderboardOverall(), ALTERNATIVES_LIMIT);
 
   const instructions = agentInstructions(score.signals, agentFileShare(score.language));
+  // Built from matched paths and the sanitised description, never file contents.
+  const starter = starterIfMissing(instructions, repo, score.signals);
   const slug = `${owner}/${name}`;
   const path = liveScorePath({ host, owner, name });
   // The repo page's order, less "How it compares", which ranks against the board.
@@ -228,7 +231,7 @@ export default async function LiveScorePage({
 
         {instructions && (
           <Section id="agent-instructions">
-            <AgentInstructions data={instructions} slug={slug} repo={repo} />
+            <AgentInstructions data={instructions} slug={slug} repo={repo} starter={starter} companions />
           </Section>
         )}
 

@@ -19,7 +19,7 @@ export default function GlobalError({ retry }: { error: Error & { digest?: strin
               Try again
             </button>
             {/* A full load, not <Link>: client navigation would reuse the layout that just threw. */}
-            <a href="/" className="text-[14px] text-ink-dim hover:text-ink">
+            <a href="/" className="text-[14px] dim-link">
               ← back to the leaderboard
             </a>
           </div>

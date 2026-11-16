@@ -51,7 +51,12 @@ export function HashDetails({
     <details ref={ref} className="group rounded-xl border border-line bg-surface">
       <summary className="flex cursor-pointer list-none items-center justify-between gap-3 rounded-xl px-5 py-4 group-open:rounded-b-none hover:bg-surface-hover [&::-webkit-details-marker]:hidden">
         {summary}
-        <CaretDown size={14} weight="bold" aria-hidden="true" className="shrink-0 text-muted group-open:rotate-180" />
+        <CaretDown
+          size={14}
+          weight="bold"
+          aria-hidden="true"
+          className="shrink-0 text-muted transition-transform duration-200 group-open:rotate-180"
+        />
       </summary>
       <div className="px-5 pb-5">{children}</div>
     </details>

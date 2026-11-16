@@ -38,7 +38,7 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
         {m.ch}
       </div>
 
-      <div className="flex-1">
+      <div className="min-w-0 flex-1">
         <div className="text-[14.5px]">
           <Link href={checkPath(signal.id)} className="font-medium ink-link">
             {signal.label}
@@ -55,7 +55,7 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
                 target="_blank"
                 rel="nofollow noopener noreferrer"
                 aria-label={`${path} on ${hostLabel(repo?.host ?? "")} (new tab)`}
-                className="text-muted hover:text-ink-soft"
+                className="text-muted hover:text-ink"
               >
                 {path}
               </a>

@@ -9,7 +9,7 @@ export function SkillsShBadge({ className = "" }: { className?: string }) {
       href={SKILL_LISTING_URL}
       rel="noopener noreferrer"
       aria-label="Agent Friendly Skill on skills.sh (new tab)"
-      className={`inline-flex h-[54px] items-center gap-3 rounded-[10px] border border-badge-line bg-badge-card px-4 text-badge-ink no-underline shadow-sm hover:opacity-90 hover:no-underline ${className}`}
+      className={`inline-flex h-[54px] items-center gap-3 rounded-[10px] border border-badge-line bg-badge-card px-4 text-badge-ink shadow-sm hover:opacity-90 ${className}`}
     >
       <svg width="22" height="22" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true">
         <path d="M8 1L16 15H0L8 1Z" />

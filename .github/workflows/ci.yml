@@ -46,7 +46,7 @@ jobs:
         run: bun run test
 
       - name: DB leak scan
-        run: bun run check-db-leaks
+        run: bun run check-db-leaks data/rank.db data/*.json
 
       # tsc does not see what only the bundler sees — a server-only import
       # pulled into a client component, an RSC boundary violation. Without this

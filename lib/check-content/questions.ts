@@ -8,15 +8,15 @@ export const CHECK_QUESTIONS: Record<string, CheckQuestions> = {
   agents_md: {
     pass: "How many repos have an AGENTS.md?",
     why: "Why do AI coding agents need an AGENTS.md?",
-    scoring: "What makes a good AGENTS.md?",
+    scoring: "How long should an AGENTS.md be?",
     fix: "How do I add an AGENTS.md to my repo?",
     agents: "Which AI agents read AGENTS.md?",
   },
   cursor_rules: {
     pass: "How many repos have Cursor rules?",
-    why: "Why does Cursor need project rules?",
+    why: "Why use Cursor project rules?",
     scoring: "What counts as Cursor rules?",
-    fix: "How do I add Cursor rules to my repo?",
+    fix: "How do I add Cursor rules, and why isn't one applied?",
     agents: "Which AI agents read Cursor rules?",
   },
   gemini_md: {

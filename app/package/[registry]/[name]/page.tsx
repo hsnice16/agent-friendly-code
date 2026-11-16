@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -95,9 +95,9 @@ export default async function Page({ params }: { params: Promise<{ registry: str
 
                 <Link
                   href={repoPath(result.repo)}
-                  className="tap-target mt-2 inline-flex items-center gap-1 text-sm text-ink-dim hover:text-ink-soft"
+                  className="tap-target mt-2 inline-flex items-center gap-1 text-sm dim-link"
                 >
-                  See the full score <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
+                  See the full score <ArrowRight size={14} weight="bold" aria-hidden="true" />
                 </Link>
               </div>
 
@@ -124,7 +124,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
               target="_blank"
               href={result.contact_url}
               rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
+              className="mt-4 btn-secondary btn-sm"
             >
               Ask us to score it <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
             </a>
@@ -146,7 +146,7 @@ export default async function Page({ params }: { params: Promise<{ registry: str
               target="_blank"
               href={result.contact_url}
               rel="noopener noreferrer"
-              className="mt-4 inline-flex items-center gap-1.5 rounded-md border border-line bg-surface-2 px-3 py-1.5 text-[13px] font-medium text-ink hover:bg-surface-hover"
+              className="mt-4 btn-secondary btn-sm"
             >
               Tell us the right link <ArrowUpRight size={13} weight="bold" aria-hidden="true" />
             </a>

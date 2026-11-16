@@ -13,7 +13,7 @@ const COLUMNS: { label: string; value: (p: AdoptionPoint) => number }[] = [
 export function AdoptionTable({ points, csvHref }: { points: AdoptionPoint[]; csvHref: string }) {
   return (
     <details className="mt-3 text-[13px] text-muted">
-      <summary className="-my-2.5 cursor-pointer py-2.5">Numbers by month</summary>
+      <summary className="-my-2.5 cursor-pointer py-2.5 hover:text-ink">Numbers by month</summary>
       <section
         // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region
         tabIndex={0}

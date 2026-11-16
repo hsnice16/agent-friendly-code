@@ -46,6 +46,11 @@ export function hubPath(slug: string): string {
   return `/language/${slug}`;
 }
 
+// Two segments, so proxy.ts's single-segment matcher never redirects it.
+export function languageAgentsPath(slug: string): string {
+  return `${hubPath(slug)}/agents`;
+}
+
 export const OTHER_LANGUAGES_PATH = "/language/other";
 export const UNKNOWN_LANGUAGE = { slug: "unknown", label: "Language not detected" } as const;
 

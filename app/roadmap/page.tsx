@@ -14,7 +14,7 @@ export default function RoadmapPage() {
       <PageHeader
         crumbs={{ current: { name: "Roadmap", path: "/roadmap" } }}
         title="Roadmap"
-        lead="What's coming next. Each item links to its task file: the plan, what counts as done, and known limits."
+        lead="Each item links to its task file: the plan, what counts as done, and known limits."
       />
 
       <div className="flex flex-col gap-3.5">
@@ -48,7 +48,7 @@ export default function RoadmapPage() {
                       target="_blank"
                       href={`${REPO_URL}/blob/main/${it.taskFile}`}
                       aria-label={`Open ${it.taskFile} on GitHub (new tab)`}
-                      className="tap-target chip mt-1 max-w-full self-start [overflow-wrap:anywhere] border-line bg-surface-2 font-mono text-muted hover:text-ink-soft"
+                      className="tap-target chip mt-1 max-w-full self-start [overflow-wrap:anywhere] border-line bg-surface-2 font-mono text-muted hover:border-line-strong hover:text-ink"
                     >
                       {it.taskFile}
                       <ArrowUpRight size={11} weight="bold" aria-hidden="true" />

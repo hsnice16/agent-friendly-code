@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-
+import { AgentsMdFaq } from "@/components/AgentsMdFaq";
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
+import { OtherToolsTable } from "@/components/OtherToolsTable";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { AGENT_READS, agentsUsingAgentsMd } from "@/lib/agent-reads";
+import { AGENT_READS, agentsUsingAgentsMd, OTHER_TOOLS } from "@/lib/agent-reads";
+import { AGENT_DOCS_CHECKED, agentsMdFaq, plainText } from "@/lib/agents-faq";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
@@ -16,7 +18,8 @@ import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { MODELS } from "@/lib/scoring/weights";
 import { agentList } from "@/lib/utils/agent-list";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
-import { percent } from "@/lib/utils/format";
+import { COMPARE_PATH } from "@/lib/utils/compare-path";
+import { formatDay, percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
 
@@ -31,6 +34,7 @@ export default function AgentsPage() {
   const counts = getInstructionFileCounts();
   const always = agentsUsingAgentsMd("always");
   const viaSetting = agentsUsingAgentsMd("setting");
+  const faqs = agentsMdFaq();
 
   return (
     <>
@@ -48,13 +52,28 @@ export default function AgentsPage() {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
+      <JsonLd
+        data={{
+          "@type": "FAQPage",
+          mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.question,
+            acceptedAnswer: { "@type": "Answer", text: plainText(f.answer) },
+          })),
+        }}
+      />
       <PageHeader
         crumbs={{ current: { name: "Agents", path: PATH } }}
         title={PAGE_COPY[PATH].title}
         lead={
           <>
             Most agents read AGENTS.md: {agentList(always)}. Claude Code reads CLAUDE.md and falls back to AGENTS.md.{" "}
-            {agentList(viaSetting)} read their own files, and AGENTS.md only when configured to.
+            {agentList(viaSetting)} read their own files, and AGENTS.md only when configured to. Checked against each
+            agent&apos;s docs on {formatDay(AGENT_DOCS_CHECKED)}. How repos are set up for each, side by side:{" "}
+            <Link href={COMPARE_PATH} className="prose-link">
+              compare agents
+            </Link>
+            .
           </>
         }
       />
@@ -78,7 +97,7 @@ export default function AgentsPage() {
                 return (
                   <tr key={m.id} className="align-top">
                     <th scope="row" className="font-medium">
-                      <Link href={modelPath(m.id)} className={LINK}>
+                      <Link href={modelPath(m.id)} className={`${LINK} cover-link`}>
                         {m.label}
                       </Link>
                     </th>
@@ -110,6 +129,14 @@ export default function AgentsPage() {
       </Panel>
 
       <div className="mt-3.5">
+        <OtherToolsTable tools={OTHER_TOOLS} />
+      </div>
+
+      <div className="mt-3.5">
+        <AgentsMdFaq faqs={faqs} checked={AGENT_DOCS_CHECKED} />
+      </div>
+
+      <div className="mt-3.5">
         <Panel>
           <PanelHeading>How do I write one file every agent reads?</PanelHeading>
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
@@ -121,7 +148,7 @@ export default function AgentsPage() {
               .
             </li>
             <li>
-              If you keep a CLAUDE.md, start it with <code className={CODE}>@AGENTS.md</code>, or Claude Code skips
+              If you keep a CLAUDE.md, import <code className={CODE}>@AGENTS.md</code> in it, or Claude Code skips
               AGENTS.md.{" "}
               <Link href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
                 AGENTS.md vs CLAUDE.md
@@ -152,11 +179,12 @@ export default function AgentsPage() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>How many repos have each file?</PanelHeading>
-          <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
+          <ul className="link-list">
             {counts.files.map((f) => (
-              <li key={f.file} className="flex items-baseline justify-between gap-3">
-                <Link href={checkPath(f.signalId)} className={LINK}>
+              <li key={f.file} className="flex items-baseline justify-between gap-3 link-row">
+                <Link href={checkPath(f.signalId)} className={`${LINK} cover-link`}>
                   <code className={CODE}>{f.file}</code>
+                  {f.qualifier && ` ${f.qualifier}`}
                 </Link>
                 <span className="tabular-nums">
                   {f.count} of {counts.total} ({percent(f.count, counts.total)})

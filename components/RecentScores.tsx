@@ -29,18 +29,15 @@ function ScoreList({ rows }: { rows: Row[] }) {
   return (
     <ul className="m-0 list-none p-0">
       {rows.map((row) => (
-        <li key={`${row.host}/${row.owner}/${row.name}`} className="border-b border-line last:border-b-0">
-          <Link
-            href={hrefFor(row)}
-            className="flex items-center justify-between gap-3 py-3 no-underline hover:no-underline"
-          >
-            <span className="min-w-0 text-[14.5px] text-ink [overflow-wrap:anywhere]">
+        <li key={`${row.host}/${row.owner}/${row.name}`} className="flex items-center justify-between gap-3 link-row">
+          <span className="min-w-0 text-[14.5px] [overflow-wrap:anywhere]">
+            <Link href={hrefFor(row)} className="ink-link cover-link">
               {row.owner}/{row.name}
-              <OwnRepoTag repo={row} />
-              <HostPill host={row.host} />
-            </span>
-            <ScoreNumber score={row.score} />
-          </Link>
+            </Link>
+            <OwnRepoTag repo={row} />
+            <HostPill host={row.host} />
+          </span>
+          <ScoreNumber score={row.score} />
         </li>
       ))}
     </ul>

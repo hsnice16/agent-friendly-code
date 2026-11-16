@@ -40,14 +40,18 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
         </Link>
       </p>
 
-      <div className="divide-y divide-line">
+      <div>
         {[...MODELS]
           .map((m) => ({ model: m, score: modelScores.find((x) => x.modelId === m.id)?.score ?? null }))
           .sort((a, b) => (b.score ?? -1) - (a.score ?? -1))
           .map(({ model: m, score: s }) => (
-            <div key={m.id} className="agent-row">
+            <div key={m.id} className="agent-row link-row">
               <div className="text-[14.5px]">
-                <Link href={modelPath(m.id)} aria-label={`${m.label} leaderboard`} className="font-medium ink-link">
+                <Link
+                  href={modelPath(m.id)}
+                  aria-label={`${m.label} leaderboard`}
+                  className="font-medium ink-link cover-link"
+                >
                   {m.label}
                 </Link>
                 {ranks?.[m.id] && (

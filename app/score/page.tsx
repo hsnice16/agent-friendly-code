@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CheckChecklist } from "@/components/CheckChecklist";
+import { FaqList } from "@/components/FaqList";
 import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreForm } from "@/components/LiveScoreForm";
 import { PageHeader } from "@/components/PageHeader";
@@ -11,6 +12,7 @@ import { getCheckStats } from "@/lib/check-stats";
 import { listLeaderboardOverall } from "@/lib/db";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { APP_NAME, APP_URL, OG_IMAGE_SIZE } from "@/lib/version";
 
 const OG_IMAGE = {
@@ -29,6 +31,20 @@ type FaqEntry = {
 };
 
 const FAQ: FaqEntry[] = [
+  {
+    q: "What does the agent readiness check look at?",
+    a: `The code repository, not a website or a deployed app: AGENTS.md and the other files agents read, tests, CI, linter and type config, dev setup and the rest of the ${SIGNALS.length} checks. Each is weighted by how much each agent relies on it.`,
+    link: { phrase: `${SIGNALS.length} checks`, href: "/check" },
+  },
+  {
+    q: "Is it free? Do I need an account?",
+    a: "Free, with no signup and no account.",
+  },
+  {
+    q: "Can it write an AGENTS.md for my repo?",
+    a: "If the repo has none, the result includes a starter AGENTS.md drafted from the files the checks found, commands left for you to fill in. More on the AGENTS.md generator.",
+    link: { phrase: "AGENTS.md generator", href: GENERATOR_PATH },
+  },
   {
     q: "Which AI coding agent should I use for my codebase?",
     a: "This page tells you which agent your repo is best set up for, not which writes the best code. Each agent reads different files (Claude Code loads CLAUDE.md, Cursor its rules files), so you get a score and fixes for each.",
@@ -67,7 +83,7 @@ const JSON_LD = {
       "@type": "WebApplication",
       "@id": `${APP_URL}/score#app`,
       url: `${APP_URL}/score`,
-      name: "Live Score",
+      name: "Live Score: agent readiness checker",
       isAccessibleForFree: true,
       description: PAGE_COPY["/score"].description,
       publisher: { "@id": `${APP_URL}/#org` },
@@ -118,8 +134,8 @@ export default function ScoreIndexPage() {
 
       <PageHeader
         crumbs={{ current: { name: "Live Score", path: "/score" } }}
-        title="Is your repo ready for AI coding agents?"
-        lead="Paste a public GitHub repo link to get a score for each agent and the one the repo is best set up for. Same checks and weights as the leaderboard; nothing is saved."
+        title="Agent readiness checker for GitHub repos"
+        lead="Paste a public GitHub repo link for a score per AI coding agent, the one the repo is best set up for, and what to fix first. Free, no signup, nothing saved; same checks and weights as the leaderboard."
       >
         <LiveScoreForm />
 
@@ -138,16 +154,7 @@ export default function ScoreIndexPage() {
         <Panel>
           <PanelHeading>Questions</PanelHeading>
 
-          <dl className="m-0">
-            {FAQ.map((entry) => (
-              <div key={entry.q} className="border-b border-line py-3.5 last:border-b-0 last:pb-0">
-                <dt className="m-0 text-[14.5px] font-semibold text-ink">{entry.q}</dt>
-                <dd className="m-0 mt-1.5 text-[14px] leading-relaxed text-ink-dim">
-                  <Answer entry={entry} />
-                </dd>
-              </div>
-            ))}
-          </dl>
+          <FaqList items={FAQ.map((e) => ({ key: e.q, q: e.q, a: <Answer entry={e} /> }))} />
         </Panel>
       </div>
     </>

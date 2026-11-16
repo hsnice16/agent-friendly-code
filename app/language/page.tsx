@@ -14,7 +14,7 @@ import { averageScore, hubPath, isHub, OTHER_LANGUAGES_PATH, otherLanguageGroups
 
 export const metadata: Metadata = staticPageMetadata("/language");
 
-const LINK_CLASS = "text-ink-dim hover:text-ink-soft";
+const LINK_CLASS = "dim-link";
 
 export default function LanguagesPage() {
   const hubs = getLanguageGroups().filter(isHub);

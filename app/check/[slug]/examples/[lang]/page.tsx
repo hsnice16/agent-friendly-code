@@ -222,21 +222,21 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>More examples</PanelHeading>
-          <ul className="m-0 mb-3 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
-            <li>
-              <Link href={examplesPath} className={LINK}>
+          <ul className="m-0 mb-3 flex list-none flex-col p-0 text-[14.5px] text-ink-dim">
+            <li className="link-row">
+              <Link href={examplesPath} className={`${LINK} cover-link`}>
                 Every language
               </Link>
               : all {getAgentsMdExamples().rows.length} files, with the longest and shortest that pass
             </li>
-            <li>
-              <Link href={hubPath(lang.slug)} className={LINK}>
+            <li className="link-row">
+              <Link href={hubPath(lang.slug)} className={`${LINK} cover-link`}>
                 Most agent-friendly {lang.label} repos
               </Link>
               : all {lang.total}, ranked on every check
             </li>
-            <li>
-              <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={LINK}>
+            <li className="link-row">
+              <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={`${LINK} cover-link`}>
                 AGENTS.md vs CLAUDE.md
               </Link>
               : which file to write
@@ -263,8 +263,8 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
 function ExamplesSummary({ lang }: { lang: LanguageExamples }) {
   return (
     <>
-      {lang.rows.length} of the {lang.total} {lang.label} repos on the leaderboard have an AGENTS.md or CLAUDE.md at the
-      root, and {lang.passing} are long enough to pass the{" "}
+      {lang.rows.length} of {lang.total} {lang.label} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
+      {lang.passing} are long enough to pass the{" "}
       <Link href={checkPath(SIGNAL_ID)} className="prose-link">
         AGENTS.md check
       </Link>{" "}

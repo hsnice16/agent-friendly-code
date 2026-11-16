@@ -9,14 +9,22 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { ReportBar, ReportStat } from "@/components/ReportStat";
 import { SERIES_LABEL } from "@/lib/agents-md-adoption";
 import { ADOPTION, adoptionDatasetJsonLd } from "@/lib/agents-md-report";
+import { CENSUS_SUMMARY } from "@/lib/file-census";
 import { getAgentsMdExamples, getInstructionFileCounts, reposWithBoth } from "@/lib/leaderboard-files";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
-import { REPORT_CSV_PATH, REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
+import {
+  AI_POLICY_REPORT_PATH,
+  REPORT_CSV_PATH,
+  REPORT_PATH,
+  REPORT_TITLE,
+  SIZE_REPORT_PATH,
+} from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
 
 export const metadata: Metadata = staticPageMetadata(REPORT_PATH);
@@ -25,26 +33,8 @@ const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const NUMBER = new Intl.NumberFormat("en-US");
 
 // Points are the difference of the rounded shares shown beside them, so the three always add up.
-const share = (part: number, total: number) => (total === 0 ? 0 : Math.round((part / total) * 100));
+const share = (part: number, total: number) => (total === 0 ? 0 : Math.round((part * 100) / total));
 const pts = (d: number) => `${d > 0 ? "+" : d < 0 ? "−" : ""}${Math.abs(d)} pts`;
-
-function Stat({ label, value, note }: { label: string; value: string; note: React.ReactNode }) {
-  return (
-    <Panel className="h-full">
-      <p className="eyebrow m-0 mb-2 text-[12.5px] text-muted">{label}</p>
-      <p className="m-0 text-[28px] font-bold leading-none tracking-tight text-ink">{value}</p>
-      <p className="mt-2 mb-0 text-[13px] leading-snug text-ink-dim">{note}</p>
-    </Panel>
-  );
-}
-
-function Bar({ part, total }: { part: number; total: number }) {
-  return (
-    <div aria-hidden className="h-[7px] overflow-hidden rounded-sm bg-line">
-      <div className="h-full rounded-sm bg-muted" style={{ width: percent(part, total) }} />
-    </div>
-  );
-}
 
 export default function AgentsMdReportPage() {
   const { points, cohort, minRepos } = ADOPTION;
@@ -77,24 +67,24 @@ export default function AgentsMdReportPage() {
 
       <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2 lg:grid-cols-4">
         {cohort && (
-          <Stat
+          <ReportStat
             label={`${SERIES_LABEL.agentsMd} since ${formatDay(cohort.since)}`}
             value={pts(share(cohort.agentsMdNow, cohort.repos) - share(cohort.agentsMdThen, cohort.repos))}
             note={`The same ${cohort.repos} repos: ${share(cohort.agentsMdThen, cohort.repos)}% had one then, ${share(cohort.agentsMdNow, cohort.repos)}% now`}
           />
         )}
-        <Stat
+        <ReportStat
           label={SERIES_LABEL.claudeMd}
           value={percent(last.claudeMd, last.repos)}
           note={`${last.claudeMd} of ${last.repos} repos`}
         />
-        <Stat
+        <ReportStat
           label={SERIES_LABEL.withFile}
           value={percent(last.withFile, last.repos)}
           note={`${last.withFile} repos with AGENTS.md, CLAUDE.md or another name agents read`}
         />
         {last.medianChars != null && (
-          <Stat
+          <ReportStat
             label="Median length"
             value={NUMBER.format(last.medianChars)}
             note={`characters, across those ${last.withFile} files`}
@@ -117,11 +107,11 @@ export default function AgentsMdReportPage() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Instructions file by language</PanelHeading>
-          <ul className="m-0 grid list-none grid-cols-1 gap-x-10 gap-y-2.5 p-0 text-[14.5px] text-ink-dim md:grid-cols-2">
+          <ul className="m-0 grid list-none grid-cols-1 gap-x-10 p-0 text-[14.5px] text-ink-dim md:grid-cols-2">
             {examples.languages.map((l) => (
-              <li key={l.slug} className="grid grid-cols-[minmax(0,1fr)_90px] items-center gap-x-4">
+              <li key={l.slug} className="grid grid-cols-[minmax(0,1fr)_90px] items-center gap-x-4 link-row">
                 <span className="min-w-0">
-                  <Link href={hubPath(l.slug)} className={LINK}>
+                  <Link href={hubPath(l.slug)} className={`${LINK} cover-link`}>
                     {l.label}
                   </Link>
                   <span className="tabular-nums text-muted">
@@ -129,7 +119,7 @@ export default function AgentsMdReportPage() {
                     · {l.withFile} of {l.total} ({percent(l.withFile, l.total)})
                   </span>
                 </span>
-                <Bar part={l.withFile} total={l.total} />
+                <ReportBar part={l.withFile} total={l.total} />
               </li>
             ))}
           </ul>
@@ -173,7 +163,8 @@ export default function AgentsMdReportPage() {
           </section>
           <p className={`${PROSE} mt-3 text-[13px]`}>
             A repo with both AGENTS.md and CLAUDE.md counts under AGENTS.md: the check stops at the first file with
-            content, so how many have both isn&apos;t measured.{" "}
+            content. The file census finds both at the root of {CENSUS_SUMMARY.rootBoth} of the {CENSUS_SUMMARY.repos}{" "}
+            GitHub repos, symlinks and empty files included.{" "}
             <Link href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
               Which one to use
             </Link>
@@ -199,6 +190,17 @@ export default function AgentsMdReportPage() {
               {points.length} snapshot days from {formatDay(first.date)} to {asOf}, each the last{" "}
               <ExternalLink href={`${REPO_URL}/commits/main/data/rank.db`}>committed database</ExternalLink> that day.
               Days with no commit, or fewer than {minRepos} repos while the list was first filled, have no point.
+            </li>
+            <li>
+              How long the files are:{" "}
+              <Link href={SIZE_REPORT_PATH} className="prose-link">
+                AGENTS.md sizes
+              </Link>
+              ; what projects allow agents to contribute:{" "}
+              <Link href={AI_POLICY_REPORT_PATH} className="prose-link">
+                AI contribution policies
+              </Link>
+              .
             </li>
             <li>
               How the{" "}

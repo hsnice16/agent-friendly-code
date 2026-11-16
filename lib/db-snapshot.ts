@@ -28,3 +28,16 @@ export function readSnapshotRows(file: string): SnapshotRow[] {
     db.close();
   }
 }
+
+export type BoardRepo = { host: string; owner: string; name: string; branch: string | null };
+
+export function readBoardRepos(file: string): BoardRepo[] {
+  const db = new Database(file, { readonly: true, fileMustExist: true });
+  try {
+    return db
+      .prepare("SELECT host, owner, name, default_branch AS branch FROM repo ORDER BY host, owner, name")
+      .all() as BoardRepo[];
+  } finally {
+    db.close();
+  }
+}

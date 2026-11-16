@@ -34,7 +34,7 @@ import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
-import { REPORT_PATH, REPORT_TITLE } from "@/lib/utils/report-path";
+import { REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const SIGNAL_ID = "agents_md";
@@ -120,6 +120,10 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             <Link href={REPORT_PATH} className="prose-link">
               {REPORT_TITLE}
             </Link>
+            . How long they run:{" "}
+            <Link href={SIZE_REPORT_PATH} className="prose-link">
+              AGENTS.md sizes
+            </Link>
             .
           </>
         }
@@ -155,8 +159,8 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
           <ul className="m-0 mb-3 flex list-none flex-col gap-1.5 p-0 text-[14.5px] text-ink-dim">
             {ex.byFile.map((f) => (
               <li key={f.file}>
-                <code className="font-mono text-[13px] text-ink">{f.file}</code>: {f.count} repos ({f.passing} pass in
-                full)
+                <code className="font-mono text-[13px] text-ink">{f.file}</code>: {f.count}{" "}
+                {f.count === 1 ? "repo" : "repos"} ({f.passing} {f.passing === 1 ? "passes" : "pass"} in full)
               </li>
             ))}
           </ul>
@@ -172,10 +176,10 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
             <CodeText text={CHECK_CONTENT[SIGNAL_ID].why} />
           </p>
           <p className="mt-3 mb-1.5 text-[13px] text-muted">The weight each agent gives this check:</p>
-          <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1 p-0 text-[14px] text-ink-dim sm:grid-cols-3">
+          <ul className="m-0 grid list-none grid-cols-1 gap-x-6 p-0 text-[14px] text-ink-dim sm:grid-cols-3">
             {readers.map(({ m, weight }) => (
-              <li key={m.id} className="flex items-baseline justify-between gap-3">
-                <Link href={modelPath(m.id)} className={LINK}>
+              <li key={m.id} className="flex items-baseline justify-between gap-3 link-row">
+                <Link href={modelPath(m.id)} className={`${LINK} cover-link`}>
                   {m.label}
                 </Link>
                 <span className="tabular-nums">{weight.toFixed(1)}</span>
@@ -205,12 +209,12 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
         <div className="mt-3.5">
           <Panel>
             <PanelHeading>By language</PanelHeading>
-            <ul className="m-0 grid list-none grid-cols-1 gap-x-6 gap-y-1.5 p-0 text-[14px] text-ink-dim sm:grid-cols-2 md:grid-cols-3">
+            <ul className="m-0 grid list-none grid-cols-1 gap-x-6 p-0 text-[14px] text-ink-dim sm:grid-cols-2 md:grid-cols-3">
               {ex.languages.map((l) => (
-                <li key={l.slug} className="flex items-baseline justify-between gap-3">
+                <li key={l.slug} className="flex items-baseline justify-between gap-3 link-row">
                   <Link
                     href={l.withFile >= LANGUAGE_EXAMPLES_MIN ? languageExamplesPath(l.slug) : hubPath(l.slug)}
-                    className={LINK}
+                    className={`${LINK} cover-link`}
                   >
                     {l.label}
                   </Link>

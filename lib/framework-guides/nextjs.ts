@@ -17,7 +17,7 @@ export const NEXTJS: FrameworkGuide = {
   ],
   frameworkRepo: "github/vercel/next.js",
   intro:
-    "Agents learned Next.js from older versions, so the most useful lines say which version and router you use and what changed. Since 16.3, `next dev` writes a block into AGENTS.md that points agents at the docs bundled in `node_modules/next/dist/docs/`; keep it, and add your own rules around it.",
+    "Agents learned Next.js from older versions, so say which version and router you use and what changed. Since 16.3, `next dev` writes an AGENTS.md block pointing agents at the docs bundled in `node_modules/next/dist/docs/`; keep it and add your rules around it.",
   commands: [
     { cmd: "next dev", note: "dev server; Turbopack by default since 16" },
     { cmd: "next build", note: "production build; no longer runs the linter" },
@@ -28,7 +28,7 @@ export const NEXTJS: FrameworkGuide = {
   layout: [
     "App Router (`app/`) or Pages Router (`pages/`), and which one new routes go in.",
     'Which files are Client Components: everything a `"use client"` file imports ships to the browser.',
-    "In a monorepo, which package holds the Next.js app, and where its own AGENTS.md is.",
+    "In a monorepo, which package holds the Next.js app and where its AGENTS.md is.",
   ],
   rules: [
     "`params`, `searchParams`, `cookies()` and `headers()` are async in 16; synchronous access is gone.",

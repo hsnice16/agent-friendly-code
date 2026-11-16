@@ -11,9 +11,11 @@ const HOME_TITLE = `${APP_NAME} — is your codebase ready for AI agents?`;
 
 export const HOSTS_TEXT = "GitHub, GitLab and Bitbucket";
 
-// The searches that reach these boards are "best repos for Claude Code" and the like.
+// Worded for the searches that reach these boards: "best github repos for
+// claude code", "cursor leaderboard". Kept to what fits 60 characters with the
+// longest label, Kimi Code CLI, so no board falls back to a different wording.
 export function modelBoardTitle(label: string): string {
-  return `Best repos for ${label}, ranked by agent readiness`;
+  return `Best GitHub repos for ${label}: ranked leaderboard`;
 }
 
 export function leaderboardTitle(view: LeaderboardView): string {
@@ -48,8 +50,8 @@ export function leaderboardDescription(view: LeaderboardView): string {
 
   const top = allRows[0];
   return fitDescription(
-    `${total} public ${hosts} repos ranked by ${fit}.`,
-    ...(top ? [`${top.owner}/${top.name} leads with ${(top.score ?? 0).toFixed(1)}.`] : []),
+    `The ${agent} leaderboard: ${total} public repos ranked by ${fit}.`,
+    ...(top ? [`${top.owner}/${top.name} leads with a ${agent} score of ${(top.score ?? 0).toFixed(1)}.`] : []),
     `Scored on what ${agent} looks for.`,
   );
 }

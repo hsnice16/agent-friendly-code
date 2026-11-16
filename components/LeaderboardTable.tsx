@@ -36,6 +36,8 @@ type Props = {
   loading?: boolean;
   /** Replaces the rows, e.g. when the board data failed to load. */
   notice?: ReactNode;
+  /** Off on the long hub lists: each visible row would prefetch a repo page, an ISR read. */
+  prefetch?: boolean;
 };
 
 // On the body, not each row: the board's HTML repeats a row's classes per row.
@@ -59,6 +61,7 @@ export function LeaderboardTable({
   busy = false,
   loading = false,
   notice,
+  prefetch,
 }: Props) {
   const inPlace = (fn?: () => void) =>
     fn
@@ -114,12 +117,12 @@ export function LeaderboardTable({
               <td colSpan={5} className="p-11 text-center text-[13px] text-muted">
                 {q ? (
                   <>
-                    No repos match &ldquo;
+                    No {host === "all" ? "" : `${HOST_LABELS[host]} `}repos match &ldquo;
                     <strong data-clarity-mask="true" className="text-ink">
                       {q}
                     </strong>
                     &rdquo;.{" "}
-                    <Link href={clearSearchHref} onClick={clearSearch} className="text-ink-dim hover:text-ink-soft">
+                    <Link href={clearSearchHref} onClick={clearSearch} className="prose-link">
                       Clear search
                     </Link>
                     .
@@ -128,11 +131,7 @@ export function LeaderboardTable({
                   <>
                     No {host === "all" ? "" : `${HOST_LABELS[host]} `}repo on this board shows the badge yet.{" "}
                     {clearBadgeHref ? (
-                      <Link
-                        href={clearBadgeHref}
-                        onClick={inPlace(onClearBadge)}
-                        className="text-ink-dim hover:text-ink-soft"
-                      >
+                      <Link href={clearBadgeHref} onClick={inPlace(onClearBadge)} className="prose-link">
                         Show every {host === "all" ? "" : `${HOST_LABELS[host]} `}repo
                       </Link>
                     ) : null}
@@ -160,8 +159,9 @@ export function LeaderboardTable({
                   <td>
                     <Link
                       href={repoPath(r)}
+                      prefetch={prefetch}
                       aria-label={`View ${r.owner}/${r.name} details`}
-                      className="font-medium text-ink [overflow-wrap:anywhere] hover:text-ink-soft cover-link"
+                      className="font-medium ink-link [overflow-wrap:anywhere] cover-link"
                     >
                       {r.owner}/{r.name}
                     </Link>
@@ -175,7 +175,7 @@ export function LeaderboardTable({
                       </p>
                     )}
                   </td>
-                  <td className="hidden text-right tabular-nums text-ink-dim sm:table-cell">
+                  <td className="hidden whitespace-nowrap text-right tabular-nums text-ink-dim sm:table-cell">
                     <span>{compactStars(r.stars)}</span>
                   </td>
                   <td className="text-right">
@@ -188,7 +188,7 @@ export function LeaderboardTable({
                       rel="noopener noreferrer"
                       target="_blank"
                       aria-label={`Open ${r.owner}/${r.name} on ${r.host} (new tab)`}
-                      className="relative inline-flex items-center gap-1 whitespace-nowrap text-ink-dim hover:text-ink-soft"
+                      className="relative inline-flex items-center gap-1 whitespace-nowrap dim-link"
                     >
                       open <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
                     </a>

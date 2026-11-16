@@ -47,7 +47,7 @@ export function ConsentBanner() {
     >
       <p className="m-0 text-[13.5px] leading-snug text-ink-dim">
         May we use analytics cookies to count visits and record how pages are used?{" "}
-        <Link href="/privacy" className="text-ink-dim hover:text-ink">
+        <Link href="/privacy" className="dim-link">
           Privacy
         </Link>
       </p>
