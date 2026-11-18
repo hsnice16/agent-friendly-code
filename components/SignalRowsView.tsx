@@ -1,7 +1,7 @@
+"use client";
+
 import Link from "next/link";
 
-import type { SignalResult } from "@/lib/scoring/signals/types";
-import { checkPath } from "@/lib/utils/check-path";
 import { hostLabel, percent } from "@/lib/utils/format";
 import { matchesDirectory, repoFileUrl } from "@/lib/utils/repo-file-url";
 
@@ -23,14 +23,27 @@ function mark(pass: number): { key: keyof typeof MARK_CLASSES; ch: string } {
   return { key: "bad", ch: "✗" };
 }
 
-type RepoLocation = Parameters<typeof repoFileUrl>[0];
+export type SignalRowData = { id: string; label: string; href: string; pass: number; detail: string; path?: string };
+export type RepoLocation = Parameters<typeof repoFileUrl>[0];
 
-/** With `repo`, the matched path links to it on the default branch. Rows go in a `divide-y divide-line` list. */
-export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoLocation }) {
+export function SignalRowsView({ rows, repo }: { rows: SignalRowData[]; repo?: RepoLocation }) {
+  return (
+    <div className="divide-y divide-line">
+      {rows.map((s) => (
+        <SignalRow key={s.id} signal={s} repo={repo} />
+      ))}
+    </div>
+  );
+}
+
+function SignalRow({ signal, repo }: { signal: SignalRowData; repo?: RepoLocation }) {
   const m = mark(signal.pass);
   const { cls, label } = MARK_CLASSES[m.key];
-  const path = signal.matchedPath;
-  const href = path && repo ? repoFileUrl(repo, path, matchesDirectory(signal)) : null;
+  const path = signal.path;
+  const href =
+    path && repo
+      ? repoFileUrl(repo, path, matchesDirectory({ id: signal.id, pass: signal.pass, matchedPath: path }))
+      : null;
 
   return (
     <div className="check-row">
@@ -40,7 +53,7 @@ export function SignalRow({ signal, repo }: { signal: SignalResult; repo?: RepoL
 
       <div className="min-w-0 flex-1">
         <div className="text-[14.5px]">
-          <Link href={checkPath(signal.id)} className="font-medium ink-link">
+          <Link href={signal.href} className="font-medium ink-link">
             {signal.label}
           </Link>
           <span className="check-pass">· {percent(signal.pass, 1)} pass</span>

@@ -1,4 +1,4 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
+import { ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
 import type { BoardRow } from "@/lib/board";
@@ -73,9 +73,10 @@ export function LeaderboardTable({
   const clearSearch = inPlace(onClearSearch);
 
   return (
+    // `relative`: the cells' sr-only labels are absolute, and without it they escape the scroller and widen the page.
     <div
       aria-busy={busy || loading || undefined}
-      className={`overflow-x-auto rounded-xl border border-line bg-surface transition-opacity ${busy ? "opacity-60" : ""}`}
+      className={`relative overflow-x-auto rounded-xl border border-line bg-surface transition-opacity ${busy ? "opacity-60" : ""}`}
     >
       <table className="w-full border-separate border-spacing-0">
         <caption className="sr-only">

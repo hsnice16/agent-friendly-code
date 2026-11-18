@@ -16,7 +16,7 @@ import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
 import type { NavSection } from "@/components/SectionNav";
 import { SignalListCard } from "@/components/SignalListCard";
-import { SignalRow } from "@/components/SignalRow";
+import { SignalRows } from "@/components/SignalRows";
 
 import { checkRates } from "@/lib/check-rates";
 import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
@@ -186,17 +186,13 @@ export default async function Page({ params }: { params: Promise<Params> }) {
               </h2>
             }
           >
-            <div className="divide-y divide-line">
-              {signals.map((s) => (
-                <SignalRow key={s.id} signal={s} repo={repo} />
-              ))}
-            </div>
+            <SignalRows signals={signals} repo={repo} />
           </HashDetails>
         </Section>
 
         {report && (
           <Section id="compare">
-            <RepoReport slug={slug} report={report} />
+            <RepoReport slug={slug} report={report} agentsInTotal={MODELS.length} />
           </Section>
         )}
 

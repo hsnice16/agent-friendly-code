@@ -16,7 +16,7 @@ import { RepoSummary } from "@/components/RepoSummary";
 import type { NavSection } from "@/components/SectionNav";
 import { ShareScore } from "@/components/ShareScore";
 import { SignalListCard } from "@/components/SignalListCard";
-import { SignalRow } from "@/components/SignalRow";
+import { SignalRows } from "@/components/SignalRows";
 import { TrackEvent } from "@/components/TrackEvent";
 import { ALTERNATIVES_LIMIT, STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getRepoByHostOwnerName, listLeaderboardOverall } from "@/lib/db";
@@ -244,11 +244,7 @@ export default async function LiveScorePage({
               </h2>
             }
           >
-            <div className="divide-y divide-line">
-              {score.signals.map((s) => (
-                <SignalRow key={s.id} signal={s} repo={repo} />
-              ))}
-            </div>
+            <SignalRows signals={score.signals} repo={repo} />
           </HashDetails>
         </Section>
 

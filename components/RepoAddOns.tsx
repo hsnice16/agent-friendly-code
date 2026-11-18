@@ -28,7 +28,9 @@ export function RepoAddOns({ host, owner, name, appUrl, repoPagePath, score, pag
 
   return (
     <Panel tone="tip">
-      <PanelHeading tone="tip">Add to your repo</PanelHeading>
+      <PanelHeading tone="tip" icon="puzzle">
+        Add to your repo
+      </PanelHeading>
 
       {/* Same shape for both: what it is, what it does, one action, so neither reads as the footnote. */}
       <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 md:grid-cols-2">

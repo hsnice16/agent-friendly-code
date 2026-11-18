@@ -175,7 +175,9 @@ export default function AgentsMdSizePage() {
 
       <div className="mt-3.5">
         <Panel tone="warn">
-          <PanelHeading tone="warn">Is longer better?</PanelHeading>
+          <PanelHeading tone="warn" icon="file-text">
+            Is longer better?
+          </PanelHeading>
           <SizeGroupTable
             rows={[
               ...size.buckets.map((b) => ({ label: b.label, count: b.count, value: score(b.medianScore) })),

@@ -149,7 +149,9 @@ export default function AiPolicyReportPage() {
 
       <div className="mt-3.5">
         <Panel tone="tip">
-          <PanelHeading tone="tip">If you contribute with an AI agent</PanelHeading>
+          <PanelHeading tone="tip" icon="pull-request">
+            If you contribute with an AI agent
+          </PanelHeading>
           <ol className="m-0 ml-5 flex list-decimal flex-col gap-1.5 text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               Read the repo&apos;s CONTRIBUTING file and any AI_POLICY.md before the agent writes code. Many policies

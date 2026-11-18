@@ -28,9 +28,14 @@ export function HomeLeaderboard({ view, stats }: Props) {
         {/* Under the h1, not the subtitle: heatmaps showed the form below it went unseen.
             It stacks below `sm`, so the copy stays short to keep the board near the fold. */}
         <div className="callout mt-3 max-w-[640px]">
-          <p className="m-0 text-[15px] font-semibold text-ink">
-            Is your repo ready for AI agents? Paste a GitHub URL to score it.
-          </p>
+          <div className="flex items-center gap-3">
+            <span aria-hidden="true" className="glyph size-8 bg-tip/10 text-tip">
+              <span className="icon-link" />
+            </span>
+            <p className="m-0 text-[15px] font-semibold text-ink">
+              Is your repo ready for AI agents? Paste a GitHub URL to score it.
+            </p>
+          </div>
           <LiveScoreForm className="mt-3" />
         </div>
 

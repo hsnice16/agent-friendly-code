@@ -2,22 +2,13 @@ import { type ScoreSummary, type RepoSummary as Summary, topPercent } from "@/li
 
 import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
+import { Stat } from "./Stat";
 
 const GRID_COLS: Record<number, string> = {
   2: "sm:grid-cols-2",
   3: "sm:grid-cols-3",
   4: "sm:grid-cols-2 lg:grid-cols-4",
 };
-
-export function Stat({ label, value, note }: { label: string; value: React.ReactNode; note?: React.ReactNode }) {
-  return (
-    <div className="tile">
-      <dt className="text-[12.5px] eyebrow text-muted">{label}</dt>
-      <dd className="stat-value">{value}</dd>
-      {note && <dd className="m-0 mt-1 text-[13px] text-muted">{note}</dd>}
-    </div>
-  );
-}
 
 function OutOf({ n, total }: { n: string | number; total: number }) {
   return (

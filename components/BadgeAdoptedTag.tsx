@@ -1,4 +1,4 @@
-import { CheckCircle } from "@phosphor-icons/react/dist/ssr";
+import { CheckCircle } from "@phosphor-icons/react";
 
 export function BadgeAdoptedTag() {
   return (

@@ -59,7 +59,9 @@ export default function SkillPage() {
       />
 
       <Panel tone="tip">
-        <PanelHeading tone="tip">Install</PanelHeading>
+        <PanelHeading tone="tip" icon="download">
+          Install
+        </PanelHeading>
         <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
           The{" "}
           <ExternalLink href="https://github.com/vercel-labs/skills" tone="ink">
@@ -135,7 +137,9 @@ export default function SkillPage() {
 
       <div className="mt-3.5">
         <Panel tone="info">
-          <PanelHeading tone="info">Optional: score at the start of every session</PanelHeading>
+          <PanelHeading tone="info" icon="play">
+            Optional: score at the start of every session
+          </PanelHeading>
           <p className="m-0 mb-3 text-[14.5px] leading-relaxed text-ink-dim">
             Add a session-start hook to the matching settings file:
           </p>

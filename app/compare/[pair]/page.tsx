@@ -175,7 +175,9 @@ export default async function ComparePage({ params }: { params: Params }) {
 
       <div className="mt-3.5">
         <Panel tone="tip">
-          <PanelHeading tone="tip">What if I use both?</PanelHeading>
+          <PanelHeading tone="tip" icon="merge">
+            What if I use both?
+          </PanelHeading>
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               Write the shared instructions once, in AGENTS.md at the repo root.{" "}

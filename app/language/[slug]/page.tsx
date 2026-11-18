@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import { LeaderboardTable } from "@/components/LeaderboardTable";
+import { HubLeaderboardTable } from "@/components/HubLeaderboardTable";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
@@ -121,7 +121,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         </div>
       )}
 
-      <LeaderboardTable
+      <HubLeaderboardTable
         q=""
         page={1}
         host="all"

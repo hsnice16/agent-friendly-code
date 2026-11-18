@@ -154,7 +154,9 @@ export default async function LanguageAgentsPage({ params }: { params: Params })
         </Panel>
 
         <Panel tone="tip" className="h-full">
-          <PanelHeading tone="tip">How do I set up a {label} repo for agents?</PanelHeading>
+          <PanelHeading tone="tip" icon="wrench">
+            How do I set up a {label} repo for agents?
+          </PanelHeading>
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px]">
             {examples && (
               <li>

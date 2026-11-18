@@ -45,7 +45,9 @@ export function SizeDocs() {
 export function SizeAdvice({ median }: { median: string }) {
   return (
     <Panel tone="tip">
-      <PanelHeading tone="tip">So how long should yours be?</PanelHeading>
+      <PanelHeading tone="tip" icon="ruler">
+        So how long should yours be?
+      </PanelHeading>
       <ul className="m-0 ml-5 flex list-disc flex-col gap-2 text-[14.5px] leading-relaxed text-ink-dim">
         <li>
           Short enough that every line earns its place. The typical file here is about {median} characters; past 16 KiB,

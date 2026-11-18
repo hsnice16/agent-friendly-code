@@ -31,7 +31,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 
 ## React Server Components
 
-- **Default to server components.** Only add `"use client"` when you need state, effects, browser APIs, or event handlers.
+- **Default to server components.** Only add `"use client"` when you need state, effects, browser APIs, or event handlers, or for a markup-heavy `*View` fed trimmed data (AGENTS.md → Conventions). For a `*View`, flag props passed untrimmed and any value other than a component that a server file imports from a `"use client"` module; server-only imports already fail `tests/client-boundary.test.ts`.
 - **Fetch data in pages**, pass props down. Components don't fetch.
 - **Use `<Link>` from `next/link`** for internal navigation, not `<a href>`.
 - **Query params over client state** where possible; the boards are the exception (AGENTS.md → Conventions).
@@ -44,7 +44,7 @@ Run through this checklist on any diff. Flag violations with the specific line a
 
 ## Icons
 
-Only `@phosphor-icons/react`. Block Lucide, Heroicons, React Icons, inline SVG, emoji-as-icon. Import server components from `@phosphor-icons/react/dist/ssr`; client components from the root entry.
+Only `@phosphor-icons/react`, or an `icon-*` mask utility in `globals.css` built from a Phosphor path. Block Lucide, Heroicons, React Icons, inline SVG, emoji-as-icon. Import server components from `@phosphor-icons/react/dist/ssr`; client components from the root entry.
 
 ## Accessibility (quick pass — delegate deeper checks to `quality-check`)
 

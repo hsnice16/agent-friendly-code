@@ -1,0 +1,149 @@
+"use client";
+
+import Link from "next/link";
+
+import type { RepoRow } from "@/lib/types/db";
+import { compactStars, formatDate } from "@/lib/utils/format";
+import type { RepoAboutData } from "@/lib/utils/repo-about";
+import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
+
+import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
+import { HostPill } from "./HostPill";
+import { OwnRepoTag } from "./OwnRepoTag";
+import { Panel } from "./Panel";
+import { RepoAbout } from "./RepoAbout";
+import { ScoreDeltaPopover } from "./ScoreDeltaPopover";
+
+export type HeroRepo = Pick<
+  RepoRow,
+  | "owner"
+  | "name"
+  | "host"
+  | "url"
+  | "stars"
+  | "language"
+  | "default_branch"
+  | "last_scored_at"
+  | "overall_score"
+  | "previous_overall_score"
+  | "badge_embedded"
+>;
+
+export type HeroProps = {
+  repo: HeroRepo;
+  about: RepoAboutData;
+  commitSha?: string;
+  /** The hub to link, when the repo's language has one. */
+  language?: { label: string; href: string };
+  topicLinks?: Record<string, string>;
+};
+
+// `commitSha` is the live-score path: there is no "last scored" when the page
+// render *is* the scoring, so the commit is the only honest freshness fact.
+export function RepoHeroView({ repo, about, commitSha, language, topicLinks }: HeroProps) {
+  const overall = repo.overall_score ?? 0;
+  const overallTier = scoreTier(overall);
+
+  const prev = repo.previous_overall_score;
+  const hasDelta = prev != null && repo.overall_score != null && repo.overall_score !== prev;
+
+  return (
+    <Panel padding={false}>
+      <div className="flex flex-col gap-5 px-5 py-5 sm:flex-row sm:items-start sm:justify-between sm:px-6 sm:py-6">
+        <div className="min-w-0 flex-1">
+          {/* The pills sit beside the h1, not in it: inside, its text read "owner/nameGitHub".
+              `[&>span]:ml-0`: the pills' own ml-2 indents them when they wrap under the h1. */}
+          <div className="flex flex-wrap items-center gap-x-2 gap-y-1 [&>span]:ml-0">
+            <h1 className="m-0 min-w-0 break-words text-[20px] font-semibold tracking-tight sm:text-[22px]">
+              {repo.owner}/{repo.name}
+            </h1>
+            <HostPill host={repo.host} />
+            {repo.badge_embedded ? <BadgeAdoptedTag /> : null}
+            <OwnRepoTag repo={repo} />
+          </div>
+
+          <a
+            target="_blank"
+            href={repo.url}
+            rel="noopener noreferrer"
+            className="tap-target mt-1 block break-all text-sm text-muted hover:text-ink"
+            aria-label={`${repo.owner}/${repo.name} on ${repo.host} (new tab)`}
+          >
+            {repo.url}
+          </a>
+
+          <RepoAbout about={about} topicLinks={topicLinks} />
+
+          <dl className="mt-3.5 flex flex-wrap gap-x-6 gap-y-1 text-[13.5px] text-muted">
+            <div>
+              <dt className="inline">Stars: </dt>
+              <dd className="inline font-medium text-ink">{compactStars(repo.stars, false)}</dd>
+            </div>
+
+            {repo.language && (
+              <div>
+                <dt className="inline">Language: </dt>
+                <dd className="inline font-medium text-ink">
+                  {language ? (
+                    <Link href={language.href} className="tap-target font-medium ink-link">
+                      {language.label}
+                    </Link>
+                  ) : (
+                    repo.language
+                  )}
+                </dd>
+              </div>
+            )}
+
+            <div>
+              <dt className="inline">Default branch: </dt>
+              <dd className="inline font-medium text-ink">{repo.default_branch ?? "—"}</dd>
+            </div>
+
+            <div>
+              {commitSha ? (
+                <>
+                  <dt className="inline">Commit: </dt>
+                  <dd className="inline font-medium font-mono text-ink">{commitSha.slice(0, 7)}</dd>
+                </>
+              ) : (
+                <>
+                  <dt className="inline">Last scored: </dt>
+                  {/* A date, not "3h ago": the page is rendered once per deploy, and a
+                      relative time would freeze at whatever it said then. */}
+                  <dd className="inline font-medium text-ink">
+                    {repo.last_scored_at ? (
+                      <time dateTime={new Date(repo.last_scored_at * 1000).toISOString()}>
+                        {formatDate(repo.last_scored_at)}
+                      </time>
+                    ) : (
+                      "—"
+                    )}
+                  </dd>
+                </>
+              )}
+            </div>
+          </dl>
+        </div>
+
+        <div className="min-w-[110px] shrink-0 text-left sm:text-center">
+          <div
+            role="img"
+            aria-label={`Overall score ${overall.toFixed(1)} out of 100`}
+            className={`text-[36px] font-bold leading-none tracking-tight tabular-nums sm:text-[42px] ${TIER_TEXT_CLASS[overallTier]}`}
+          >
+            {overall.toFixed(1)}
+          </div>
+          {hasDelta && prev != null && repo.overall_score != null && (
+            <ScoreDeltaPopover
+              current={repo.overall_score}
+              previous={prev}
+              scoredAt={repo.last_scored_at ? formatDate(repo.last_scored_at, { time: true }) : null}
+            />
+          )}
+          <div className="mt-2 text-[12.5px] eyebrow text-muted">Overall</div>
+        </div>
+      </div>
+    </Panel>
+  );
+}

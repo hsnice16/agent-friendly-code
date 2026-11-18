@@ -33,7 +33,9 @@ export default function PackageIndexPage() {
       />
 
       <Panel tone="tip">
-        <PanelHeading tone="tip">Look up a package</PanelHeading>
+        <PanelHeading tone="tip" icon="package">
+          Look up a package
+        </PanelHeading>
 
         <PackageLookupForm />
 

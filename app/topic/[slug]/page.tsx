@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-
+import { HubLeaderboardTable } from "@/components/HubLeaderboardTable";
 import { JsonLd } from "@/components/JsonLd";
-import { LeaderboardTable } from "@/components/LeaderboardTable";
 import { PageHeader } from "@/components/PageHeader";
 import { getTopicGroups, getTopicPage, type TopicPage } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicDescription, topicPath, topicTitle } from "@/lib/topics";
@@ -74,7 +73,7 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         }
       />
 
-      <LeaderboardTable
+      <HubLeaderboardTable
         q=""
         page={1}
         host="all"

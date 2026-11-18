@@ -1,6 +1,6 @@
 # 0.10.0 — maintainer ownership + at-scale discovery
 
-**Status**: planned
+**Status**: in_progress
 
 01 and 02 both add an external touchpoint — OAuth sessions with per-user DB writes, and a userscript probing registry pages — so they ship in one cut.
 

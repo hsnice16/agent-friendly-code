@@ -104,7 +104,9 @@ export default function ContributePage() {
       />
 
       <Panel tone="warn">
-        <PanelHeading tone="warn">Read the project&apos;s rules first</PanelHeading>
+        <PanelHeading tone="warn" icon="book-open">
+          Read the project&apos;s rules first
+        </PanelHeading>
         <p className={PROSE}>
           Before opening an AI-assisted pull request, read the CONTRIBUTING guide and any AI policy: some projects
           restrict or refuse AI-generated contributions, or ask you to say when an agent helped. A listed repo is easy
@@ -189,7 +191,9 @@ export default function ContributePage() {
           </ul>
         </Panel>
         <Panel tone="tip">
-          <PanelHeading tone="tip">Contributing with an agent</PanelHeading>
+          <PanelHeading tone="tip" icon="robot">
+            Contributing with an agent
+          </PanelHeading>
           <ul className="m-0 ml-5 flex list-disc flex-col gap-1.5 text-[14.5px] leading-relaxed text-ink-dim">
             <li>Have the agent read CONTRIBUTING and the agent file before it touches code.</li>
             <li>Run the project&apos;s tests and linters yourself, and say in the PR that an agent helped.</li>

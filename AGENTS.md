@@ -20,6 +20,7 @@ bun run test           # node --test + tsx
 bun x tsc --noEmit
 bun run score <url|path>
 bun run seed           # reconcile data/rank.db with scripts/seed-list.ts, then rescore every seed
+bun run seed-packages  # only the /package page's popular-package chips (`seed` runs it too)
 bun run init-db        # optional: migrate an older DB (the schema also applies on open)
 bun run audit-seeds    # forks / mirrors / archived / renamed / gone / stale seeds (needs GITHUB_TOKEN)
 bun run badge-adopters # repos whose README shows their own badge, on or off the board (needs GITHUB_TOKEN)
@@ -44,6 +45,7 @@ lib/
   constants/  hosts, board and sort keys, page sizes and limits, cache headers, legal-page dates
   db.ts       the only import path for queries; re-exports the query modules (schema in db-schema.ts);
               db-snapshot.ts reads old rank.db copies read-only (importing db.ts migrates rank.db)
+  types/      DB row shapes (`RepoRow`, `LeaderboardRow`)
   utils/      URL builders, page titles, formatting, repo-page builders
   check-content/  prose for each /check/<slug> page, keyed by signal id
   framework-guides/, language-guides/  per-framework and per-language AGENTS.md guide content
@@ -70,6 +72,7 @@ data/ai-policy.json   each project's stance on AI contributions, classified by h
 
 - **Exact-pinned deps** (no `^`, no `latest`) — scoring must be deterministic.
 - **Server components by default.** Prefer `<Link>` and query params over client state. Exceptions, both because the page is prerendered: repo pages never read `?model=` (`ModelSuggestionsSwitch` reads it in the browser), and the boards never read search params: search, filter and sort run in `BoardClient` over `/api/board`, an internal payload whose order must match `listLeaderboard` (`tests/board.test.ts`).
+- **Markup-heavy parts render as client components fed data** (`SiteHeader`, `SiteFooter`, `NotFoundView`, and the `*View` files behind repo sections and hub tables). The RSC payload carries a server component's whole rendered tree but only a client component's props, and payload bytes are billed as ISR reads. The prerendered HTML is unchanged. The server wrapper trims rows to the fields rendered and resolves anything server-only (`checkPath` reads the signal registry), and a view imports only client-safe modules: no `lib/scoring/signals`, `scorer`, `db`, `ai-policy` (the whole dataset) or `MODELS` (every agent's sources); `tests/client-boundary.test.ts` fails on one. A value other than a component, exported from a `"use client"` file, reaches the server as a reference, not the value; share it from a plain module (`stance-chip.ts`).
 - **One place per URL shape.** Build repo URLs with `lib/utils/repo-path.ts`, check URLs with `check-path.ts`, board URLs with `leaderboard-href.ts`, links to a file on its host with `repo-file-url.ts`, report URLs with `report-path.ts`; guide, compare, contribute and generator URLs each have their own `*-path.ts`.
 - **Page metadata.** Static-page titles and descriptions live in `PAGE_COPY` (`lib/page-meta.ts`); a page whose title or description carries live counts builds them in `generateMetadata` from a `lib/` helper instead. Length caps come from `lib/utils/page-title.ts`. Next.js shallow-merges `openGraph` / `twitter`, so a page that sets either re-spreads `OG_DEFAULTS` / `TWITTER_DEFAULTS` and sets an image (`DEFAULT_OG_IMAGE` or its own).
 - **Indexing.** A board page is `/`, `/model/<id>` or `…/page/<n>`; a searched, filtered or sorted view is the same prerendered page re-cut in the browser, so its canonical is the board. Never a robots.txt `Disallow` for them, which would hide the canonical. Package pages are noindex and stay out of the sitemap.
@@ -77,8 +80,8 @@ data/ai-policy.json   each project's stance on AI contributions, classified by h
 - **Path lookups** in signals go through `firstExisting` / `resolveRelative` / `resolveAllRelative` (`helpers.ts`), never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
 - **An empty AGENTS.md / CLAUDE.md** (`agents_md` pass 0.2) does not count as having one wherever a share is shown.
 - **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`, `analytics-consent.ts`) wrapped in try/catch, read after mount so server HTML matches.
-- **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`. A class string repeated in 3+ components, or many times on one page, may become a plain-CSS `@utility` in `globals.css` (`card`, `pill`, `check-row`…): every class string ships twice per page, in the HTML and the RSC payload.
-- **Shared UI.** Every page opens with `PageHeader` (breadcrumbs on sub-pages). Controls use the `btn-primary` / `btn-secondary` / `field` utilities (`btn-sm` beside text or inside a card), data tables `table-wrap` + `data-table`, FAQs `FaqList`, tags `chip`, standalone "X →" links `arrow-link`. Panel tones have fixed meanings (`Panel.tsx`); a new variant is a new shared style, not a one-off.
+- **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`. A class string repeated in 3+ components, or many times on one page, may become a plain-CSS `@utility` in `globals.css` (`card`, `pill`, `check-row`…): in a server component every class string ships twice per page, in the HTML and the RSC payload.
+- **Shared UI.** Every page opens with `PageHeader` (breadcrumbs on sub-pages). Controls use the `btn-primary` / `btn-secondary` / `field` utilities (`btn-sm` beside text or inside a card), data tables `table-wrap` + `data-table`, FAQs `FaqList`, tags `chip`, standalone "X →" links `arrow-link`. Panel tones have fixed meanings (`Panel.tsx`), and a toned `PanelHeading` takes an `icon` (a CSS-mask utility in `globals.css`); a new variant is a new shared style, not a one-off.
 - **Interaction.** A row, list item or tile that leads somewhere is one target, like a board row: its main link gets `cover-link` (inside `data-table`, `link-row` or `tile`), so all of it highlights on hover. `link-row` brings its own divider and height; don't add `py-*` or `divide-y`. Text links are `ink-link`, `dim-link`, `prose-link` (in muted prose) or `arrow-link`: hover changes the colour, never adds an underline. Motion stays CSS-only and off under `prefers-reduced-motion`.
 - **Comments say why, never what.** The shallow-clone note in `lib/clients/git.ts` is the model.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines (pre-commit enforced). `scripts/` is exempt.

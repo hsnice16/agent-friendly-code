@@ -28,7 +28,9 @@ export default function PackageNotFound() {
       />
 
       <Panel tone="tip">
-        <PanelHeading tone="tip">Check the spelling</PanelHeading>
+        <PanelHeading tone="tip" icon="text-aa">
+          Check the spelling
+        </PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Names are looked up exactly as the registry spells them, scope included (<code>@scope/name</code> on npm).{" "}
           <Link href="/package" className="prose-link">

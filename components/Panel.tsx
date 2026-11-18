@@ -51,8 +51,55 @@ export function Panel({
   return <section className={cls}>{children}</section>;
 }
 
-export function PanelHeading({ children, tone }: { children: React.ReactNode; tone?: PanelTone }) {
-  const toneClass = tone ? TONE_HEADING[tone] : "text-muted";
+// Whole class names: Tailwind only generates a utility it finds spelled out in the source.
+const ICON_CLASS = {
+  download: "icon-download",
+  play: "icon-play",
+  "text-aa": "icon-text-aa",
+  search: "icon-search",
+  wrench: "icon-wrench",
+  robot: "icon-robot",
+  "book-open": "icon-book-open",
+  merge: "icon-merge",
+  "list-checks": "icon-list-checks",
+  package: "icon-package",
+  "pull-request": "icon-pull-request",
+  puzzle: "icon-puzzle",
+  ruler: "icon-ruler",
+  flask: "icon-flask",
+  "file-text": "icon-file-text",
+} as const;
 
-  return <h2 className={`card-title ${toneClass}`}>{Children.map(children, keepFileCase)}</h2>;
+export type PanelIcon = keyof typeof ICON_CLASS;
+
+const TONE_GLYPH: Record<PanelTone, string> = {
+  tip: "bg-tip/10 text-tip",
+  info: "bg-info/10 text-info",
+  warn: "bg-warn/10 text-warn",
+};
+
+export function PanelHeading({
+  children,
+  tone,
+  icon,
+}: {
+  children: React.ReactNode;
+  tone?: PanelTone;
+  icon?: PanelIcon;
+}) {
+  const toneClass = tone ? TONE_HEADING[tone] : "text-muted";
+  const text = Children.map(children, keepFileCase);
+
+  if (!icon) {
+    return <h2 className={`card-title ${toneClass}`}>{text}</h2>;
+  }
+
+  return (
+    <h2 className={`card-title flex items-center gap-2.5 ${toneClass}`}>
+      <span aria-hidden="true" className={`glyph size-7 ${TONE_GLYPH[tone ?? "tip"]}`}>
+        <span className={ICON_CLASS[icon]} />
+      </span>
+      <span className="min-w-0">{text}</span>
+    </h2>
+  );
 }

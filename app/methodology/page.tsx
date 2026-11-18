@@ -41,7 +41,9 @@ export default function MethodologyPage() {
       </PageHeader>
 
       <Panel tone="warn">
-        <PanelHeading tone="warn">Weights from docs, not yet tested</PanelHeading>
+        <PanelHeading tone="warn" icon="flask">
+          Weights from docs, not yet tested
+        </PanelHeading>
 
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Scores come from <strong className="text-ink">file checks</strong>: whether a file exists, and how long it is.

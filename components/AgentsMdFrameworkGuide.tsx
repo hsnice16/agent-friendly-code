@@ -78,8 +78,8 @@ export function AgentsMdGuidePanels({ guide }: { guide: AgentsMdGuide }) {
         <PanelHeading>Which commands should it list?</PanelHeading>
         <ul className="m-0 flex list-none flex-col gap-2 p-0 text-[14.5px] text-ink-dim">
           {guide.commands.map((c) => (
-            <li key={c.cmd} className="flex flex-col gap-x-4 sm:flex-row sm:items-baseline">
-              <code className="shrink-0 font-mono text-[13px] text-ink sm:w-[22rem]">{c.cmd}</code>
+            <li key={c.cmd} className="flex flex-col gap-x-4 md:flex-row md:items-baseline">
+              <code className="shrink-0 font-mono text-[13px] text-ink md:w-[22rem]">{c.cmd}</code>
               <span>
                 <CodeText text={c.note} />
               </span>

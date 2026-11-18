@@ -43,7 +43,9 @@ export default function ChecksPage() {
 
       <div className="mb-5">
         <Panel tone="tip">
-          <PanelHeading tone="tip">Start with these {START_WITH_CHECKS}</PanelHeading>
+          <PanelHeading tone="tip" icon="list-checks">
+            Start with these {START_WITH_CHECKS}
+          </PanelHeading>
           <p className="m-0 mb-2.5 text-[13.5px] text-ink-dim">
             The most weight summed across all {MODELS.length} agents, so each fix moves every agent&apos;s score:
           </p>

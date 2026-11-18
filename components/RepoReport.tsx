@@ -1,9 +1,11 @@
-import { MODELS } from "@/lib/scoring/weights";
+"use client";
+
+// Client for payload size: AGENTS.md → Conventions.
 import { percent } from "@/lib/utils/format";
 import type { RepoReportData } from "@/lib/utils/repo-report";
 
 import { Panel, PanelHeading } from "./Panel";
-import { Stat } from "./RepoSummary";
+import { Stat } from "./Stat";
 
 function Diff({ diff }: { diff: number }) {
   if (Math.abs(diff) < 0.05) return <>Level</>;
@@ -36,7 +38,16 @@ function SubHeading({ children }: { children: React.ReactNode }) {
   return <h3 className="m-0 mb-2 text-[13px] font-semibold text-ink-soft">{children}</h3>;
 }
 
-export function RepoReport({ slug, report }: { slug: string; report: RepoReportData }) {
+export function RepoReport({
+  slug,
+  report,
+  agentsInTotal,
+}: {
+  slug: string;
+  report: RepoReportData;
+  /** Passed in: importing the agent list would ship every agent's weights and sources to the browser. */
+  agentsInTotal: number;
+}) {
   const { comparisons, starsRank, language, missing, rare, lift } = report;
 
   return (
@@ -104,7 +115,7 @@ export function RepoReport({ slug, report }: { slug: string; report: RepoReportD
         <p className="m-0 mt-5 rounded-lg border border-tip/40 bg-surface-2 px-3.5 py-3 text-[14px] text-ink-dim">
           <span className="font-semibold text-tip">One fix for the most agents: </span>
           <span className="font-medium text-ink">{lift.label}</span> would raise the score for{" "}
-          {lift.agents === MODELS.length ? `all ${MODELS.length}` : `${lift.agents} of ${MODELS.length}`} agents, by up
+          {lift.agents === agentsInTotal ? `all ${agentsInTotal}` : `${lift.agents} of ${agentsInTotal}`} agents, by up
           to {lift.maxGain.toFixed(1)} points.
         </p>
       )}

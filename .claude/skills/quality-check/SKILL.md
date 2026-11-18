@@ -29,7 +29,7 @@ Run the four checks below on any diff affecting UI or I/O. Report findings group
 
 ## Performance
 
-- **Server components by default.** Client components only when necessary.
+- **Server components by default.** Client components only when necessary, or as a markup-heavy `*View` fed trimmed data to keep the RSC payload small (AGENTS.md → Conventions); check that the view adds no server module to the browser chunks.
 - **Third-party scripts** load after hydration: `next/script` `afterInteractive` (`GoogleAnalytics.tsx`), or injected on consent (`lib/clarity.ts`). Each origin needs a CSP entry in `next.config.ts`.
 - **No client-side data fetching** for rendering — use the DB in a Server Component or API route. Exception: a board re-cut (search, filter, sort) reads the static `/api/board` in `BoardClient`, because the boards are prerendered.
 - **Images**: `next/image` for local images; plain `<img loading="lazy">` only for remote badge SVGs.
