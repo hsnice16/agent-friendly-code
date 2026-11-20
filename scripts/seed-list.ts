@@ -320,6 +320,8 @@ export const SEEDS: Seed[] = [
   },
   { url: "https://github.com/rust-lang/cargo", note: "Cargo — the Rust package manager" },
   { url: "https://github.com/rayon-rs/rayon", note: "Rayon — data-parallelism library for Rust" },
+  { url: "https://github.com/jdx/mise", note: "mise — dev tool versions, env vars and task runner" },
+  { url: "https://github.com/succinctlabs/sp1", note: "SP1 — zero-knowledge virtual machine for RISC-V programs" },
 
   // --- GitHub, Go ---
   {
@@ -423,6 +425,10 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/openssl/openssl", note: "OpenSSL — TLS / cryptography library" },
   { url: "https://github.com/git/git", note: "Git — the version control system itself (mirror)", accept: ["mirror"] },
   { url: "https://github.com/ocornut/imgui", note: "Dear ImGui — immediate-mode GUI" },
+  {
+    url: "https://github.com/cartesi/machine-emulator",
+    note: "Cartesi Machine — RISC-V emulator for off-chain computation",
+  },
 
   // --- GitHub, JVM (Java / Kotlin) ---
   {
