@@ -12,6 +12,7 @@
 
 ## Shipped since 0.9.4, owed a changelog line
 
+- The dependency-manifest check counts a root `.slnx` solution (the .NET 10 default) and `Directory.Packages.props`, so .NET repos laid out that way no longer fail it ([#20](https://github.com/hsnice16/agent-friendly-code/issues/20)).
 - The leaderboards have a Badge filter that shows only repos displaying the Agent Friendly Code badge in their README (`?badge=1`).
 - Repo pages are lighter: "Similar repos" also lists repos sharing the repo's GitHub topics (formerly a separate section), the badge and a link to the GitHub Action share one "Add to your repo" card (on Live Score pages too, in place of the workflow file), and the footer links the language and topic hubs instead of listing each one.
 - A package its registry doesn't list now gets a "Package not found" page (404) instead of "no source repo listed", and `/api/package/<registry>/<name>` answers it with `status: "not_found"` and HTTP 404.
