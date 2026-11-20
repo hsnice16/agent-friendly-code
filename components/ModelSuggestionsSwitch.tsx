@@ -14,8 +14,17 @@ import { SuggestionItem } from "./SuggestionItem";
  * this page, only spends crawl budget. Reading the query in the browser keeps
  * old `?model=` links working on a static page.
  */
-export function ModelSuggestionsSwitch({ agents, text }: { agents: SwitchAgent[]; text: Record<string, FixText> }) {
-  const [selected, setSelected] = useState(agents[0].id);
+export function ModelSuggestionsSwitch({
+  agents,
+  text,
+  initial,
+}: {
+  agents: SwitchAgent[];
+  text: Record<string, FixText>;
+  /** For a page rendered per request, which can read `?model=` before the first paint. */
+  initial?: string;
+}) {
+  const [selected, setSelected] = useState(initial && agents.some((a) => a.id === initial) ? initial : agents[0].id);
 
   useEffect(() => {
     const wanted = new URLSearchParams(window.location.search).get("model");

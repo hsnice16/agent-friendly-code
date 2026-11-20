@@ -67,7 +67,7 @@ const FAQ: FaqEntry[] = [
   },
   {
     q: "Does it work on private repos, GitLab, or Bitbucket?",
-    a: "Only public GitHub repos for now. GitLab and Bitbucket are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. Private repos would need access we choose not to ask for; run the agent skill locally instead.",
+    a: "Live Score scores public GitHub repos. A GitLab or Bitbucket repo already on the leaderboard opens its page, scored the same way; others are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. Private repos would need access we choose not to ask for; run the agent skill locally instead.",
     link: { phrase: "the agent skill", href: "/skill" },
   },
   {
@@ -139,7 +139,9 @@ export default function ScoreIndexPage() {
       >
         <LiveScoreForm />
 
-        <p className="mt-3 text-[13px] text-muted">GitLab and Bitbucket are coming soon.</p>
+        <p className="mt-3 text-[13px] text-muted">
+          GitLab and Bitbucket repos already on the leaderboard open their page; scoring others is coming soon.
+        </p>
       </PageHeader>
 
       <RecentScores

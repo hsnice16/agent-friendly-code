@@ -40,7 +40,9 @@ export function LiveScoreForm({ className = "mt-5" }: { className?: string }) {
         return;
       }
       setPending(false);
-      setError(`${hostLabel(parsed.host)} is coming soon. GitHub repos work today.`);
+      setError(
+        `This ${hostLabel(parsed.host)} repo isn't on the leaderboard yet, and Live Score only reads GitHub for now.`,
+      );
       return;
     }
 

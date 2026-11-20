@@ -5,7 +5,8 @@ import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HashDetails } from "@/components/HashDetails";
-import { ModelSuggestions } from "@/components/ModelSuggestions";
+import { LiveScoreUnavailable } from "@/components/LiveScoreUnavailable";
+import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { Panel } from "@/components/Panel";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RecordScore } from "@/components/RecordScore";
@@ -24,7 +25,7 @@ import { cachedLiveScore, type LiveTarget, parseLiveTarget } from "@/lib/live-sc
 import { TooLargeError } from "@/lib/live-score/hosts";
 import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { topImprovements } from "@/lib/scoring/scorer";
-import type { ModelId } from "@/lib/scoring/weights";
+import { MODELS } from "@/lib/scoring/weights";
 import { starterIfMissing } from "@/lib/starter-agents-md";
 import type { RepoRow } from "@/lib/types/db";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
@@ -36,6 +37,7 @@ import { liveScorePath, repoPath, withQuery } from "@/lib/utils/repo-path";
 import { summarizeScore } from "@/lib/utils/repo-summary";
 import { scoreTier } from "@/lib/utils/score";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
+import { suggestionSwitchProps } from "@/lib/utils/suggestion-switch";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
 
 // lib/live-score/score.ts and http.ts time out inside this cap.
@@ -97,19 +99,6 @@ function Unsupported({ host }: { host: string }) {
   );
 }
 
-function Unavailable({ reason, outcome }: { reason: string; outcome: "not_found" | "too_large" }) {
-  return (
-    <Panel>
-      <TrackEvent event={{ name: "live_score_result", outcome }} />
-      <h1 className="m-0 text-[19px] font-semibold tracking-tight">Couldn&apos;t score this repo</h1>
-      <p className="mt-2 max-w-[64ch] text-[14.5px] text-ink-dim">{reason}</p>
-      <Link href="/score" className="mt-3.5 inline-block text-[14px] dim-link">
-        ← Try another repo
-      </Link>
-    </Panel>
-  );
-}
-
 export default async function LiveScorePage({
   params,
   searchParams,
@@ -136,28 +125,19 @@ export default async function LiveScorePage({
     score = await cachedLiveScore(parsed);
   } catch (err) {
     if (err instanceof TooLargeError) {
-      return (
-        <Unavailable
-          outcome="too_large"
-          reason="Too big to score here. Score it on your own computer with the agent skill."
-        />
-      );
+      return <LiveScoreUnavailable outcome="too_large" reason="Too big to score here." />;
     }
     // Everything else is transient — a rate limit, a host blip — so error.tsx offers a retry.
     throw err;
   }
 
-  if (!score) {
-    return (
-      <Unavailable
-        outcome="not_found"
-        reason="We couldn't find a public repo with that name. Check the owner and repo name."
-      />
-    );
-  }
+  // A 404 status, not a 200 page: link previews would otherwise unfurl "not found" as a result.
+  if (!score) notFound();
 
-  const selected: ModelId = isModelId(model) ? model : "claude-code";
-  const suggestions = topImprovements(selected, score.signals);
+  const signals = score.signals;
+  // Every agent's list ships with the page, so a pill switches in the browser; a
+  // `?model=` round trip would re-run the score.
+  const agents = MODELS.map((m) => ({ id: m.id, label: m.label, suggestions: topImprovements(m.id, signals) }));
   const strengths = score.signals.filter((s) => s.pass >= 1).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
   const gaps = score.signals.filter((s) => s.pass === 0).slice(0, STRENGTHS_GAPS_VISIBLE_LIMIT);
 
@@ -222,7 +202,7 @@ export default async function LiveScorePage({
         </Section>
 
         <Section id="fix-first">
-          <ModelSuggestions selected={selected} suggestions={suggestions} basePath={path} />
+          <ModelSuggestionsSwitch {...suggestionSwitchProps(agents)} initial={isModelId(model) ? model : undefined} />
         </Section>
 
         <Section id="agent-scores">
