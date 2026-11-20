@@ -26,3 +26,4 @@
 - `/agents` answers "does <agent> read AGENTS.md?" for every agent, and covers Copilot, Antigravity, OpenCode, Devin Desktop and Kiro.
 - AGENTS.md examples pages for React, Vue, Laravel, Android and Flutter, with Angular, Spring Boot, .NET, React Native and iOS (and Swift, C# and Dart language pages) once the 30 new seeds are scored.
 - Check pages for tests, linter, pre-commit, dev setup and CI say how agents use each (hooks, devcontainers, CI); /check/agents-md and /check/cursor-rules explain the format and best practices.
+- The linter check counts C#, F# and Kotlin configs: an `.editorconfig` with `dotnet_`, `csharp_`, `visual_basic_`, `fsharp_` or `ktlint_` keys, `.globalconfig`, `stylecop.json`, `fsharplint.json`, or a `Directory.Build.props` that sets `EnforceCodeStyleInBuild`, `AnalysisLevel` or `AnalysisMode` (#21).

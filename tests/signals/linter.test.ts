@@ -64,6 +64,71 @@ describe("linter signal", () => {
     assert.equal(linter.check(fixture).pass, 0);
   });
 
+  test("pass=0 for an indent-only .editorconfig in a .NET repo", () => {
+    fixture = makeFixture({
+      ".editorconfig":
+        "root = true\n\n[*.cs]\nindent_style = space\nindent_size = 4\n# dotnet_style_qualification_for_field = false",
+      "App.sln": "",
+    });
+    assert.equal(linter.check(fixture).pass, 0);
+  });
+
+  test("pass=1 for .editorconfig with .NET code-style rules", () => {
+    fixture = makeFixture({
+      ".editorconfig": "root = true\n\n[*.cs]\n  csharp_style_var_elsewhere = true:suggestion\n",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.equal(r.matchedPath, ".editorconfig");
+  });
+
+  test("pass=1 for .editorconfig with analyzer severities", () => {
+    fixture = makeFixture({ ".editorconfig": "[*.{cs,vb}]\ndotnet_diagnostic.CA1822.severity = warning" });
+    assert.equal(linter.check(fixture).pass, 1);
+  });
+
+  test("pass=1 for .editorconfig with ktlint or Fantomas keys", () => {
+    fixture = makeFixture({ ".editorconfig": "[*.{kt,kts}]\nktlint_code_style = ktlint_official" });
+    assert.equal(linter.check(fixture).pass, 1);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ ".editorconfig": "[*.fs]\nfsharp_max_line_length = 120" });
+    assert.equal(linter.check(fixture).pass, 1);
+  });
+
+  test("pass=1 for .globalconfig and stylecop.json (.NET analyzers)", () => {
+    fixture = makeFixture({ ".globalconfig": "is_global = true\ndotnet_diagnostic.CA2007.severity = none" });
+    assert.equal(linter.check(fixture).pass, 1);
+    removeFixture(fixture);
+
+    fixture = makeFixture({ "stylecop.json": '{"settings":{}}' });
+    assert.equal(linter.check(fixture).pass, 1);
+  });
+
+  test("pass=1 for Directory.Build.props that enforces code style or sets AnalysisLevel", () => {
+    fixture = makeFixture({
+      "Directory.Build.props":
+        "<Project><PropertyGroup><EnforceCodeStyleInBuild>true</EnforceCodeStyleInBuild></PropertyGroup></Project>",
+    });
+    assert.equal(linter.check(fixture).pass, 1);
+    removeFixture(fixture);
+
+    fixture = makeFixture({
+      "Directory.Build.props":
+        "<Project><PropertyGroup><AnalysisLevel>latest</AnalysisLevel></PropertyGroup></Project>",
+    });
+    assert.equal(linter.check(fixture).matchedPath, "Directory.Build.props");
+  });
+
+  test("pass=0 for Directory.Build.props that only treats warnings as errors", () => {
+    fixture = makeFixture({
+      "Directory.Build.props":
+        "<Project><PropertyGroup><TreatWarningsAsErrors>true</TreatWarningsAsErrors><EnforceCodeStyleInBuild>false</EnforceCodeStyleInBuild></PropertyGroup></Project>",
+    });
+    assert.equal(linter.check(fixture).pass, 0);
+  });
+
   test("pass=1 for config/detekt/detekt.yml (Gradle plugin convention)", () => {
     fixture = makeFixture({ "config/detekt/detekt.yml": "build:\n  maxIssues: 0" });
     assert.equal(linter.check(fixture).pass, 1);

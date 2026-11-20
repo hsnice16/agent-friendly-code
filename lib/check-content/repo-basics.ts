@@ -51,6 +51,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     why: "A linter makes style checkable: the agent runs it and fixes the errors instead of copying the nearest file. Aider lints after every edit by default; without a config it has nothing to lint against.",
     scoring: [
       "Full pass: a config file for a supported tool, or a `[tool.ruff]`, `[tool.black]`, `[tool.flake8]`, `[tool.pylint]` or `[tool.mypy]` section in `pyproject.toml`.",
+      "Also a full pass: an `.editorconfig` with `dotnet_`, `csharp_`, `visual_basic_`, `fsharp_` or `ktlint_` keys, or a `Directory.Build.props` that sets `EnforceCodeStyleInBuild`, `AnalysisLevel` or `AnalysisMode`. An `.editorconfig` with only indentation and charset settings does not count.",
       "Fail: no config found. We do not run the linter.",
     ],
     fix: "Commit your language's standard linter config and put the lint command in AGENTS.md. A linter on default settings leaves no file to find.",
