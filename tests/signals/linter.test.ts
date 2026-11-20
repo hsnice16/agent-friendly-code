@@ -163,4 +163,49 @@ describe("linter signal", () => {
     fixture = makeFixture({ ".clj-kondo/config.edn": "{:linters {}}" });
     assert.equal(linter.check(fixture).pass, 1);
   });
+
+  test("pass=1 for eslint.config.ts", () => {
+    fixture = makeFixture({
+      "eslint.config.ts": "export default []",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for .prettierrc.yaml", () => {
+    fixture = makeFixture({
+      ".prettierrc.yaml": "semi: false",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for biome.jsonc", () => {
+    fixture = makeFixture({
+      "biome.jsonc": "{}",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for .golangci.toml", () => {
+    fixture = makeFixture({
+      ".golangci.toml": "",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for phpcs.xml.dist", () => {
+    fixture = makeFixture({
+      "phpcs.xml.dist": "<ruleset/>",
+    });
+    const r = linter.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
 });

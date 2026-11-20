@@ -33,4 +33,31 @@ describe("preCommit signal", () => {
     fixture = makeFixture({ ".husky/pre-commit": "#!/bin/sh" });
     assert.equal(preCommit.check(fixture).pass, 1);
   });
+
+  test("pass=1 for prek.toml", () => {
+    fixture = makeFixture({
+      "prek.toml": "repos = []",
+    });
+    const r = preCommit.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for .lefthook.yml", () => {
+    fixture = makeFixture({
+      ".lefthook.yml": "pre-commit: {}",
+    });
+    const r = preCommit.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for lefthook.toml", () => {
+    fixture = makeFixture({
+      "lefthook.toml": "",
+    });
+    const r = preCommit.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
 });

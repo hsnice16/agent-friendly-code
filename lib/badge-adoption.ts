@@ -1,6 +1,5 @@
 import { firstExisting, readSafe } from "./scoring/signals/helpers";
-
-const README_CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
+import { CANDIDATES as README_CANDIDATES } from "./scoring/signals/readme";
 
 export function detectBadgeEmbed(repoPath: string, slug: string): boolean {
   const p = firstExisting(repoPath, README_CANDIDATES);

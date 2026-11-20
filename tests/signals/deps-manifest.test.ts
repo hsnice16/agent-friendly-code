@@ -141,4 +141,73 @@ describe("depsManifest signal", () => {
     fixture = makeFixture({ "package.json/x": "", "go.mod": "module x" });
     assert.match(depsManifest.check(fixture).matchedPath ?? "", /go\.mod$/);
   });
+
+  test("pass=1 for settings.gradle.kts alone (gradle init puts the build file in app/)", () => {
+    fixture = makeFixture({
+      "settings.gradle.kts": 'include("app")',
+      "app/build.gradle.kts": "",
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for deno.json", () => {
+    fixture = makeFixture({
+      "deno.json": "{}",
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for gleam.toml", () => {
+    fixture = makeFixture({
+      "gleam.toml": 'name = "app"',
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for Julia Project.toml", () => {
+    fixture = makeFixture({
+      "Project.toml": 'name = "App"',
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for MODULE.bazel", () => {
+    fixture = makeFixture({
+      "MODULE.bazel": 'module(name = "app")',
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for pixi.toml", () => {
+    fixture = makeFixture({
+      "pixi.toml": "",
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for conda environment.yml", () => {
+    fixture = makeFixture({
+      "environment.yml": "name: app\ndependencies:\n  - python=3.12",
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=0 for an environment.yml that is not a conda environment", () => {
+    fixture = makeFixture({ "environment.yml": "db_host: localhost\nreplicas: 3" });
+    assert.equal(depsManifest.check(fixture).pass, 0);
+  });
 });

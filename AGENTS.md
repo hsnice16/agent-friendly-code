@@ -39,7 +39,7 @@ Set `RANK_DB_PATH` to work on a copy of the database; `data/rank.db` is rewritte
 app/          routes: pages, API (app/api), OG images (app/og), robots.ts, sitemap.ts, llms.txt
 components/   presentational React components
 lib/
-  scoring/    signals (one file each), weights.ts (MODELS), scorer.ts — pure, vendored by the siblings
+  scoring/    signals (one file each, plus shared helpers), weights.ts (MODELS), scorer.ts — pure, vendored by the siblings
   live-score/ /score/…: host tree API → materialized directory → scoreRepo
   clients/    git clone, host APIs, package registries, language names
   constants/  hosts, board and sort keys, page sizes and limits, cache headers, legal-page dates
@@ -77,7 +77,8 @@ data/ai-policy.json   each project's stance on AI contributions, classified by h
 - **Page metadata.** Static-page titles and descriptions live in `PAGE_COPY` (`lib/page-meta.ts`); a page whose title or description carries live counts builds them in `generateMetadata` from a `lib/` helper instead. Length caps come from `lib/utils/page-title.ts`. Next.js shallow-merges `openGraph` / `twitter`, so a page that sets either re-spreads `OG_DEFAULTS` / `TWITTER_DEFAULTS` and sets an image (`DEFAULT_OG_IMAGE` or its own).
 - **Indexing.** A board page is `/`, `/model/<id>` or `…/page/<n>`; a searched, filtered or sorted view is the same prerendered page re-cut in the browser, so its canonical is the board. Never a robots.txt `Disallow` for them, which would hide the canonical. Package pages are noindex and stay out of the sitemap.
 - **Signal IDs** (`agents_md`, `tests`, …) are stable. Renaming one is a migration.
-- **Path lookups** in signals go through `firstExisting` / `resolveRelative` / `resolveAllRelative` (`helpers.ts`), never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
+- **Path lookups** in signals go through `firstExisting` / `firstFile` / `resolveRelative` / `resolveAllRelative` / `createResolver` (`helpers.ts`), or `findNear` (`nearby.ts`) for the root and one folder down, never `existsSync(join(…))`. They match case-insensitively (`readme.md`, `README.MD`) so Linux CI and macOS agree, and must not depend on `readdir` order.
+- **A signal that reads a file's contents** adds it to `lib/live-score/content-files.ts` (`NEAR_CONTENT_CANDIDATES` if it is read one folder down too). Live Score fetches only those, and scores any other file as empty.
 - **An empty AGENTS.md / CLAUDE.md** (`agents_md` pass 0.2) does not count as having one wherever a share is shown.
 - **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`, `analytics-consent.ts`) wrapped in try/catch, read after mount so server HTML matches.
 - **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`. A class string repeated in 3+ components, or many times on one page, may become a plain-CSS `@utility` in `globals.css` (`card`, `pill`, `check-row`…): in a server component every class string ships twice per page, in the HTML and the RSC payload.
@@ -105,7 +106,7 @@ Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` buil
 
 ## Adding a signal
 
-1. Add `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (with `improveSuggestion`), using the `helpers.ts` resolvers.
+1. Add `lib/scoring/signals/<kebab-id>.ts` implementing `Signal` (with `improveSuggestion`), using the `helpers.ts` / `nearby.ts` resolvers. A file it reads the contents of goes in `lib/live-score/content-files.ts`.
 2. Register it in `SIGNALS` (`signals/index.ts`) and give it a weight in **every** model in `weights.ts` (missing means 0).
 3. Write its `/check/<slug>` prose in `lib/check-content/`, and its panel headings in `questions.ts` there. Its `scoring` lines restate the signal's thresholds by hand; keep them in step.
 4. Update the hard-coded signal count in `README.md` and the count and list in `app/methodology/faq.ts`.

@@ -57,6 +57,16 @@ describe("typeConfig signal", () => {
     assert.equal(typeConfig.check(fixture).pass, 1);
   });
 
+  test("pass=1 for a root *.slnx (typed C#)", () => {
+    fixture = makeFixture({ "App.slnx": "<Solution />" });
+    assert.equal(typeConfig.check(fixture).pass, 1);
+  });
+
+  test("pass=1 for Directory.Packages.props (typed C#)", () => {
+    fixture = makeFixture({ "Directory.Packages.props": "<Project />" });
+    assert.equal(typeConfig.check(fixture).pass, 1);
+  });
+
   test("pass=1 for build.sbt (typed Scala)", () => {
     fixture = makeFixture({ "build.sbt": 'scalaVersion := "3.3.0"' });
     assert.equal(typeConfig.check(fixture).pass, 1);
@@ -85,5 +95,77 @@ describe("typeConfig signal", () => {
   test("directories named like type configs or typed-language manifests do not count", () => {
     fixture = makeFixture({ "tsconfig.json/x": "", "Cargo.toml/x": "", "app.cabal/x": "" });
     assert.equal(typeConfig.check(fixture).pass, 0);
+  });
+
+  test("pass=1 for deno.json", () => {
+    fixture = makeFixture({
+      "deno.json": "{}",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for settings.gradle (typed Java/Kotlin)", () => {
+    fixture = makeFixture({
+      "settings.gradle": "",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for pubspec.yaml (typed Dart)", () => {
+    fixture = makeFixture({
+      "pubspec.yaml": "name: app",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for a root *.nimble (typed Nim)", () => {
+    fixture = makeFixture({
+      "app.nimble": "",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for an Xcode project directory (typed Swift)", () => {
+    fixture = makeFixture({
+      "App.xcodeproj/project.pbxproj": "",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for [tool.basedpyright] in pyproject.toml", () => {
+    fixture = makeFixture({
+      "pyproject.toml": '[tool.basedpyright]\ntypeCheckingMode = "strict"',
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for [tool.ty] in pyproject.toml", () => {
+    fixture = makeFixture({
+      "pyproject.toml": "[tool.ty.rules]\n",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("[tool.typos] is not a type checker", () => {
+    fixture = makeFixture({
+      "pyproject.toml": "[tool.typos]\n",
+    });
+    const r = typeConfig.check(fixture);
+
+    assert.equal(r.pass, 0);
   });
 });

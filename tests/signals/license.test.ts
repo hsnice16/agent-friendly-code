@@ -36,4 +36,41 @@ describe("license signal", () => {
     assert.equal(r.pass, 1);
     assert.match(r.matchedPath ?? "", /\/license\.md$/);
   });
+
+  test("pass=1 for British-spelt LICENCE", () => {
+    fixture = makeFixture({
+      LICENCE: "MIT",
+    });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for UNLICENSE", () => {
+    fixture = makeFixture({
+      UNLICENSE: "public domain",
+    });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for a dual LICENSE-MIT / LICENSE-APACHE pair", () => {
+    fixture = makeFixture({
+      "LICENSE-MIT": "MIT",
+      "LICENSE-APACHE": "Apache",
+    });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("pass=1 for a REUSE LICENSES/ folder", () => {
+    fixture = makeFixture({
+      "LICENSES/MIT.txt": "MIT",
+    });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
 });

@@ -1,7 +1,20 @@
-import { characters, firstExisting, readSafe } from "./helpers";
+import { join } from "node:path";
+
+import { characters, createResolver, entryKind, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
-const CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
+// GitHub renders .github/ ahead of the root, but a root README is what agents open first.
+export const CANDIDATES = [
+  "README.md",
+  "README.rst",
+  "README.adoc",
+  "README.asciidoc",
+  "README.markdown",
+  "README.txt",
+  "README",
+  ".github/README.md",
+  "docs/README.md",
+];
 
 export const readme: Signal = {
   id: "readme",
@@ -10,7 +23,11 @@ export const readme: Signal = {
   improveSuggestion:
     "Expand your README to cover what the project does, how to install, the common commands, and the high-level layout.",
   check: (repo) => {
-    const p = firstExisting(repo, CANDIDATES);
+    // Anything but a folder: a `readme/` of screenshots must not hide `.github/README.md`;
+    // a dangling link reads as empty.
+    const resolve = createResolver(repo);
+    const rel = CANDIDATES.map(resolve).find((r) => r && entryKind(repo, join(repo, r)) !== "dir");
+    const p = rel ? join(repo, rel) : null;
 
     if (!p) {
       return {

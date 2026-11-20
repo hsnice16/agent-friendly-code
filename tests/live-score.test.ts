@@ -3,11 +3,14 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, it } from "node:test";
 
-import { CONTENT_CANDIDATES } from "../lib/live-score/content-files";
+import { CONTENT_CANDIDATES, NEAR_CONTENT_CANDIDATES } from "../lib/live-score/content-files";
 import { blobUrl, RateLimitedError, rawUrl, resolveCommit } from "../lib/live-score/hosts";
 import { safeAbsolute } from "../lib/live-score/materialize";
 import { SUPPORTED_HOSTS } from "../lib/live-score/supported";
-import { IN_FILE } from "../lib/scoring/signals/linter";
+import { CONDA } from "../lib/scoring/signals/deps-manifest";
+import { LINTER_IN_FILE } from "../lib/scoring/signals/linter";
+import { CANDIDATES as README_CANDIDATES } from "../lib/scoring/signals/readme";
+import { TYPE_IN_FILE } from "../lib/scoring/signals/type-config";
 
 const SIGNALS_DIR = join(process.cwd(), "lib", "scoring", "signals");
 
@@ -17,24 +20,35 @@ describe("content candidates", () => {
   // list has to stay ahead of the signals rather than behind them.
   it("covers every candidate list belonging to a content-reading signal", () => {
     const lower = new Set(CONTENT_CANDIDATES.map((c) => c.toLowerCase()));
+    const near = new Set(NEAR_CONTENT_CANDIDATES.map((c) => c.toLowerCase()));
 
+    // Root-only reads.
     const readers: Record<string, string[]> = {
-      "readme.ts": ["README.md", "README.rst", "README.txt", "README"],
+      "readme.ts": README_CANDIDATES,
       "agents-md.ts": ["AGENTS.md", "CLAUDE.md", "AGENT.md"],
       "gemini-md.ts": ["GEMINI.md"],
       "openhands-setup.ts": [".openhands/setup.sh"],
-      "dev-env.ts": ["package.json"],
-      "linter.ts": IN_FILE.map((f) => f.file),
-      "type-config.ts": ["pyproject.toml"],
+      "dev-env.ts": ["package.json", "mix.exs"],
+      "tests.ts": ["package.json"],
+      "pre-commit.ts": ["package.json", "Cargo.toml"],
       "size.ts": [".gitignore"],
     };
 
-    for (const [file, paths] of Object.entries(readers)) {
+    // Read at the root and one folder down.
+    const nearReaders: Record<string, string[]> = {
+      "linter.ts": LINTER_IN_FILE.map((f) => f.file),
+      "type-config.ts": TYPE_IN_FILE.map((f) => f.file),
+      "deps-manifest.ts": CONDA,
+    };
+
+    for (const [file, paths] of Object.entries({ ...readers, ...nearReaders })) {
       const source = readFileSync(join(SIGNALS_DIR, file), "utf8");
       assert.match(source, /readSafe|readFileSync/, `${file} is expected to read file contents`);
 
       for (const path of paths) {
-        assert.ok(lower.has(path.toLowerCase()), `${file} reads ${path}, missing from CONTENT_CANDIDATES`);
+        const key = path.toLowerCase();
+        const covered = file in nearReaders ? near.has(key) : lower.has(key) || near.has(key);
+        assert.ok(covered, `${file} reads ${path}, missing from the Live Score content lists`);
       }
     }
   });

@@ -2,8 +2,9 @@ import { mkdirSync, realpathSync, rmSync, symlinkSync, writeFileSync } from "nod
 import { dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 import type { RepoHost } from "../clients/github";
-import { entryKind, MAX_READ_BYTES, resolveRelative } from "../scoring/signals/helpers";
-import { CONTENT_CANDIDATES } from "./content-files";
+import { createResolver, entryKind, MAX_READ_BYTES } from "../scoring/signals/helpers";
+import { childDirs } from "../scoring/signals/nearby";
+import { CONTENT_CANDIDATES, MAX_NEAR_FETCHES, NEAR_CONTENT_CANDIDATES } from "./content-files";
 import { assertNotRateLimited, blobUrl, hostToken, listTree, rawUrl, requestHeaders, type TreeEntry } from "./hosts";
 import { pooled, readCapped, timedFetch } from "./http";
 
@@ -100,16 +101,27 @@ async function fetchContent(
   // ../../private/tmp/… and every fetch would 404 into an empty file.
   const root = realpathSync.native(dest);
 
+  const near = ["", ...childDirs(dest)].flatMap((base) =>
+    NEAR_CONTENT_CANDIDATES.map((c) => (base ? `${base}/${c}` : c)),
+  );
+  const nearStart = CONTENT_CANDIDATES.length;
+
+  const resolveIn = createResolver(dest);
   const wanted = new Set<string>();
-  for (const candidate of CONTENT_CANDIDATES) {
+  let nearFetches = 0;
+  for (const [i, candidate] of [...CONTENT_CANDIDATES, ...near].entries()) {
+    // Root first, then folders in the scorer's own order: past the cap a hostile repo
+    // (64 folders each holding every candidate) can only lose its last folders' configs.
+    if (i >= nearStart && nearFetches >= MAX_NEAR_FETCHES) break;
     // The scorer's own case-insensitive lookup, then the OS follows any symlink:
     // whichever file scoring will actually read is the one we fetch.
-    const hit = resolveRelative(dest, candidate);
+    const hit = resolveIn(candidate);
     if (!hit || entryKind(dest, join(dest, hit)) !== "file") continue;
     try {
       const rel = relative(root, realpathSync.native(join(dest, hit)));
       // A placeholder's raw URL would serve a link the scorer never follows.
       if (!rel || rel.startsWith("..") || isAbsolute(rel) || placeholders.has(rel)) continue;
+      if (i >= nearStart && !wanted.has(rel)) nearFetches++;
       wanted.add(rel);
     } catch {}
   }

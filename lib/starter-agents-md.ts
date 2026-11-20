@@ -1,5 +1,10 @@
+import {
+  TESTS_DIR_DETAIL_PREFIX,
+  TESTS_FILES_DETAIL_PREFIX,
+  TESTS_SCRIPT_DETAIL,
+  TYPED_LANGUAGE_DETAIL_PREFIX,
+} from "@/lib/scoring/details";
 import type { SignalResult } from "@/lib/scoring/signals";
-
 import { VS_AGENTS_MD } from "./check-content/vs-agents-md";
 import { type AgentInstructionsData, HAS_FILE_PASS } from "./utils/agent-instructions";
 import { INVISIBLE } from "./utils/repo-about";
@@ -28,11 +33,23 @@ const FACTS: { id: string; line: (p: string, s: SignalResult) => string }[] = [
   { id: "deps_manifest", line: (p) => `Dependencies are declared in \`${p}\`.` },
   {
     id: "tests",
-    // Below a full pass the check found no test directory and names one test file, not where the tests live.
-    line: (p, s) => (s.pass < 1 ? `Test files are spread through the tree, e.g. \`${p}\`.` : `Tests live in \`${p}\`.`),
+    // The detail says which the check found: a test directory, one test file, or only a test script.
+    line: (p, s) =>
+      s.detail === TESTS_SCRIPT_DETAIL
+        ? `A test script is defined in \`${p}\`.`
+        : s.detail?.startsWith(TESTS_FILES_DETAIL_PREFIX) ||
+            (!s.detail?.startsWith(TESTS_DIR_DETAIL_PREFIX) && s.pass < 1)
+          ? `Test files are spread through the tree, e.g. \`${p}\`.`
+          : `Tests live in \`${p}\`.`,
   },
   { id: "linter", line: (p) => `Lint and format rules are configured in \`${p}\`.` },
-  { id: "type_config", line: (p) => `Type checking is configured in \`${p}\`.` },
+  {
+    id: "type_config",
+    line: (p, s) =>
+      s.detail?.startsWith(TYPED_LANGUAGE_DETAIL_PREFIX)
+        ? `The compiler checks types; the build is defined in \`${p}\`.`
+        : `Type checking is configured in \`${p}\`.`,
+  },
   { id: "ci", line: (p) => `CI is defined in \`${p}\`; read it for the exact install, lint and test steps.` },
   { id: "pre_commit", line: (p) => `Commit hooks are set up in \`${p}\`; don't skip them.` },
   { id: "dev_env", line: devEnvLine },

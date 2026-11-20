@@ -38,7 +38,7 @@ export const GUIDE_THEMES: GuideTheme[] = [
     checks: [
       {
         id: "tests",
-        action: "Keep tests in a conventional directory, and put the command that runs one file in AGENTS.md.",
+        action: "Keep tests where your language expects them, and put the command that runs one file in AGENTS.md.",
       },
       { id: "ci", action: "Define CI in the repo, so the agent can run what a change must pass." },
       { id: "linter", action: "Commit the linter config, so style is checked rather than copied from nearby files." },

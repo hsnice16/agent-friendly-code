@@ -127,6 +127,13 @@ function resolveWith(repo: string, rel: string, cache: DirCache): string | null 
   return parts.join("/");
 }
 
+// One directory listing per folder across many lookups: a fresh cache per call
+// re-reads the same folder once per candidate, quadratic on a wide tree.
+export function createResolver(repo: string): (rel: string) => string | null {
+  const cache: DirCache = new Map();
+  return (rel) => resolveWith(repo, rel, cache);
+}
+
 // Returns the path as spelled on disk, not as spelled in the candidate list —
 // callers surface it as `matchedPath`, so it has to be the real name.
 export function resolveRelative(repo: string, rel: string): string | null {

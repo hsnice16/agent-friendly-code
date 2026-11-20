@@ -87,4 +87,33 @@ describe("devEnv signal", () => {
     assert.equal(r.pass, 0.7);
     assert.equal(r.matchedPath, "docker-compose.yaml");
   });
+
+  test("counts a nested .devcontainer/<name>/devcontainer.json", () => {
+    fixture = makeFixture({
+      ".devcontainer/python/devcontainer.json": "{}",
+    });
+    const r = devEnv.check(fixture);
+
+    assert.equal(r.pass, 0.7);
+    assert.equal(r.matchedPath, ".devcontainer/python/devcontainer.json");
+  });
+
+  test("counts .justfile and Taskfile.yaml", () => {
+    fixture = makeFixture({
+      ".justfile": "",
+      "Taskfile.yaml": "",
+    });
+    const r = devEnv.check(fixture);
+
+    assert.equal(r.pass, 1);
+  });
+
+  test("counts Copilot's copilot-setup-steps.yml", () => {
+    fixture = makeFixture({
+      ".github/workflows/copilot-setup-steps.yml": "",
+    });
+    const r = devEnv.check(fixture);
+
+    assert.equal(r.pass, 0.7);
+  });
 });

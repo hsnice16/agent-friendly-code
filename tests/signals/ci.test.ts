@@ -49,4 +49,40 @@ describe("ci signal", () => {
     fixture = makeFixture({ ".github/workflows/ci.yml/README.md": "not a workflow" });
     assert.equal(ci.check(fixture).pass, 0);
   });
+
+  test("pass=0.9 for bitbucket-pipelines.yml", () => {
+    fixture = makeFixture({
+      "bitbucket-pipelines.yml": "pipelines: {}",
+    });
+    const r = ci.check(fixture);
+
+    assert.equal(r.pass, 0.9);
+  });
+
+  test("pass=0.9 for buildkite.yml at the root", () => {
+    fixture = makeFixture({
+      "buildkite.yml": "steps: []",
+    });
+    const r = ci.check(fixture);
+
+    assert.equal(r.pass, 0.9);
+  });
+
+  test("pass=0.9 for a .woodpecker/ folder", () => {
+    fixture = makeFixture({
+      ".woodpecker/test.yaml": "steps: []",
+    });
+    const r = ci.check(fixture);
+
+    assert.equal(r.pass, 0.9);
+  });
+
+  test("pass=0.9 for Forgejo Actions", () => {
+    fixture = makeFixture({
+      ".forgejo/workflows/ci.yml": "on: push",
+    });
+    const r = ci.check(fixture);
+
+    assert.equal(r.pass, 0.9);
+  });
 });

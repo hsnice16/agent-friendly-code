@@ -29,6 +29,11 @@ const FIXTURES = [
   { url: "https://github.com/vercel/ai", why: "link target with a trailing newline", pr: true },
   { url: "https://github.com/honojs/hono", why: "small baseline", pr: true },
   { url: "https://github.com/Sonarr/Sonarr", why: "linter passes on .editorconfig contents alone", pr: true },
+  {
+    url: "https://github.com/MudBlazor/MudBlazor",
+    why: "linter config only one folder down (src/.editorconfig)",
+    pr: true,
+  },
   { url: "https://github.com/zed-industries/zed", why: "251 symlinks" },
   { url: "https://github.com/ClickHouse/ClickHouse", why: "AGENTS.md symlinked into .claude/" },
   { url: "https://github.com/JetBrains/kotlin", why: "tree API truncates" },
