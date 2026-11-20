@@ -1,12 +1,13 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "agent-friendly": {
       "source": "hsnice16/agent-friendly-skill",
       "ref": "v0",
+      "commit": "63b8c85a36432aae6cf81baa6b523d38e188cd61",
       "sourceType": "github",
       "skillPath": "skills/agent-friendly/SKILL.md",
-      "computedHash": "c602c76dc932d2d43fcf327e39b0828505d023500b36747b417ea4f45d8b1bee"
+      "computedHash": "18bd3f530cf8a1ae634cc842d51618bdc8f3fb8879d5c5608352db2b7b14f46e"
     }
   }
 }

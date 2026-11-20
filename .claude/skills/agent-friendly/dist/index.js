@@ -862,6 +862,23 @@ function formatSummary(score) {
 
 /***/ }),
 
+/***/ 723:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TYPED_LANGUAGE_DETAIL_PREFIX = exports.TESTS_SCRIPT_DETAIL = exports.TESTS_FILES_DETAIL_PREFIX = exports.TESTS_DIR_DETAIL_PREFIX = void 0;
+// Detail text that lib/starter-agents-md.ts reads back to word its facts: kept in one
+// place so rewording a signal can't silently change the starter AGENTS.md.
+exports.TESTS_DIR_DETAIL_PREFIX = "Found /";
+exports.TESTS_FILES_DETAIL_PREFIX = "Test files detected";
+exports.TESTS_SCRIPT_DETAIL = "A test script in package.json, but no test files found";
+exports.TYPED_LANGUAGE_DETAIL_PREFIX = "Typed language";
+
+
+/***/ }),
+
 /***/ 789:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
@@ -1154,12 +1171,54 @@ const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 const OTHER_CI = [
     ".gitlab-ci.yml",
+    "bitbucket-pipelines.yml",
     ".circleci/config.yml",
     "azure-pipelines.yml",
+    "azure-pipelines.yaml",
     ".travis.yml",
     "Jenkinsfile",
     ".buildkite/pipeline.yml",
+    ".buildkite/pipeline.yaml",
+    ".buildkite/pipeline.json",
+    "buildkite.yml",
+    "buildkite.yaml",
+    "buildkite.json",
+    "buildkite/pipeline.yml",
+    "buildkite/pipeline.yaml",
+    "buildkite/pipeline.json",
+    ".woodpecker.yml",
+    ".woodpecker.yaml",
+    "appveyor.yml",
+    ".appveyor.yml",
+    ".cirrus.yml",
+    ".cirrus.star",
+    ".drone.yml",
+    ".semaphore/semaphore.yml",
+    "cloudbuild.yaml",
+    "cloudbuild.yml",
+    "buildspec.yml",
+    "bitrise.yml",
+    "codemagic.yaml",
+    ".build.yml",
+    ".zuul.yaml",
+    "zuul.yaml",
+    ".onedev-buildspec.yml",
+    ".teamcity/settings.kts",
 ];
+// Systems that read every YAML file in a folder; an empty or README-only folder runs nothing.
+const CI_DIRS = [".woodpecker", ".forgejo/workflows", ".gitea/workflows", ".builds", ".zuul.d", "zuul.d", ".tekton"];
+function yamlFiles(repo, rel) {
+    const abs = (0, node_path_1.join)(repo, rel);
+    if ((0, helpers_1.entryKind)(repo, abs) !== "dir") {
+        return [];
+    }
+    try {
+        return (0, node_fs_1.readdirSync)(abs).filter((f) => /\.ya?ml$/i.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)));
+    }
+    catch {
+        return [];
+    }
+}
 exports.ci = {
     id: "ci",
     label: "CI configuration",
@@ -1167,25 +1226,19 @@ exports.ci = {
     improveSuggestion: "Add a CI workflow (e.g. .github/workflows/ci.yml or .gitlab-ci.yml) that runs tests + linter on every PR.",
     check: (repo) => {
         const ghWf = (0, helpers_1.resolveRelative)(repo, ".github/workflows");
-        if (ghWf) {
-            const abs = (0, node_path_1.join)(repo, ghWf);
-            try {
-                if ((0, helpers_1.entryKind)(repo, abs) === "dir") {
-                    const files = (0, node_fs_1.readdirSync)(abs).filter((f) => /\.ya?ml$/i.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)));
-                    if (files.length > 0) {
-                        return {
-                            pass: 1,
-                            id: "ci",
-                            matchedPath: ghWf,
-                            label: "CI configuration",
-                            detail: `${files.length} GitHub Actions workflow${files.length === 1 ? "" : "s"}`,
-                        };
-                    }
-                }
-            }
-            catch { }
+        const workflows = ghWf ? yamlFiles(repo, ghWf) : [];
+        if (ghWf && workflows.length > 0) {
+            return {
+                pass: 1,
+                id: "ci",
+                matchedPath: ghWf,
+                label: "CI configuration",
+                detail: `${workflows.length} GitHub Actions workflow${workflows.length === 1 ? "" : "s"}`,
+            };
         }
-        const m = (0, helpers_1.firstExisting)(repo, OTHER_CI);
+        const m = (0, helpers_1.firstFile)(repo, OTHER_CI) ??
+            CI_DIRS.map((d) => (0, helpers_1.resolveRelative)(repo, d)).find((rel) => rel && yamlFiles(repo, rel).length > 0) ??
+            null;
         if (m) {
             return {
                 id: "ci",
@@ -1362,77 +1415,114 @@ exports.cursorRules = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.depsManifest = void 0;
-const node_fs_1 = __nccwpck_require__(24);
+exports.depsManifest = exports.CONDA = void 0;
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
+const nearby_1 = __nccwpck_require__(280);
 const CANDIDATES = [
+    // JavaScript / TypeScript
     "package.json",
     "pnpm-lock.yaml",
     "yarn.lock",
+    "deno.json",
+    "deno.jsonc",
+    // Python
     "pyproject.toml",
     "requirements.txt",
     "Pipfile",
     "poetry.lock",
+    "setup.py",
+    "pixi.toml",
+    // Rust, Go, Ruby, PHP, Dart
     "Cargo.toml",
     "go.mod",
     "Gemfile",
     "composer.json",
     "pubspec.yaml",
+    // JVM
     "build.gradle",
     "build.gradle.kts",
-    "build.sbt",
+    "settings.gradle",
+    "settings.gradle.kts",
+    "gradle/libs.versions.toml",
     "pom.xml",
-    "mix.exs",
-    "Package.swift",
+    "build.sbt",
+    "build.sc",
+    "build.mill",
+    "ivy.xml",
     "deps.edn",
     "project.clj",
-    "stack.yaml",
-    "dune-project",
+    "bb.edn",
+    // .NET
+    "Directory.Packages.props",
+    "packages.config",
+    "paket.dependencies",
+    // BEAM, Swift, functional and systems languages
+    "mix.exs",
     "rebar.config",
+    "gleam.toml",
+    "Package.swift",
+    "Podfile",
+    "Cartfile",
+    "stack.yaml",
+    "package.yaml",
+    "cabal.project",
+    "dune-project",
     "shard.yml",
     "build.zig",
+    "build.zig.zon",
+    "elm.json",
+    "spago.yaml",
+    "v.mod",
+    "dub.json",
+    "dub.sdl",
+    "fpm.toml",
+    "alire.toml",
+    // Julia, R, Perl
+    "Project.toml",
+    "DESCRIPTION",
+    "renv.lock",
+    "cpanfile",
+    "Makefile.PL",
+    "dist.ini",
+    // C / C++
     "CMakeLists.txt",
     "meson.build",
     "conanfile.txt",
     "conanfile.py",
     "vcpkg.json",
+    "xmake.lua",
+    "MODULE.bazel",
+    "WORKSPACE",
+    "WORKSPACE.bazel",
 ];
-const GLOB_MANIFESTS = [/\.(csproj|fsproj|vbproj|sln)$/i, /\.cabal$/i, /\.nimble$/i];
-function findGlobManifest(repo) {
-    try {
-        const entries = (0, node_fs_1.readdirSync)(repo).sort();
-        for (const re of GLOB_MANIFESTS) {
-            const hit = entries.find((f) => re.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, f)));
-            if (hit) {
-                return hit;
-            }
-        }
-    }
-    catch { }
-    return null;
-}
+const PATTERNS = [
+    /\.(csproj|fsproj|vbproj|vcxproj|sln|slnx|proj)$/i,
+    /\.cabal$/i,
+    /\.nimble$/i,
+    /\.gemspec$/i,
+    /\.opam$/i,
+    /\.rockspec$/i,
+];
+// `environment.yml` also names Ansible vars and app settings; conda's has a dependencies list.
+exports.CONDA = ["environment.yml", "environment.yaml"];
+const CONDA_RE = /^dependencies:/m;
+const isConda = (rel) => exports.CONDA.includes(rel.slice(rel.lastIndexOf("/") + 1).toLowerCase());
 exports.depsManifest = {
     id: "deps_manifest",
     label: "Dependency manifest",
     description: "A dependency manifest, so the agent can reproduce the environment.",
     improveSuggestion: "Commit a proper manifest (package.json, pyproject.toml, Cargo.toml, go.mod, etc.) plus a lockfile.",
     check: (repo) => {
-        const m = (0, helpers_1.firstFile)(repo, CANDIDATES);
+        const m = (0, nearby_1.findNear)(repo, {
+            names: [...CANDIDATES, ...exports.CONDA],
+            patterns: PATTERNS,
+            accept: (rel) => !isConda(rel) || CONDA_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo)),
+        });
         if (m) {
             return {
                 pass: 1,
                 matchedPath: m,
-                id: "deps_manifest",
-                detail: "Manifest present",
-                label: "Dependency manifest",
-            };
-        }
-        const glob = findGlobManifest(repo);
-        if (glob) {
-            return {
-                pass: 1,
-                matchedPath: glob,
                 id: "deps_manifest",
                 detail: "Manifest present",
                 label: "Dependency manifest",
@@ -1457,36 +1547,137 @@ exports.depsManifest = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.devEnv = void 0;
+const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
+// Each inner list is one tool, counted once however many of its files are present:
+// Taskfile.yml beside its Taskfile.dist.yml override is still one Taskfile.
 const ARTIFACTS = [
-    "Makefile",
-    ".devcontainer/devcontainer.json",
-    ".devcontainer.json",
-    "flake.nix",
-    "shell.nix",
-    "Dockerfile",
-    "docker-compose.yml",
-    "docker-compose.yaml",
-    "compose.yml",
-    "compose.yaml",
-    "justfile",
-    "Taskfile.yml",
-    "tox.ini",
-    "noxfile.py",
-    "mvnw",
-    "gradlew",
-    "bin/setup",
-    ".devin/blueprint.yaml",
-    ".cursor/environment.json",
+    ["Makefile", "GNUmakefile", "BSDmakefile"],
+    [".devcontainer/devcontainer.json"],
+    [".devcontainer.json"],
+    ["flake.nix"],
+    ["shell.nix"],
+    ["default.nix"],
+    ["devenv.nix"],
+    ["devbox.json"],
+    ["Dockerfile", "Containerfile"],
+    ["docker-compose.yml"],
+    ["docker-compose.yaml"],
+    ["compose.yml"],
+    ["compose.yaml"],
+    ["justfile", ".justfile"],
+    ["Taskfile.yml", "Taskfile.yaml", "Taskfile.dist.yml", "Taskfile.dist.yaml"],
+    ["Rakefile", "Rakefile.rb"],
+    ["Earthfile"],
+    ["Makefile.toml"],
+    ["Vagrantfile"],
+    ["Brewfile"],
+    [".gitpod.yml"],
+    ["tox.ini"],
+    ["noxfile.py"],
+    ["pixi.toml"],
+    ["mvnw"],
+    ["gradlew"],
+    ["bin/setup"],
+    ["script/bootstrap", "script/setup"],
+    [".devin/blueprint.yaml"],
+    [".cursor/environment.json"],
+    [".github/workflows/copilot-setup-steps.yml"],
 ];
+// The language's own tool fetches dependencies and builds in one command (`cargo
+// build`, `go build`, `dotnet build`, `swift build`), so the manifest is the setup.
+const TOOLCHAIN_FILES = [
+    "Cargo.toml",
+    "go.mod",
+    "Package.swift",
+    "pubspec.yaml",
+    "build.zig",
+    "gleam.toml",
+    "deno.json",
+    "deno.jsonc",
+    "stack.yaml",
+    "cabal.project",
+    "shard.yml",
+    "rebar.config",
+    "elm.json",
+    "spago.yaml",
+    "dub.json",
+    "dub.sdl",
+    "fpm.toml",
+    "alire.toml",
+    "build.sbt",
+    "MODULE.bazel",
+    "uv.lock",
+];
+const TOOLCHAIN_PATTERNS = /\.(sln|slnx|csproj|fsproj|vbproj|cabal|nimble)$/i;
+// `mix compile` does not fetch deps; a `setup` alias is the one-command path.
+const MIX_SETUP_RE = /\bsetup:\s*\[/;
+function nestedDevcontainer(repo, resolve) {
+    const dir = resolve(".devcontainer");
+    if (!dir || (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, dir)) !== "dir") {
+        return null;
+    }
+    let subs = [];
+    try {
+        subs = (0, node_fs_1.readdirSync)((0, node_path_1.join)(repo, dir)).sort();
+    }
+    catch {
+        return null;
+    }
+    // The devcontainer spec's third location: one folder per config, for repos with several.
+    for (const sub of subs) {
+        const rel = resolve(`${dir}/${sub}/devcontainer.json`);
+        if (rel && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel))) {
+            return rel;
+        }
+    }
+    return null;
+}
+function toolchain(repo, resolve) {
+    for (const f of TOOLCHAIN_FILES) {
+        const rel = resolve(f);
+        if (rel && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel))) {
+            return rel;
+        }
+    }
+    try {
+        const hit = (0, node_fs_1.readdirSync)(repo)
+            .sort()
+            .find((e) => TOOLCHAIN_PATTERNS.test(e) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, e)));
+        if (hit) {
+            return hit;
+        }
+    }
+    catch { }
+    const mix = resolve("mix.exs");
+    return mix && MIX_SETUP_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, mix), repo)) ? mix : null;
+}
 exports.devEnv = {
     id: "dev_env",
     label: "Reproducible dev env",
     description: "One-command setup the agent can run: Makefile, devcontainer, Nix or Docker.",
     improveSuggestion: "Add a Makefile or devcontainer or Dockerfile so the agent can set up the project in one command.",
     check: (repo) => {
-        const matches = (0, helpers_1.resolveAllRelative)(repo, ARTIFACTS);
+        const resolve = (0, helpers_1.createResolver)(repo);
+        const matches = [];
+        for (const group of ARTIFACTS) {
+            for (const f of group) {
+                const rel = resolve(f);
+                if (rel) {
+                    matches.push(rel);
+                    break;
+                }
+            }
+        }
+        if (!matches.some((m) => m.toLowerCase().endsWith("devcontainer.json"))) {
+            const nested = nestedDevcontainer(repo, resolve);
+            if (nested)
+                matches.push(nested);
+        }
+        const tool = toolchain(repo, resolve);
+        if (tool)
+            matches.push(tool);
         if (matches.length >= 2) {
             return {
                 pass: 1,
@@ -1505,7 +1696,7 @@ exports.devEnv = {
                 label: "Reproducible dev env",
             };
         }
-        const pkg = (0, helpers_1.resolveRelative)(repo, "package.json");
+        const pkg = resolve("package.json");
         if (pkg) {
             try {
                 const j = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo));
@@ -1546,16 +1737,51 @@ const LABEL = "GEMINI.md";
 // Gemini CLI inlines `@file.md` imports. Only these are followed: the live-score
 // path fetches no other file's content, so any other would break parity.
 const IMPORTABLE = ["AGENTS.md", "CLAUDE.md", "AGENT.md"];
-// Gemini CLI skips imports in code blocks, so a fenced block matches first and is kept.
-const IMPORT_OR_FENCE = /^[ \t]*(?:```|~~~)[^\n]*\n[\s\S]*?^[ \t]*(?:```|~~~)[ \t]*\r?$|^[ \t]*@(?:\.\/)?([^\s/]+\.md)[ \t]*\r?$/gim;
+// Gemini CLI skips imports in code blocks. A fence opens on a ``` or ~~~ line
+// and closes on the next bare one; an opener that never closes is ignored.
+// Line by line, not one regex: a lazy fence pattern rescans the rest of the
+// file from every unclosed opener, which a hostile file turns into minutes.
+const FENCE_OPEN = /^[ \t]*(?:```|~~~)/;
+const FENCE_CLOSE = /^[ \t]*(?:```|~~~)[ \t]*\r?$/;
+const IMPORT = /^[ \t]*@(?:\.\/)?([^\s/]+\.md)[ \t]*\r?$/i;
+// Repeated imports could otherwise grow the text without bound.
+const MAX_EXPANDED = 4 * helpers_1.MAX_READ_BYTES;
 function withImports(repo, text) {
-    return text.replace(IMPORT_OR_FENCE, (match, name) => {
-        if (!name || !IMPORTABLE.some((f) => f.toLowerCase() === name.toLowerCase())) {
-            return match;
+    const lines = text.split("\n");
+    // nextClose[i]: the first bare fence line at or after i, so each lookup is O(1).
+    const nextClose = new Array(lines.length + 1).fill(-1);
+    for (let i = lines.length - 1; i >= 0; i--) {
+        nextClose[i] = FENCE_CLOSE.test(lines[i]) ? i : nextClose[i + 1];
+    }
+    const imported = new Map();
+    const out = [];
+    let size = 0;
+    const push = (s) => {
+        if (size <= MAX_EXPANDED)
+            out.push(s);
+        size += s.length + 1;
+    };
+    for (let i = 0; i < lines.length; i++) {
+        const close = i < lines.length - 1 && FENCE_OPEN.test(lines[i]) ? nextClose[i + 1] : -1;
+        if (close >= 0) {
+            for (let j = i; j <= close; j++)
+                push(lines[j]);
+            i = close;
+            continue;
         }
-        const rel = (0, helpers_1.resolveRelative)(repo, name);
-        return rel ? (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo) : match;
-    });
+        const name = IMPORT.exec(lines[i])?.[1];
+        if (!name || !IMPORTABLE.some((f) => f.toLowerCase() === name.toLowerCase())) {
+            push(lines[i]);
+            continue;
+        }
+        const key = name.toLowerCase();
+        if (!imported.has(key)) {
+            const rel = (0, helpers_1.resolveRelative)(repo, name);
+            imported.set(key, rel ? (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo) : null);
+        }
+        push(imported.get(key) ?? lines[i]);
+    }
+    return out.join("\n");
 }
 exports.geminiMd = {
     label: LABEL,
@@ -1622,6 +1848,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MAX_READ_BYTES = void 0;
 exports.characters = characters;
 exports.entryKind = entryKind;
+exports.createResolver = createResolver;
 exports.resolveRelative = resolveRelative;
 exports.resolveAllRelative = resolveAllRelative;
 exports.firstExisting = firstExisting;
@@ -1711,6 +1938,12 @@ function resolveWith(repo, rel, cache) {
         current = (0, node_path_1.join)(current, actual);
     }
     return parts.join("/");
+}
+// One directory listing per folder across many lookups: a fresh cache per call
+// re-reads the same folder once per candidate, quadratic on a wide tree.
+function createResolver(repo) {
+    const cache = new Map();
+    return (rel) => resolveWith(repo, rel, cache);
 }
 // Returns the path as spelled on disk, not as spelled in the candidate list —
 // callers surface it as `matchedPath`, so it has to be the real name.
@@ -1900,15 +2133,47 @@ function runAllSignals(repoPath) {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.license = void 0;
+const node_fs_1 = __nccwpck_require__(24);
+const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = ["LICENSE", "LICENSE.md", "LICENSE.txt", "COPYING", "COPYING.md"];
+const CANDIDATES = [
+    "LICENSE",
+    "LICENSE.md",
+    "LICENSE.txt",
+    "LICENCE",
+    "LICENCE.md",
+    "LICENCE.txt",
+    "COPYING",
+    "COPYING.md",
+    "COPYING.txt",
+    "UNLICENSE",
+    "LICENSE-MIT",
+    "LICENSE-APACHE",
+];
+// REUSE keeps one SPDX-named file per licence in `LICENSES/` and makes a root
+// LICENSE optional. Exact spelling: a `licenses/` folder is often vendored notices.
+function reuseLicenses(repo) {
+    const abs = (0, node_path_1.join)(repo, "LICENSES");
+    try {
+        // Compared against the listing, not opened by path: a case-insensitive disk would let `licenses/` through.
+        if (!(0, node_fs_1.readdirSync)(repo).includes("LICENSES") || (0, helpers_1.entryKind)(repo, abs) !== "dir") {
+            return null;
+        }
+        return (0, node_fs_1.readdirSync)(abs).some((f) => /^[A-Za-z0-9.+-]+\.txt$/.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(abs, f)))
+            ? "LICENSES"
+            : null;
+    }
+    catch {
+        return null;
+    }
+}
 exports.license = {
     id: "license",
     label: "License file",
     description: "A license, so it's clear what may be done with the code.",
     improveSuggestion: "Add a LICENSE (or COPYING) file — MIT, Apache-2.0, BSD, GPL, etc. — at the repo root.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES) ?? reuseLicenses(repo);
         if (m) {
             return {
                 pass: 1,
@@ -1930,71 +2195,248 @@ exports.license = {
 
 /***/ }),
 
+/***/ 767:
+/***/ ((__unused_webpack_module, exports) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.BUILD_FILE_LINTERS = exports.LINTER_FILES = void 0;
+// Files that only exist to configure a linter or formatter for source code, by the
+// tool's documented default name. Linters for docs or config files (Markdown, YAML,
+// Dockerfiles) are left out: they give an agent editing code no feedback.
+exports.LINTER_FILES = [
+    // ESLint (the .eslintrc family is ignored by ESLint 10 but still names the project's rules)
+    "eslint.config.js",
+    "eslint.config.mjs",
+    "eslint.config.cjs",
+    "eslint.config.ts",
+    "eslint.config.mts",
+    "eslint.config.cts",
+    ".eslintrc",
+    ".eslintrc.js",
+    ".eslintrc.cjs",
+    ".eslintrc.json",
+    ".eslintrc.yaml",
+    ".eslintrc.yml",
+    // Prettier
+    ".prettierrc",
+    ".prettierrc.json",
+    ".prettierrc.json5",
+    ".prettierrc.yaml",
+    ".prettierrc.yml",
+    ".prettierrc.toml",
+    ".prettierrc.js",
+    ".prettierrc.mjs",
+    ".prettierrc.cjs",
+    ".prettierrc.ts",
+    ".prettierrc.mts",
+    ".prettierrc.cts",
+    "prettier.config.js",
+    "prettier.config.mjs",
+    "prettier.config.cjs",
+    "prettier.config.ts",
+    "prettier.config.mts",
+    "prettier.config.cts",
+    // Other JS/TS and CSS tools
+    "biome.json",
+    "biome.jsonc",
+    ".biome.json",
+    ".biome.jsonc",
+    ".oxlintrc.json",
+    ".oxlintrc.jsonc",
+    "oxlint.config.ts",
+    "oxlint.config.mts",
+    ".oxfmtrc.json",
+    ".oxfmtrc.jsonc",
+    "oxfmt.config.ts",
+    "oxfmt.config.mts",
+    "dprint.json",
+    "dprint.jsonc",
+    ".dprint.json",
+    ".dprint.jsonc",
+    ".config/dprint.json",
+    ".config/dprint.jsonc",
+    "stylelint.config.js",
+    "stylelint.config.mjs",
+    "stylelint.config.cjs",
+    "stylelint.config.ts",
+    ".stylelintrc",
+    ".stylelintrc.json",
+    ".stylelintrc.yaml",
+    ".stylelintrc.yml",
+    ".stylelintrc.js",
+    ".stylelintrc.mjs",
+    ".stylelintrc.cjs",
+    "xo.config.js",
+    "xo.config.mjs",
+    "xo.config.ts",
+    "xo.config.mts",
+    "tslint.json",
+    // Python
+    "ruff.toml",
+    ".ruff.toml",
+    ".pylintrc",
+    "pylintrc",
+    ".flake8",
+    ".isort.cfg",
+    ".style.yapf",
+    // Rust, Go
+    "rustfmt.toml",
+    ".rustfmt.toml",
+    "clippy.toml",
+    ".clippy.toml",
+    ".golangci.yml",
+    ".golangci.yaml",
+    ".golangci.toml",
+    ".golangci.json",
+    "staticcheck.conf",
+    // Ruby, Swift, PHP
+    ".rubocop.yml",
+    ".standard.yml",
+    ".swiftlint.yml",
+    ".swiftformat",
+    ".swift-format",
+    "phpstan.neon",
+    "phpstan.neon.dist",
+    "phpstan.dist.neon",
+    "psalm.xml",
+    "psalm.xml.dist",
+    "phpcs.xml",
+    ".phpcs.xml",
+    "phpcs.xml.dist",
+    ".phpcs.xml.dist",
+    ".php-cs-fixer.php",
+    ".php-cs-fixer.dist.php",
+    "pint.json",
+    "ecs.php",
+    ".phan/config.php",
+    // JVM
+    "checkstyle.xml",
+    "config/checkstyle/checkstyle.xml",
+    "config/codenarc/codenarc.xml",
+    "detekt.yml",
+    "config/detekt/detekt.yml",
+    ".scalafmt.conf",
+    ".scalafix.conf",
+    // .NET
+    ".globalconfig",
+    "stylecop.json",
+    "fsharplint.json",
+    ".csharpierrc",
+    ".csharpierrc.json",
+    ".csharpierrc.yaml",
+    // Functional and BEAM languages
+    ".hlint.yaml",
+    "fourmolu.yaml",
+    ".stylish-haskell.yaml",
+    ".ocamlformat",
+    ".credo.exs",
+    ".formatter.exs",
+    "elvis.config",
+    ".clj-kondo/config.edn",
+    ".cljfmt.edn",
+    "cljfmt.edn",
+    // C / C++, Dart, Lua, Zig, Crystal
+    ".clang-format",
+    "_clang-format",
+    ".clang-tidy",
+    "CPPLINT.cfg",
+    "analysis_options.yaml",
+    "stylua.toml",
+    ".stylua.toml",
+    ".luacheckrc",
+    "selene.toml",
+    "zlint.json",
+    ".ameba.yml",
+    // Julia, R, Perl, Shell, PowerShell, Solidity, Terraform
+    ".JuliaFormatter.toml",
+    ".lintr",
+    "air.toml",
+    ".perlcriticrc",
+    ".perltidyrc",
+    ".shellcheckrc",
+    "PSScriptAnalyzerSettings.psd1",
+    ".solhint.json",
+    ".tflint.hcl",
+    // Multi-language runners
+    ".github/linters",
+    ".mega-linter.yml",
+    ".trunk/trunk.yaml",
+    "treefmt.toml",
+    ".treefmt.toml",
+];
+// Gradle and Maven usually configure these in the build file rather than a file of their own.
+exports.BUILD_FILE_LINTERS = /com\.diffplug\.spotless|spotless-maven-plugin|maven-checkstyle-plugin|maven-pmd-plugin|spotbugs|net\.ltgt\.errorprone|error_prone_core|palantir-java-format|com\.palantir\.java-format|fmt-maven-plugin|formatter-maven-plugin|io\.gitlab\.arturbosch\.detekt|dev\.detekt|org\.jlleitschuh\.gradle\.ktlint|org\.jmailen\.kotlinter|com\.ncorti\.ktfmt|\bid\s*(?:\(\s*)?["'](?:checkstyle|pmd|codenarc)["']|apply\s+plugin:\s*["'](?:checkstyle|pmd|codenarc)["']/;
+
+
+/***/ }),
+
 /***/ 809:
 /***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.linter = void 0;
+exports.linter = exports.LINTER_IN_FILE = void 0;
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = [
-    ".eslintrc",
-    ".eslintrc.js",
-    ".eslintrc.json",
-    ".eslintrc.cjs",
-    "eslint.config.js",
-    "eslint.config.mjs",
-    ".prettierrc",
-    ".prettierrc.json",
-    ".prettierrc.js",
-    "prettier.config.js",
-    "ruff.toml",
-    ".ruff.toml",
-    ".pylintrc",
-    ".flake8",
-    "setup.cfg",
-    "rustfmt.toml",
-    ".rustfmt.toml",
-    "clippy.toml",
-    ".golangci.yml",
-    ".golangci.yaml",
-    "biome.json",
-    ".biome.json",
-    ".rubocop.yml",
-    ".standard.yml",
-    ".swiftlint.yml",
-    ".swiftformat",
-    ".swift-format",
-    "detekt.yml",
-    "config/detekt/detekt.yml",
-    ".scalafmt.conf",
-    "phpstan.neon",
-    "phpstan.neon.dist",
-    "psalm.xml",
-    "psalm.xml.dist",
-    ".php-cs-fixer.dist.php",
-    ".php-cs-fixer.php",
-    ".credo.exs",
-    ".formatter.exs",
-    "stylua.toml",
-    ".stylua.toml",
-    "checkstyle.xml",
-    "config/checkstyle/checkstyle.xml",
-    "analysis_options.yaml",
-    ".clang-format",
-    ".clang-tidy",
-    ".clj-kondo/config.edn",
+const linter_files_1 = __nccwpck_require__(767);
+const nearby_1 = __nccwpck_require__(280);
+// A plain .editorconfig (indent, charset) is tool-neutral and stays a fail; these
+// prefixes are keys only dotnet format / Roslyn, Fantomas or ktlint read.
+const EDITORCONFIG_TOOL_RE = /^[ \t]*(?:dotnet|csharp|visual_basic|fsharp|ktlint)_/m;
+// TreatWarningsAsErrors is left out: it hardens whatever warnings exist but
+// configures no analyzer.
+const BUILD_PROPS_RE = /<EnforceCodeStyleInBuild>\s*true\s*<|<Analysis(?:Level|Mode)>/i;
+// Top-level only: the same names under devDependencies install a tool, not configure it.
+const PACKAGE_JSON_KEYS = ["eslintConfig", "prettier", "stylelint", "xo", "standard"];
+function hasPackageJsonKey(text) {
+    try {
+        const pkg = JSON.parse(text);
+        if (!pkg || typeof pkg !== "object" || Array.isArray(pkg)) {
+            return false;
+        }
+        return PACKAGE_JSON_KEYS.some((k) => pkg[k] != null);
+    }
+    catch {
+        return false;
+    }
+}
+const test = (re) => (text) => re.test(text);
+const PY_LINT_SECTION = /^\[(flake8|pylint|isort|pycodestyle|pep8|pydocstyle)\b/m;
+// Files that configure a linter in some repos and not in others.
+exports.LINTER_IN_FILE = [
+    { file: "pyproject.toml", matches: test(/\[tool\.(ruff|black|flake8|pylint|mypy|isort|yapf)/) },
+    { file: ".editorconfig", matches: test(EDITORCONFIG_TOOL_RE) },
+    { file: "Directory.Build.props", matches: test(BUILD_PROPS_RE) },
+    { file: "package.json", matches: hasPackageJsonKey },
+    { file: "deno.json", matches: test(/"(lint|fmt)"\s*:/) },
+    { file: "deno.jsonc", matches: test(/"(lint|fmt)"\s*:/) },
+    { file: "tox.ini", matches: test(PY_LINT_SECTION) },
+    // Packaging metadata and pytest settings live here too; only a linter section counts.
+    { file: "setup.cfg", matches: test(PY_LINT_SECTION) },
+    { file: "Cargo.toml", matches: test(/^\[(workspace\.)?lints[\].]/m) },
+    { file: "build.zig", matches: test(/\baddFmt\b/) },
+    { file: "rebar.config", matches: test(/\berlfmt\b/) },
+    { file: "foundry.toml", matches: test(/^\[fmt\]/m) },
+    { file: "build.gradle", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
+    { file: "build.gradle.kts", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
+    { file: "settings.gradle", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
+    { file: "settings.gradle.kts", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
+    { file: "gradle/libs.versions.toml", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
+    { file: "pom.xml", matches: test(linter_files_1.BUILD_FILE_LINTERS) },
 ];
-const PYPROJECT_RE = /\[tool\.(ruff|black|flake8|pylint|mypy)/;
+// Java projects keep Checkstyle rules wherever their build points: `checkstyle/`,
+// `style/`, `codestyle/`, `.baseline/checkstyle/`, `src/checkstyle/`.
+const CHECKSTYLE_RE = /(^|\/)[^/]*checkstyle[^/]*\.xml$/i;
 exports.linter = {
     id: "linter",
     label: "Linter / formatter config",
     description: "A linter, so the agent gets style feedback right away instead of guessing.",
-    improveSuggestion: "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint) and commit the config.",
+    improveSuggestion: "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint, .NET rules in .editorconfig) and commit the config.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const m = (0, nearby_1.findNear)(repo, { names: linter_files_1.LINTER_FILES, kind: "any" });
         if (m) {
             return {
                 pass: 1,
@@ -2004,14 +2446,32 @@ exports.linter = {
                 label: "Linter / formatter config",
             };
         }
-        const pyproject = (0, helpers_1.resolveRelative)(repo, "pyproject.toml");
-        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject), repo))) {
+        // One search over every shared file, so the folder listings are read once.
+        const inFile = (0, nearby_1.findNear)(repo, {
+            names: exports.LINTER_IN_FILE.map((f) => f.file),
+            accept: (rel) => {
+                const entry = exports.LINTER_IN_FILE.find((f) => rel.toLowerCase().endsWith(f.file.toLowerCase()));
+                return !!entry && entry.matches((0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo));
+            },
+        });
+        if (inFile) {
             return {
                 pass: 1,
                 id: "linter",
-                matchedPath: pyproject,
+                matchedPath: inFile,
                 label: "Linter / formatter config",
-                detail: "Configured in pyproject.toml",
+                detail: `Configured in ${inFile}`,
+            };
+        }
+        // Not under a skipped folder: CI writes `build/logs/checkstyle.xml` as a report.
+        const [checkstyle] = (0, helpers_1.walkFind)(repo, (rel) => CHECKSTYLE_RE.test(rel) && !rel.split("/").slice(0, -1).some(nearby_1.isSkippedDir), 2, 1);
+        if (checkstyle) {
+            return {
+                pass: 1,
+                id: "linter",
+                matchedPath: checkstyle,
+                detail: "Config detected",
+                label: "Linter / formatter config",
             };
         }
         return {
@@ -2022,6 +2482,135 @@ exports.linter = {
         };
     },
 };
+
+
+/***/ }),
+
+/***/ 280:
+/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.MAX_CHILD_DIRS = exports.isSkippedDir = void 0;
+exports.childDirs = childDirs;
+exports.findNear = findNear;
+const node_fs_1 = __nccwpck_require__(24);
+const node_path_1 = __nccwpck_require__(760);
+const helpers_1 = __nccwpck_require__(742);
+// Folders holding samples, docs, fixtures or someone else's code: a manifest or
+// config there describes that code, not the repo.
+const SKIP = new Set([
+    "bench",
+    "benchmark",
+    "benchmarks",
+    "build",
+    "demo",
+    "demos",
+    "deps",
+    "dist",
+    "doc",
+    "docs",
+    "e2e",
+    "example",
+    "examples",
+    "extern",
+    "external",
+    "fixtures",
+    "node_modules",
+    "out",
+    "playground",
+    "reports",
+    "sample",
+    "samples",
+    "site",
+    "spec",
+    "target",
+    "template",
+    "templates",
+    "test",
+    "testdata",
+    "test-resources",
+    "test_resources",
+    "tests",
+    "third-party",
+    "third_party",
+    "thirdparty",
+    "tmp",
+    "vendor",
+    "website",
+]);
+const isSkippedDir = (name) => SKIP.has(name.toLowerCase());
+exports.isSkippedDir = isSkippedDir;
+// A hostile root with thousands of folders must not cost thousands of listings.
+exports.MAX_CHILD_DIRS = 64;
+/** Top-level folders a repo keeps its own code in (`src/`, `dotnet/`, `app/`), in a stable order. */
+function childDirs(repo) {
+    let entries = [];
+    try {
+        entries = (0, node_fs_1.readdirSync)(repo).sort();
+    }
+    catch {
+        return [];
+    }
+    const dirs = [];
+    for (const e of entries) {
+        if (dirs.length >= exports.MAX_CHILD_DIRS) {
+            break;
+        }
+        if (e.startsWith(".") || (0, exports.isSkippedDir)(e)) {
+            continue;
+        }
+        if ((0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, e)) === "dir") {
+            dirs.push(e);
+        }
+    }
+    return dirs;
+}
+/**
+ * The first match at the root, else in a top-level folder. Root first, so a repo's
+ * own file always wins over a subproject's. Returns the on-disk relative path.
+ */
+function findNear(repo, spec) {
+    const resolve = (0, helpers_1.createResolver)(repo);
+    const kind = spec.kind ?? "file";
+    const accept = spec.accept ?? (() => true);
+    const fits = (rel) => {
+        const abs = (0, node_path_1.join)(repo, rel);
+        if (kind === "file" && !(0, helpers_1.isFileEntry)(repo, abs))
+            return false;
+        if (kind === "dir" && (0, helpers_1.entryKind)(repo, abs) !== "dir")
+            return false;
+        return accept(rel);
+    };
+    for (const base of ["", ...childDirs(repo)]) {
+        for (const name of spec.names ?? []) {
+            const rel = resolve(base ? `${base}/${name}` : name);
+            if (rel && fits(rel)) {
+                return rel;
+            }
+        }
+        if (!spec.patterns?.length) {
+            continue;
+        }
+        let entries = [];
+        try {
+            entries = (0, node_fs_1.readdirSync)(base ? (0, node_path_1.join)(repo, base) : repo).sort();
+        }
+        catch {
+            continue;
+        }
+        for (const re of spec.patterns) {
+            for (const e of entries) {
+                const rel = base ? `${base}/${e}` : e;
+                if (re.test(e) && fits(rel)) {
+                    return rel;
+                }
+            }
+        }
+    }
+    return null;
+}
 
 
 /***/ }),
@@ -2082,15 +2671,72 @@ exports.openhandsSetup = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.preCommit = void 0;
+const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = [".pre-commit-config.yaml", ".husky", "lefthook.yml", "lefthook.yaml"];
+const LEFTHOOK = ["yml", "yaml", "toml", "json", "jsonc"].flatMap((ext) => [
+    `lefthook.${ext}`,
+    `.lefthook.${ext}`,
+    `.config/lefthook.${ext}`,
+]);
+const CANDIDATES = [
+    ".pre-commit-config.yaml",
+    // pre-commit itself reads only `.yaml`; prek reads both, and `prek.toml`.
+    ".pre-commit-config.yml",
+    "prek.toml",
+    ".husky",
+    ".huskyrc",
+    ".huskyrc.json",
+    ...LEFTHOOK,
+    ".simple-git-hooks.js",
+    ".simple-git-hooks.cjs",
+    ".simple-git-hooks.mjs",
+    ".simple-git-hooks.json",
+    "simple-git-hooks.js",
+    "simple-git-hooks.cjs",
+    "simple-git-hooks.mjs",
+    "simple-git-hooks.json",
+    ".rusty-hook.toml",
+    "rusty-hook.toml",
+    ".overcommit.yml",
+    "captainhook.json",
+    "grumphp.yml",
+    "grumphp.yaml",
+    "grumphp.yml.dist",
+    "grumphp.yaml.dist",
+    "grumphp.dist.yml",
+    "grumphp.dist.yaml",
+    "hk.pkl",
+];
+// simple-git-hooks and yorkie read a top-level key; Husky up to v4 read `husky.hooks`.
+function packageJsonHooks(text) {
+    try {
+        const pkg = JSON.parse(text);
+        return !!pkg && typeof pkg === "object" && !!(pkg["simple-git-hooks"] || pkg.gitHooks || pkg.husky?.hooks);
+    }
+    catch {
+        return false;
+    }
+}
+// [ \t], not \s: with `m`, \s spans newlines and a file of blank lines goes quadratic.
+const CARGO_HUSKY_RE = /^[ \t]*cargo-husky[ \t]*=/m;
 exports.preCommit = {
     id: "pre_commit",
     label: "Pre-commit / git hooks",
     description: "Pre-commit hooks catch problems before the agent waits on CI.",
     improveSuggestion: "Set up pre-commit (.pre-commit-config.yaml), husky, or lefthook to run format+lint on every commit.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const resolve = (0, helpers_1.createResolver)(repo);
+        let m = CANDIDATES.map(resolve).find(Boolean) ?? null;
+        if (!m) {
+            const pkg = resolve("package.json");
+            if (pkg && packageJsonHooks((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo)))
+                m = pkg;
+        }
+        if (!m) {
+            const cargo = resolve("Cargo.toml");
+            if (cargo && CARGO_HUSKY_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, cargo), repo)))
+                m = cargo;
+        }
         if (m) {
             return {
                 pass: 1,
@@ -2118,16 +2764,32 @@ exports.preCommit = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.readme = void 0;
+exports.readme = exports.CANDIDATES = void 0;
+const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = ["README.md", "README.rst", "README.txt", "README"];
+// GitHub renders .github/ ahead of the root, but a root README is what agents open first.
+exports.CANDIDATES = [
+    "README.md",
+    "README.rst",
+    "README.adoc",
+    "README.asciidoc",
+    "README.markdown",
+    "README.txt",
+    "README",
+    ".github/README.md",
+    "docs/README.md",
+];
 exports.readme = {
     id: "readme",
     label: "README",
     description: "A README with enough detail for the agent to learn the project.",
     improveSuggestion: "Expand your README to cover what the project does, how to install, the common commands, and the high-level layout.",
     check: (repo) => {
-        const p = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        // Anything but a folder: a `readme/` of screenshots must not hide `.github/README.md`;
+        // a dangling link reads as empty.
+        const resolve = (0, helpers_1.createResolver)(repo);
+        const rel = exports.CANDIDATES.map(resolve).find((r) => r && (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, r)) !== "dir");
+        const p = rel ? (0, node_path_1.join)(repo, rel) : null;
         if (!p) {
             return {
                 pass: 0,
@@ -2281,39 +2943,131 @@ exports.size = {
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.tests = void 0;
+const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
+const details_1 = __nccwpck_require__(723);
 const helpers_1 = __nccwpck_require__(742);
-const DIRS = ["tests", "test", "__tests__", "spec", "specs", "src/test"];
-const FILE_RE = /(^|\/)(.*\.test\.|.*\.spec\.|test_.*\.py$|.*_test\.go$|.*_test\.rs$|.*Test\.java$|.*Tests?\.kt$|.*_test\.exs$|.*_test\.dart$|.*Spec\.scala$|.*Test\.scala$|.*Test\.php$|.*_test\.rb$|.*_spec\.rb$|.*Tests?\.cs$)/;
+const nearby_1 = __nccwpck_require__(280);
+const DIRS = ["tests", "test", "__tests__", "spec", "specs", "src/test", "testsuite"];
+// A module's own suite one level down: Gradle/Maven `app/src/test`, Kotlin
+// Multiplatform `src/commonTest`, `guava-tests/test`.
+const MODULE_DIRS = ["tests", "test", "__tests__", "spec", "src/test"];
+// Source sets named `<x>Test` (commonTest, jvmTest, androidTest, integTest).
+const SOURCE_SET_RE = /^[a-z]\w*Test$/;
+// .NET and Xcode name test projects `App.Tests` / `AppTests`. Case-sensitive, so `contests/` stays out.
+const TEST_PROJECT_RE = /^[\w.-]+Tests$/;
+const CODE_EXT = "(?:[cm]?[jt]sx?|vue|svelte|py|rb|go|rs|java|kts?|swift|cs|fs|php|dart|exs?|lua|c|cc|cpp|cxx|hpp|m|mm|scala|groovy|clj[cs]?|hs|ml|nim|cr|jl|[rR]|erl|gleam|sh)";
+// Each tested against the file name alone, so none can backtrack across a path.
+const TEST_FILE_RES = [
+    new RegExp(`^.+[._](test|spec)\\.${CODE_EXT}$`),
+    /^test_.+\.(py|c|cc|cpp)$/,
+    /^tests?\.py$/,
+    /^.+_unittest\.(c|cc|cpp)$/,
+    /^.+(Tests?|TestCase|Spec|Suite)\.(java|kts?|scala|groovy|php|cs|fs|swift|m|mm|hs)$/,
+    /^.+[a-z0-9]IT\.(java|kt)$/,
+    /^.+_(SUITE|tests)\.erl$/,
+    /^test-.+\.[rR]$/,
+];
+// Perl's `t/*.t`, the root `test.js` of a small npm package, and anything Jest
+// runs by default from a `__tests__/` folder (react-router's `*-test.tsx`).
+const PATH_RES = [/(^|\/)t\/[^/]+\.t$/, /^test\.[cm]?[jt]s$/, /(^|\/)__tests__\/[^/]+\.[cm]?[jt]sx?$/];
+function isTestFile(rel) {
+    const name = rel.slice(rel.lastIndexOf("/") + 1);
+    return TEST_FILE_RES.some((re) => re.test(name)) || PATH_RES.some((re) => re.test(rel));
+}
+function listDirs(abs) {
+    try {
+        return (0, node_fs_1.readdirSync)(abs).sort();
+    }
+    catch {
+        return [];
+    }
+}
+function testDir(repo) {
+    const resolve = (0, helpers_1.createResolver)(repo);
+    const isDir = (rel) => !!rel && (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, rel)) === "dir";
+    for (const d of DIRS) {
+        const rel = resolve(d);
+        if (isDir(rel)) {
+            return rel;
+        }
+    }
+    for (const name of listDirs(repo)) {
+        if (TEST_PROJECT_RE.test(name) && isDir(name)) {
+            return name;
+        }
+    }
+    for (const base of ["", ...(0, nearby_1.childDirs)(repo)]) {
+        if (base) {
+            for (const d of MODULE_DIRS) {
+                const rel = resolve(`${base}/${d}`);
+                if (isDir(rel)) {
+                    return rel;
+                }
+            }
+        }
+        const src = resolve(base ? `${base}/src` : "src");
+        if (!isDir(src)) {
+            continue;
+        }
+        for (const name of listDirs((0, node_path_1.join)(repo, src))) {
+            if (SOURCE_SET_RE.test(name) && isDir(`${src}/${name}`)) {
+                return `${src}/${name}`;
+            }
+        }
+    }
+    return null;
+}
+// npm writes this placeholder into every new package.json.
+// Tested against the trimmed script: a trailing \s* after `[^&|;]*` backtracks quadratically.
+const PLACEHOLDER_RE = /no test specified|^(exit\s+\d+|true|echo\b[^&|;]*)$/i;
+function testScript(repo) {
+    const pkg = (0, helpers_1.createResolver)(repo)("package.json");
+    if (!pkg) {
+        return false;
+    }
+    try {
+        const script = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo))?.scripts?.test;
+        return typeof script === "string" && script.trim() !== "" && !PLACEHOLDER_RE.test(script.trim());
+    }
+    catch {
+        return false;
+    }
+}
 exports.tests = {
     id: "tests",
     label: "Test suite",
     description: "Tests the agent can run to check its changes.",
     improveSuggestion: "Add a tests/ (or test/, __tests__/, spec/) directory with runnable tests. Document how to run them in AGENTS.md.",
     check: (repo) => {
-        for (const d of DIRS) {
-            const rel = (0, helpers_1.resolveRelative)(repo, d);
-            if (!rel) {
-                continue;
-            }
-            if ((0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, rel)) === "dir") {
-                return {
-                    pass: 1,
-                    id: "tests",
-                    matchedPath: rel,
-                    label: "Test suite",
-                    detail: `Found /${rel}`,
-                };
-            }
+        const dir = testDir(repo);
+        if (dir) {
+            return {
+                pass: 1,
+                id: "tests",
+                matchedPath: dir,
+                label: "Test suite",
+                detail: `${details_1.TESTS_DIR_DETAIL_PREFIX}${dir}`,
+            };
         }
-        const hits = (0, helpers_1.walkFind)(repo, (rel) => FILE_RE.test(rel), 3, 1);
-        if (hits.length > 0) {
+        // Go, Rust and JS keep tests beside the code by convention; that is a suite too.
+        const [file] = (0, helpers_1.walkFind)(repo, isTestFile, 4, 1);
+        if (file) {
+            return {
+                pass: 1,
+                id: "tests",
+                label: "Test suite",
+                matchedPath: file,
+                detail: `${details_1.TESTS_FILES_DETAIL_PREFIX} (${file})`,
+            };
+        }
+        if (testScript(repo)) {
             return {
                 pass: 0.7,
                 id: "tests",
                 label: "Test suite",
-                matchedPath: hits[0],
-                detail: `Test files detected (${hits[0]})`,
+                matchedPath: "package.json",
+                detail: details_1.TESTS_SCRIPT_DETAIL,
             };
         }
         return {
@@ -2334,79 +3088,144 @@ exports.tests = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.typeConfig = void 0;
-const node_fs_1 = __nccwpck_require__(24);
+exports.typeConfig = exports.TYPE_IN_FILE = void 0;
 const node_path_1 = __nccwpck_require__(760);
+const details_1 = __nccwpck_require__(723);
 const helpers_1 = __nccwpck_require__(742);
-const CANDIDATES = ["tsconfig.json", "jsconfig.json", "mypy.ini", ".mypy.ini", "pyrightconfig.json"];
-const PYPROJECT_RE = /\[tool\.(mypy|pyright)/;
-const TYPED_LANG_FILES = [
-    { file: "Cargo.toml", lang: "Rust" },
-    { file: "go.mod", lang: "Go" },
-    { file: "pom.xml", lang: "Java" },
-    { file: "build.gradle", lang: "Java/Kotlin" },
-    { file: "build.gradle.kts", lang: "Java/Kotlin" },
-    { file: "build.sbt", lang: "Scala" },
-    { file: "Package.swift", lang: "Swift" },
-    { file: "global.json", lang: "C#" },
-    { file: "dune-project", lang: "OCaml" },
-    { file: "stack.yaml", lang: "Haskell" },
-    { file: "build.zig", lang: "Zig" },
+const nearby_1 = __nccwpck_require__(280);
+// Type-checker configs for languages that are not typed by default.
+const CONFIGS = [
+    "tsconfig.json",
+    "jsconfig.json",
+    "deno.json",
+    "deno.jsonc",
+    ".flowconfig",
+    "mypy.ini",
+    ".mypy.ini",
+    "pyrightconfig.json",
+    "pyrefly.toml",
+    "ty.toml",
+    "sorbet/config",
+    "Steepfile",
+    "phpstan.neon",
+    "phpstan.neon.dist",
+    "phpstan.dist.neon",
+    "psalm.xml",
+    "psalm.xml.dist",
+    ".luaurc",
 ];
-const GLOB_TYPED = [
-    { re: /\.(csproj|fsproj|vbproj|sln)$/i, lang: "C#" },
+// Monorepos keep only `tsconfig.base.json` at the top; Laravel ships `phpstan.src.neon.dist`.
+const CONFIG_PATTERNS = [/^tsconfig[.-][\w.-]+\.json$/i, /^phpstan\.[\w.-]+\.neon(\.dist)?$/i];
+exports.TYPE_IN_FILE = [
+    { file: "pyproject.toml", re: /\[tool\.(mypy|pyright|basedpyright|ty|pyrefly)[\].]/ },
+    { file: "setup.cfg", re: /^\[mypy[\]-]/m },
+];
+const TYPED_LANG_FILES = {
+    "cargo.toml": "Rust",
+    "go.mod": "Go",
+    "pom.xml": "Java",
+    "build.gradle": "Java/Kotlin",
+    "build.gradle.kts": "Java/Kotlin",
+    "settings.gradle": "Java/Kotlin",
+    "settings.gradle.kts": "Java/Kotlin",
+    "build.sbt": "Scala",
+    "build.sc": "Scala",
+    "build.mill": "Scala",
+    "package.swift": "Swift",
+    "global.json": ".NET",
+    "directory.packages.props": ".NET",
+    "dune-project": "OCaml",
+    "stack.yaml": "Haskell",
+    "cabal.project": "Haskell",
+    "build.zig": "Zig",
+    "pubspec.yaml": "Dart",
+    "shard.yml": "Crystal",
+    "gleam.toml": "Gleam",
+    "elm.json": "Elm",
+    "spago.yaml": "PureScript",
+    "spago.dhall": "PureScript",
+    "rescript.json": "ReScript",
+    "bsconfig.json": "ReScript",
+    "v.mod": "V",
+    "dub.json": "D",
+    "dub.sdl": "D",
+    "fpm.toml": "Fortran",
+    "alire.toml": "Ada",
+    "cmakelists.txt": "C/C++",
+    "meson.build": "C/C++",
+    "xmake.lua": "C/C++",
+    "conanfile.txt": "C/C++",
+    "conanfile.py": "C/C++",
+    "vcpkg.json": "C/C++",
+};
+const TYPED_LANG_PATTERNS = [
+    { re: /\.(csproj|fsproj|vbproj)$/i, lang: ".NET" },
+    { re: /\.vcxproj$/i, lang: "C/C++" },
+    // A Visual Studio solution may hold C#, F#, VB or C++ projects: typed either way.
+    { re: /\.(sln|slnx)$/i, lang: ".NET/C++" },
     { re: /\.cabal$/i, lang: "Haskell" },
+    { re: /\.nimble$/i, lang: "Nim" },
+    { re: /\.opam$/i, lang: "OCaml" },
 ];
-function detectTypedLang(repo) {
-    for (const { file, lang } of TYPED_LANG_FILES) {
-        if ((0, helpers_1.firstFile)(repo, [file])) {
-            return lang;
-        }
+const NATIVE_PY_BACKEND_RE = /build-backend\s*=\s*["'](mesonpy|scikit_build_core\.build|py_build_cmake)/;
+const baseName = (rel) => rel.slice(rel.lastIndexOf("/") + 1);
+function langOf(rel) {
+    const name = baseName(rel);
+    return TYPED_LANG_FILES[name.toLowerCase()] ?? TYPED_LANG_PATTERNS.find((p) => p.re.test(name))?.lang ?? "typed";
+}
+function typedLanguage(repo) {
+    // numpy and scipy build their C extensions through a native build backend; the repo is still
+    // Python. A pyproject.toml for helper scripts (llama.cpp) leaves a C++ repo C++.
+    const pyproject = (0, helpers_1.createResolver)(repo)("pyproject.toml");
+    const pythonPackage = !!pyproject && NATIVE_PY_BACKEND_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject), repo));
+    const file = (0, nearby_1.findNear)(repo, {
+        names: Object.keys(TYPED_LANG_FILES),
+        patterns: TYPED_LANG_PATTERNS.map((p) => p.re),
+        accept: (rel) => !(pythonPackage && langOf(rel) === "C/C++"),
+    });
+    if (file) {
+        return { rel: file, lang: langOf(file) };
     }
-    try {
-        const entries = (0, node_fs_1.readdirSync)(repo);
-        for (const { re, lang } of GLOB_TYPED) {
-            if (entries.some((f) => re.test(f) && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, f)))) {
-                return lang;
-            }
-        }
-    }
-    catch { }
-    return null;
+    // An Xcode app has no Package.swift; its project is a folder.
+    const xcode = (0, nearby_1.findNear)(repo, { patterns: [/\.xcodeproj$/i], kind: "dir" });
+    return xcode ? { rel: xcode, lang: "Swift/Objective-C" } : null;
 }
 exports.typeConfig = {
     id: "type_config",
     label: "Type configuration",
     description: "Static types let the agent check call sites without running code.",
-    improveSuggestion: "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python). Rust/Go/JVM/Scala/Swift/C#/OCaml/Haskell/Zig are typed by default.",
+    improveSuggestion: "Add a type config (tsconfig.json for JS/TS, mypy.ini or pyrightconfig.json for Python, PHPStan for PHP). Compiled languages such as Rust, Go, Java, C#, Swift and C++ count once their build file is committed.",
     check: (repo) => {
-        const m = (0, helpers_1.firstFile)(repo, CANDIDATES);
-        if (m) {
+        const config = (0, nearby_1.findNear)(repo, { names: CONFIGS, patterns: CONFIG_PATTERNS });
+        if (config) {
             return {
                 pass: 1,
-                matchedPath: m,
+                matchedPath: config,
                 id: "type_config",
                 label: "Type configuration",
                 detail: "Type config present",
             };
         }
-        const pyproject = (0, helpers_1.resolveRelative)(repo, "pyproject.toml");
-        if (pyproject && PYPROJECT_RE.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pyproject), repo))) {
-            return {
-                pass: 1,
-                id: "type_config",
-                label: "Type configuration",
-                matchedPath: pyproject,
-                detail: "Configured in pyproject.toml",
-            };
+        for (const { file, re } of exports.TYPE_IN_FILE) {
+            const rel = (0, nearby_1.findNear)(repo, { names: [file], accept: (r) => re.test((0, helpers_1.readSafe)((0, node_path_1.join)(repo, r), repo)) });
+            if (rel) {
+                return {
+                    pass: 1,
+                    id: "type_config",
+                    label: "Type configuration",
+                    matchedPath: rel,
+                    detail: `Configured in ${rel}`,
+                };
+            }
         }
-        const lang = detectTypedLang(repo);
-        if (lang) {
+        const typed = typedLanguage(repo);
+        if (typed) {
             return {
                 pass: 1,
                 id: "type_config",
                 label: "Type configuration",
-                detail: `Typed language (${lang})`,
+                matchedPath: typed.rel,
+                detail: `${details_1.TYPED_LANGUAGE_DETAIL_PREFIX} (${typed.lang})`,
             };
         }
         return {

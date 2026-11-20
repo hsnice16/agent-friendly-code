@@ -5,7 +5,7 @@ description: Score the current repo's readiness for AI coding agents on disk, sh
 
 # agent-friendly
 
-Score the user's current repo locally with a bundled scorer and recommend a model class. Evaluates 16 static signals (AGENTS.md, CI, tests, README, linter, dev env, license, contributing, pre-commit hooks, deps manifest, type config, codebase size, plus four agent-specific instruction files) and produces overall + per-agent scores. Entirely local — no HTTP calls.
+Score the user's current repo locally with a bundled scorer and recommend a model class. Evaluates 17 static signals (AGENTS.md, CI, tests, README, linter, dev env, license, contributing, pre-commit hooks, deps manifest, type config, codebase size, plus five agent-specific files) and produces overall + per-agent scores. Entirely local — no HTTP calls.
 
 ## When to use
 
@@ -39,7 +39,7 @@ Skip when the user is asking about a different repo, a remote URL, or a concept 
      "warnings": [], // string[] — surface to user before showing the score if non-empty
      "signals": [
        { "id": "agents_md", "label": "AGENTS.md", "pass": 1, "matchedPath": "AGENTS.md" }
-       // 15 more signals...
+       // 16 more signals...
      ],
      "modelScores": [
        {
