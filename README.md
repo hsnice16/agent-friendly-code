@@ -1,6 +1,6 @@
 # Agent Friendly Code
 
-[![Release](https://img.shields.io/badge/release-0.9.4-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
+[![Release](https://img.shields.io/badge/release-0.9.5-blue?style=flat-square)](https://agentfriendlycode.com/changelog)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green?style=flat-square)](./LICENSE)
 [![Node ≥22](https://img.shields.io/badge/node-%E2%89%A522-43853d?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org)
 [![Sponsor](https://img.shields.io/badge/sponsor-%E2%9D%A4-db61a2?style=flat-square&logo=githubsponsors&logoColor=white)](https://github.com/sponsors/hsnice16)
@@ -54,7 +54,7 @@ The skill and the Action vendor the scorer and never call the API.
 
 - Weights come from each agent's documentation, not yet from measured agent success. A benchmark harness that runs agents on real tasks is planned for 1.0.
 - Static checks can be gamed, for example by an empty `AGENTS.md` (which scores as nearly missing).
-- Live Score supports GitHub only. GitLab and Bitbucket work but are held back by their API limits.
+- Live Score scores public GitHub repos; a GitLab or Bitbucket repo already on the board opens its page. Others are held back by those hosts' API limits.
 - Maintainers can't opt out yet; that ships with the claim flow in 0.10. Until then, [open an issue](https://github.com/hsnice16/agent-friendly-code/issues).
 
 Roadmap: [/roadmap](https://agentfriendlycode.com/roadmap). Released changes: [/changelog](https://agentfriendlycode.com/changelog).

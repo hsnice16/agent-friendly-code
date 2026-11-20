@@ -10,6 +10,27 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.5",
+    date: "2026-11-20",
+    title: "Every language's own files count",
+    highlights: [
+      "The checks recognise each language's standard files, so a well set-up repo passes whatever it is written in: every ESLint, Prettier and Biome config name, Checkstyle, Spotless, detekt and ktlint in Java and Kotlin builds, .NET, F# and Kotlin rules in `.editorconfig`, `.slnx` solutions, PHPStan and Psalm, Dart, C and C++ as typed languages, and more (issues #20 and #21).",
+      "The manifest, linter and type checks also look one folder down (`src/`, `dotnet/`). Tests kept beside the code earn full credit, and a language toolchain such as `Cargo.toml` or `go.mod` counts as one-command setup.",
+      'Live Score switches agents in "What to fix first" instantly. Its "Couldn\'t score this repo" page points private repos to the agent skill, and a GitLab or Bitbucket repo already on the board opens its page.',
+      "Eight guides at `/guide/<slug>`: CLAUDE.md, copilot-instructions.md, one instructions file for every agent, AGENTS.md vs skills, AGENTS.md in a monorepo, Windsurf rules, llms.txt vs AGENTS.md, and coding agent benchmarks.",
+      "`/compare/<a>-vs-<b>` for ten agent pairs, and `/language/<slug>/agents` for the seven largest languages.",
+      "`/report/agents-md-size` (how long real AGENTS.md and CLAUDE.md files are) and `/report/ai-contribution-policy` (what 120 projects say about AI-assisted contributions).",
+      "`/contribute`: open source projects with a CONTRIBUTING guide, tests and CI, by language, leaving out those that refuse AI contributions.",
+      "`/agents-md-generator`, and Live Score results offer the same starter AGENTS.md, plus CLAUDE.md and Gemini CLI stubs.",
+      '`/agents` answers "does <agent> read AGENTS.md?" for every agent, now including Copilot, Antigravity, OpenCode, Devin Desktop and Kiro.',
+      "AGENTS.md examples for React, Vue, Laravel, Android, Flutter, Angular, Spring Boot, .NET, React Native and iOS, and Swift, C# and Dart language pages.",
+      "The leaderboards have a Badge filter (`?badge=1`) showing only repos that display the Agent Friendly Code badge.",
+      'Repo pages are lighter: "Similar repos" also matches GitHub topics, the badge and the GitHub Action share one "Add to your repo" card, and the footer links the language and topic hubs.',
+      'A package its registry doesn\'t list gets a "Package not found" page, and `/api/package/<registry>/<name>` answers it with HTTP 404.',
+      "Check pages say how agents use tests, linters, hooks, dev setup and CI; /check/agents-md and /check/cursor-rules explain the format and best practices.",
+    ],
+  },
+  {
     label: "0.9.4",
     date: "2026-11-04",
     title: "Guides for agent-ready repos",

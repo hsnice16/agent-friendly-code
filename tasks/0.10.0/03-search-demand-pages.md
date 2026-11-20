@@ -1,6 +1,6 @@
 # Pages for what people search
 
-**Status**: in_progress
+**Status**: done
 
 ## Why
 
@@ -36,4 +36,4 @@ MCP config is out of scope for now.
 
 ## What shipped
 
-All pages above. The framework examples for Angular, Spring Boot, .NET, React Native and iOS, and the Swift, C# and Dart language pages, appear once a rescore scores the 30 new seeds.
+All pages above, released in [0.9.5](../0.9.5/README.md).
