@@ -20,5 +20,7 @@ export const CONTENT_CANDIDATES = [
   ".aider.conf.yml",
   "package.json",
   "pyproject.toml",
+  ".editorconfig",
+  "Directory.Build.props",
   ".gitignore",
 ] as const;

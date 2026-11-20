@@ -7,6 +7,7 @@ import { CONTENT_CANDIDATES } from "../lib/live-score/content-files";
 import { blobUrl, RateLimitedError, rawUrl, resolveCommit } from "../lib/live-score/hosts";
 import { safeAbsolute } from "../lib/live-score/materialize";
 import { SUPPORTED_HOSTS } from "../lib/live-score/supported";
+import { IN_FILE } from "../lib/scoring/signals/linter";
 
 const SIGNALS_DIR = join(process.cwd(), "lib", "scoring", "signals");
 
@@ -23,7 +24,7 @@ describe("content candidates", () => {
       "gemini-md.ts": ["GEMINI.md"],
       "openhands-setup.ts": [".openhands/setup.sh"],
       "dev-env.ts": ["package.json"],
-      "linter.ts": ["pyproject.toml"],
+      "linter.ts": IN_FILE.map((f) => f.file),
       "type-config.ts": ["pyproject.toml"],
       "size.ts": [".gitignore"],
     };

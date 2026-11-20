@@ -50,16 +50,33 @@ const CANDIDATES = [
   ".clang-format",
   ".clang-tidy",
   ".clj-kondo/config.edn",
+  ".globalconfig",
+  "stylecop.json",
+  "fsharplint.json",
 ];
 
 const PYPROJECT_RE = /\[tool\.(ruff|black|flake8|pylint|mypy)/;
+
+// A plain .editorconfig (indent, charset) is tool-neutral and stays a fail; these
+// prefixes are keys only dotnet format / Roslyn, Fantomas or ktlint read.
+const EDITORCONFIG_TOOL_RE = /^[ \t]*(?:dotnet|csharp|visual_basic|fsharp|ktlint)_/m;
+
+// TreatWarningsAsErrors is left out: it hardens whatever warnings exist but
+// configures no analyzer.
+const BUILD_PROPS_RE = /<EnforceCodeStyleInBuild>\s*true\s*<|<Analysis(?:Level|Mode)>/i;
+
+export const IN_FILE: { file: string; re: RegExp }[] = [
+  { file: "pyproject.toml", re: PYPROJECT_RE },
+  { file: ".editorconfig", re: EDITORCONFIG_TOOL_RE },
+  { file: "Directory.Build.props", re: BUILD_PROPS_RE },
+];
 
 export const linter: Signal = {
   id: "linter",
   label: "Linter / formatter config",
   description: "A linter, so the agent gets style feedback right away instead of guessing.",
   improveSuggestion:
-    "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint) and commit the config.",
+    "Configure a linter/formatter (ESLint+Prettier, Biome, Ruff, rustfmt+clippy, golangci-lint, .NET rules in .editorconfig) and commit the config.",
   check: (repo) => {
     const m = firstExisting(repo, CANDIDATES);
 
@@ -73,15 +90,18 @@ export const linter: Signal = {
       };
     }
 
-    const pyproject = resolveRelative(repo, "pyproject.toml");
-    if (pyproject && PYPROJECT_RE.test(readSafe(join(repo, pyproject), repo))) {
-      return {
-        pass: 1,
-        id: "linter",
-        matchedPath: pyproject,
-        label: "Linter / formatter config",
-        detail: "Configured in pyproject.toml",
-      };
+    for (const { file, re } of IN_FILE) {
+      const rel = resolveRelative(repo, file);
+
+      if (rel && re.test(readSafe(join(repo, rel), repo))) {
+        return {
+          pass: 1,
+          id: "linter",
+          matchedPath: rel,
+          label: "Linter / formatter config",
+          detail: `Configured in ${rel}`,
+        };
+      }
     }
 
     return {
