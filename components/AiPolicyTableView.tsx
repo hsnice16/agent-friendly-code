@@ -48,7 +48,7 @@ export function AiPolicyTableView({ groups }: { groups: PolicyGroup[] }) {
               <thead>
                 <tr>
                   <th scope="col">Repo</th>
-                  <th scope="col" className="hidden sm:table-cell">
+                  <th scope="col" className="wide-only">
                     Stance
                   </th>
                   <th scope="col">What it says</th>
@@ -72,17 +72,17 @@ export function AiPolicyTableView({ groups }: { groups: PolicyGroup[] }) {
                         </span>
                       )}
                     </th>
-                    <td className="hidden sm:table-cell">
+                    <td className="wide-only">
                       <Chip stance={g.stance} label={g.label} />
                     </td>
                     <td className="min-w-[12rem] text-ink-dim">{p.summary}</td>
-                    <td className="font-mono text-[12.5px] [overflow-wrap:anywhere]">
+                    <td className="mono-cell [overflow-wrap:anywhere]">
                       <a
                         href={p.url}
                         target="_blank"
                         rel="nofollow noopener noreferrer"
                         aria-label={`${p.path} in ${p.owner}/${p.name} (new tab)`}
-                        className="inline-flex items-center gap-0.5 dim-link"
+                        className="out-link dim-link"
                       >
                         {p.path} <span aria-hidden="true" className="icon-out" />
                       </a>

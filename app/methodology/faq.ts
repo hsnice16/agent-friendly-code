@@ -23,7 +23,7 @@ export const METHODOLOGY_FAQ = [
   },
   {
     q: "How do I stop pull requests from lowering my score?",
-    a: "Install the GitHub Action (hsnice16/agent-friendly-action). In your CI it scores each pull request against its target branch and posts one comment with what changed. An AGENTS_BADGE_TOKEN secret turns it on; every GitHub repo's page has the workflow to copy.",
+    a: "Install the GitHub Action (hsnice16/agent-friendly-action). In your CI it scores each pull request against its target branch and posts one comment with what changed. An AGENTS_BADGE_TOKEN secret turns it on; the workflow to copy is on /action.",
   },
   {
     q: "What is AGENTS.md or CLAUDE.md?",

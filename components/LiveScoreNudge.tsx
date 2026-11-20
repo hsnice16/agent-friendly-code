@@ -1,9 +1,12 @@
-import { ArrowRight } from "@phosphor-icons/react/dist/ssr";
+"use client";
+
+import { ArrowRight } from "@phosphor-icons/react";
 
 import { TrackedLink } from "./TrackedLink";
 
 // Most visitors land on a repo page from a search for that repo, not their own;
 // the form lives on the home page and /score, so this only points at it.
+// Client: see AGENTS.md → Conventions.
 export function LiveScoreNudge() {
   return (
     <aside className="callout mt-3.5 flex flex-wrap items-center gap-x-4 gap-y-3">

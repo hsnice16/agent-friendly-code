@@ -1,3 +1,6 @@
+"use client";
+
+// A client component so the payload carries its props, not its markup (AGENTS.md → Conventions).
 import Link from "next/link";
 
 import { badgeMarkdown } from "@/lib/utils/badge";

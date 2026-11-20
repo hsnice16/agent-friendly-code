@@ -1,6 +1,23 @@
 import type { NextConfig } from "next";
 
 import { BOARD_REDIRECTS } from "./lib/board-redirects";
+import { APP_HOST, APP_URL } from "./lib/version";
+
+// `noindex` keeps the production alias out of search, but each visit still renders a
+// whole page; a 308 renders none. Pages only: README badges and OG images may point at
+// this host, and preview deployments answer on other *.vercel.app hosts.
+const ALIAS_HOST = "agent-friendly-code.vercel.app";
+const ALIAS_REDIRECT =
+  APP_HOST === ALIAS_HOST
+    ? []
+    : [
+        {
+          source: "/:path((?!api/|og/|_next/).*)",
+          has: [{ type: "host" as const, value: ALIAS_HOST.replaceAll(".", "\\.") }],
+          destination: `${APP_URL}/:path`,
+          permanent: true,
+        },
+      ];
 
 // 'unsafe-inline' scripts: Next's hydration payload and the GA init are inline,
 // and nonces would need a proxy on every route, which would make the static
@@ -36,11 +53,9 @@ const config: NextConfig = {
     "/*": ["./tasks/**", "./tests/**", "./scripts/**", "./*.md", "./public/**", "./.claude/**", "./.next/cache/**"],
   },
 
-  // Every deployment answers on its *.vercel.app alias as well as the custom
-  // domain, serving the same pages. The canonical tag already points home, but
-  // a crawler has to fetch the copy to read it; this keeps it out of the index
-  // without costing that fetch. The value is an anchored regex over the
-  // lowercased hostname, so the custom domain cannot match it.
+  // Previews, and the alias's API and OG routes, still answer on *.vercel.app;
+  // noindex drops them without a crawler fetching the canonical. Anchored regex
+  // over the lowercased host, so the custom domain can't match.
   async headers() {
     return [
       {
@@ -66,7 +81,11 @@ const config: NextConfig = {
   // Crawlers and some clients request /favicon.ico without reading the page's
   // <link rel="icon">, which points at /icon.svg.
   async redirects() {
-    return [{ source: "/favicon.ico", destination: "/icon.svg", permanent: true }, ...BOARD_REDIRECTS];
+    return [
+      { source: "/favicon.ico", destination: "/icon.svg", permanent: true },
+      ...ALIAS_REDIRECT,
+      ...BOARD_REDIRECTS,
+    ];
   },
 
   // `/repo/:id` was the original repo URL, and repos also answer to other

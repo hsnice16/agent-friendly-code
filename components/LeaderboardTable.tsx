@@ -1,4 +1,3 @@
-import { ArrowUpRight } from "@phosphor-icons/react";
 import Link from "next/link";
 import type { MouseEvent, ReactNode } from "react";
 import type { BoardRow } from "@/lib/board";
@@ -170,20 +169,16 @@ export function LeaderboardTable({
                     <HostPill host={r.host} />
                     {r.badge_embedded ? <BadgeAdoptedTag /> : null}
                     {/* No title tooltip: the row's link overlay covers it, and the repo page has the full text. */}
-                    {description && (
-                      <p className="m-0 mt-0.5 hidden max-w-[60ch] text-[12.5px] leading-snug text-muted sm:line-clamp-1">
-                        {description}
-                      </p>
-                    )}
+                    {description && <p className="row-desc">{description}</p>}
                   </td>
-                  <td className="hidden whitespace-nowrap text-right tabular-nums text-ink-dim sm:table-cell">
+                  <td className="num-cell wide-only">
                     <span>{compactStars(r.stars)}</span>
                   </td>
                   <td className="text-right">
                     <ScoreCell score={r.score} />
                   </td>
                   {/* Below `sm` the table would scroll sideways; the repo page links the host anyway. */}
-                  <td className="hidden sm:table-cell">
+                  <td className="wide-only">
                     <a
                       href={r.url}
                       rel="noopener noreferrer"
@@ -191,7 +186,7 @@ export function LeaderboardTable({
                       aria-label={`Open ${r.owner}/${r.name} on ${r.host} (new tab)`}
                       className="relative inline-flex items-center gap-1 whitespace-nowrap dim-link"
                     >
-                      open <ArrowUpRight size={14} weight="bold" aria-hidden="true" />
+                      open <span aria-hidden="true" className="icon-out [--icon-size:14px]" />
                     </a>
                   </td>
                 </tr>

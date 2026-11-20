@@ -1,5 +1,3 @@
-import { ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
-
 type ExternalLinkTone = "dim" | "ink";
 
 const TONE_CLASS: Record<ExternalLinkTone, string> = {
@@ -22,9 +20,10 @@ export function ExternalLink({ href, title, children, tone = "dim", iconSize = 1
       title={title}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex max-w-full items-center gap-0.5 [overflow-wrap:anywhere] ${TONE_CLASS[tone]}`}
+      className={`out-link max-w-full [overflow-wrap:anywhere] ${TONE_CLASS[tone]}`}
     >
-      {children} <ArrowUpRight size={iconSize} weight="bold" aria-hidden="true" />
+      {children} {/* May shrink: in a narrow table cell a fixed-width arrow pushes long URLs onto an extra line. */}
+      <span aria-hidden="true" className={iconSize === 12 ? "icon-out shrink [--icon-size:12px]" : "icon-out shrink"} />
       <span className="sr-only"> (new tab)</span>
     </a>
   );

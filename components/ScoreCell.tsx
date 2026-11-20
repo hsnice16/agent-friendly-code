@@ -5,8 +5,8 @@ export function ScoreCell({ score }: { score: number | null }) {
   const n = score ?? 0;
 
   return (
-    <div className="ml-auto flex items-center justify-end gap-3.5 sm:min-w-[180px]">
-      <div className="hidden sm:block">
+    <div className="score-cell">
+      <div className="wide-only">
         <ScoreBar score={n} />
       </div>
 

@@ -9,7 +9,7 @@ import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreNumber } from "./ScoreNumber";
 
 // On a phone the file link and its length are the point; the rest is on the repo page.
-const WIDE_ONLY = "hidden sm:table-cell";
+const WIDE_ONLY = "wide-only";
 
 export type ExampleTableRow = {
   id: number;
@@ -68,14 +68,14 @@ export function AgentsMdExampleTableView({ rows, caption, showLanguage = true }:
                 </Link>
                 <OwnRepoTag repo={r} />
               </td>
-              <td className="whitespace-nowrap font-mono text-[12.5px]">
+              <td className="mono-cell whitespace-nowrap">
                 {r.fileUrl ? (
                   <a
                     href={r.fileUrl}
                     target="_blank"
                     rel="nofollow noopener noreferrer"
                     aria-label={`${r.file} in ${r.owner}/${r.name} (new tab)`}
-                    className="inline-flex items-center gap-0.5 dim-link"
+                    className="out-link dim-link"
                   >
                     {r.file} <span aria-hidden="true" className="icon-out" />
                   </a>
@@ -83,19 +83,17 @@ export function AgentsMdExampleTableView({ rows, caption, showLanguage = true }:
                   <span className="text-ink-dim">{r.file}</span>
                 )}
               </td>
-              <td className="whitespace-nowrap text-right tabular-nums text-ink-dim">
+              <td className="num-cell">
                 {r.length != null ? (
                   <>
                     {r.length.toLocaleString("en-US")}
-                    <span className="hidden sm:inline"> chars</span>
+                    <span className="wide-only"> chars</span>
                   </>
                 ) : (
                   "—"
                 )}
               </td>
-              <td className={`whitespace-nowrap text-right tabular-nums text-ink-dim ${WIDE_ONLY}`}>
-                {compactStars(r.stars)}
-              </td>
+              <td className={`num-cell ${WIDE_ONLY}`}>{compactStars(r.stars)}</td>
               {showLanguage && <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>}
               <td className={`text-right ${WIDE_ONLY}`}>
                 <ScoreNumber score={r.score ?? 0} size="sm" />

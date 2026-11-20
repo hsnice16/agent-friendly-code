@@ -90,7 +90,7 @@ export const PAGE_COPY = {
     type: "article",
   },
   "/package": {
-    title: "Packages",
+    title: "npm, PyPI and Cargo package checker",
     description: "Look up an npm, PyPI or Cargo package to see how ready its source repo is for AI coding agents.",
     type: "website",
   },

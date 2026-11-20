@@ -9,7 +9,7 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { ScoreNumber } from "./ScoreNumber";
 
 // On a phone the repo, its score and whether it has an agent file are the pick; the rest is on the repo page.
-const WIDE_ONLY = "hidden sm:table-cell";
+const WIDE_ONLY = "wide-only";
 
 function Mark({ on, title }: { on: boolean; title?: string }) {
   return on ? (
@@ -104,9 +104,7 @@ export function ContributeTableView({ rows, caption, showLanguage = true, policy
                 </Link>
               </td>
               {showLanguage && <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>}
-              <td className={`whitespace-nowrap text-right tabular-nums text-ink-dim ${WIDE_ONLY}`}>
-                {compactStars(r.stars)}
-              </td>
+              <td className={`num-cell ${WIDE_ONLY}`}>{compactStars(r.stars)}</td>
               <td className="text-right">
                 <ScoreNumber score={r.score ?? 0} size="sm" />
               </td>

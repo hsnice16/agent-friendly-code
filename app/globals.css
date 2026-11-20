@@ -100,12 +100,12 @@
     center / contain no-repeat;
 }
 
-/* The external-file arrow of the long repo tables: a mask, so each row ships a
-   class name instead of an SVG. */
+/* Phosphor's bold ArrowUpRight as a mask, so a new-tab link ships a class name
+   instead of an SVG. Another size sets --icon-size. */
 @utility icon-out {
   display: inline-block;
-  width: 11px;
-  height: 11px;
+  width: var(--icon-size, 11px);
+  height: var(--icon-size, 11px);
   flex-shrink: 0;
   background-color: currentColor;
   mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 256 256'%3E%3Cpath d='M204,64V168a12,12,0,0,1-24,0V93L72.49,200.49a12,12,0,0,1-17-17L163,76H88a12,12,0,0,1,0-24H192A12,12,0,0,1,204,64Z'/%3E%3C/svg%3E")
@@ -909,6 +909,76 @@
   }
 }
 
+/* Repeated on every row of the long tables, so one class each instead of five.
+   wide-only keeps the element's own display; `hidden sm:table-cell` would restate it. */
+@utility wide-only {
+  @media (width < 40rem) {
+    display: none;
+  }
+}
+
+@utility num-cell {
+  white-space: nowrap;
+  text-align: right;
+  --tw-numeric-spacing: tabular-nums;
+  font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+    var(--tw-numeric-fraction,);
+  color: var(--color-ink-dim);
+}
+
+@utility mono-cell {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+}
+
+/* A new-tab link with its icon-out arrow; the tone stays a class. */
+@utility out-link {
+  display: inline-flex;
+  align-items: center;
+  gap: calc(var(--spacing) * 0.5);
+}
+
+/* Board rows (LeaderboardTable). The rank box is one size with or without a medal, so numbers align. */
+@utility rank-box {
+  display: inline-flex;
+  width: calc(var(--spacing) * 6);
+  height: calc(var(--spacing) * 6);
+  align-items: center;
+  justify-content: center;
+  border-radius: calc(infinity * 1px);
+  font-size: var(--text-xs);
+  line-height: var(--tw-leading, var(--text-xs--line-height));
+}
+
+@utility row-desc {
+  margin: 0;
+  margin-top: calc(var(--spacing) * 0.5);
+  display: none;
+  max-width: 60ch;
+  font-size: 12.5px;
+  line-height: 1.375;
+  color: var(--color-muted);
+
+  @media (width >= 40rem) {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+}
+
+@utility score-cell {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: calc(var(--spacing) * 3.5);
+
+  @media (width >= 40rem) {
+    min-width: 180px;
+  }
+}
+
 @utility table-wrap {
   /* Contains absolutely positioned sr-only text, which otherwise widens the page. */
   position: relative;
@@ -1031,12 +1101,12 @@ textarea,
   }
 }
 
+/* A select has no caret to mark focus, so it keeps the global ring. */
 input:focus,
 input:focus-visible,
 textarea:focus,
 textarea:focus-visible,
-select:focus,
-select:focus-visible {
+select:focus:not(:focus-visible) {
   outline: none !important;
   box-shadow: none !important;
 }
