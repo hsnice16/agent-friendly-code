@@ -55,6 +55,27 @@ describe("depsManifest signal", () => {
     assert.match(r.matchedPath ?? "", /\.csproj$/);
   });
 
+  test("pass=1 for a root *.slnx with projects only under src/ (.NET 10 default)", () => {
+    fixture = makeFixture({
+      "App.slnx": "<Solution />",
+      "src/App/App.csproj": '<Project Sdk="Microsoft.NET.Sdk" />',
+    });
+    const r = depsManifest.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /\.slnx$/);
+  });
+
+  test("pass=1 for a root *.sln", () => {
+    fixture = makeFixture({ "App.sln": "Microsoft Visual Studio Solution File" });
+    assert.equal(depsManifest.check(fixture).pass, 1);
+  });
+
+  test("pass=1 for Directory.Packages.props (.NET central package management)", () => {
+    fixture = makeFixture({ "Directory.Packages.props": "<Project />" });
+    assert.equal(depsManifest.check(fixture).pass, 1);
+  });
+
   test("pass=1 for build.sbt (Scala)", () => {
     fixture = makeFixture({ "build.sbt": 'scalaVersion := "3.3.0"' });
     assert.equal(depsManifest.check(fixture).pass, 1);

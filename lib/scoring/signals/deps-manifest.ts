@@ -35,9 +35,10 @@ const CANDIDATES = [
   "conanfile.txt",
   "conanfile.py",
   "vcpkg.json",
+  "Directory.Packages.props",
 ];
 
-const GLOB_MANIFESTS: RegExp[] = [/\.(csproj|fsproj|vbproj|sln)$/i, /\.cabal$/i, /\.nimble$/i];
+const GLOB_MANIFESTS: RegExp[] = [/\.(csproj|fsproj|vbproj|sln|slnx)$/i, /\.cabal$/i, /\.nimble$/i];
 
 function findGlobManifest(repo: string): string | null {
   try {
