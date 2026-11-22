@@ -2,12 +2,12 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { homeJsonLdGraph } from "../components/HomeJsonLd";
-import { LEADERBOARD_PAGE_SIZE } from "../lib/constants/scoring";
+import { LEADERBOARD_FIRST_PAGE_SIZE } from "../lib/constants/scoring";
 import type { LeaderboardRow } from "../lib/types/db";
 import { boardItemList } from "../lib/utils/board-item-list";
 import { APP_URL } from "../lib/version";
 
-const rows = Array.from({ length: LEADERBOARD_PAGE_SIZE + 5 }, (_, i) => ({
+const rows = Array.from({ length: LEADERBOARD_FIRST_PAGE_SIZE + 5 }, (_, i) => ({
   host: "github",
   owner: "o",
   name: `r${i}`,
@@ -21,7 +21,7 @@ const types = (graph: Record<string, unknown>[]) => graph.map((n) => n["@type"])
 describe("boardItemList", () => {
   it("lists only the first page's rows on page 1", () => {
     const list = boardItemList({ page: 1, allRows: rows }, "Board");
-    assert.equal(list?.numberOfItems, LEADERBOARD_PAGE_SIZE);
+    assert.equal(list?.numberOfItems, LEADERBOARD_FIRST_PAGE_SIZE);
     assert.deepEqual(items(list)[0], {
       "@type": "ListItem",
       position: 1,
@@ -35,7 +35,7 @@ describe("boardItemList", () => {
     assert.equal(list?.numberOfItems, 5);
     assert.deepEqual(
       items(list).map((i) => [i.position, i.name]),
-      rows.slice(LEADERBOARD_PAGE_SIZE).map((r, i) => [LEADERBOARD_PAGE_SIZE + i + 1, `o/${r.name}`]),
+      rows.slice(LEADERBOARD_FIRST_PAGE_SIZE).map((r, i) => [LEADERBOARD_FIRST_PAGE_SIZE + i + 1, `o/${r.name}`]),
     );
   });
 });
@@ -43,8 +43,8 @@ describe("boardItemList", () => {
 describe("homeJsonLdGraph", () => {
   const graph = (page: number) => homeJsonLdGraph({ view: { page, allRows: rows }, contentChangedAt: 1_700_000_000 });
 
-  it("puts the Dataset on the canonical home only", () => {
-    assert.deepEqual(types(graph(1)), ["ItemList", "Dataset"]);
+  it("puts the Dataset and the site's own nodes on the canonical home only", () => {
+    assert.deepEqual(types(graph(1)), ["ItemList", "Organization", "WebSite", "WebApplication", "Dataset"]);
     assert.deepEqual(types(graph(2)), ["ItemList"]);
   });
 });

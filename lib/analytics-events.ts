@@ -6,13 +6,17 @@ export type AnalyticsEvent =
   | { name: "live_score_result"; outcome: LiveScoreOutcome; tier?: ScoreTier }
   | { name: "share_score"; network: ShareNetwork }
   | { name: "badge_copy"; page: "repo" | "live_score" }
-  | { name: "copy_install"; tool: "skill" | "skill_hook" | "action" | "starter_agents_md" }
+  | { name: "copy_install"; tool: "skill" | "skill_hook" | "action" | "starter_agents_md" | "example_agents_md" }
   | { name: "package_lookup"; registry: string }
   | { name: "select_agent"; agent: string }
   // GA4's recommended name: its built-in "Search term" dimension reads `search_term`.
   | { name: "search"; search_term: string; results: number; board: string }
   | { name: "leaderboard_filter"; filter: "host" | "badge" | "sort"; option: string }
-  | { name: "score_nudge_click" };
+  | { name: "score_nudge_click" }
+  | { name: "generator_cta_click"; page: GeneratorCtaPage }
+  | { name: "starter_open"; page: "repo" | "score" };
+
+export type GeneratorCtaPage = "home" | "repo" | "score" | "check" | "examples" | "language" | "framework";
 
 export type ShareNetwork = "x" | "linkedin" | "bluesky" | "copy_link";
 export type LiveScoreOutcome = "scored" | "not_found" | "too_large" | "unsupported" | "error";

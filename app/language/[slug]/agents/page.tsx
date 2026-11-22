@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentStandingsTable } from "@/components/AgentStandingsTable";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
@@ -138,9 +138,9 @@ export default async function LanguageAgentsPage({ params }: { params: Params })
           <ul className="link-list">
             {shares.map((f) => (
               <li key={f.file} className="flex items-baseline justify-between gap-3 link-row">
-                <Link href={checkPath(f.signalId)} className={`${LINK} cover-link`}>
+                <IntentLink href={checkPath(f.signalId)} className={`${LINK} cover-link`}>
                   <code className={CODE}>{f.file}</code>
-                </Link>
+                </IntentLink>
                 <span className="tabular-nums">
                   {f.count} of {rows.length} ({percent(f.count, rows.length)})
                 </span>
@@ -160,25 +160,25 @@ export default async function LanguageAgentsPage({ params }: { params: Params })
           <ul className="m-0 flex list-none flex-col gap-1.5 p-0 text-[14.5px]">
             {examples && (
               <li>
-                <Link href={languageExamplesPath(page.slug)} className="arrow-link whitespace-normal">
+                <IntentLink href={languageExamplesPath(page.slug)} className="arrow-link whitespace-normal">
                   {examples.guide ? `AGENTS.md for ${label}: guide and examples` : `${label} AGENTS.md examples`} →
-                </Link>
+                </IntentLink>
               </li>
             )}
             <li>
-              <Link href={hubPath(page.slug)} className="arrow-link whitespace-normal">
+              <IntentLink href={hubPath(page.slug)} className="arrow-link whitespace-normal">
                 Most agent-friendly {label} repos →
-              </Link>
+              </IntentLink>
             </li>
             <li>
-              <Link href="/agents" className="arrow-link whitespace-normal">
+              <IntentLink href="/agents" className="arrow-link whitespace-normal">
                 Which files each agent reads →
-              </Link>
+              </IntentLink>
             </li>
             <li>
-              <Link href={GUIDE_PATH} className="arrow-link whitespace-normal">
+              <IntentLink href={GUIDE_PATH} className="arrow-link whitespace-normal">
                 Make a repo agent-ready →
-              </Link>
+              </IntentLink>
             </li>
           </ul>
         </Panel>
@@ -196,15 +196,15 @@ export default async function LanguageAgentsPage({ params }: { params: Params })
         {COMPARE_PAIRS.map((p, i) => (
           <span key={p.slug}>
             {i > 0 && " · "}
-            <Link href={comparePath(p.slug)} className={LINK}>
+            <IntentLink href={comparePath(p.slug)} className={LINK}>
               {MODEL_BY_ID[p.a].label} vs {MODEL_BY_ID[p.b].label}
-            </Link>
+            </IntentLink>
           </span>
         ))}
         {" · "}
-        <Link href={COMPARE_PATH} className={LINK}>
+        <IntentLink href={COMPARE_PATH} className={LINK}>
           All comparisons
-        </Link>
+        </IntentLink>
       </p>
       {others.length > 0 && (
         <p className="mt-2 mb-0 text-[13px] text-muted">
@@ -212,9 +212,9 @@ export default async function LanguageAgentsPage({ params }: { params: Params })
           {others.map((g, i) => (
             <span key={g.slug}>
               {i > 0 && " · "}
-              <Link href={languageAgentsPath(g.slug)} className={LINK}>
+              <IntentLink href={languageAgentsPath(g.slug)} className={LINK}>
                 {g.label}
-              </Link>
+              </IntentLink>
             </span>
           ))}
         </p>

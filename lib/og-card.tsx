@@ -100,6 +100,38 @@ export function ogCard({ heading, sub, footerLeft, footerRight, headingSize = 70
   );
 }
 
+/**
+ * A title as headline lines: split after its first ": " or "? ", then each part
+ * wrapped into lines of even length, at most `max` characters, so no word is left alone.
+ */
+export function headlineLines(title: string, max: number): string[] {
+  const at = title.search(/[:?] /);
+  const parts = at > 0 ? [title.slice(0, at + 1), title.slice(at + 2)] : [title];
+  return parts.flatMap((part) => {
+    const width = Math.min(max, Math.ceil(part.length / Math.ceil(part.length / max)) + 4);
+    const lines: string[] = [];
+    for (const word of part.split(" ")) {
+      const last = lines[lines.length - 1];
+      if (last && `${last} ${word}`.length <= width) lines[lines.length - 1] = `${last} ${word}`;
+      else lines.push(word);
+    }
+    return lines;
+  });
+}
+
+// Characters that fit a 1040px line at each size, on the bold system font.
+const HEADLINE_FIT = [
+  { size: 64, chars: 38, upTo: 38 },
+  { size: 56, chars: 44, upTo: 80 },
+  { size: 48, chars: 51, upTo: Number.POSITIVE_INFINITY },
+];
+
+/** A content page's card: its title as the headline, and a line carrying its number. */
+export function pageCard({ title, sub, path }: { title: string; sub: string; path: string }): ImageResponse {
+  const fit = HEADLINE_FIT.find((f) => title.length <= f.upTo) ?? HEADLINE_FIT[2];
+  return ogCard({ heading: headlineLines(title, fit.chars), headingSize: fit.size, sub, footerRight: ogSiteUrl(path) });
+}
+
 type RepoScoreCard = {
   slug: string;
   /** Printed as is; "—" when the repo has no score. */

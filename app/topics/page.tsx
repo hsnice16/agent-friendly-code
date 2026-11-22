@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { IntentLink } from "@/components/IntentLink";
 import { PageHeader } from "@/components/PageHeader";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
@@ -32,10 +32,10 @@ export default function TopicsPage() {
         <ul className="m-0 grid list-none grid-cols-1 gap-2.5 p-0 sm:grid-cols-2 md:grid-cols-3">
           {topics.map((t) => (
             <li key={t.slug} className="relative flex items-baseline justify-between gap-2 tile">
-              <Link href={topicPath(t.slug)} className="font-medium ink-link cover-link">
+              <IntentLink href={topicPath(t.slug)} className="font-medium ink-link cover-link">
                 {/* Labels stay lowercase for use mid-sentence; a tile starts one. */}
                 <span>{t.label}</span>
-              </Link>
+              </IntentLink>
               <span className="text-[12px] text-muted">{t.rows.length} repos</span>
             </li>
           ))}
@@ -51,13 +51,13 @@ export default function TopicsPage() {
         >
           <span>By language:</span>
           {hubs.map((g) => (
-            <Link key={g.slug} href={hubPath(g.slug)} className={LINK_CLASS}>
+            <IntentLink key={g.slug} href={hubPath(g.slug)} className={LINK_CLASS}>
               {g.label}
-            </Link>
+            </IntentLink>
           ))}
-          <Link href="/language" className="arrow-link">
+          <IntentLink href="/language" className="arrow-link">
             All languages →
-          </Link>
+          </IntentLink>
         </nav>
       )}
     </>

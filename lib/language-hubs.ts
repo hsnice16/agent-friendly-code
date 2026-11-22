@@ -2,6 +2,7 @@ import { cache } from "react";
 
 import { HUB_GAPS_LIMIT } from "./constants/scoring";
 import { getSignalPassRates, listLeaderboardOverall } from "./db";
+import { boardLeader } from "./leaderboard-meta";
 import { SIGNALS } from "./scoring/signals";
 import type { LeaderboardRow, SignalPassRate } from "./types/db";
 import { averageScore, groupByLanguage, isHub, type LanguageGroup } from "./utils/language";
@@ -9,7 +10,8 @@ import { readers } from "./utils/readers";
 
 export type Hub = LanguageGroup<LeaderboardRow> & {
   average: number;
-  top: LeaderboardRow;
+  /** Undefined when no repo here clears the star floor. */
+  top: LeaderboardRow | undefined;
   gaps: SignalPassRate[];
 };
 
@@ -18,6 +20,13 @@ export type Hub = LanguageGroup<LeaderboardRow> & {
 // and say nothing about the language.
 const SHARED_SIGNALS = new Set(SIGNALS.map((s) => s.id).filter((id) => readers(id) > 1));
 
+/** The checks these repos most often miss, for a hub or topic page. */
+export function commonGaps(repoIds: number[]): SignalPassRate[] {
+  return getSignalPassRates(repoIds)
+    .filter((s) => SHARED_SIGNALS.has(s.id))
+    .slice(0, HUB_GAPS_LIMIT);
+}
+
 export const getLanguageGroups = cache(() => groupByLanguage(listLeaderboardOverall()));
 
 export const getHub = cache((slug: string): Hub | null => {
@@ -25,8 +34,5 @@ export const getHub = cache((slug: string): Hub | null => {
   if (!group || !isHub(group)) return null;
 
   const average = averageScore(group.rows);
-  const gaps = getSignalPassRates(group.rows.map((r) => r.id))
-    .filter((s) => SHARED_SIGNALS.has(s.id))
-    .slice(0, HUB_GAPS_LIMIT);
-  return { ...group, average, top: group.rows[0], gaps };
+  return { ...group, average, top: boardLeader(group.rows), gaps: commonGaps(group.rows.map((r) => r.id)) };
 });

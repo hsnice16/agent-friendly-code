@@ -24,9 +24,9 @@ AI coding agents succeed far more often on some repos than others, and the diffe
 | Where                                                                  | What you get                                                                                                     |
 | ---------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
 | [agentfriendlycode.com](https://agentfriendlycode.com)                 | Ranked public repos from GitHub, GitLab and Bitbucket, with boards per agent, language and topic, and a page per check.          |
-| [Guide](https://agentfriendlycode.com/guide) and [AGENTS.md report](https://agentfriendlycode.com/report/agents-md) | How to get a repo ready for agents, with real pass rates, plus guides to CLAUDE.md, Copilot instructions and monorepos; AGENTS.md adoption over time, with a CSV. |
-| [Comparisons](https://agentfriendlycode.com/compare) and [AI policy report](https://agentfriendlycode.com/report/ai-contribution-policy) | Agents compared by how repos are set up for them; what projects' policies say about AI contributions. |
-| [Live Score](https://agentfriendlycode.com/score)                      | Paste any public GitHub repo URL to score its current commit.                                                   |
+| [Guide](https://agentfriendlycode.com/guide) and reports on [AGENTS.md](https://agentfriendlycode.com/report/agents-md) and [agent skills](https://agentfriendlycode.com/report/agent-skills) | How to get a repo ready for agents, with real pass rates, plus guides to CLAUDE.md, Copilot instructions and monorepos; AGENTS.md and agent-skill adoption over time. |
+| [Agents](https://agentfriendlycode.com/agents), [comparisons](https://agentfriendlycode.com/compare) and [AI policy report](https://agentfriendlycode.com/report/ai-contribution-policy) | Which instructions file each agent reads; agents compared by how repos are set up for them; what projects' policies say about AI contributions. |
+| [Live Score](https://agentfriendlycode.com/score) and [AGENTS.md generator](https://agentfriendlycode.com/agents-md-generator) | Paste any public GitHub repo URL to score its current commit; one without an AGENTS.md gets a starter draft. |
 | [Agent skill](https://github.com/hsnice16/agent-friendly-skill)        | `npx skills add hsnice16/agent-friendly-skill#v0` — scores the repo you are in, offline, and suggests a model. On [skills.sh](https://www.skills.sh/hsnice16/agent-friendly-skill/agent-friendly). |
 | [GitHub Action](https://github.com/hsnice16/agent-friendly-action)     | Comments on each pull request with how it changes the score. Runs in your CI.                                    |
 | Badge                                                                  | `https://agentfriendlycode.com/api/badge/<host>/<owner>/<name>.svg`, `?model=<id>` for one agent.               |
@@ -41,6 +41,8 @@ Read-only JSON, no key:
 - `GET /api/repos` — every ranked repo with its overall score.
 - `GET /api/repo/<id>` — one repo by internal id.
 - `GET /api/package/<registry>/<name>` — npm, PyPI or Cargo package → its source repo's score.
+
+Feeds: `/changelog.xml` (Atom) and CSVs at `/report/agents-md.csv`, `/report/agent-skills.csv` and `/check/agents-md/examples.csv`.
 
 The skill and the Action vendor the scorer and never call the API.
 

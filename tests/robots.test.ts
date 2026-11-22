@@ -28,6 +28,13 @@ describe("robots", () => {
     }
   });
 
+  it("keeps OG cards from training crawlers only", () => {
+    assert.ok([ruleFor("GPTBot")?.disallow].flat().includes("/og/"));
+    for (const agent of ["*", "Twitterbot", "PerplexityBot"]) {
+      assert.ok(![ruleFor(agent)?.disallow].flat().includes("/og/"), agent);
+    }
+  });
+
   it("lets answer engines read repo pages", () => {
     for (const agent of ["PerplexityBot", "OAI-SearchBot", "Claude-SearchBot", "ChatGPT-User"]) {
       assert.ok(![ruleFor(agent)?.disallow].flat().includes("/repo/"), agent);

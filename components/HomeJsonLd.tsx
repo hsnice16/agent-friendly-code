@@ -1,5 +1,6 @@
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { SIGNALS } from "@/lib/scoring/signals";
+import { SITE_JSON_LD_NODES } from "@/lib/site-json-ld";
 import { agentList } from "@/lib/utils/agent-list";
 import { boardItemList } from "@/lib/utils/board-item-list";
 import { APP_NAME, APP_URL, APP_VERSION } from "@/lib/version";
@@ -14,9 +15,9 @@ type HomeJsonLdProps = {
 /**
  * The Dataset is the whole leaderboard (its download is /api/repos), so only
  * the canonical home carries it: on page 2+ it would be a second
- * copy of one dataset at a URL that shows a slice of it. Organization, WebSite
- * and WebApplication are site-wide and live in app/layout.tsx. No mainEntity:
- * the page's ItemList is one page of rows, not the dataset.
+ * copy of one dataset at a URL that shows a slice of it. The site's own nodes
+ * (lib/site-json-ld.ts) ride along. No mainEntity: the page's ItemList is one
+ * page of rows, not the dataset.
  */
 export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Record<string, unknown>[] {
   const itemList = boardItemList(view, "Agent-friendliness leaderboard");
@@ -25,6 +26,7 @@ export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Re
   }
   return [
     itemList,
+    ...SITE_JSON_LD_NODES,
     {
       "@type": "Dataset",
       "@id": `${APP_URL}/#dataset`,

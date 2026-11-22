@@ -4,6 +4,7 @@ export type CensusRepo = {
   host: string;
   owner: string;
   name: string;
+  branch?: string | null;
   truncated: boolean;
   /** Set when the tree read failed; every list below is then empty, not measured. */
   error?: string;
@@ -43,6 +44,10 @@ export type CensusSummary = {
   claudeImportsAgents: number;
   /** Root AGENTS.md and CLAUDE.md both present, however they relate. */
   rootBoth: number;
+  /** Of `rootBoth`, one is a symlink (to the other, or both to a third file). */
+  rootBothLinked: number;
+  rootAgentsMdOnly: number;
+  rootClaudeMdOnly: number;
   /** Root AGENTS.md and CLAUDE.md as two real files, the CLAUDE.md not importing the other. */
   twoUnlinkedFiles: number;
   copilot: number;
@@ -92,6 +97,9 @@ export function summarizeCensus(all: CensusRepo[], generatedAt: string): CensusS
     anyRootLink: n(linked),
     claudeImportsAgents: n((r) => r.claudeMdImportsAgentsMd === true),
     rootBoth: n((r) => rootAgents(r) && rootClaude(r)),
+    rootBothLinked: n((r) => rootAgents(r) && rootClaude(r) && linked(r)),
+    rootAgentsMdOnly: n((r) => rootAgents(r) && !rootClaude(r)),
+    rootClaudeMdOnly: n((r) => rootClaude(r) && !rootAgents(r)),
     twoUnlinkedFiles: n((r) => rootAgents(r) && rootClaude(r) && !linked(r) && r.claudeMdImportsAgentsMd !== true),
     copilot: n((r) => r.copilotInstructions),
     copilotPath: n((r) => r.copilotPathInstructions > 0),

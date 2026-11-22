@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-
 import { compactStars } from "@/lib/utils/format";
 import { repoPath } from "@/lib/utils/repo-path";
 
+import { IntentLink } from "./IntentLink";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreNumber } from "./ScoreNumber";
 
@@ -35,7 +34,7 @@ export function AgentsMdExampleTableView({ rows, caption, showLanguage = true }:
   return (
     // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region
     <section className="table-wrap" tabIndex={0} aria-label={caption}>
-      <table className="data-table text-[14px]">
+      <table className="data-table example-cells text-[14px]">
         <caption className="sr-only">{caption}</caption>
         <thead>
           <tr>
@@ -60,15 +59,14 @@ export function AgentsMdExampleTableView({ rows, caption, showLanguage = true }:
         <tbody>
           {rows.map((r) => (
             <tr key={r.id}>
-              <td className="repo-cell">
-                {/* The hub lists every repo: scrolling past them would prefetch each repo page, a billed ISR read apiece. */}
-                <Link href={repoPath(r)} prefetch={false} className="font-medium ink-link cover-link">
+              <td>
+                <IntentLink href={repoPath(r)} className="font-medium ink-link cover-link">
                   {r.owner}/<wbr />
                   {r.name}
-                </Link>
+                </IntentLink>
                 <OwnRepoTag repo={r} />
               </td>
-              <td className="mono-cell whitespace-nowrap">
+              <td>
                 {r.fileUrl ? (
                   <a
                     href={r.fileUrl}
@@ -83,19 +81,19 @@ export function AgentsMdExampleTableView({ rows, caption, showLanguage = true }:
                   <span className="text-ink-dim">{r.file}</span>
                 )}
               </td>
-              <td className="num-cell">
+              <td>
                 {r.length != null ? (
                   <>
                     {r.length.toLocaleString("en-US")}
-                    <span className="wide-only"> chars</span>
+                    <span> chars</span>
                   </>
                 ) : (
                   "—"
                 )}
               </td>
-              <td className={`num-cell ${WIDE_ONLY}`}>{compactStars(r.stars)}</td>
-              {showLanguage && <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>}
-              <td className={`text-right ${WIDE_ONLY}`}>
+              <td>{compactStars(r.stars)}</td>
+              {showLanguage && <td>{r.language ?? "—"}</td>}
+              <td>
                 <ScoreNumber score={r.score ?? 0} size="sm" />
               </td>
             </tr>

@@ -33,6 +33,7 @@ describe("sitemap", async () => {
       "/contribute",
       "/report/agents-md-size",
       "/report/ai-contribution-policy",
+      "/report/agent-skills",
       "/agents-md-generator",
     ];
     for (const path of paths) assert.ok(urls.includes(`${APP_URL}${path}`), path);

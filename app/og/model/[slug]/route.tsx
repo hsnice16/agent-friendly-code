@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 
+import { boardLeader, leaderSentence } from "@/lib/leaderboard-meta";
 import { resolveLeaderboardView } from "@/lib/leaderboard-view";
 import { ogCard, ogSiteUrl } from "@/lib/og-card";
 import { MODEL_BY_ID, MODELS } from "@/lib/scoring/weights";
@@ -21,13 +22,11 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
 
   const { label } = MODEL_BY_ID[slug];
   const rows = resolveLeaderboardView(slug).allRows;
-  const top = rows[0];
+  const top = boardLeader(rows);
 
   return ogCard({
     heading: [`Best GitHub repos for ${label}`, "ranked leaderboard"],
-    sub: top
-      ? `By their ${label} score. ${top.owner}/${top.name} leads with ${(top.score ?? 0).toFixed(1)}.`
-      : `By their ${label} score.`,
+    sub: top ? `By their ${label} score. ${leaderSentence(top)}` : `By their ${label} score.`,
     footerLeft: `${rows.length} repos scored for ${label}`,
     footerRight: ogSiteUrl(modelPath(slug)),
   });

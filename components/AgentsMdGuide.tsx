@@ -1,14 +1,25 @@
-import Link from "next/link";
-
+import type { ExampleLink } from "@/lib/agents-md-example-links";
 import { AGENTS_MD_INCLUDE, AGENTS_MD_LEAVE_OUT } from "@/lib/check-content/agents-md-guide";
 import { checkSubPath } from "@/lib/utils/check-path";
 
 import { CodeText } from "./CodeText";
+import { IntentLink } from "./IntentLink";
+import { LINK } from "./link-class";
 import { Panel, PanelHeading } from "./Panel";
 
 const NUMBER = new Intl.NumberFormat("en-US");
 
-export function AgentsMdGuide({ medianLength, files }: { medianLength: number | null; files: number }) {
+export function AgentsMdGuide({
+  medianLength,
+  files,
+  byLanguage = [],
+  byFramework = [],
+}: {
+  medianLength: number | null;
+  files: number;
+  byLanguage?: ExampleLink[];
+  byFramework?: ExampleLink[];
+}) {
   const examples = checkSubPath("agents_md", "examples");
 
   return (
@@ -33,12 +44,31 @@ export function AgentsMdGuide({ medianLength, files }: { medianLength: number | 
       {medianLength != null && (
         <p className="mt-3 mb-0 text-[13.5px] text-ink-dim">
           The median of the {files} on the leaderboard is {NUMBER.format(medianLength)} characters.{" "}
-          <Link href={examples} className="prose-link">
+          <IntentLink href={examples} className="prose-link">
             Read them
-          </Link>
+          </IntentLink>
           .
         </p>
       )}
+      <LinkLine lead="Examples by language" links={byLanguage} />
+      <LinkLine lead="By framework, with what to put in the file" links={byFramework} />
     </Panel>
+  );
+}
+
+function LinkLine({ lead, links }: { lead: string; links: ExampleLink[] }) {
+  if (links.length === 0) return null;
+  return (
+    <p className="mt-2 mb-0 text-[13.5px] text-ink-dim">
+      {lead}:{" "}
+      {links.map((l, i) => (
+        <span key={l.href}>
+          {i > 0 && " · "}
+          <IntentLink href={l.href} className={LINK}>
+            {l.label}
+          </IntentLink>
+        </span>
+      ))}
+    </p>
   );
 }

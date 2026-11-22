@@ -16,7 +16,9 @@ describe("check practice panels", () => {
 
   it("ship snippets that parse", () => {
     for (const [id, p] of Object.entries(CHECK_PRACTICE)) {
-      if (p.snippet?.caption.endsWith(".json")) assert.doesNotThrow(() => JSON.parse(p.snippet?.text ?? ""), id);
+      for (const s of p.snippets ?? []) {
+        if (s.caption.endsWith(".json")) assert.doesNotThrow(() => JSON.parse(s.text), id);
+      }
     }
   });
 });

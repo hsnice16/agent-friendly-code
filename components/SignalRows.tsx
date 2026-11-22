@@ -1,5 +1,4 @@
 import type { SignalResult } from "@/lib/scoring/signals/types";
-import { checkPath } from "@/lib/utils/check-path";
 
 import { type RepoLocation, SignalRowsView } from "./SignalRowsView";
 
@@ -7,8 +6,6 @@ import { type RepoLocation, SignalRowsView } from "./SignalRowsView";
 export function SignalRows({ signals, repo }: { signals: SignalResult[]; repo?: RepoLocation }) {
   const rows = signals.map((s) => ({
     id: s.id,
-    label: s.label,
-    href: checkPath(s.id),
     pass: s.pass,
     detail: s.detail,
     ...(s.matchedPath ? { path: s.matchedPath } : {}),

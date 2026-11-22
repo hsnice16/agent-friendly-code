@@ -4,6 +4,7 @@ import {
   type MouseEvent,
   type ReactNode,
   startTransition,
+  useDeferredValue,
   useEffect,
   useLayoutEffect,
   useMemo,
@@ -67,7 +68,11 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
   const searchTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const lastView = useRef<ShownPage>(server);
 
-  const { status, data } = useBoardData();
+  const { status, data: arrived } = useBoardData();
+  // The store's update is synchronous, and the payload often lands mid-keystroke
+  // (it is fetched when a control is reached for); deriving and rendering the
+  // rows from it at low priority keeps that keystroke responsive.
+  const data = useDeferredValue(arrived);
 
   const needsData = isRecut(query) || query.page !== server.page;
   const rows = useMemo(() => (data ? boardRows(data, model) : null), [data, model]);
@@ -230,7 +235,7 @@ export function BoardClient({ model, agents, activeLabel, intro, server, summary
       settleSearch(queryRef.current.q);
     }
     const next = { ...query, page };
-    setQuery(next);
+    startTransition(() => setQuery(next));
     write(next, "push");
     scrollToBoard();
   }

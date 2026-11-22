@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { CodeText } from "@/components/CodeText";
+import { IntentLink } from "@/components/IntentLink";
 import { LINK_STRONG } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -30,13 +30,13 @@ export default function ChecksPage() {
         <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Every score here comes from these {SIGNALS.length} file checks. Each has a page: what it looks for, why agents
           need it, how to pass it, and how many of the {total} leaderboard repos do. The{" "}
-          <Link href="/methodology" className="prose-link">
+          <IntentLink href="/methodology" className="prose-link">
             methodology
-          </Link>{" "}
+          </IntentLink>{" "}
           covers the weights, and the{" "}
-          <Link href="/guide" className="prose-link">
+          <IntentLink href="/guide" className="prose-link">
             guide
-          </Link>{" "}
+          </IntentLink>{" "}
           groups the checks into what to do.
         </p>
       </PageHeader>
@@ -54,22 +54,22 @@ export default function ChecksPage() {
               const stats = getCheckStats(c.id);
               return (
                 <li key={c.id}>
-                  <Link href={checkPath(c.id)} className={LINK_STRONG}>
+                  <IntentLink href={checkPath(c.id)} className={LINK_STRONG}>
                     {SIGNAL_BY_ID[c.id].label}
-                  </Link>{" "}
+                  </IntentLink>{" "}
                   · summed weight {c.sum.toFixed(1)} · {percent(stats.full, stats.total)} of repos pass
                 </li>
               );
             })}
           </ol>
           <p className="mt-3 mb-0 text-[14px] text-ink-dim">
-            <Link href="/score" className="prose-link">
+            <IntentLink href="/score" className="prose-link">
               Check your repo now
-            </Link>{" "}
+            </IntentLink>{" "}
             to see which of the {SIGNALS.length} it passes, or read{" "}
-            <Link href={checkSubPath("agents_md", "examples")} className="prose-link">
+            <IntentLink href={checkSubPath("agents_md", "examples")} className="prose-link">
               real AGENTS.md examples
-            </Link>{" "}
+            </IntentLink>{" "}
             from popular repos.
           </p>
         </Panel>
@@ -80,10 +80,10 @@ export default function ChecksPage() {
           const stats = getCheckStats(s.id);
           return (
             <li key={s.id} className="relative tile">
-              <div className="flex items-start justify-between gap-3">
-                <Link href={checkPath(s.id)} className={`cover-link ${LINK_STRONG}`}>
+              <div className="flex items-baseline justify-between gap-3">
+                <IntentLink href={checkPath(s.id)} className={`cover-link ${LINK_STRONG}`}>
                   {s.label}
-                </Link>
+                </IntentLink>
                 <span className="shrink-0 text-[13px] tabular-nums text-ink-dim">
                   {percent(stats.full, stats.total)} pass
                 </span>

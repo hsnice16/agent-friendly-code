@@ -52,9 +52,10 @@ export default function PrivacyPage() {
             <li>
               <strong className="text-ink">Analytics.</strong> We use Google Analytics 4, which does not log or store IP
               addresses, to measure aggregate traffic patterns — page views, leaderboard searches (the words searched
-              and how many repos matched), filter and sort changes, Live Score results, package lookups, clicks on the
-              share, badge, copy, agent and &ldquo;Score your repo&rdquo; buttons, referrers, approximate location,
-              device and browser type, and time on page. This data is not used to identify individual visitors.
+              and how many repos matched), filter and sort changes, Live Score submissions and results, package lookups,
+              clicks on the share, badge, copy, agent, &ldquo;Score your repo&rdquo; buttons and the AGENTS.md generator
+              and starter-draft buttons, referrers, approximate location, device and browser type, and time on page.
+              This data is not used to identify individual visitors.
             </li>
             <li className="mt-2">
               <strong className="text-ink">Heatmaps and session recordings.</strong> We use Microsoft Clarity to see

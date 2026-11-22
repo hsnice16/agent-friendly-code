@@ -12,12 +12,12 @@ const GRID_COLS: Record<number, string> = {
 
 export type Props = {
   /** Absent on a live score, which has no board rank. */
-  rank?: { rank: number; total: number; note: string };
+  rank?: { rank: number; total: number; note: string; href: string };
   passing: number;
   signalCount: number;
-  best: { label: string; score: number } | null;
+  best: { label: string; score: number; href: string } | null;
   /** `fix` is the biggest gain, already worded; without one the card shows the score. */
-  worst: { label: string; score: number; fix: string | null } | null;
+  worst: { label: string; score: number; fix: string | null; href: string } | null;
 };
 
 function OutOf({ n, total }: { n: string | number; total: number }) {
@@ -34,6 +34,7 @@ export function RepoSummaryView({ rank, passing, signalCount, best, worst }: Pro
       <Stat
         key="rank"
         label="Rank"
+        href={rank.href}
         value={<OutOf n={`#${rank.rank}`} total={rank.total} />}
         note={rank.note || undefined}
       />
@@ -41,6 +42,7 @@ export function RepoSummaryView({ rank, passing, signalCount, best, worst }: Pro
     <Stat
       key="checks"
       label="Checks passed"
+      href="#all-checks"
       value={<OutOf n={passing} total={signalCount} />}
       note="Full list below"
     />,
@@ -48,6 +50,7 @@ export function RepoSummaryView({ rank, passing, signalCount, best, worst }: Pro
       <Stat
         key="best"
         label="Best set up for"
+        href={best.href}
         value={best.label}
         note={
           <>
@@ -60,6 +63,7 @@ export function RepoSummaryView({ rank, passing, signalCount, best, worst }: Pro
       <Stat
         key="worst"
         label="Needs most work for"
+        href={worst.href}
         value={worst.label}
         note={
           worst.fix ?? (

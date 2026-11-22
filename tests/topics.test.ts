@@ -131,8 +131,7 @@ describe("topic page copy", () => {
         label,
         count: 123,
         average: 61.25,
-        top: "someone/some-long-repo-name",
-        topScore: 99,
+        leader: "Best with 100+ stars: someone/some-long-repo-name (99.0).",
       });
       assert.ok(d.length <= MAX_DESCRIPTION_LENGTH, d);
     }
@@ -141,7 +140,7 @@ describe("topic page copy", () => {
   it("gives each topic its own title and description", () => {
     const titles = labels.map((l) => pageTitle(topicTitle(l)).absolute);
     const descriptions = labels.map((label) =>
-      topicDescription({ label, count: 9, average: 50, top: "a/b", topScore: 70 }),
+      topicDescription({ label, count: 9, average: 50, leader: "Best with 100+ stars: a/b (70.0)." }),
     );
     assert.equal(new Set(titles).size, labels.length);
     assert.equal(new Set(descriptions).size, labels.length);

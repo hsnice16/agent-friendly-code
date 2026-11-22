@@ -1,4 +1,5 @@
 import { inConsentRegion, readConsent } from "./analytics-consent";
+import { APP_HOST } from "./version";
 
 type ClarityFn = ((...args: unknown[]) => void) & { q?: unknown[][] };
 
@@ -22,7 +23,8 @@ export function clarityAllowed(): boolean {
 }
 
 export function startClarity(): void {
-  if (!PROJECT_ID) return;
+  // As in GoogleAnalytics.tsx: local copies and previews serve the same pages.
+  if (!PROJECT_ID || window.location.host !== APP_HOST) return;
   // Already loaded (no-consent visit, or a decline earlier on this page): only
   // the consent signal is missing.
   if (window.clarity) {

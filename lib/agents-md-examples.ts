@@ -2,6 +2,7 @@ import type { AgentsMdGuide } from "./framework-guides/types";
 import { LANGUAGE_GUIDES } from "./language-guides";
 import type { LeaderboardRow, SignalFile } from "./types/db";
 import { fileLength, hasAgentFile } from "./utils/agent-instructions";
+import { csvField } from "./utils/csv";
 import { groupByLanguage, isHub, languageSlug } from "./utils/language";
 import { median } from "./utils/median";
 import { repoOwnership } from "./utils/own-repo";
@@ -135,6 +136,32 @@ export function examplesByLanguage(ex: Pick<AgentsMdExamples, "rows" | "language
       };
     })
     .sort((a, b) => b.rows.length - a.rows.length);
+}
+
+/** Files whose language has no examples page of its own, so the hub is the only page listing them. */
+export function examplesWithoutLanguagePage(ex: Pick<AgentsMdExamples, "rows" | "languages">): ExampleRow[] {
+  const built = new Set(examplesByLanguage(ex).map((l) => l.slug));
+  return ex.rows.filter((r) => !r.language || !built.has(languageSlug(r.language)));
+}
+
+export function examplesCsv(rows: ExampleRow[]): string {
+  const head = ["repo", "host", "language", "file", "characters", "passes", "stars", "score", "file_url"];
+  const lines = rows.map((r) =>
+    [
+      `${r.owner}/${r.name}`,
+      r.host,
+      r.language,
+      r.file,
+      r.length,
+      r.pass >= 1 ? "yes" : "no",
+      r.stars,
+      r.score == null ? null : Math.round(r.score * 10) / 10,
+      r.fileUrl,
+    ]
+      .map(csvField)
+      .join(","),
+  );
+  return `${head.join(",")}\n${lines.join("\n")}\n`;
 }
 
 export function languageExamplesTitle(lang: Pick<LanguageExamples, "slug" | "label" | "rows" | "guide">): string {

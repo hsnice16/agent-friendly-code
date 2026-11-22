@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { CodeText } from "@/components/CodeText";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK, LINK_STRONG } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
@@ -107,9 +107,9 @@ export default function GuidePage() {
         <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Of {agentsMd.total} popular repos on our leaderboard, {percent(agentsMd.present, agentsMd.total)} have an
           AGENTS.md or CLAUDE.md (
-          <Link href={REPORT_PATH} className="prose-link">
+          <IntentLink href={REPORT_PATH} className="prose-link">
             how that has grown
-          </Link>
+          </IntentLink>
           ), {passRate("tests")} pass our tests check and {passRate("ci")} our CI check. Below are the {SIGNALS.length}{" "}
           best practices we score, grouped by what they do for an agent; the {START_WITH} marked count most across
           agents.
@@ -130,9 +130,9 @@ export default function GuidePage() {
                     className="flex flex-col gap-x-4 link-row sm:flex-row sm:items-baseline sm:justify-between"
                   >
                     <span>
-                      <Link href={checkPath(c.id)} className={`${LINK_STRONG} cover-link`}>
+                      <IntentLink href={checkPath(c.id)} className={`${LINK_STRONG} cover-link`}>
                         {SIGNAL_BY_ID[c.id].label}
-                      </Link>
+                      </IntentLink>
                       {startHere.has(c.id) && (
                         <span className="ml-2 text-[12.5px] font-medium text-tip">start here</span>
                       )}
@@ -158,9 +158,9 @@ export default function GuidePage() {
             <ul className="link-list">
               {AGENT_FILES.map((l) => (
                 <li key={l.href} className="link-row">
-                  <Link href={l.href} className={`${LINK} cover-link`}>
+                  <IntentLink href={l.href} className={`${LINK} cover-link`}>
                     {l.label}
-                  </Link>
+                  </IntentLink>
                   : {l.note}
                 </li>
               ))}
@@ -172,9 +172,9 @@ export default function GuidePage() {
             <ul className="link-list">
               {TOOLS.map((l) => (
                 <li key={l.href} className="link-row">
-                  <Link href={l.href} className={`${LINK} cover-link`}>
+                  <IntentLink href={l.href} className={`${LINK} cover-link`}>
                     {l.label}
-                  </Link>
+                  </IntentLink>
                   : {l.note}
                 </li>
               ))}
@@ -185,24 +185,24 @@ export default function GuidePage() {
         <Panel>
           <PanelHeading>AGENTS.md examples to copy</PanelHeading>
           <p className={PROSE}>
-            <Link href={checkSubPath("agents_md", "examples")} className={LINK}>
+            <IntentLink href={checkSubPath("agents_md", "examples")} className={LINK}>
               All {ex.rows.length} on the leaderboard
-            </Link>
+            </IntentLink>
             , or by language and framework:
           </p>
           <ul className="mt-2 mb-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 text-[14px] text-ink-dim">
             {examplesByFramework(ex).map((f) => (
               <li key={f.guide.slug}>
-                <Link href={frameworkExamplesPath(f.guide.slug)} className={LINK}>
+                <IntentLink href={frameworkExamplesPath(f.guide.slug)} className={LINK}>
                   {f.guide.label}
-                </Link>
+                </IntentLink>
               </li>
             ))}
             {examplesByLanguage(ex).map((l) => (
               <li key={l.slug}>
-                <Link href={languageExamplesPath(l.slug)} className={LINK}>
+                <IntentLink href={languageExamplesPath(l.slug)} className={LINK}>
                   {l.label}
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>
@@ -212,9 +212,9 @@ export default function GuidePage() {
           <ul className="link-list">
             {DATA_PAGES.map((l) => (
               <li key={l.href} className="link-row">
-                <Link href={l.href} className={`${LINK} cover-link`}>
+                <IntentLink href={l.href} className={`${LINK} cover-link`}>
                   {l.label}
-                </Link>
+                </IntentLink>
                 : {l.note}
               </li>
             ))}
@@ -226,9 +226,9 @@ export default function GuidePage() {
               <PanelHeading>{e.question}</PanelHeading>
               <p className={PROSE}>
                 <CodeText text={e.answer} />{" "}
-                <Link href={e.link.href} className="prose-link">
+                <IntentLink href={e.link.href} className="prose-link">
                   {e.link.label}
-                </Link>
+                </IntentLink>
                 .
               </p>
             </Panel>
@@ -239,9 +239,9 @@ export default function GuidePage() {
       <p className="mt-5 mb-0 text-[13px] text-muted">
         Shares are of the {agentsMd.total} leaderboard repos; empty files don&apos;t count. How each agent weighs the
         checks:{" "}
-        <Link href="/methodology" className="prose-link">
+        <IntentLink href="/methodology" className="prose-link">
           methodology
-        </Link>
+        </IntentLink>
         .
       </p>
     </>

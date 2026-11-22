@@ -67,17 +67,17 @@ describe("buildRepoReport", () => {
   });
 
   it("lists shared gaps with their pass rates and skips single-agent files", () => {
-    assert.deepEqual(report.missing, [{ label: "Pre-commit / git hooks", all: 0.31, language: 0.25 }]);
+    assert.deepEqual(report.missing, [{ id: "pre_commit", all: 0.31, language: 0.25 }]);
   });
 
   it("leaves AGENTS.md to the agent instructions panel", () => {
     const without = signals.map((x) => (x.id === "agents_md" ? { ...x, pass: 0, matchedPath: undefined } : x));
     const r = buildRepoReport({ repo: board[1], summary, board, signals: without, rates });
-    assert.ok(!r.missing.some((m) => m.label.startsWith("AGENTS.md")));
+    assert.ok(!r.missing.some((m) => m.id === "agents_md"));
   });
 
   it("lists checks it passes that fewer than half of repos do", () => {
-    assert.deepEqual(report.rare, [{ label: "README", all: 0.3 }]);
+    assert.deepEqual(report.rare, [{ id: "readme", all: 0.3 }]);
   });
 
   it("names the fix that helps the most agents", () => {

@@ -82,7 +82,8 @@ describe("RepoAbout", () => {
     const html = render({ description: "<b>x</b>", topics: ["go", "cli"] }, { go: "/language/go" });
     assert.match(html, /&lt;b&gt;x&lt;\/b&gt;/);
     assert.match(html, /<a [^>]*href="\/language\/go"[^>]*>go<\/a>/);
-    assert.match(html, /<span [^>]*>cli<\/span>/);
+    assert.match(html, /<li [^>]*>cli<\/li>/);
+    assert.equal(html.match(/class="chip /g)?.length, 1);
     assert.equal(html.match(/<a /g)?.length, 1);
   });
 });

@@ -55,6 +55,13 @@ export function percentile(sorted: number[], p: number): number {
   return sorted[i];
 }
 
+/** Whole percent of the measured files shorter than `length`. */
+export function longerThan(length: number, rows: { length: number | null }[]): number {
+  const measured = rows.filter((r) => r.length != null);
+  const shorter = measured.filter((r) => (r.length as number) < length).length;
+  return measured.length === 0 ? 0 : Math.floor((shorter * 100) / measured.length);
+}
+
 const scores = (rows: { score: number | null }[]) => rows.flatMap((r) => (r.score == null ? [] : [r.score]));
 const lengths = (rows: Measured[]) => rows.map((r) => r.length);
 

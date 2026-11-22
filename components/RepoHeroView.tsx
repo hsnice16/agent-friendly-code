@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-
 import type { RepoRow } from "@/lib/types/db";
 import { compactStars, formatDate } from "@/lib/utils/format";
 import type { RepoAboutData } from "@/lib/utils/repo-about";
@@ -9,6 +7,7 @@ import { scoreTier, TIER_TEXT_CLASS } from "@/lib/utils/score";
 
 import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
+import { IntentLink } from "./IntentLink";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { Panel } from "./Panel";
 import { RepoAbout } from "./RepoAbout";
@@ -85,9 +84,9 @@ export function RepoHeroView({ repo, about, commitSha, language, topicLinks }: H
                 <dt className="inline">Language: </dt>
                 <dd className="inline font-medium text-ink">
                   {language ? (
-                    <Link href={language.href} className="tap-target font-medium ink-link">
+                    <IntentLink href={language.href} className="tap-target font-medium ink-link">
                       {language.label}
-                    </Link>
+                    </IntentLink>
                   ) : (
                     repo.language
                   )}

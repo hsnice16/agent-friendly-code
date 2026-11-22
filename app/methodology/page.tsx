@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
-import { FaqList } from "@/components/FaqList";
-import { JsonLd } from "@/components/JsonLd";
+import { FaqSection } from "@/components/FaqSection";
+import { IntentLink } from "@/components/IntentLink";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { weightsChangedText } from "@/lib/changelog";
@@ -18,20 +17,9 @@ import { METHODOLOGY_FAQ } from "./faq";
 
 export const metadata: Metadata = staticPageMetadata("/methodology");
 
-const FAQ_JSON_LD = {
-  "@type": "FAQPage",
-  mainEntity: METHODOLOGY_FAQ.map((entry) => ({
-    "@type": "Question",
-    name: entry.q,
-    acceptedAnswer: { "@type": "Answer", text: entry.a },
-  })),
-};
-
 export default function MethodologyPage() {
   return (
     <>
-      <JsonLd data={FAQ_JSON_LD} />
-
       <PageHeader
         crumbs={{ current: { name: "Methodology", path: "/methodology" } }}
         title={`How ${APP_NAME} scores repos`}
@@ -49,9 +37,9 @@ export default function MethodologyPage() {
           Scores come from <strong className="text-ink">file checks</strong>: whether a file exists, and how long it is.
           No agent is run. Each agent&apos;s weights follow <strong className="text-ink">its own docs</strong> (Sources,
           under each agent) but aren&apos;t yet measured against real runs; that is v1.0.0 on the{" "}
-          <Link href="/roadmap" className="prose-link">
+          <IntentLink href="/roadmap" className="prose-link">
             roadmap
-          </Link>
+          </IntentLink>
           . Treat scores as a guide, not a verdict.
         </p>
       </Panel>
@@ -90,10 +78,10 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
                 key={s.id}
                 className="flex flex-col gap-2 py-3 link-row sm:grid sm:grid-cols-[160px_1fr] sm:items-start sm:gap-5"
               >
-                <div>
-                  <Link href={checkPath(s.id)} className="text-[14.5px] font-medium ink-link cover-link">
+                <div className="text-[14.5px]">
+                  <IntentLink href={checkPath(s.id)} className="font-medium ink-link cover-link">
                     {s.label}
-                  </Link>
+                  </IntentLink>
                   <div className="mt-0.5 font-mono text-[11.5px] text-muted">{s.id}</div>
                 </div>
 
@@ -183,10 +171,7 @@ improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100 
       </div>
 
       <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>Questions</PanelHeading>
-          <FaqList items={METHODOLOGY_FAQ.map((e) => ({ key: e.q, q: e.q, a: <CodeText text={e.a} /> }))} />
-        </Panel>
+        <FaqSection heading="Questions" items={METHODOLOGY_FAQ} />
       </div>
     </>
   );

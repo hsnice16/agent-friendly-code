@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { IntentLink } from "@/components/IntentLink";
 import { PackageLookupForm } from "@/components/PackageLookupForm";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -51,11 +51,11 @@ export default function PackageIndexPage() {
           <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
             {EXAMPLES.map(({ registry, name }) => (
               <li key={`${registry}/${name}`}>
-                <Link href={`/package/${registry}/${name}`} className="block tile text-ink">
+                <IntentLink href={`/package/${registry}/${name}`} className="block tile text-ink">
                   <span className="font-mono text-[13px] text-muted">{registry}</span>
                   <span className="mx-1.5 text-muted">/</span>
                   <span className="font-medium">{name}</span>
-                </Link>
+                </IntentLink>
               </li>
             ))}
           </ul>
@@ -83,7 +83,7 @@ export default function PackageIndexPage() {
             <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
               {topRows.map((row) => (
                 <li key={`${row.registry}/${row.name}`}>
-                  <Link
+                  <IntentLink
                     href={`/package/${row.registry}/${encodeURIComponent(row.name)}`}
                     className="flex items-center justify-between tile text-ink"
                   >
@@ -93,7 +93,7 @@ export default function PackageIndexPage() {
                       <span className="font-medium">{row.name}</span>
                     </span>
                     <span className="ml-3 shrink-0 tabular-nums text-[13px] text-muted">{row.score.toFixed(1)}</span>
-                  </Link>
+                  </IntentLink>
                 </li>
               ))}
             </ul>

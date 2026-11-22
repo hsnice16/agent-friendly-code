@@ -55,7 +55,6 @@
   }
 }
 
-/* Dark theme — same token names, different values. */
 @media (prefers-color-scheme: dark) {
   :root {
     --color-bg: #0a0a0a;
@@ -328,6 +327,16 @@
     border-color: var(--color-line-strong);
     background-color: var(--color-surface-hover);
     translate: 0 -1px;
+  }
+}
+
+/* The ring goes on the whole target, not the few words that hold the link. */
+.tile:has(.cover-link:focus-visible) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+
+  & .cover-link:focus-visible {
+    outline: none;
   }
 }
 
@@ -803,7 +812,6 @@
   }
 }
 
-/* No focus style, deliberately: the caret marks a focused field. */
 @utility field {
   min-width: 0;
   min-height: 44px;
@@ -823,6 +831,11 @@
     &:hover:not(:disabled) {
       border-color: var(--color-line-strong);
     }
+  }
+
+  /* The global input rule drops the outline ring, so focus shows on the border. */
+  &:focus-visible:not(:disabled) {
+    border-color: var(--color-accent);
   }
 
   &:disabled {
@@ -938,6 +951,121 @@
   gap: calc(var(--spacing) * 0.5);
 }
 
+/* Per-column cell styles for the long tables, set once on the table or tbody:
+   a class string on a cell is repeated in the HTML for every row. Each rule
+   restates the utilities named beside it, declaration for declaration. */
+
+/* LeaderboardTable's rows tbody. */
+@utility board-cells {
+  & > tr {
+    position: relative;
+    cursor: pointer;
+  }
+
+  /* tabular-nums text-muted */
+  & > tr > td:nth-child(1) {
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+      var(--tw-numeric-fraction,);
+    color: var(--color-muted);
+  }
+
+  /* font-medium [overflow-wrap:anywhere] */
+  & > tr > td:nth-child(2) > .cover-link {
+    --tw-font-weight: var(--font-weight-medium);
+    font-weight: var(--font-weight-medium);
+    overflow-wrap: anywhere;
+  }
+
+  /* num-cell wide-only */
+  & > tr > td:nth-child(3) {
+    white-space: nowrap;
+    text-align: right;
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+      var(--tw-numeric-fraction,);
+    color: var(--color-ink-dim);
+  }
+
+  & > tr > td:nth-child(4) {
+    text-align: right;
+  }
+
+  /* relative inline-flex items-center gap-1 whitespace-nowrap, and an icon-out at 14px */
+  & > tr > td:nth-child(5) > a {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: calc(var(--spacing) * 1);
+    white-space: nowrap;
+  }
+
+  & > tr > td:nth-child(5) .icon-out {
+    --icon-size: 14px;
+  }
+
+  @media (width < 40rem) {
+    & > tr > td:nth-child(3),
+    & > tr > td:nth-child(5) {
+      display: none;
+    }
+  }
+}
+
+/* AgentsMdExampleTableView's table. The Language column is optional, so Score is
+   matched as the last cell. */
+@utility example-cells {
+  /* repo-cell */
+  & tbody td:nth-child(1) {
+    min-width: 7rem;
+    overflow-wrap: break-word;
+  }
+
+  /* mono-cell whitespace-nowrap */
+  & tbody td:nth-child(2) {
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    white-space: nowrap;
+  }
+
+  /* num-cell, and num-cell wide-only */
+  & tbody td:is(:nth-child(3), :nth-child(4)) {
+    white-space: nowrap;
+    text-align: right;
+    --tw-numeric-spacing: tabular-nums;
+    font-variant-numeric: var(--tw-ordinal,) var(--tw-slashed-zero,) var(--tw-numeric-figure,) var(--tw-numeric-spacing,)
+      var(--tw-numeric-fraction,);
+    color: var(--color-ink-dim);
+  }
+
+  /* whitespace-nowrap text-ink-dim wide-only */
+  & tbody td:nth-child(5):not(:last-child) {
+    white-space: nowrap;
+    color: var(--color-ink-dim);
+  }
+
+  /* text-right wide-only */
+  & tbody td:last-child {
+    text-align: right;
+  }
+
+  @media (width >= 40rem) {
+    & tbody td:nth-child(1) {
+      min-width: 9rem;
+    }
+  }
+
+  /* The length cell's " chars" too. */
+  @media (width < 40rem) {
+    & tbody td:nth-child(3) > span,
+    & tbody td:nth-child(4),
+    & tbody td:nth-child(5),
+    & tbody td:last-child {
+      display: none;
+    }
+  }
+}
+
 /* Board rows (LeaderboardTable). The rank box is one size with or without a medal, so numbers align. */
 @utility rank-box {
   display: inline-flex;
@@ -1000,6 +1128,16 @@
   line-height: 1.5;
 }
 
+/* HostPill's colours and spacing, on every board row beside `chip eyebrow`. */
+@utility host-pill {
+  margin-left: calc(var(--spacing) * 2);
+  border-color: var(--color-line);
+  background-color: var(--color-surface-2);
+  /* `middle` centres on the x-height, an uppercase chip ~2px below the repo name. */
+  vertical-align: 0.1em;
+  color: var(--color-muted);
+}
+
 /* A 44px hit area on touch-sized screens without growing the element. In a
    wrapped list, the caller's row gap must leave room, or neighbours overlap. */
 @utility tap-target {
@@ -1018,7 +1156,6 @@
   }
 }
 
-/* Let UA surfaces (scrollbars, form controls, autofill) adapt to user pref. */
 :root {
   color-scheme: light dark;
 }

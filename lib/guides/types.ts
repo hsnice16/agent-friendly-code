@@ -14,6 +14,8 @@ export type GuideSection = {
   /** Phrased as the question a searcher types, like the /check panel headings. */
   heading: string;
   tone?: "tip" | "info" | "warn";
+  /** Its ordered list becomes the page's HowTo steps. */
+  howTo?: boolean;
   blocks: GuideBlock[];
 };
 
@@ -34,4 +36,6 @@ export type Guide = {
   /** Official docs behind the facts above; never blogs. */
   sources: string[];
   related: { href: string; label: string }[];
+  /** Links each language's AGENTS.md examples page, for a guide whose advice turns on the stack. */
+  languageExamples?: boolean;
 };

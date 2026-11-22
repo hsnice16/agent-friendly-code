@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { IntentLink } from "./IntentLink";
 
 export type SizeGroupRow = { label: string; href?: string; count: number; value: string };
 
@@ -33,9 +33,9 @@ export function SizeGroupTable({
             <tr key={r.label}>
               <th scope="row" className="font-normal text-ink">
                 {r.href ? (
-                  <Link href={r.href} className="ink-link cover-link">
+                  <IntentLink href={r.href} className="ink-link cover-link">
                     {r.label}
-                  </Link>
+                  </IntentLink>
                 ) : (
                   r.label
                 )}

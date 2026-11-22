@@ -1,10 +1,9 @@
-import Link from "next/link";
-
 import type { PairStats, WeightGap } from "@/lib/agent-scores";
 import type { ModelProfile } from "@/lib/scoring/weights";
 import { checkPath } from "@/lib/utils/check-path";
 import { languageAgentsPath } from "@/lib/utils/language";
 
+import { IntentLink } from "./IntentLink";
 import { LINK } from "./link-class";
 
 type Pair = { a: ModelProfile; b: ModelProfile };
@@ -34,9 +33,9 @@ export function WeightGapTable({ a, b, gaps }: Pair & { gaps: WeightGap[] }) {
           {gaps.map((g) => (
             <tr key={g.id}>
               <th scope="row" className="font-medium">
-                <Link href={checkPath(g.id)} className={`${LINK} cover-link`}>
+                <IntentLink href={checkPath(g.id)} className={`${LINK} cover-link`}>
                   {g.label}
-                </Link>
+                </IntentLink>
               </th>
               <td className="text-right tabular-nums">{pct(g.shareA)}</td>
               <td className="text-right tabular-nums">{pct(g.shareB)}</td>
@@ -76,9 +75,9 @@ export function LanguageLeadTable({ a, b, languages }: Pair & { languages: PairS
           {languages.map((l) => (
             <tr key={l.slug}>
               <th scope="row" className="font-medium">
-                <Link href={languageAgentsPath(l.slug)} className={`${LINK} cover-link`}>
+                <IntentLink href={languageAgentsPath(l.slug)} className={`${LINK} cover-link`}>
                   {l.label}
-                </Link>
+                </IntentLink>
               </th>
               <td className="text-right tabular-nums">{l.n}</td>
               <td className={`text-right tabular-nums ${l.avgA >= l.avgB ? LEAD : ""}`}>{l.avgA.toFixed(1)}</td>

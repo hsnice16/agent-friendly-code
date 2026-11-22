@@ -1,6 +1,6 @@
 // Seeds rot silently: repos get archived, renamed, turned into forks, or replaced
-// by a mirror of somewhere else. None of that errors during scoring — the score
-// just quietly describes the wrong thing. This is the check that catches it.
+// by a mirror. None of that errors during scoring; the score just describes the
+// wrong thing.
 
 import { writeFileSync } from "node:fs";
 

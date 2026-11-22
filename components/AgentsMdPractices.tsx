@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 import { AGENTS_MD_PRACTICES, AGENTS_MD_TEMPLATE } from "@/lib/check-content/agents-md-guide";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
 import { checkSubPath } from "@/lib/utils/check-path";
@@ -9,6 +7,7 @@ import { REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-
 import { CodeText } from "./CodeText";
 import { CopySnippet } from "./CopySnippet";
 import { ExternalLink } from "./ExternalLink";
+import { IntentLink } from "./IntentLink";
 import { LINK } from "./link-class";
 import { Panel, PanelHeading } from "./Panel";
 
@@ -36,9 +35,9 @@ export function AgentsMdPractices() {
               {p.link && (
                 <>
                   {" "}
-                  <Link href={p.link.href} className="prose-link">
+                  <IntentLink href={p.link.href} className="prose-link">
                     {p.link.label}
-                  </Link>
+                  </IntentLink>
                   .
                 </>
               )}
@@ -72,9 +71,9 @@ export function AgentsMdPractices() {
           <ul className="link-list">
             {MORE.map((l) => (
               <li key={l.href} className="link-row">
-                <Link href={l.href} className={`${LINK} cover-link`}>
+                <IntentLink href={l.href} className={`${LINK} cover-link`}>
                   {l.label}
-                </Link>
+                </IntentLink>
                 : {l.note}
               </li>
             ))}

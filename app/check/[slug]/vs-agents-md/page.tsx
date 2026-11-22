@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 
 import { CodeText } from "@/components/CodeText";
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
@@ -14,13 +14,14 @@ import { agentsReading, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getCheckStats } from "@/lib/check-stats";
-import { getLeaderboardStats } from "@/lib/db";
+import { CENSUS } from "@/lib/file-census";
 import { getInstructionFileCounts, reposWithBoth } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
+import { boardModified } from "@/lib/page-dates";
 import { MODELS } from "@/lib/scoring/weights";
 import { agentList } from "@/lib/utils/agent-list";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
-import { percent } from "@/lib/utils/format";
+import { formatDay, percent } from "@/lib/utils/format";
 import { pageTitle } from "@/lib/utils/page-title";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -30,6 +31,15 @@ const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const COLS = "sm:grid-cols-[minmax(7rem,0.8fr)_1fr_1fr] sm:gap-x-4";
 // Each cell's column name: shown when the row stacks, kept for screen readers once the header row shows.
 const CELL_LABEL = "font-medium text-muted sm:sr-only";
+
+// The census records root symlinks and GEMINI.md paths, but no Cursor rule paths.
+function rootLinksToAgentsMd(file: string): { count: number; of: number; date: string } | null {
+  if (file !== "GEMINI.md") return null;
+  const withRoot = CENSUS.repos.filter((r) => !r.error && r.geminiMd.some((p) => p.toLowerCase() === "gemini.md"));
+  if (withRoot.length === 0) return null;
+  const count = withRoot.filter((r) => /agents\.md$/i.test(r.rootLinks[file] ?? "")).length;
+  return { count, of: withRoot.length, date: CENSUS.generatedAt.slice(0, 10) };
+}
 
 export const dynamicParams = false;
 
@@ -65,7 +75,8 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
   const path = checkSubPath(id, "vs-agents-md");
   const stats = getCheckStats(id);
   const both = reposWithBoth(id);
-  const { contentChangedAt } = getLeaderboardStats();
+  const modified = boardModified();
+  const linked = rootLinksToAgentsMd(c.file);
   const files = getInstructionFileCounts();
   const agentsMdRepos = files.files.find((f) => f.file === "AGENTS.md")?.count ?? 0;
   const readers = agentsReading(c.file);
@@ -82,9 +93,9 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
       agentsMd: (
         <>
           {agentsUsingAgentsMd("always").length} of {MODELS.length};{" "}
-          <Link href="/agents" className="prose-link">
+          <IntentLink href="/agents" className="prose-link">
             which ones
-          </Link>
+          </IntentLink>
         </>
       ),
     },
@@ -105,7 +116,7 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
           ],
           citation: c.sources,
           datePublished: "2026-11-04",
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          ...(modified ? { dateModified: modified } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
@@ -114,6 +125,7 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
         crumbs={{ parents: [CHECKS_CRUMB, checkCrumb(id)], current: { name: `${c.name} vs AGENTS.md`, path } }}
         title={c.title}
         lead={<CodeText text={c.answer} />}
+        updated={modified}
       />
 
       <Panel>
@@ -142,6 +154,13 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
         <p className={`${PROSE} mt-3 text-[13px]`}>
           {both} of the {stats.present} repos with {c.name} also have an AGENTS.md or CLAUDE.md. Empty files don&apos;t
           count.
+          {linked && (
+            <>
+              {" "}
+              On {formatDay(linked.date)}, {linked.count} of the {linked.of} GitHub repos with a root {c.file} made it a
+              symlink to an AGENTS.md.
+            </>
+          )}
         </p>
       </Panel>
 
@@ -178,17 +197,17 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
         ))}
       </p>
       <p className="mt-2 mb-0 text-[13px] text-muted">
-        <Link href={checkPath(id)} className={LINK}>
+        <IntentLink href={checkPath(id)} className={LINK}>
           How we score {c.name}
-        </Link>
+        </IntentLink>
         {" · "}
-        <Link href={checkSubPath("agents_md", "vs-claude-md")} className={LINK}>
+        <IntentLink href={checkSubPath("agents_md", "vs-claude-md")} className={LINK}>
           AGENTS.md vs CLAUDE.md
-        </Link>
+        </IntentLink>
         {" · "}
-        <Link href="/guide" className={LINK}>
+        <IntentLink href="/guide" className={LINK}>
           Make a repo agent-ready
-        </Link>
+        </IntentLink>
       </p>
     </>
   );

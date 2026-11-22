@@ -10,8 +10,10 @@ import { COMPARE_PAIRS } from "@/lib/compare-pairs";
 import { PRIVACY_UPDATED, TERMS_UPDATED } from "@/lib/constants/legal";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { GUIDES } from "@/lib/guides";
+import { guideModified } from "@/lib/guides/modified";
 import { getLanguageGroups } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { frameworkModified, rowsModified } from "@/lib/page-dates";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
@@ -25,15 +27,18 @@ import { guidePath } from "@/lib/utils/guide-path";
 import { hubPath, isHub, languageAgentsPath, OTHER_LANGUAGES_PATH, otherLanguageGroups } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
-import { AI_POLICY_REPORT_PATH, REPORT_PATH, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
+import { AI_POLICY_REPORT_PATH, REPORT_PATH, SIZE_REPORT_PATH, SKILLS_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_URL } from "@/lib/version";
 
-// The framework pages' guide text changes with no row moving; bump this when it does.
-const FRAMEWORK_GUIDES_UPDATED = new Date("2026-11-16");
+// Hand-written pages with no data behind them; bump one when its copy changes.
+const ACTION_UPDATED = new Date("2026-11-16");
+const SKILL_UPDATED = new Date("2026-11-18");
+const ABOUT_UPDATED = new Date("2026-11-16");
+const ROADMAP_UPDATED = new Date("2026-11-16");
 
 function newest(rows: { content_changed_at: number | null }[]): Date | undefined {
-  const changed = Math.max(0, ...rows.map((r) => r.content_changed_at ?? 0));
-  return changed > 0 ? new Date(changed * 1000) : undefined;
+  const changed = rowsModified(rows);
+  return changed ? new Date(changed) : undefined;
 }
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -70,11 +75,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       priority: 0.8,
       url: `${APP_URL}/action`,
+      lastModified: ACTION_UPDATED,
       changeFrequency: "monthly",
     },
     {
       priority: 0.8,
       url: `${APP_URL}/skill`,
+      lastModified: SKILL_UPDATED,
       changeFrequency: "monthly",
     },
     {
@@ -98,6 +105,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     {
       priority: 0.5,
       url: `${APP_URL}/about`,
+      lastModified: ABOUT_UPDATED,
       changeFrequency: "monthly",
     },
     {
@@ -116,6 +124,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.6,
       changeFrequency: "weekly",
       url: `${APP_URL}/roadmap`,
+      lastModified: ROADMAP_UPDATED,
     },
     {
       priority: 0.6,
@@ -215,7 +224,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...examplesByLanguage(examples).map((l) => ({ url: languageExamplesPath(l.slug), lastModified: newest(l.rows) })),
     ...examplesByFramework(examples).map((f) => ({
       url: frameworkExamplesPath(f.guide.slug),
-      lastModified: new Date(Math.max(newest(f.rows)?.getTime() ?? 0, FRAMEWORK_GUIDES_UPDATED.getTime())),
+      lastModified: new Date(frameworkModified(f)),
     })),
   ].map((e) => ({
     priority: 0.7,
@@ -235,12 +244,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
     changeFrequency: "weekly",
     url: `${APP_URL}${guidePath(g.slug)}`,
-    lastModified: new Date(Math.max(new Date(g.updated).getTime(), contentChanged?.getTime() ?? 0)),
+    // Same date the page shows and puts in its JSON-LD.
+    lastModified: new Date(guideModified(g)),
   }));
 
   // Every one of these is built from the board, so it moves when the board does.
   const boardPages: { path: string; priority: number }[] = [
     { path: SIZE_REPORT_PATH, priority: 0.7 },
+    { path: SKILLS_REPORT_PATH, priority: 0.7 },
     { path: CONTRIBUTE_PATH, priority: 0.7 },
     { path: COMPARE_PATH, priority: 0.6 },
     ...COMPARE_PAIRS.map((p) => ({ path: comparePath(p.slug), priority: 0.6 })),

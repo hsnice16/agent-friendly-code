@@ -1,33 +1,41 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
+import { FaqSection } from "@/components/FaqSection";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { AGENT_READS, type AgentsMdUse, agentsUsingAgentsMd } from "@/lib/agent-reads";
+import { type ReadsRow, ReadsTableView, type SetupCard, SetupsView } from "@/components/VsClaudeMdViews";
+import { AGENT_READS, type AgentsMdUse, OTHER_TOOLS } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
+import { setupExamples } from "@/lib/check-breakdowns";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
-import { getLeaderboardStats } from "@/lib/db";
+import { CHECK_SNIPPET, SETUPS, VS_CLAUDE_MD_FAQ, VS_CLAUDE_MD_SOURCES } from "@/lib/check-content/vs-claude-md";
+import { listLeaderboardOverall } from "@/lib/db";
+import { CENSUS_SUMMARY as C } from "@/lib/file-census";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
+import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
+import { boardModified } from "@/lib/page-dates";
 import { AGENTS_VS_CLAUDE_MD } from "@/lib/page-meta";
 import { MODELS } from "@/lib/scoring/weights";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
-import { percent } from "@/lib/utils/format";
+import { formatDay, percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
+import { repoPath } from "@/lib/utils/repo-path";
 import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const SIGNAL_ID = "agents_md";
 const PATH = checkSubPath(SIGNAL_ID, "vs-claude-md");
-const CLAUDE_DOCS = "https://code.claude.com/docs/en/memory#agents-md";
+const EXAMPLES_PER_SETUP = 3;
 
 const { title: TITLE, description: DESCRIPTION } = AGENTS_VS_CLAUDE_MD;
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const CODE = "font-mono text-[13px] text-ink";
 
 const AGENTS_MD_CELL: Record<AgentsMdUse, string> = {
   always: "Yes",
@@ -69,10 +77,36 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
     notFound();
   }
 
-  const { contentChangedAt } = getLeaderboardStats();
+  const modified = boardModified();
   const counts = getInstructionFileCounts();
   const countOf = (file: string) => counts.files.find((f) => f.file === file)?.count ?? 0;
-  const agentsMdReaders = agentsUsingAgentsMd("always");
+  const agentsMd = countOf("AGENTS.md");
+  const claudeOnly = countOf("CLAUDE.md");
+  const examples = setupExamples(listLeaderboardOverall(), EXAMPLES_PER_SETUP);
+  const setupCount = { import: C.claudeImportsAgents, symlink: C.rootBothLinked, separate: C.twoUnlinkedFiles };
+  const rows: ReadsRow[] = [
+    ...MODELS.map((m) => ({
+      key: m.id,
+      label: m.label,
+      href: modelPath(m.id),
+      agentsMd: AGENTS_MD_CELL[AGENT_READS[m.id].agentsMd],
+      claudeMd: AGENT_READS[m.id].claudeMd,
+    })),
+    ...OTHER_TOOLS.map((t) => ({
+      key: t.name,
+      label: t.name,
+      agentsMd: t.agentsMd,
+      claudeMd: t.files.includes("CLAUDE.md"),
+    })),
+  ];
+  const setups: SetupCard[] = SETUPS.map((st) => ({
+    ...st,
+    count: setupCount[st.id],
+    examples: examples[st.id].map((full) => {
+      const [owner, name] = full.split("/");
+      return { label: full, href: repoPath({ host: "github", owner, name }) };
+    }),
+  }));
 
   return (
     <>
@@ -87,8 +121,9 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
             { "@type": "Thing", name: "AGENTS.md" },
             { "@type": "Thing", name: "CLAUDE.md" },
           ],
+          citation: VS_CLAUDE_MD_SOURCES,
           datePublished: "2026-10-21",
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          ...(modified ? { dateModified: modified } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
@@ -100,54 +135,25 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
         }}
         title={TITLE}
         lead={
-          <>
-            Use AGENTS.md: {agentsMdReaders.length} of the {MODELS.length} agents we score read it, and Claude Code
-            falls back to it. If you also need a CLAUDE.md, start it with <code className={CODE}>@AGENTS.md</code>, or
-            Claude Code skips AGENTS.md.
-          </>
+          <CodeText
+            text={`Use AGENTS.md, and if anyone uses Claude Code, add a CLAUDE.md that imports it with \`@AGENTS.md\`: Claude Code reads AGENTS.md only when there is no CLAUDE.md. ${agentsMd} of ${counts.total} popular repos (${percent(agentsMd, counts.total)}) have an AGENTS.md; ${claudeOnly} have only a CLAUDE.md.`}
+          />
         }
+        updated={modified}
       >
         <p className={`mt-2.5 ${PAGE_LEAD}`}>
-          Both hold the same content. AGENTS.md is the shared name; CLAUDE.md is Claude Code&apos;s.
+          Both are plain Markdown with the same content. AGENTS.md is the open format most agents read; CLAUDE.md is
+          Claude Code&apos;s name for it.
         </p>
       </PageHeader>
 
       <Panel>
         <PanelHeading>Which agents read AGENTS.md and which read CLAUDE.md?</PanelHeading>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
-        <section className="table-wrap" tabIndex={0} aria-label="Agents and the files they read">
-          <table className="data-table text-[14px]">
-            <caption className="sr-only">Whether each AI coding agent reads AGENTS.md and CLAUDE.md</caption>
-            <thead>
-              <tr>
-                <th scope="col">Agent</th>
-                <th scope="col">
-                  <span className="normal-case">AGENTS.md</span>
-                </th>
-                <th scope="col">
-                  <span className="normal-case">CLAUDE.md</span>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="text-ink-dim">
-              {MODELS.map((m) => (
-                <tr key={m.id}>
-                  <th scope="row" className="font-medium">
-                    <Link href={modelPath(m.id)} className={`${LINK} cover-link`}>
-                      {m.label}
-                    </Link>
-                  </th>
-                  <td>{AGENTS_MD_CELL[AGENT_READS[m.id].agentsMd]}</td>
-                  <td>{AGENT_READS[m.id].claudeMd ? "Yes" : "No"}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </section>
+        <ReadsTableView rows={rows} />
         <p className={`${PROSE} mt-3 text-[13px]`}>
-          <Link href="/agents" className={LINK}>
+          <IntentLink href="/agents" className={LINK}>
             Every file each agent reads
-          </Link>
+          </IntentLink>
           , with links to their docs.
         </p>
       </Panel>
@@ -164,52 +170,68 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
             ))}
           </ul>
           <p className={`${PROSE} mt-3 text-[13px]`}>
-            Needs Claude Code v2.1.277 or later. A <code className={CODE}>.claude/CLAUDE.md</code> or CLAUDE.local.md
-            counts as a CLAUDE.md.{" "}
-            <ExternalLink href={CLAUDE_DOCS} title={CLAUDE_DOCS}>
-              Claude Code&apos;s docs
-            </ExternalLink>{" "}
-            also cover a setting that loads both.
+            <CodeText text="Needs Claude Code v2.1.277 or later. A `.claude/CLAUDE.md` or CLAUDE.local.md counts as a CLAUDE.md. Run `/memory` to see what loaded." />
           </p>
         </Panel>
       </div>
 
       <div className="mt-3.5">
         <Panel>
-          <PanelHeading>How many repos use AGENTS.md and how many use CLAUDE.md?</PanelHeading>
+          <PanelHeading>How do I keep one file for both?</PanelHeading>
+          <SetupsView setups={setups} check={CHECK_SNIPPET} />
+        </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <Panel>
+          <PanelHeading>What do popular repos do?</PanelHeading>
           <p className={PROSE}>
-            Of {counts.total} leaderboard repos,{" "}
+            On {formatDay(C.date)} we read the whole file tree of {C.repos} GitHub repos on our board.{" "}
             <strong className="text-ink">
-              {countOf("AGENTS.md")} have an AGENTS.md ({percent(countOf("AGENTS.md"), counts.total)})
-            </strong>{" "}
-            and {countOf("CLAUDE.md")} only a CLAUDE.md ({percent(countOf("CLAUDE.md"), counts.total)}). Empty files
-            don&apos;t count.
+              {C.rootAgentsMdOnly} had only a root AGENTS.md, {C.rootClaudeMdOnly} only a root CLAUDE.md, and{" "}
+              {C.rootBoth} both
+            </strong>
+            : {C.claudeImportsAgents} import AGENTS.md from CLAUDE.md, {C.rootBothLinked} use a symlink and{" "}
+            {C.twoUnlinkedFiles} keep two separate files.
           </p>
           <p className={`${PROSE} mt-3`}>
             Our{" "}
-            <Link href={checkPath(SIGNAL_ID)} className="prose-link">
+            <IntentLink href={checkPath(SIGNAL_ID)} className="prose-link">
               AGENTS.md check
-            </Link>{" "}
+            </IntentLink>{" "}
             passes either name; the choice only changes which agents find it.{" "}
-            <Link href={checkSubPath(SIGNAL_ID, "examples")} className="prose-link">
+            <IntentLink href={checkSubPath(SIGNAL_ID, "examples")} className="prose-link">
               Read both kinds
-            </Link>{" "}
-            in popular repos.
-          </p>
-          <p className={`${PROSE} mt-3`}>
-            For other agents:{" "}
+            </IntentLink>{" "}
+            in popular repos. For other agents:{" "}
             {Object.entries(VS_AGENTS_MD).map(([id, c], i) => (
               <span key={id}>
                 {i > 0 && ", "}
-                <Link href={checkSubPath(id, "vs-agents-md")} className={LINK}>
+                <IntentLink href={checkSubPath(id, "vs-agents-md")} className={LINK}>
                   {c.name} vs AGENTS.md
-                </Link>
+                </IntentLink>
               </span>
             ))}
             .
           </p>
         </Panel>
       </div>
+
+      <div className="mt-3.5">
+        <FaqSection heading="Questions people ask" items={VS_CLAUDE_MD_FAQ} />
+      </div>
+
+      <p className="mt-5 mb-0 text-[13px] text-muted">
+        From the docs:{" "}
+        {distinctSourceLabels(VS_CLAUDE_MD_SOURCES).map((label, i) => (
+          <span key={VS_CLAUDE_MD_SOURCES[i]}>
+            {i > 0 && " · "}
+            <ExternalLink href={VS_CLAUDE_MD_SOURCES[i]} title={VS_CLAUDE_MD_SOURCES[i]}>
+              {label}
+            </ExternalLink>
+          </span>
+        ))}
+      </p>
     </>
   );
 }

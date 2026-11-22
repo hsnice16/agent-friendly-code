@@ -204,10 +204,10 @@ export function topicTitle(label: string, max = MAX_TITLE_LENGTH): string {
   return options.find((t) => t.length <= max) ?? `${label.slice(0, max - " repos".length - 1).trimEnd()}… repos`;
 }
 
-export function topicDescription(t: { label: string; count: number; average: number; top: string; topScore: number }) {
+export function topicDescription(t: { label: string; count: number; average: number; leader?: string }) {
   return fitDescription(
     `${t.count} ${t.label} repos ranked by how ready they are for AI coding agents like Claude Code and Cursor.`,
     `Average score ${t.average.toFixed(1)}.`,
-    `${t.top} leads with ${t.topScore.toFixed(1)}.`,
+    ...(t.leader ? [t.leader] : []),
   );
 }

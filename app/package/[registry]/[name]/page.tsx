@@ -1,10 +1,10 @@
 import { ArrowRight, ArrowUpRight } from "@phosphor-icons/react/dist/ssr";
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
 import { HostPill } from "@/components/HostPill";
+import { IntentLink } from "@/components/IntentLink";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { isRegistry } from "@/lib/clients/registries";
@@ -93,12 +93,12 @@ export default async function Page({ params }: { params: Promise<{ registry: str
                   <HostPill host={result.repo.host} />
                 </div>
 
-                <Link
+                <IntentLink
                   href={repoPath(result.repo)}
                   className="tap-target mt-2 inline-flex items-center gap-1 text-sm dim-link"
                 >
                   See the full score <ArrowRight size={14} weight="bold" aria-hidden="true" />
-                </Link>
+                </IntentLink>
               </div>
 
               <ScoreNumber score={result.repo.overall_score ?? 0} size="xl" />

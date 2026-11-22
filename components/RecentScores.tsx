@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 
 import { type RecentScore, readRecents } from "@/lib/live-score/recents";
 import { liveScorePath, repoPath } from "@/lib/utils/repo-path";
 
 import { HostPill } from "./HostPill";
+import { IntentLink } from "./IntentLink";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { Panel, PanelHeading } from "./Panel";
 import { ScoreNumber } from "./ScoreNumber";
@@ -31,9 +31,9 @@ function ScoreList({ rows }: { rows: Row[] }) {
       {rows.map((row) => (
         <li key={`${row.host}/${row.owner}/${row.name}`} className="flex items-center justify-between gap-3 link-row">
           <span className="min-w-0 text-[14.5px] [overflow-wrap:anywhere]">
-            <Link href={hrefFor(row)} className="ink-link cover-link">
+            <IntentLink href={hrefFor(row)} className="ink-link cover-link">
               {row.owner}/{row.name}
-            </Link>
+            </IntentLink>
             <OwnRepoTag repo={row} />
             <HostPill host={row.host} />
           </span>

@@ -44,7 +44,7 @@ For each category below, decide **yes / no / N/A**, then act on the yeses:
   - Specifics:
     - Stack changes (Next.js / React / Tailwind / DB driver) → update **Stack**.
     - New top-level folder or `lib/` area → update the **Layout** tree (it lists directories, not every file).
-    - New page in `app/` → reachable from the nav, footer or a parent page, and in `app/sitemap.ts` unless noindex.
+    - New page in `app/` → reachable from the nav, footer or a parent page, and covered as AGENTS.md → Adding a page says unless noindex.
     - New signal / model / host → ensure the matching "Adding a …" section in `AGENTS.md` is still accurate.
     - New convention or constraint → add a bullet under **Conventions**.
 - **`README.md`**

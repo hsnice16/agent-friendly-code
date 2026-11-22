@@ -1,12 +1,8 @@
 import { SIGNAL_BY_ID } from "@/lib/scoring/signals";
 
-export function checkSlug(signalId: string): string {
-  return signalId.replace(/_/g, "-");
-}
+import { type CheckSubPage, checkPath, checkSlug, checkSubPath } from "./check-slug";
 
-export function checkPath(signalId: string): string {
-  return `/check/${checkSlug(signalId)}`;
-}
+export { type CheckSubPage, checkPath, checkSlug, checkSubPath };
 
 export function signalIdFromSlug(slug: string): string | null {
   const id = slug.replace(/-/g, "_");
@@ -25,12 +21,6 @@ const CRUMB_LABEL: Record<string, string> = {
 
 export function checkCrumb(signalId: string): { name: string; path: string } {
   return { name: CRUMB_LABEL[signalId] ?? SIGNAL_BY_ID[signalId].label, path: checkPath(signalId) };
-}
-
-export type CheckSubPage = "examples" | "vs-claude-md" | "vs-agents-md";
-
-export function checkSubPath(signalId: string, page: CheckSubPage): string {
-  return `${checkPath(signalId)}/${page}`;
 }
 
 export function languageExamplesPath(languageSlug: string): string {

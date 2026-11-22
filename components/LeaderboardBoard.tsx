@@ -11,7 +11,14 @@ const AGENTS = [{ id: "overall" as const, label: "Overall" }, ...MODELS.map((m) 
 
 const DATE = new Intl.DateTimeFormat("en", { month: "short", day: "numeric", timeZone: "UTC" });
 
-export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats: LeaderboardStats }) {
+type Props = {
+  view: LeaderboardView;
+  stats: LeaderboardStats;
+  /** Off where the page shows the rationale elsewhere, or not at all. */
+  rationale?: boolean;
+};
+
+export function LeaderboardBoard({ view, stats, rationale: showRationale = true }: Props) {
   const { page, totalPages, model } = view;
   const { startIdx, rows } = boardPage(view);
 
@@ -26,9 +33,11 @@ export function LeaderboardBoard({ view, stats }: { view: LeaderboardView; stats
         agents={AGENTS}
         activeLabel={activeLabel}
         intro={
-          <div className="mx-0.5 mb-5 -mt-0.5 max-w-[80ch] text-[13px] leading-[1.55] text-muted">
-            <strong className="text-ink-dim">{activeLabel}</strong> — <CodeText text={rationale} />
-          </div>
+          showRationale && (
+            <div className="mx-0.5 mb-5 -mt-0.5 max-w-[80ch] text-[13px] leading-[1.55] text-muted">
+              <strong className="text-ink-dim">{activeLabel}</strong> — <CodeText text={rationale} />
+            </div>
+          )
         }
         server={{ page, totalPages, startIdx, rows: rows.map(toBoardRow) }}
         summary={

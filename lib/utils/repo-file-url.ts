@@ -24,3 +24,15 @@ export function repoFileUrl(repo: RepoLocation, path: string, directory = false)
   if (repo.host === "bitbucket") return `${base}/src/${ref}`;
   return `${base}/${directory ? "tree" : "blob"}/${ref}`;
 }
+
+/** The file's raw bytes, for a `curl` that copies it; null without a default branch. */
+export function repoRawFileUrl(repo: RepoLocation, path: string): string | null {
+  if (!repo.default_branch) return null;
+
+  const ref = `${segments(repo.default_branch)}/${segments(path)}`;
+  const base = repo.url.replace(/\/+$/, "");
+  if (repo.host === "gitlab") return `${base}/-/raw/${ref}`;
+  if (repo.host === "bitbucket") return `${base}/raw/${ref}`;
+  const gh = base.match(/^https:\/\/github\.com\/(.+)$/);
+  return gh ? `https://raw.githubusercontent.com/${gh[1]}/${ref}` : null;
+}

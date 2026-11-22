@@ -6,7 +6,6 @@ import { BoardPendingScript } from "@/components/BoardPendingScript";
 import { Clarity } from "@/components/Clarity";
 import { ConsentBanner } from "@/components/ConsentBanner";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
-import { JsonLd } from "@/components/JsonLd";
 import { SiteFooter } from "@/components/SiteFooter";
 import { SiteHeader } from "@/components/SiteHeader";
 import { ANALYTICS_ON } from "@/lib/analytics-consent";
@@ -48,40 +47,6 @@ export const metadata: Metadata = {
   },
 };
 
-const JSON_LD = {
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": `${APP_URL}/#org`,
-      url: APP_URL,
-      name: APP_NAME,
-      sameAs: [REPO_URL],
-      logo: `${APP_URL}/icon.svg`,
-    },
-    {
-      "@type": "WebSite",
-      "@id": `${APP_URL}/#site`,
-      url: APP_URL,
-      name: APP_NAME,
-      description: APP_DESCRIPTION,
-      publisher: { "@id": `${APP_URL}/#org` },
-    },
-    {
-      "@type": "WebApplication",
-      "@id": `${APP_URL}/#app`,
-      url: APP_URL,
-      name: APP_NAME,
-      operatingSystem: "Any",
-      isAccessibleForFree: true,
-      description: APP_DESCRIPTION,
-      publisher: { "@id": `${APP_URL}/#org` },
-      applicationCategory: "DeveloperApplication",
-      offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
-      browserRequirements: "Requires JavaScript-enabled modern browser",
-    },
-  ],
-};
-
 export const viewport: Viewport = {
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#ffffff" },
@@ -108,9 +73,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth">
       <head>
         <BoardPendingScript />
+        {/* Not metadata.alternates: a page's own `alternates.canonical` replaces the whole object. */}
+        <link rel="alternate" type="application/atom+xml" title={`${APP_NAME} changelog`} href="/changelog.xml" />
       </head>
       <body>
-        <JsonLd data={JSON_LD} />
         <GoogleAnalytics />
         {process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID && <Clarity />}
         {ANALYTICS_ON && <ConsentBanner />}

@@ -20,10 +20,9 @@ export function PerModelScores({ modelScores, signals, ranks }: Props) {
     .sort((a, b) => (b.score ?? -1) - (a.score ?? -1))
     .map(({ model: m, score }) => ({
       id: m.id,
-      label: m.label,
       score,
       ...(ranks?.[m.id] ? { rank: ranks[m.id] } : {}),
-      checks: keySignals(m, signals).map((s) => ({ id: s.id, label: s.label, pass: s.pass })),
+      checks: keySignals(m, signals).map((s) => ({ id: s.id, pass: s.pass })),
     }));
 
   return <PerModelScoresView rows={rows} />;

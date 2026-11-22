@@ -53,7 +53,8 @@ const ALLOW = ["/", "/api/repos"];
 // Crawl heavily for no visitors: Petal Search (Huawei) and an SEO tool's index.
 const BLOCKED = ["PetalBot", "SemrushBot"];
 
-const BULK_DISALLOW = [...DISALLOW, "/repo/", "/topic/"];
+// A crawler that isn't rendering a link preview has no use for the cards.
+const BULK_DISALLOW = [...DISALLOW, "/repo/", "/topic/", "/og/"];
 
 export default function robots(): MetadataRoute.Robots {
   return {

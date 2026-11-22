@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { AiPolicyTable, StanceChip } from "@/components/AiPolicyTable";
+import { CiteThis } from "@/components/CiteThis";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -24,24 +25,26 @@ import { checkPath } from "@/lib/utils/check-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { GUIDE_PATH } from "@/lib/utils/guide-path";
+import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "@/lib/utils/report-path";
-import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export function generateMetadata(): Metadata {
   const title = aiPolicyTitle();
   const description = aiPolicyDescription();
+  const image = ogImage(AI_POLICY_REPORT_PATH, title);
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: AI_POLICY_REPORT_PATH },
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
     openGraph: {
       ...OG_DEFAULTS,
-      images: [DEFAULT_OG_IMAGE],
+      images: [image],
       title,
       description,
       url: AI_POLICY_REPORT_PATH,
@@ -76,6 +79,7 @@ export default function AiPolicyReportPage() {
             with no policy here may still have one somewhere we didn&apos;t look.
           </>
         }
+        updated={checked}
       />
 
       <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2 lg:grid-cols-4">
@@ -165,17 +169,17 @@ export default function AiPolicyReportPage() {
           </ol>
           <p className={`${PROSE} mt-3`}>
             See also:{" "}
-            <Link href={CONTRIBUTE_PATH} className="prose-link">
+            <IntentLink href={CONTRIBUTE_PATH} className="prose-link">
               projects easy for an agent to work in
-            </Link>
+            </IntentLink>
             ,{" "}
-            <Link href={GUIDE_PATH} className="prose-link">
+            <IntentLink href={GUIDE_PATH} className="prose-link">
               how to set an agent up
-            </Link>{" "}
+            </IntentLink>{" "}
             and{" "}
-            <Link href={checkPath("contributing")} className="prose-link">
+            <IntentLink href={checkPath("contributing")} className="prose-link">
               what a CONTRIBUTING guide covers
-            </Link>
+            </IntentLink>
             .
           </p>
         </Panel>
@@ -187,9 +191,9 @@ export default function AiPolicyReportPage() {
           <ul className="m-0 ml-5 flex list-disc flex-col gap-1.5 text-[14.5px] leading-relaxed text-ink-dim">
             {namedProjects().map((n) => (
               <li key={n.label}>
-                <Link href={repoPath(n)} className="prose-link">
+                <IntentLink href={repoPath(n)} className="prose-link">
                   {n.label}
-                </Link>
+                </IntentLink>
                 {n.policy ? (
                   <>
                     {" "}
@@ -239,6 +243,10 @@ export default function AiPolicyReportPage() {
             <li>Each policy was classified by hand on {day}. Policies change; the linked file is the current word.</li>
           </ul>
         </Panel>
+      </div>
+
+      <div className="mt-3.5">
+        <CiteThis title={aiPolicyTitle()} path={AI_POLICY_REPORT_PATH} asOf={day} />
       </div>
     </>
   );

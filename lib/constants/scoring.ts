@@ -5,9 +5,17 @@ export const SCORE_THRESHOLD_GOOD = 80;
 // from the URL, so the input's own maxLength is not the boundary.
 export const MAX_SEARCH_LENGTH = 120;
 
-// One size for every device: `/page/N` is a shareable, indexable address,
-// so the rows it resolves to must not depend on the user agent.
-export const LEADERBOARD_PAGE_SIZE = 12;
+// One size for every device: `/page/N` is a shareable address, so the rows it
+// resolves to must not depend on the user agent. Page 1 stays short: at 32 rows
+// Clarity showed visitors leaving mid-board, never reaching the footer's links,
+// and each row adds ~2 KB billed as ISR reads. Deeper pages are read mostly by
+// crawlers, where fewer, longer pages cost less.
+export const LEADERBOARD_FIRST_PAGE_SIZE = 12;
+export const LEADERBOARD_PAGE_SIZE = 50;
+
+// The repo a board's copy names as its leader. A tiny repo can score 100, and
+// naming it there reads as a broken ranking; the table itself is unfiltered.
+export const LEAD_MIN_STARS = 100;
 
 export const DEFAULT_SUGGESTION_LIMIT = 3;
 export const ALTERNATIVES_LIMIT = 6;

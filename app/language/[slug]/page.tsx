@@ -1,18 +1,20 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
+import { CommonGapsPanel } from "@/components/CommonGapsPanel";
 import { HubLeaderboardTable } from "@/components/HubLeaderboardTable";
+import { IntentLink } from "@/components/IntentLink";
+import { LeaderClause } from "@/components/LeaderClause";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
-import { Panel, PanelHeading } from "@/components/Panel";
+import { frameworkLinksForLanguage } from "@/lib/agents-md-example-links";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { checkPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { leaderSentence } from "@/lib/leaderboard-meta";
+import { languageExamplesPath } from "@/lib/utils/check-path";
 import { hubPath, hubTitle, isHub, languageAgentsPath } from "@/lib/utils/language";
 import { fitDescription, pageTitle } from "@/lib/utils/page-title";
-import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
@@ -26,11 +28,10 @@ export function generateStaticParams(): Params[] {
 }
 
 function hubDescription(hub: Hub): string {
-  const top = `${hub.top.owner}/${hub.top.name}`;
   return fitDescription(
     `${hub.rows.length} ${hub.label} repos ranked by how ready they are for AI coding agents like Claude Code and Cursor.`,
     `Average score ${hub.average.toFixed(1)}.`,
-    `${top} leads with ${(hub.top.score ?? 0).toFixed(1)}.`,
+    ...(hub.top ? [leaderSentence(hub.top)] : []),
   );
 }
 
@@ -61,6 +62,7 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
 
   const path = hubPath(hub.slug);
   const examples = examplesByLanguage(getAgentsMdExamples()).find((l) => l.slug === hub.slug);
+  const frameworks = frameworkLinksForLanguage(getAgentsMdExamples(), hub.slug);
 
   return (
     <>
@@ -70,56 +72,37 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         lead={
           <>
             {hub.rows.length} {hub.label} repos, ranked by overall score (the average across agents). They average{" "}
-            <strong className="text-ink">{hub.average.toFixed(1)}</strong>, and{" "}
-            <Link href={repoPath(hub.top)} className="prose-link">
-              {hub.top.owner}/{hub.top.name}
-            </Link>{" "}
-            leads with <strong className="text-ink">{(hub.top.score ?? 0).toFixed(1)}</strong>.
+            <strong className="text-ink">{hub.average.toFixed(1)}</strong>.{hub.top && <LeaderClause top={hub.top} />}
           </>
         }
       >
         {examples && (
           <p className={`mt-2.5 ${PAGE_LEAD}`}>
             {examples.rows.length} of them have an AGENTS.md or CLAUDE.md:{" "}
-            <Link href={languageExamplesPath(hub.slug)} className="prose-link">
+            <IntentLink href={languageExamplesPath(hub.slug)} className="prose-link">
               {hub.label} AGENTS.md examples
-            </Link>
+            </IntentLink>
+            {frameworks.map((f, i) => (
+              <span key={f.href}>
+                {i === 0 ? ", and guides for " : i === frameworks.length - 1 ? " and " : ", "}
+                <IntentLink href={f.href} className="prose-link">
+                  {f.label}
+                </IntentLink>
+              </span>
+            ))}
             .
           </p>
         )}
         {hub.rows.length >= LANGUAGE_AGENTS_MIN_REPOS && (
           <p className="mt-2.5 mb-0 text-[14.5px]">
-            <Link href={languageAgentsPath(hub.slug)} className="arrow-link whitespace-normal">
+            <IntentLink href={languageAgentsPath(hub.slug)} className="arrow-link whitespace-normal">
               Which AI coding agent {hub.label} repos are best set up for →
-            </Link>
+            </IntentLink>
           </p>
         )}
       </PageHeader>
 
-      {hub.gaps.length > 0 && (
-        <div className="mb-3.5">
-          <Panel>
-            <PanelHeading>What {hub.label} repos most often miss</PanelHeading>
-            <ul className="link-list">
-              {hub.gaps.map((g) => (
-                <li key={g.id} className="link-row">
-                  <Link href={checkPath(g.id)} className="font-medium ink-link cover-link">
-                    {g.label}
-                  </Link>
-                  : {Math.round(g.rate * 100)}% pass rate
-                </li>
-              ))}
-            </ul>
-            <p className="mt-3 mb-0 text-[13px] text-muted">
-              Leaves out checks only one agent reads, which almost no repo passes. The{" "}
-              <Link href="/methodology" className="prose-link">
-                methodology
-              </Link>{" "}
-              explains each check.
-            </p>
-          </Panel>
-        </div>
-      )}
+      <CommonGapsPanel label={hub.label} gaps={hub.gaps} />
 
       <HubLeaderboardTable
         q=""
@@ -129,7 +112,6 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         totalPages={1}
         rows={hub.rows}
         clearSearchHref={path}
-        prefetch={false}
         activeLabel={`${hub.label} repos, overall`}
       />
     </>

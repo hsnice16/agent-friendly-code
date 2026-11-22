@@ -3,10 +3,20 @@ import "./_temp-db";
 import assert from "node:assert/strict";
 import { after, describe, it } from "node:test";
 
-import { boardRows, DEFAULT_QUERY, findBoardRepo, isRecut, parseBoardQuery, sortRows, viewBoard } from "../lib/board";
+import {
+  boardRows,
+  DEFAULT_QUERY,
+  findBoardRepo,
+  isRecut,
+  pageOfRank,
+  pageSlice,
+  parseBoardQuery,
+  sortRows,
+  viewBoard,
+} from "../lib/board";
 import { buildBoardData } from "../lib/board-data";
 import { HOST_DOMAINS, HOSTS } from "../lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE } from "../lib/constants/scoring";
+import { LEADERBOARD_FIRST_PAGE_SIZE, LEADERBOARD_PAGE_SIZE } from "../lib/constants/scoring";
 import { db, listLeaderboard, saveScoredRepo } from "../lib/db";
 import type { ModelId } from "../lib/scoring/weights";
 
@@ -95,8 +105,9 @@ describe("browser board", () => {
     assert.ok(acme.rows.every((r) => r.owner === "Acme"));
 
     const last = viewBoard(all, { ...DEFAULT_QUERY, page: 99 });
-    assert.equal(last.page, Math.ceil(30 / LEADERBOARD_PAGE_SIZE));
-    assert.equal(last.startIdx, (last.page - 1) * LEADERBOARD_PAGE_SIZE);
+    assert.equal(last.page, pageSlice(30, 99).totalPages);
+    assert.equal(last.startIdx, pageSlice(30, last.page).startIdx);
+    assert.equal(last.rows.length, pageSlice(30, last.page).endIdx - last.startIdx);
     assert.equal(viewBoard(all, { ...DEFAULT_QUERY, q: "nothing" }).total, 0);
   });
 
@@ -150,5 +161,31 @@ describe("parseBoardQuery", () => {
     assert.equal(parseBoardQuery(new URLSearchParams("badge=1")).badge, true);
     assert.equal(parseBoardQuery(new URLSearchParams("badge=true")).badge, false);
     assert.equal(isRecut(parseBoardQuery(new URLSearchParams("badge=1"))), true);
+  });
+});
+
+describe("pageSlice", () => {
+  const FIRST = LEADERBOARD_FIRST_PAGE_SIZE;
+  const SIZE = LEADERBOARD_PAGE_SIZE;
+
+  it("gives page 1 the shorter slice and every later page the full one", () => {
+    const total = FIRST + SIZE + 1;
+    assert.deepEqual(pageSlice(total, 1), { page: 1, totalPages: 3, startIdx: 0, endIdx: FIRST });
+    assert.deepEqual(pageSlice(total, 2), { page: 2, totalPages: 3, startIdx: FIRST, endIdx: FIRST + SIZE });
+    assert.deepEqual(pageSlice(total, 3), { page: 3, totalPages: 3, startIdx: FIRST + SIZE, endIdx: total });
+    assert.equal(pageSlice(FIRST, 1).totalPages, 1);
+    assert.equal(pageSlice(0, 1).totalPages, 1);
+  });
+
+  it("clamps a page number past the end to the last page", () => {
+    assert.equal(pageSlice(FIRST + 1, 99).page, 2);
+    assert.equal(pageSlice(FIRST + 1, 0).page, 1);
+  });
+
+  it("finds the page that shows each rank", () => {
+    for (const rank of [1, FIRST, FIRST + 1, FIRST + SIZE, FIRST + SIZE + 1, 400]) {
+      const { startIdx, endIdx } = pageSlice(1000, pageOfRank(rank));
+      assert.ok(rank > startIdx && rank <= endIdx, `rank ${rank}`);
+    }
   });
 });

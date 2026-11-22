@@ -35,18 +35,22 @@ export function CopySnippet({
   const { copied, copy } = useCopy(text, event);
   const isMultiLine = text.includes("\n");
   const scrolls = isMultiLine && !wrap;
+  // Prose (`wrap`) is text a visitor may want to select a part of, so only a one-line command copies on click.
+  const clickCopies = !isMultiLine && !wrap;
 
   return (
     <div className="relative">
       <pre
         // A one-line command wraps instead of scrolling, so none of it hides under the copy button on a phone.
         className={`m-0 overflow-x-auto rounded-md border bg-surface-2 px-3 py-2 pr-11 text-[12px] leading-relaxed ${
-          wrap ? "whitespace-pre-wrap break-words" : isMultiLine ? "" : "whitespace-pre-wrap break-all"
+          wrap ? "whitespace-pre-wrap break-words" : isMultiLine ? "" : "cursor-pointer whitespace-pre-wrap break-all"
         } ${highlight ? PRE_TONE[highlight] : "border-line"}`}
         // A keyboard user can only scroll a region that takes focus.
         {...(scrolls ? { tabIndex: 0, role: "region", "aria-label": label } : {})}
+        // Visitors clicked the command itself expecting a copy; the button stays the keyboard route.
+        {...(clickCopies ? { onClick: copy } : {})}
       >
-        <code>{text}</code>
+        <code className={clickCopies ? "select-all" : undefined}>{text}</code>
       </pre>
 
       <button

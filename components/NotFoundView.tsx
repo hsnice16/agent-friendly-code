@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { IntentLink } from "./IntentLink";
 import { PageHeader } from "./PageHeader";
 import { Panel, PanelHeading } from "./Panel";
 
@@ -58,9 +59,9 @@ export function NotFoundView() {
           <ul className="m-0 grid list-none p-0">
             {DESTINATIONS.map((d) => (
               <li key={d.href} className="flex flex-col gap-0.5 link-row sm:flex-row sm:items-baseline sm:gap-3">
-                <Link href={d.href} className="min-w-[9rem] text-[14.5px] font-semibold ink-link cover-link">
+                <IntentLink href={d.href} className="min-w-[9rem] text-[14.5px] font-semibold ink-link cover-link">
                   {d.label}
-                </Link>
+                </IntentLink>
                 <span className="text-[14px] leading-relaxed text-muted">{d.blurb}</span>
               </li>
             ))}

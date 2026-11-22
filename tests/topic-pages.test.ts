@@ -3,6 +3,7 @@ import "./_temp-db";
 import assert from "node:assert/strict";
 import { after, describe, it } from "node:test";
 
+import { LEAD_MIN_STARS } from "../lib/constants/scoring";
 import { db, saveScoredRepo } from "../lib/db";
 import { TOPIC_PAGE_MIN_REPOS } from "../lib/topics";
 import { APP_URL } from "../lib/version";
@@ -15,6 +16,8 @@ for (let i = 0; i < TOPIC_PAGE_MIN_REPOS; i++) {
     host: "github",
     language: "Go",
     overall: 40 + i,
+    // Only the runner-up clears the floor, so the leader is not simply the first row.
+    stars: i === TOPIC_PAGE_MIN_REPOS - 2 ? LEAD_MIN_STARS : 1,
     modelScores: [],
     url: `https://github.com/o/r${i}`,
     signals: [{ id: "agents_md", label: "AGENTS.md", pass: i < 2 ? 1 : 0, detail: "", matchedPath: "AGENTS.md" }],
@@ -45,6 +48,6 @@ describe("topic pages from the DB", async () => {
     const page = getTopicPage("cli");
     assert.equal(page?.rows.length, TOPIC_PAGE_MIN_REPOS);
     assert.equal(page?.withAgentFile, 2);
-    assert.equal(page?.top.name, `r${TOPIC_PAGE_MIN_REPOS - 1}`);
+    assert.equal(page?.top?.name, `r${TOPIC_PAGE_MIN_REPOS - 2}`);
   });
 });

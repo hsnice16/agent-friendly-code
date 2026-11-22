@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { AdoptionChart } from "@/components/AdoptionChart";
 import { AdoptionTable } from "@/components/AdoptionTable";
-import { CopySnippet } from "@/components/CopySnippet";
+import { CiteThis } from "@/components/CiteThis";
 import { ExternalLink } from "@/components/ExternalLink";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
@@ -18,6 +18,7 @@ import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
+import { ogImage } from "@/lib/utils/og-image";
 import {
   AI_POLICY_REPORT_PATH,
   REPORT_CSV_PATH,
@@ -25,9 +26,9 @@ import {
   REPORT_TITLE,
   SIZE_REPORT_PATH,
 } from "@/lib/utils/report-path";
-import { APP_NAME, APP_URL, REPO_URL } from "@/lib/version";
+import { REPO_URL } from "@/lib/version";
 
-export const metadata: Metadata = staticPageMetadata(REPORT_PATH);
+export const metadata: Metadata = staticPageMetadata(REPORT_PATH, ogImage(REPORT_PATH, REPORT_TITLE));
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const NUMBER = new Intl.NumberFormat("en-US");
@@ -46,7 +47,6 @@ export default function AgentsMdReportPage() {
   const others = counts.files
     .filter((f) => f.signalId !== "agents_md")
     .map((f) => ({ label: f.file, count: f.count, withInstructions: reposWithBoth(f.signalId) }));
-  const cite = `${APP_NAME}. "${REPORT_TITLE}." Data as of ${asOf}. ${APP_URL}${REPORT_PATH}`;
 
   return (
     <>
@@ -57,12 +57,13 @@ export default function AgentsMdReportPage() {
         lead={
           <>
             <strong className="text-ink">
-              {percent(last.agentsMd, last.repos)} of the {last.repos} popular open source repos we track have an
-              AGENTS.md
+              As of {asOf}, {last.agentsMd} of the {last.repos} popular open source repos we track (
+              {percent(last.agentsMd, last.repos)}) have an AGENTS.md.
             </strong>{" "}
-            ({last.agentsMd} repos, empty files not counted), as of {asOf}.
+            Empty files don&apos;t count.
           </>
         }
+        updated={last.date}
       />
 
       <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2 lg:grid-cols-4">
@@ -111,9 +112,9 @@ export default function AgentsMdReportPage() {
             {examples.languages.map((l) => (
               <li key={l.slug} className="grid grid-cols-[minmax(0,1fr)_90px] items-center gap-x-4 link-row">
                 <span className="min-w-0">
-                  <Link href={hubPath(l.slug)} className={`${LINK} cover-link`}>
+                  <IntentLink href={hubPath(l.slug)} className={`${LINK} cover-link`}>
                     {l.label}
-                  </Link>
+                  </IntentLink>
                   <span className="tabular-nums text-muted">
                     {" "}
                     · {l.withFile} of {l.total} ({percent(l.withFile, l.total)})
@@ -165,9 +166,9 @@ export default function AgentsMdReportPage() {
             A repo with both AGENTS.md and CLAUDE.md counts under AGENTS.md: the check stops at the first file with
             content. The file census finds both at the root of {CENSUS_SUMMARY.rootBoth} of the {CENSUS_SUMMARY.repos}{" "}
             GitHub repos, symlinks and empty files included.{" "}
-            <Link href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
+            <IntentLink href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
               Which one to use
-            </Link>
+            </IntentLink>
             .
           </p>
         </Panel>
@@ -177,9 +178,9 @@ export default function AgentsMdReportPage() {
           <ul className="m-0 ml-5 flex list-disc flex-col gap-1.5 text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               The sample is the leaderboard: a{" "}
-              <Link href="/about" className="prose-link">
+              <IntentLink href="/about" className="prose-link">
                 curated list
-              </Link>{" "}
+              </IntentLink>{" "}
               of popular public repos on GitHub, GitLab and Bitbucket, rescored daily.
             </li>
             <li>
@@ -193,24 +194,24 @@ export default function AgentsMdReportPage() {
             </li>
             <li>
               How long the files are:{" "}
-              <Link href={SIZE_REPORT_PATH} className="prose-link">
+              <IntentLink href={SIZE_REPORT_PATH} className="prose-link">
                 AGENTS.md sizes
-              </Link>
+              </IntentLink>
               ; what projects allow agents to contribute:{" "}
-              <Link href={AI_POLICY_REPORT_PATH} className="prose-link">
+              <IntentLink href={AI_POLICY_REPORT_PATH} className="prose-link">
                 AI contribution policies
-              </Link>
+              </IntentLink>
               .
             </li>
             <li>
               How the{" "}
-              <Link href={checkPath("agents_md")} className="prose-link">
+              <IntentLink href={checkPath("agents_md")} className="prose-link">
                 AGENTS.md check
-              </Link>{" "}
+              </IntentLink>{" "}
               scores a file, and the rest of the score:{" "}
-              <Link href="/methodology" className="prose-link">
+              <IntentLink href="/methodology" className="prose-link">
                 methodology
-              </Link>
+              </IntentLink>
               .
             </li>
           </ul>
@@ -218,9 +219,7 @@ export default function AgentsMdReportPage() {
       </div>
 
       <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>Cite this</PanelHeading>
-          <CopySnippet text={cite} />
+        <CiteThis title={REPORT_TITLE} path={REPORT_PATH} asOf={asOf}>
           <p className={`${PROSE} mt-3 text-[13px]`}>
             Every snapshot day is in{" "}
             <a href={REPORT_CSV_PATH} download className="prose-link">
@@ -229,7 +228,7 @@ export default function AgentsMdReportPage() {
             (MIT-licensed), with the count for each file. The numbers here update with every rescore; give the date you
             read them.
           </p>
-        </Panel>
+        </CiteThis>
       </div>
     </>
   );

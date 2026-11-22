@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
@@ -82,9 +82,9 @@ export default function CompareHubPage() {
               {pairs.map((p) => (
                 <tr key={p.slug}>
                   <th scope="row" className="font-medium">
-                    <Link href={comparePath(p.slug)} className={`${LINK} cover-link`}>
+                    <IntentLink href={comparePath(p.slug)} className={`${LINK} cover-link`}>
                       {MODEL_BY_ID[p.a].label} vs {MODEL_BY_ID[p.b].label}
-                    </Link>
+                    </IntentLink>
                   </th>
                   <td className="text-right tabular-nums">
                     {p.stats.avgA.toFixed(1)} vs {p.stats.avgB.toFixed(1)}
@@ -110,9 +110,9 @@ export default function CompareHubPage() {
             <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-1.5 p-0 text-[14.5px]">
               {languages.map((l) => (
                 <li key={l.slug}>
-                  <Link href={languageAgentsPath(l.slug)} className="arrow-link">
+                  <IntentLink href={languageAgentsPath(l.slug)} className="arrow-link">
                     {l.label} →
-                  </Link>
+                  </IntentLink>
                 </li>
               ))}
             </ul>
@@ -121,13 +121,13 @@ export default function CompareHubPage() {
       )}
 
       <p className="mt-5 mb-0 text-[13px] text-muted">
-        <Link href="/agents" className={LINK}>
+        <IntentLink href="/agents" className={LINK}>
           Which files each agent reads
-        </Link>
+        </IntentLink>
         {" · "}
-        <Link href="/methodology" className={LINK}>
+        <IntentLink href="/methodology" className={LINK}>
           How the scores work
-        </Link>
+        </IntentLink>
       </p>
     </>
   );

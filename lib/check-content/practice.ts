@@ -4,7 +4,9 @@
 export type CheckPractice = {
   heading: string;
   items: string[];
-  snippet?: { caption: string; text: string };
+  snippets?: { caption: string; text: string }[];
+  /** The first row is the header; each row's first cell labels it. */
+  table?: { caption: string; rows: string[][] };
   sources: string[];
 };
 
@@ -33,23 +35,87 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
       "Committed in `.claude/settings.json`, it applies to everyone in the repo once they trust the folder.",
       "Aider needs no hook: it lints the files it edits by default, and `lint-cmd` in `.aider.conf.yml` swaps in your own linter.",
     ],
-    snippet: {
-      caption: ".claude/settings.json",
-      text: '{\n  "hooks": {\n    "PostToolUse": [\n      {\n        "matcher": "Edit|Write",\n        "hooks": [\n          { "type": "command", "command": "f=$(jq -r \'.tool_input.file_path\') && npx prettier --write --ignore-unknown \\"$f\\"" }\n        ]\n      }\n    ]\n  }\n}\n',
-    },
+    snippets: [
+      {
+        caption: ".claude/settings.json",
+        text: '{\n  "hooks": {\n    "PostToolUse": [\n      {\n        "matcher": "Edit|Write",\n        "hooks": [\n          { "type": "command", "command": "f=$(jq -r \'.tool_input.file_path\') && npx prettier --write --ignore-unknown \\"$f\\"" }\n        ]\n      }\n    ]\n  }\n}\n',
+      },
+    ],
     sources: [CLAUDE_HOOKS, CLAUDE_BEST_PRACTICES, "https://aider.chat/docs/usage/lint-test.html"],
   },
   pre_commit: {
-    heading: "Do pre-commit hooks run when an AI agent commits?",
+    heading: "How do I stop an agent skipping the hooks?",
     items: [
-      "Yes, when the agent runs `git commit`: git runs the pre-commit hook first and aborts the commit if it exits non-zero.",
-      "`git commit --no-verify` skips the hook, so say in AGENTS.md that it is off limits.",
-      "Git hooks run at commit time; Claude Code hooks run inside the agent's loop. A `PostToolUse` hook formats each file as it is edited; a `Stop` hook keeps Claude working until a check passes.",
+      "Say in AGENTS.md that `--no-verify` is off limits: when a hook fails, fix the cause and commit again.",
+      "To enforce it in Claude Code, a `PreToolUse` hook on `Bash` that exits with code 2 blocks the command and sends its stderr back to Claude (last snippet below).",
+      'In Cursor, a `beforeShellExecution` hook in `.cursor/hooks.json` can answer `"permission": "deny"` to the same command.',
+      "Agent hooks also catch problems before commit time: Claude Code's `PostToolUse` or Cursor's `afterFileEdit` can format each file as it is edited, and a `Stop` hook keeps Claude working until a check passes.",
       "OpenHands' docs move `.openhands/pre-commit.sh` checks into Stop hooks in `.openhands/hooks.json`.",
+    ],
+    table: {
+      caption: "Git hooks compared with Claude Code and Cursor hooks",
+      rows: [
+        ["", "Git pre-commit hook", "Claude Code hook", "Cursor hook"],
+        [
+          "Config",
+          "`.pre-commit-config.yaml`, `.husky/`, `lefthook.yml`",
+          "`.claude/settings.json`",
+          "`.cursor/hooks.json`",
+        ],
+        [
+          "Runs",
+          "On `git commit`, whoever commits",
+          "On agent events: `PreToolUse`, `PostToolUse`, `Stop`",
+          "On agent events: `beforeShellExecution`, `afterFileEdit`, `stop`",
+        ],
+        ["Skipped by", "`--no-verify` or `-n`", "No flag", "No flag"],
+      ],
+    },
+    snippets: [
+      {
+        caption: ".pre-commit-config.yaml",
+        text: "repos:\n  - repo: https://github.com/pre-commit/pre-commit-hooks\n    rev: v5.0.0\n    hooks:\n      - id: trailing-whitespace\n      - id: end-of-file-fixer\n  - repo: https://github.com/astral-sh/ruff-pre-commit\n    rev: v0.8.0\n    hooks:\n      - id: ruff\n      - id: ruff-format\n",
+      },
+      {
+        caption: "Husky + lint-staged",
+        text: 'npx husky init\necho "npx lint-staged" > .husky/pre-commit\n\n# package.json\n"lint-staged": { "*.{js,ts,tsx}": ["eslint --fix", "prettier --write"] }\n',
+      },
+      {
+        caption: "lefthook.yml",
+        text: 'pre-commit:\n  commands:\n    lint:\n      glob: "*.{js,ts,tsx}"\n      run: npx eslint --fix {staged_files}\n      stage_fixed: true\n',
+      },
+      {
+        caption: ".claude/settings.json",
+        text: `${JSON.stringify(
+          {
+            hooks: {
+              PreToolUse: [
+                {
+                  matcher: "Bash",
+                  hooks: [
+                    {
+                      type: "command",
+                      command:
+                        "jq -r '.tool_input.command' | grep -q -- '--no-verify' && { echo 'Fix the failing hook instead of skipping it' >&2; exit 2; } || exit 0",
+                    },
+                  ],
+                },
+              ],
+            },
+          },
+          null,
+          2,
+        )}\n`,
+      },
     ],
     sources: [
       "https://git-scm.com/docs/githooks",
-      CLAUDE_HOOKS,
+      "https://code.claude.com/docs/en/hooks",
+      "https://cursor.com/docs/agent/hooks",
+      "https://pre-commit.com/",
+      "https://typicode.github.io/husky/get-started.html",
+      "https://github.com/lint-staged/lint-staged",
+      "https://lefthook.dev/configuration/",
       "https://docs.openhands.dev/openhands/usage/customization/repository",
     ],
   },
@@ -61,10 +127,12 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
       "Inside the container, as a non-root user, you can run `--dangerously-skip-permissions`. The docs warn this doesn't stop a malicious project taking anything the container can reach, so use it only with trusted repos.",
       "Cloud agents read their own setup file: Copilot's cloud agent runs `.github/workflows/copilot-setup-steps.yml` (the job must be named `copilot-setup-steps`), and Devin reads `.devin/blueprint.yaml`.",
     ],
-    snippet: {
-      caption: ".devcontainer/devcontainer.json",
-      text: '{\n  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",\n  "features": {\n    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}\n  }\n}\n',
-    },
+    snippets: [
+      {
+        caption: ".devcontainer/devcontainer.json",
+        text: '{\n  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",\n  "features": {\n    "ghcr.io/anthropics/devcontainer-features/claude-code:1.0": {}\n  }\n}\n',
+      },
+    ],
     sources: [
       "https://code.claude.com/docs/en/devcontainer",
       "https://containers.dev/",

@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { GeneratorCallout } from "@/components/GeneratorCallout";
 import { HashDetails } from "@/components/HashDetails";
 import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreNudge } from "@/components/LiveScoreNudge";
@@ -18,15 +19,18 @@ import type { NavSection } from "@/components/SectionNav";
 import { SignalListCard } from "@/components/SignalListCard";
 import { SignalRows } from "@/components/SignalRows";
 
+import { exampleLinksForRepo } from "@/lib/agents-md-example-links";
+import { longerThan } from "@/lib/agents-md-size";
 import { checkRates } from "@/lib/check-rates";
 import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getModelScores } from "@/lib/db";
+import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
 import { starterIfMissing } from "@/lib/starter-agents-md";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { topicLabel, topicLinks } from "@/lib/topics";
-import { agentInstructions } from "@/lib/utils/agent-instructions";
+import { agentInstructions, fileLength } from "@/lib/utils/agent-instructions";
 import { groupByLanguage, hubPath, isHub, languageSlug } from "@/lib/utils/language";
 import {
   agentFileShare,
@@ -95,6 +99,9 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     ? buildRepoReport({ repo, summary, board, signals, rates: checkRates(signals, repo.language) })
     : null;
   const instructions = agentInstructions(signals, agentFileShare(repo.language));
+  const agentsMd = getAgentsMdExamples();
+  const ownLength =
+    instructions?.main?.state === "ok" ? fileLength(signals.find((s) => s.id === "agents_md")?.detail ?? null) : null;
   const starter = starterIfMissing(instructions, { ...repo, description: about.description }, signals);
 
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
@@ -159,7 +166,12 @@ export default async function Page({ params }: { params: Promise<Params> }) {
             variant="strength"
             empty={{ chip: "bad", text: "Nothing passes fully yet." }}
           />
-          <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
+          <SignalListCard
+            items={gaps}
+            variant="gap"
+            empty={{ chip: "ok", text: "Nothing missing." }}
+            starterOn={starter ? "repo" : undefined}
+          />
         </Section>
 
         <Section id="fix-first">
@@ -172,7 +184,15 @@ export default async function Page({ params }: { params: Promise<Params> }) {
 
         {instructions && (
           <Section id="agent-instructions">
-            <AgentInstructions data={instructions} slug={slug} repo={repo} starter={starter} />
+            <AgentInstructions
+              data={instructions}
+              slug={slug}
+              repo={repo}
+              starter={starter}
+              examples={exampleLinksForRepo(agentsMd, repo)}
+              longerThan={ownLength == null ? undefined : longerThan(ownLength, agentsMd.rows)}
+            />
+            {starter && <GeneratorCallout page="repo" className="mt-4" starterOn="repo" />}
           </Section>
         )}
 
@@ -192,7 +212,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
 
         {report && (
           <Section id="compare">
-            <RepoReport slug={slug} report={report} agentsInTotal={MODELS.length} />
+            <RepoReport slug={slug} report={report} hubHref={hubHref} />
           </Section>
         )}
 

@@ -10,6 +10,7 @@ import { getTopPackagesByRegistry } from "@/lib/db";
 import { GUIDES } from "@/lib/guides";
 import { fillStats, getGuideStats } from "@/lib/guides/stats";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { compareLines, keyFacts, languageLines } from "@/lib/llms-sections";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
@@ -29,6 +30,8 @@ import {
   REPORT_PATH,
   REPORT_TITLE,
   SIZE_REPORT_PATH,
+  SKILLS_REPORT_CSV_PATH,
+  SKILLS_REPORT_PATH,
 } from "@/lib/utils/report-path";
 import {
   ACTION_REPO_URL,
@@ -86,6 +89,8 @@ export function GET(): Response {
 
 Every score comes from ${SIGNALS.length} file checks, listed below; no agent is run. Each AI coding agent weighs the checks by what its own docs say it reads, so one repository can score differently per agent.
 
+${keyFacts()}
+
 ## Agents scored for
 
 ${MODELS.map((m) => `- [${m.label}](${APP_URL}${modelPath(m.id)}): ${m.rationale}`).join("\n")}
@@ -111,6 +116,7 @@ ${GUIDES.map((g) => `- [${g.name}](${APP_URL}${guidePath(g.slug)}): ${fillStats(
 - [Compare agents](${APP_URL}${COMPARE_PATH}): Claude Code vs Cursor, Codex vs Gemini CLI and more: how well leaderboard repos are set up for each, pair by pair (setup, not code quality)
 - [AGENTS.md sizes](${APP_URL}${SIZE_REPORT_PATH}): How long real AGENTS.md and CLAUDE.md files are, and how many pass Devin's 16 KiB and Codex's 32 KiB limits
 - [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, classified by hand
+- [Agent skills in repos](${APP_URL}${SKILLS_REPORT_PATH}): Which popular repos ship SKILL.md files in .agents/skills or .claude/skills, with counts per repo; CSV (${APP_URL}${SKILLS_REPORT_CSV_PATH})
 - [Projects to contribute to](${APP_URL}${CONTRIBUTE_PATH}): Open source projects with a CONTRIBUTING guide, tests and CI, by language, ready for agent-assisted work
 - [AGENTS.md generator](${APP_URL}${GENERATOR_PATH}): A starter AGENTS.md drafted from a scan of any public GitHub repo
 - [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
@@ -121,6 +127,14 @@ ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by re
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
 - [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, the agent it is best set up for, score → model class, optional SessionStart hooks for Claude Code / Codex
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL
+
+## Agent comparisons
+
+${compareLines()}
+
+## Languages
+
+${languageLines()}
 
 ## Public API
 

@@ -4,6 +4,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import { AgentInstructions } from "@/components/AgentInstructions";
 import { AlternativesStrip } from "@/components/AlternativesStrip";
 import { Breadcrumbs } from "@/components/Breadcrumbs";
+import { GeneratorCallout } from "@/components/GeneratorCallout";
 import { HashDetails } from "@/components/HashDetails";
 import { LiveScoreUnavailable } from "@/components/LiveScoreUnavailable";
 import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
@@ -198,7 +199,12 @@ export default async function LiveScorePage({
             variant="strength"
             empty={{ chip: "bad", text: "Nothing passes fully yet." }}
           />
-          <SignalListCard items={gaps} variant="gap" empty={{ chip: "ok", text: "Nothing missing." }} />
+          <SignalListCard
+            items={gaps}
+            variant="gap"
+            empty={{ chip: "ok", text: "Nothing missing." }}
+            starterOn={starter ? "score" : undefined}
+          />
         </Section>
 
         <Section id="fix-first">
@@ -212,6 +218,7 @@ export default async function LiveScorePage({
         {instructions && (
           <Section id="agent-instructions">
             <AgentInstructions data={instructions} slug={slug} repo={repo} starter={starter} companions />
+            {starter && <GeneratorCallout page="score" className="mt-4" starterOn="score" />}
           </Section>
         )}
 

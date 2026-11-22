@@ -1,13 +1,14 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { ExternalLink } from "@/components/ExternalLink";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
 import { staticPageMetadata } from "@/lib/page-meta";
+import { WEBSITE_JSON_LD } from "@/lib/site-json-ld";
 import { OWN_REPO } from "@/lib/utils/own-repo";
 import { repoPath } from "@/lib/utils/repo-path";
 import { APP_NAME, APP_URL, CONTACT_EMAIL, REPO_URL } from "@/lib/version";
@@ -27,7 +28,7 @@ const ABOUT_JSON_LD = {
       url: `${APP_URL}/about`,
       name: `About — ${APP_NAME}`,
       author: { "@id": `${APP_URL}/about#author` },
-      isPartOf: { "@id": `${APP_URL}/#site` },
+      isPartOf: WEBSITE_JSON_LD,
       mainEntity: { "@id": `${APP_URL}/about#author` },
     },
   ],
@@ -73,9 +74,9 @@ export default function AboutPage() {
             Not a test of how well agents perform. Scores come from <strong className="text-ink">file checks</strong>,
             and no agent is run. Weights follow each agent&apos;s docs but aren&apos;t yet measured against real runs.
             The{" "}
-            <Link href="/methodology" className="prose-link">
+            <IntentLink href="/methodology" className="prose-link">
               methodology
-            </Link>{" "}
+            </IntentLink>{" "}
             has the plan to measure them.
           </p>
         </Panel>
@@ -94,16 +95,16 @@ export default function AboutPage() {
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             A weekly audit flags listed repos that were renamed, archived, deleted or made private, are forks or
             mirrors, or whose score stopped refreshing; each is fixed or accepted on purpose. Scoring a repo with{" "}
-            <Link href="/score" className="prose-link">
+            <IntentLink href="/score" className="prose-link">
               Live Score
-            </Link>{" "}
+            </IntentLink>{" "}
             never adds it. To suggest one, open an issue or a pull request that edits the list.
           </p>
           <p className="mt-3 mb-0 text-[14.5px] leading-relaxed text-ink-dim">
             This site&apos;s own repo,{" "}
-            <Link href={repoPath(OWN_REPO)} className="prose-link">
+            <IntentLink href={repoPath(OWN_REPO)} className="prose-link">
               {OWN_REPO.owner}/{OWN_REPO.name}
-            </Link>
+            </IntentLink>
             , and the author&apos;s other repos are listed and scored by the same rules, labelled &ldquo;this
             site&apos;s own repo&rdquo; and &ldquo;by this site&apos;s author&rdquo; wherever repos are listed.
           </p>

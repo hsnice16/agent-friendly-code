@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentsMdGuide } from "@/components/AgentsMdGuide";
@@ -7,28 +6,38 @@ import { AgentsMdPractices } from "@/components/AgentsMdPractices";
 import { CheckPracticePanel } from "@/components/CheckPracticePanel";
 import { CheckRepoList } from "@/components/CheckRepoList";
 import { CodeText } from "@/components/CodeText";
+import { GeneratorCallout } from "@/components/GeneratorCallout";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { SkillsCensusPanel } from "@/components/SkillsCensusPanel";
+import { getAgentSkillsReport } from "@/lib/agent-skills-data";
+import { frameworkExampleLinks, languageExampleLinks } from "@/lib/agents-md-example-links";
 import { AUTHOR_JSON_LD } from "@/lib/author";
+import { hookFrameworkCounts } from "@/lib/check-breakdowns";
 import { CHECK_CONTENT, CHECK_QUESTIONS } from "@/lib/check-content";
 import { CHECK_PRACTICE } from "@/lib/check-content/practice";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
-import { getLeaderboardStats } from "@/lib/db";
+import { listSignalFiles } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { boardModified } from "@/lib/page-dates";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
 import { hubPath } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
+import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, APP_URL, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
+import { SKILLS_REPORT_PATH } from "@/lib/utils/report-path";
+import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
 
+const SKILLS_SHOWN = 10;
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export const dynamicParams = false;
@@ -46,7 +55,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const { title: heading, metaTitle, description } = CHECK_CONTENT[id];
   const title = metaTitle ?? heading;
   const path = checkPath(id);
-  const image = { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: SIGNAL_BY_ID[id].label };
+  const image = ogImage(path, SIGNAL_BY_ID[id].label);
 
   return {
     title: pageTitle(title),
@@ -69,7 +78,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
   const stats = getCheckStats(id);
   const practice = Object.hasOwn(CHECK_PRACTICE, id) ? CHECK_PRACTICE[id] : null;
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
-  const { contentChangedAt } = getLeaderboardStats();
+  const modified = boardModified();
+  const hooks = id === "pre_commit" ? hookFrameworkCounts(listSignalFiles(id)) : null;
+  const skills = id === "agent_skills" ? getAgentSkillsReport() : null;
   const examples = id === "agents_md" ? getAgentsMdExamples() : null;
 
   return (
@@ -83,7 +94,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           url: `${APP_URL}${checkPath(id)}`,
           image: `${APP_URL}/og${checkPath(id)}`,
           about: { "@type": "Thing", name: signal.label },
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          ...(modified ? { dateModified: modified } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
@@ -93,6 +104,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
         crumbs={{ parents: [CHECKS_CRUMB], current: checkCrumb(id) }}
         title={content.title}
         lead={<CodeText text={content.what} />}
+        updated={modified}
       />
 
       <Panel>
@@ -104,8 +116,15 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           </strong>
           , {stats.partial} pass in part ({percent(stats.partial, stats.total)}) and {stats.none} fail (
           {percent(stats.none, stats.total)}).
+          {hooks && <> By framework: {hooks.map((h) => `${h.framework} ${h.count}`).join(", ")}.</>}
         </p>
       </Panel>
+
+      {skills && (
+        <div className="mt-3.5">
+          <SkillsCensusPanel report={skills} limit={SKILLS_SHOWN} />
+        </div>
+      )}
 
       <div className="mt-3.5">
         <Panel>
@@ -124,7 +143,18 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       {examples && (
         <div className="mt-3.5">
-          <AgentsMdGuide medianLength={examples.medianLength} files={examples.rows.length} />
+          <AgentsMdGuide
+            medianLength={examples.medianLength}
+            files={examples.rows.length}
+            byLanguage={languageExampleLinks(examples)}
+            byFramework={frameworkExampleLinks(examples)}
+          />
+        </div>
+      )}
+
+      {examples && (
+        <div className="mt-3.5">
+          <GeneratorCallout page="check" />
         </div>
       )}
 
@@ -146,9 +176,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           </ul>
           <p className="mt-3 mb-0 text-[13px] text-muted">
             How checks become a score:{" "}
-            <Link href="/methodology" className="prose-link">
+            <IntentLink href="/methodology" className="prose-link">
               methodology
-            </Link>
+            </IntentLink>
             .
           </p>
         </Panel>
@@ -167,9 +197,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           <ul className="link-list">
             {stats.agents.map(({ model, share }) => (
               <li key={model.id} className="flex items-baseline justify-between gap-3 link-row">
-                <Link href={modelPath(model.id)} className={`${LINK} cover-link`}>
+                <IntentLink href={modelPath(model.id)} className={`${LINK} cover-link`}>
                   {model.label}
-                </Link>
+                </IntentLink>
                 <span className="tabular-nums">{percent(share, 1)} of its score</span>
               </li>
             ))}
@@ -182,9 +212,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
             <ul className="link-list">
               {languages.map((l) => (
                 <li key={l.slug} className="flex items-baseline justify-between gap-3 link-row">
-                  <Link href={hubPath(l.slug)} className={`${LINK} cover-link`}>
+                  <IntentLink href={hubPath(l.slug)} className={`${LINK} cover-link`}>
                     {l.label}
-                  </Link>
+                  </IntentLink>
                   <span className="tabular-nums">
                     {l.counts.full} of {l.counts.total} ({percent(l.counts.full, l.counts.total)})
                   </span>
@@ -197,9 +227,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       {Object.hasOwn(VS_AGENTS_MD, id) && (
         <p className="mt-3.5 mb-0 text-[14.5px] text-ink-dim">
-          <Link href={checkSubPath(id, "vs-agents-md")} className={LINK}>
+          <IntentLink href={checkSubPath(id, "vs-agents-md")} className={LINK}>
             {VS_AGENTS_MD[id].name} vs AGENTS.md
-          </Link>
+          </IntentLink>
           : which to use, and how to keep one source.
         </p>
       )}
@@ -224,16 +254,25 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
 
       <p className="mt-6 mb-0 text-[13px] text-muted">
         Every check, grouped into what to do first:{" "}
-        <Link href="/guide" className="prose-link">
+        <IntentLink href="/guide" className="prose-link">
           how to make your repo ready for AI coding agents
-        </Link>
+        </IntentLink>
         .
         {id === "contributing" && (
           <>
             {" "}
-            <Link href={CONTRIBUTE_PATH} className="prose-link">
+            <IntentLink href={CONTRIBUTE_PATH} className="prose-link">
               Projects ready for agent-assisted contributions
-            </Link>
+            </IntentLink>
+            .
+          </>
+        )}
+        {id === "agent_skills" && (
+          <>
+            {" "}
+            <IntentLink href={SKILLS_REPORT_PATH} className="prose-link">
+              Which popular repos ship skills
+            </IntentLink>
             .
           </>
         )}
@@ -245,9 +284,9 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
       >
         <span>Other checks:</span>
         {SIGNALS.filter((s) => s.id !== id).map((s) => (
-          <Link key={s.id} href={checkPath(s.id)} className="dim-link">
+          <IntentLink key={s.id} href={checkPath(s.id)} className="dim-link">
             {s.label}
-          </Link>
+          </IntentLink>
         ))}
       </nav>
     </>

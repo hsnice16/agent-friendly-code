@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import type { AgentStanding } from "@/lib/agent-scores";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 
+import { IntentLink } from "./IntentLink";
 import { LINK } from "./link-class";
 import { ScoreNumber } from "./ScoreNumber";
 
@@ -30,9 +29,9 @@ export function AgentStandingsTable({ standings, label }: { standings: AgentStan
           {standings.map((s) => (
             <tr key={s.model.id}>
               <th scope="row" className="font-medium">
-                <Link href={modelPath(s.model.id)} className={`${LINK} cover-link`}>
+                <IntentLink href={modelPath(s.model.id)} className={`${LINK} cover-link`}>
                   {s.model.label}
-                </Link>
+                </IntentLink>
               </th>
               <td className="text-right">
                 <ScoreNumber score={s.average} size="sm" />

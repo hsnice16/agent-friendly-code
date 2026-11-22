@@ -1,9 +1,13 @@
 "use client";
 
 // Client for payload size: AGENTS.md → Conventions.
+import { MODEL_LABEL } from "@/lib/model-labels";
+import { SIGNAL_TEXT } from "@/lib/signal-text";
+import { checkPath } from "@/lib/utils/check-slug";
 import { percent } from "@/lib/utils/format";
 import type { RepoReportData } from "@/lib/utils/repo-report";
 
+import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
 import { Stat } from "./Stat";
 
@@ -20,11 +24,13 @@ function Diff({ diff }: { diff: number }) {
 }
 
 // The sentence carries the number; the bar is only there to compare rows at a glance.
-function RateRow({ label, share, text }: { label: string; share: number; text: string }) {
+function RateRow({ id, share, text }: { id: string; share: number; text: string }) {
   return (
     <li className="rate-row">
       <div className="min-w-0">
-        <span className="font-medium text-ink">{label}</span>
+        <IntentLink href={checkPath(id)} className="font-medium ink-link">
+          {SIGNAL_TEXT[id].label}
+        </IntentLink>
         <span className="text-muted"> · {text}</span>
       </div>
       <div aria-hidden className="h-[7px] overflow-hidden rounded-sm bg-line">
@@ -41,13 +47,14 @@ function SubHeading({ children }: { children: React.ReactNode }) {
 export function RepoReport({
   slug,
   report,
-  agentsInTotal,
+  hubHref,
 }: {
   slug: string;
   report: RepoReportData;
-  /** Passed in: importing the agent list would ship every agent's weights and sources to the browser. */
-  agentsInTotal: number;
+  /** The language hub, which the language tiles link to. */
+  hubHref?: string;
 }) {
+  const agentsInTotal = Object.keys(MODEL_LABEL).length;
   const { comparisons, starsRank, language, missing, rare, lift } = report;
 
   return (
@@ -57,9 +64,10 @@ export function RepoReport({
       </PanelHeading>
 
       <dl className="m-0 grid grid-cols-1 gap-2.5 sm:grid-cols-3">
-        {comparisons.map((c) => (
+        {comparisons.map((c, i) => (
           <Stat
             key={c.against}
+            href={i > 0 ? hubHref : "/"}
             label={`vs ${c.against}`}
             value={<Diff diff={c.diff} />}
             note={`Average ${c.average.toFixed(1)}`}
@@ -68,6 +76,7 @@ export function RepoReport({
         {starsRank && (
           <Stat
             label={`Stars among ${starsRank.language} repos`}
+            href={hubHref}
             value={
               <>
                 #{starsRank.rank} <span className="text-[14px] font-normal text-muted">of {starsRank.total}</span>
@@ -83,8 +92,8 @@ export function RepoReport({
           <ul className="m-0 list-none space-y-2.5 p-0 text-[14px]">
             {missing.map((m) => (
               <RateRow
-                key={m.label}
-                label={m.label}
+                key={m.id}
+                id={m.id}
                 share={m.all}
                 text={`passed by ${percent(m.all, 1)} of leaderboard repos${
                   m.language != null && language ? `, ${percent(m.language, 1)} of ${language} repos` : ""
@@ -100,12 +109,7 @@ export function RepoReport({
           <SubHeading>Passes checks most repos miss</SubHeading>
           <ul className="m-0 list-none space-y-2.5 p-0 text-[14px]">
             {rare.map((r) => (
-              <RateRow
-                key={r.label}
-                label={r.label}
-                share={r.all}
-                text={`only ${percent(r.all, 1)} of repos pass it`}
-              />
+              <RateRow key={r.id} id={r.id} share={r.all} text={`only ${percent(r.all, 1)} of repos pass it`} />
             ))}
           </ul>
         </div>
@@ -114,7 +118,10 @@ export function RepoReport({
       {lift && (
         <p className="m-0 mt-5 rounded-lg border border-tip/40 bg-surface-2 px-3.5 py-3 text-[14px] text-ink-dim">
           <span className="font-semibold text-tip">One fix for the most agents: </span>
-          <span className="font-medium text-ink">{lift.label}</span> would raise the score for{" "}
+          <IntentLink href={checkPath(lift.id)} className="font-medium ink-link">
+            {SIGNAL_TEXT[lift.id].label}
+          </IntentLink>{" "}
+          would raise the score for{" "}
           {lift.agents === agentsInTotal ? `all ${agentsInTotal}` : `${lift.agents} of ${agentsInTotal}`} agents, by up
           to {lift.maxGain.toFixed(1)} points.
         </p>

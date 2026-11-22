@@ -1,12 +1,13 @@
 "use client";
 
-import Link from "next/link";
 import { Fragment, type ReactNode } from "react";
 
 import type { AgentFileShare } from "@/lib/utils/agent-instructions";
-import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { GENERATOR_PATH, STARTER_ID } from "@/lib/utils/generator-path";
+import { SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 
 import { CopySnippet } from "./CopySnippet";
+import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
 
 /** An agent file with its link on the host resolved; null when the default branch is unknown. */
@@ -14,12 +15,14 @@ type LinkedFile = { name: string; href: string | null; note: string | null };
 
 export type Props = {
   slug: string;
-  main: (LinkedFile & { state: "ok" | "thin" | "empty" }) | null;
+  /** `longerThan`: the percent of the board's measured files that are shorter. */
+  main: (LinkedFile & { state: "ok" | "thin" | "empty"; longerThan?: number }) | null;
   absentMain: string[];
   others: LinkedFile[];
   absentOthers: string[];
   share: AgentFileShare;
   examplesHref: string;
+  examples: { href: string; label: string }[];
   /** A starter AGENTS.md, for a repo without a usable one. */
   starter?: string | null;
   /** Server-rendered per-agent stubs; without them the starter links to the generator. */
@@ -82,6 +85,14 @@ function MainFile({ main, absentMain }: Pick<Props, "main" | "absentMain">) {
       <Mark ok />
       {file}
       {main.note && <span className="text-muted"> · {main.note}</span>}
+      {main.longerThan != null && (
+        <>
+          <span className="text-muted"> · </span>
+          <IntentLink href={SIZE_REPORT_PATH} className="dim-link">
+            longer than {main.longerThan}% on the board
+          </IntentLink>
+        </>
+      )}
       {main.state === "thin" && <span className="text-muted"> · short</span>}
     </>
   );
@@ -124,9 +135,9 @@ function HowCommon({ share, examplesHref }: Pick<Props, "share" | "examplesHref"
       )}
       {has} of {total} repos on the leaderboard
       <span className="text-muted"> · </span>
-      <Link href={examplesHref} className="arrow-link">
+      <IntentLink href={examplesHref} className="arrow-link">
         See examples →
-      </Link>
+      </IntentLink>
     </>
   );
 }
@@ -139,6 +150,7 @@ export function AgentInstructionsView({
   absentOthers,
   share,
   examplesHref,
+  examples,
   starter,
   companions,
 }: Props) {
@@ -161,9 +173,21 @@ export function AgentInstructionsView({
         <Row label="Repos that have one">
           <HowCommon share={share} examplesHref={examplesHref} />
         </Row>
+        {examples.length > 0 && (
+          <Row label="Examples to copy">
+            {examples.map((e, i) => (
+              <Fragment key={e.href}>
+                {i > 0 && <span className="text-muted"> · </span>}
+                <IntentLink href={e.href} className="ink-link">
+                  {e.label}
+                </IntentLink>
+              </Fragment>
+            ))}
+          </Row>
+        )}
       </dl>
       {starter && (
-        <details>
+        <details id={STARTER_ID} className="scroll-mt-20">
           {/* Padding, not flex, for the 44px tap target: a flex summary loses its disclosure marker. */}
           <summary className="cursor-pointer py-2.5 text-[13px] font-medium ink-link">Get a starter AGENTS.md</summary>
           <p className="m-0 mb-2 text-[13px] text-muted">
@@ -177,9 +201,9 @@ export function AgentInstructionsView({
             </>
           ) : (
             <p className="mt-3 mb-0 text-[13px]">
-              <Link href={GENERATOR_PATH} prefetch={false} className="prose-link">
+              <IntentLink href={GENERATOR_PATH} className="prose-link">
                 What to add beside it for Claude Code, Gemini CLI and others
-              </Link>
+              </IntentLink>
             </p>
           )}
         </details>

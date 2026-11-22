@@ -2,11 +2,14 @@
 
 import Link from "next/link";
 
+import { MODEL_LABEL } from "@/lib/model-labels";
 import type { ModelId } from "@/lib/scoring/weights";
+import { SIGNAL_TEXT } from "@/lib/signal-text";
 import { modelPath } from "@/lib/utils/leaderboard-href";
+import { scoreTier, TIER_BG_CLASS } from "@/lib/utils/score";
 
+import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
-import { ScoreBar } from "./ScoreBar";
 import { ScoreNumber } from "./ScoreNumber";
 
 const MARK = {
@@ -21,10 +24,9 @@ function mark(pass: number) {
 
 export type AgentScoreRow = {
   id: ModelId;
-  label: string;
   score: number | null;
   rank?: { rank: number; total: number };
-  checks: { id: string; label: string; pass: number }[];
+  checks: { id: string; pass: number }[];
 };
 
 export function PerModelScoresView({ rows }: { rows: AgentScoreRow[] }) {
@@ -40,16 +42,16 @@ export function PerModelScoresView({ rows }: { rows: AgentScoreRow[] }) {
       </p>
 
       <div>
-        {rows.map(({ id, label, score: s, rank, checks }) => (
+        {rows.map(({ id, score: s, rank, checks }) => (
           <div key={id} className="agent-row link-row">
             <div className="text-[14.5px]">
-              <Link
+              <IntentLink
                 href={modelPath(id)}
-                aria-label={`${label} leaderboard`}
+                aria-label={`${MODEL_LABEL[id]} leaderboard`}
                 className="font-medium ink-link cover-link"
               >
-                {label}
-              </Link>
+                {MODEL_LABEL[id]}
+              </IntentLink>
               {rank && (
                 <div className="mt-0.5 text-[12px] text-muted">
                   #{rank.rank} of {rank.total}
@@ -60,7 +62,14 @@ export function PerModelScoresView({ rows }: { rows: AgentScoreRow[] }) {
             {s === null ? (
               <div className="bar-place bar-track w-[180px]" aria-hidden />
             ) : (
-              <ScoreBar score={s} width={180} className="bar-place" />
+              // Not ScoreBar's progressbar: the number beside it is what's read, and nine
+              // progressbars restated it in every repo page's HTML.
+              <div aria-hidden className="relative bar-track bar-place w-[180px]">
+                <div
+                  style={{ width: `${Math.max(0, Math.min(100, s))}%` }}
+                  className={`bar-fill ${TIER_BG_CLASS[scoreTier(s)]}`}
+                />
+              </div>
             )}
 
             {s === null ? (
@@ -82,7 +91,7 @@ export function PerModelScoresView({ rows }: { rows: AgentScoreRow[] }) {
                     <span role="img" aria-label={k.label} className={`mark-sm ${k.cls}`}>
                       {k.ch}
                     </span>
-                    {sig.label}
+                    {SIGNAL_TEXT[sig.id].label}
                   </li>
                 );
               })}

@@ -1,9 +1,11 @@
 "use client";
 
-import Link from "next/link";
-
+import { SIGNAL_TEXT } from "@/lib/signal-text";
+import { checkPath } from "@/lib/utils/check-slug";
 import { hostLabel, percent } from "@/lib/utils/format";
 import { matchesDirectory, repoFileUrl } from "@/lib/utils/repo-file-url";
+
+import { IntentLink } from "./IntentLink";
 
 const MARK_CLASSES = {
   ok: { cls: "tint-ok", label: "Pass" },
@@ -23,7 +25,7 @@ function mark(pass: number): { key: keyof typeof MARK_CLASSES; ch: string } {
   return { key: "bad", ch: "✗" };
 }
 
-export type SignalRowData = { id: string; label: string; href: string; pass: number; detail: string; path?: string };
+export type SignalRowData = { id: string; pass: number; detail: string; path?: string };
 export type RepoLocation = Parameters<typeof repoFileUrl>[0];
 
 export function SignalRowsView({ rows, repo }: { rows: SignalRowData[]; repo?: RepoLocation }) {
@@ -53,9 +55,9 @@ function SignalRow({ signal, repo }: { signal: SignalRowData; repo?: RepoLocatio
 
       <div className="min-w-0 flex-1">
         <div className="text-[14.5px]">
-          <Link href={signal.href} className="font-medium ink-link">
-            {signal.label}
-          </Link>
+          <IntentLink href={checkPath(signal.id)} className="font-medium ink-link">
+            {SIGNAL_TEXT[signal.id].label}
+          </IntentLink>
           <span className="check-pass">· {percent(signal.pass, 1)} pass</span>
         </div>
 

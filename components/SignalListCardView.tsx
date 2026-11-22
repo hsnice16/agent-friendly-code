@@ -1,16 +1,20 @@
 "use client";
 
-import Link from "next/link";
+import { SIGNAL_TEXT } from "@/lib/signal-text";
+import { checkPath } from "@/lib/utils/check-slug";
 
+import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
+import { StarterLink, type StarterPage } from "./StarterLink";
 
 type Variant = "strength" | "gap";
-type Item = { id: string; label: string; href: string };
 
 export type Props = {
-  items: Item[];
+  ids: string[];
   variant: Variant;
   empty: { chip: "ok" | "bad"; text: string };
+  /** Set when the page shows a starter AGENTS.md: the missing row links to it. */
+  starterOn?: StarterPage;
 };
 
 const VARIANTS = {
@@ -28,7 +32,7 @@ const VARIANTS = {
   },
 } as const;
 
-export function SignalListCardView({ variant, items, empty }: Props) {
+export function SignalListCardView({ variant, ids, empty, starterOn }: Props) {
   const v = VARIANTS[variant];
 
   return (
@@ -36,17 +40,25 @@ export function SignalListCardView({ variant, items, empty }: Props) {
       <PanelHeading>{v.heading}</PanelHeading>
 
       <ul className="m-0 list-none p-0 text-[14.5px]">
-        {items.length === 0 ? (
+        {ids.length === 0 ? (
           <EmptyRow chip={empty.chip}>{empty.text}</EmptyRow>
         ) : (
-          items.map((s) => (
-            <li key={s.id} className="flex items-center gap-3 link-row">
+          ids.map((id) => (
+            <li key={id} className="flex items-center gap-3 link-row">
               <span role="img" aria-label={v.ariaLabel} className={`mark-md ${v.chipClass}`}>
                 {v.glyph}
               </span>
-              <Link href={s.href} className="ink-link cover-link">
-                {s.label}
-              </Link>
+              <IntentLink href={checkPath(id)} className="ink-link cover-link">
+                {SIGNAL_TEXT[id].label}
+              </IntentLink>
+              {starterOn && id === "agents_md" && (
+                <StarterLink
+                  page={starterOn}
+                  className="ml-auto shrink-0 text-[13px] font-medium text-tip hover:text-ink"
+                >
+                  Draft one ↓
+                </StarterLink>
+              )}
             </li>
           ))
         )}

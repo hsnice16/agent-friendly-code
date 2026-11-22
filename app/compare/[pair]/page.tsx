@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { CodeText } from "@/components/CodeText";
 import { CompareReads } from "@/components/CompareReads";
 import { LanguageLeadTable, WeightGapTable } from "@/components/CompareTables";
 import { ExternalLink } from "@/components/ExternalLink";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
@@ -19,17 +19,18 @@ import { AUTHOR_JSON_LD } from "@/lib/author";
 import { compareAnswer, compareDescription, compareTitle } from "@/lib/compare-copy";
 import { COMPARE_PAIRS, type ComparePair, pairBySlug } from "@/lib/compare-pairs";
 import { LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
-import { getLeaderboardStats } from "@/lib/db";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
+import { boardModified } from "@/lib/page-dates";
 import { MODEL_BY_ID, type ModelProfile } from "@/lib/scoring/weights";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { COMPARE_CRUMB, comparePath } from "@/lib/utils/compare-path";
 import { percent } from "@/lib/utils/format";
 import { GUIDE_PATH } from "@/lib/utils/guide-path";
 import { modelPath } from "@/lib/utils/leaderboard-href";
+import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ pair: string }>;
 
@@ -52,12 +53,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const description = compareDescription(pair, load(pair));
   const path = comparePath(pair.slug);
 
+  const image = ogImage(path, title);
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: path },
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
-    openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description, url: path, type: "article" },
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
+    openGraph: { ...OG_DEFAULTS, images: [image], title, description, url: path, type: "article" },
   };
 }
 
@@ -73,7 +75,7 @@ export default async function ComparePage({ params }: { params: Params }) {
   const gaps = weightGaps(a, b);
   const files = getInstructionFileCounts();
   const sources = [...new Set([a, b].flatMap((m) => [...m.sources, ...(AGENT_READS[m.id].sources ?? [])]))];
-  const { contentChangedAt } = getLeaderboardStats();
+  const modified = boardModified();
   const others = COMPARE_PAIRS.filter((p) => p.slug !== pair.slug);
 
   const ownFileRow = {
@@ -84,9 +86,9 @@ export default async function ComparePage({ params }: { params: Params }) {
       const count = row?.count ?? 0;
       return (
         <>
-          <Link href={checkPath(own.signalId)} className="prose-link">
+          <IntentLink href={checkPath(own.signalId)} className="prose-link">
             {own.file}
-          </Link>
+          </IntentLink>
           {row?.qualifier && ` ${row.qualifier}`}: {count} of {files.total} ({percent(count, files.total)})
         </>
       );
@@ -101,11 +103,11 @@ export default async function ComparePage({ params }: { params: Params }) {
           headline: title,
           description: compareDescription(pair, stats),
           url: `${APP_URL}${path}`,
-          image: `${APP_URL}${DEFAULT_OG_IMAGE.url}`,
+          image: `${APP_URL}/og${path}`,
           about: [a, b].map((m) => ({ "@type": "SoftwareApplication", name: m.label })),
           citation: sources,
           datePublished: "2026-11-16",
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          ...(modified ? { dateModified: modified } : {}),
           author: AUTHOR_JSON_LD,
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
@@ -114,6 +116,7 @@ export default async function ComparePage({ params }: { params: Params }) {
         crumbs={{ parents: [COMPARE_CRUMB], current: { name: `${a.label} vs ${b.label}`, path } }}
         title={title}
         lead={compareAnswer(pair, stats)}
+        updated={modified}
       >
         <p className={`mt-2.5 ${PAGE_LEAD}`}>
           Scores measure how well each repo is set up for an agent: instruction files, tests, CI and the other checks,
@@ -127,9 +130,9 @@ export default async function ComparePage({ params }: { params: Params }) {
         <p className={`${PROSE} mt-3 text-[13px]`}>
           AGENTS.md and CLAUDE.md mean the file at the repo root; a repo with both counts under AGENTS.md, and empty
           files don&apos;t count.{" "}
-          <Link href="/agents" className="prose-link">
+          <IntentLink href="/agents" className="prose-link">
             Every agent&apos;s files
-          </Link>
+          </IntentLink>
           .
         </p>
       </Panel>
@@ -142,9 +145,9 @@ export default async function ComparePage({ params }: { params: Params }) {
             Each figure is the check&apos;s share of the agent&apos;s total weight, from the docs linked below. A check
             few repos pass, such as an agent&apos;s own file, lowers that agent&apos;s scores wherever it carries
             weight. The{" "}
-            <Link href="/methodology" className="prose-link">
+            <IntentLink href="/methodology" className="prose-link">
               methodology
-            </Link>{" "}
+            </IntentLink>{" "}
             lists every weight.
           </p>
         </Panel>
@@ -181,9 +184,9 @@ export default async function ComparePage({ params }: { params: Params }) {
           <ol className="m-0 ml-5 list-decimal text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               Write the shared instructions once, in AGENTS.md at the repo root.{" "}
-              <Link href={checkPath("agents_md")} className="prose-link">
+              <IntentLink href={checkPath("agents_md")} className="prose-link">
                 What to put in it
-              </Link>
+              </IntentLink>
               .
             </li>
             {[a, b].map((m) => (
@@ -193,17 +196,17 @@ export default async function ComparePage({ params }: { params: Params }) {
             ))}
           </ol>
           <p className={`${PROSE} mt-3 text-[13px]`}>
-            <Link href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
+            <IntentLink href={checkSubPath("agents_md", "vs-claude-md")} className="prose-link">
               AGENTS.md vs CLAUDE.md
-            </Link>{" "}
+            </IntentLink>{" "}
             ·{" "}
-            <Link href="/agents" className="prose-link">
+            <IntentLink href="/agents" className="prose-link">
               Which files each agent reads
-            </Link>{" "}
+            </IntentLink>{" "}
             ·{" "}
-            <Link href={GUIDE_PATH} className="prose-link">
+            <IntentLink href={GUIDE_PATH} className="prose-link">
               Make a repo agent-ready
-            </Link>
+            </IntentLink>
           </p>
         </Panel>
       </div>
@@ -221,22 +224,22 @@ export default async function ComparePage({ params }: { params: Params }) {
       </p>
       <p className="mt-2 mb-0 text-[13px] text-muted">
         Boards:{" "}
-        <Link href={modelPath(a.id)} className={LINK}>
+        <IntentLink href={modelPath(a.id)} className={LINK}>
           best set up for {a.label}
-        </Link>
+        </IntentLink>
         {" · "}
-        <Link href={modelPath(b.id)} className={LINK}>
+        <IntentLink href={modelPath(b.id)} className={LINK}>
           best set up for {b.label}
-        </Link>
+        </IntentLink>
       </p>
       <p className="mt-2 mb-0 text-[13px] text-muted">
         More comparisons:{" "}
         {others.map((p, i) => (
           <span key={p.slug}>
             {i > 0 && " · "}
-            <Link href={comparePath(p.slug)} className={LINK}>
+            <IntentLink href={comparePath(p.slug)} className={LINK}>
               {MODEL_BY_ID[p.a].label} vs {MODEL_BY_ID[p.b].label}
-            </Link>
+            </IntentLink>
           </span>
         ))}
       </p>

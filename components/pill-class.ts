@@ -1,5 +1,5 @@
-// Its own module so the client agent switch can import it without pulling
-// ModelPills' MODELS weight tables into the browser bundle.
+// Its own module so client components can import it without pulling the
+// MODELS weight tables into the browser bundle.
 const INACTIVE = "pill pill-off";
 const ACTIVE = "pill border-line-strong bg-surface-hover text-ink";
 

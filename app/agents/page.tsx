@@ -3,15 +3,19 @@ import Link from "next/link";
 import { AgentsMdFaq } from "@/components/AgentsMdFaq";
 import { CodeText } from "@/components/CodeText";
 import { ExternalLink } from "@/components/ExternalLink";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { OtherToolsTable } from "@/components/OtherToolsTable";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { SupportMatrixView } from "@/components/SupportMatrixView";
 import { AGENT_READS, agentsUsingAgentsMd, OTHER_TOOLS } from "@/lib/agent-reads";
-import { AGENT_DOCS_CHECKED, agentsMdFaq, plainText } from "@/lib/agents-faq";
+import { MATRIX_COLUMNS, supportMatrix } from "@/lib/agent-support-matrix";
+import { AGENT_DOCS_CHECKED, agentsMdFaq } from "@/lib/agents-faq";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { getLeaderboardStats } from "@/lib/db";
+import { CENSUS_SUMMARY } from "@/lib/file-census";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { sourceLabel } from "@/lib/leaderboard-model-panel";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
@@ -52,16 +56,6 @@ export default function AgentsPage() {
           publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
         }}
       />
-      <JsonLd
-        data={{
-          "@type": "FAQPage",
-          mainEntity: faqs.map((f) => ({
-            "@type": "Question",
-            name: f.question,
-            acceptedAnswer: { "@type": "Answer", text: plainText(f.answer) },
-          })),
-        }}
-      />
       <PageHeader
         crumbs={{ current: { name: "Agents", path: PATH } }}
         title={PAGE_COPY[PATH].title}
@@ -79,54 +73,66 @@ export default function AgentsPage() {
       />
 
       <Panel>
-        <PanelHeading>Files each agent reads</PanelHeading>
-        {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
-        <section className="table-wrap" tabIndex={0} aria-label="Files each agent reads">
-          <table className="data-table min-w-[620px] text-[14px]">
-            <caption className="sr-only">Repo files each AI coding agent reads</caption>
-            <thead>
-              <tr>
-                <th scope="col">Agent</th>
-                <th scope="col">Reads from the repo</th>
-                <th scope="col">Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {MODELS.map((m) => {
-                const reads = AGENT_READS[m.id];
-                return (
-                  <tr key={m.id} className="align-top">
-                    <th scope="row" className="font-medium">
-                      <Link href={modelPath(m.id)} className={`${LINK} cover-link`}>
-                        {m.label}
-                      </Link>
-                    </th>
-                    <td>
-                      <ul className="m-0 list-none p-0">
-                        {reads.files.map((f) => (
-                          <li key={f}>
-                            <code className={CODE}>{f}</code>
-                          </li>
-                        ))}
-                      </ul>
-                    </td>
-                    <td className="text-ink-dim">
-                      <CodeText text={reads.note} />{" "}
-                      {[...m.sources, ...(reads.sources ?? [])].map((url) => (
-                        <span key={url} className="mr-2 text-[12.5px]">
-                          <ExternalLink href={url} title={url}>
-                            {sourceLabel(url)}
-                          </ExternalLink>
-                        </span>
-                      ))}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </section>
+        <PanelHeading>Which agents read which file</PanelHeading>
+        <SupportMatrix />
+        <p className={`${PROSE} mt-3 text-[13px]`}>
+          Each cell links the agent&apos;s docs. Fallback: read only when CLAUDE.md is missing. Setting: read once
+          configured. —: the docs don&apos;t say. The last row is the share of {CENSUS_SUMMARY.repos} popular GitHub
+          repos with the file, at any depth, on {formatDay(CENSUS_SUMMARY.date)}.
+        </p>
       </Panel>
+
+      <div className="mt-3.5">
+        <Panel>
+          <PanelHeading>Files each agent reads</PanelHeading>
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+          <section className="table-wrap" tabIndex={0} aria-label="Files each agent reads">
+            <table className="data-table min-w-[620px] text-[14px]">
+              <caption className="sr-only">Repo files each AI coding agent reads</caption>
+              <thead>
+                <tr>
+                  <th scope="col">Agent</th>
+                  <th scope="col">Reads from the repo</th>
+                  <th scope="col">Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                {MODELS.map((m) => {
+                  const reads = AGENT_READS[m.id];
+                  return (
+                    <tr key={m.id} className="align-top">
+                      <th scope="row" className="font-medium">
+                        <IntentLink href={modelPath(m.id)} className={`${LINK} cover-link`}>
+                          {m.label}
+                        </IntentLink>
+                      </th>
+                      <td>
+                        <ul className="m-0 list-none p-0">
+                          {reads.files.map((f) => (
+                            <li key={f}>
+                              <code className={CODE}>{f}</code>
+                            </li>
+                          ))}
+                        </ul>
+                      </td>
+                      <td className="text-ink-dim">
+                        <CodeText text={reads.note} />{" "}
+                        {[...m.sources, ...(reads.sources ?? [])].map((url) => (
+                          <span key={url} className="mr-2 text-[12.5px]">
+                            <ExternalLink href={url} title={url}>
+                              {sourceLabel(url)}
+                            </ExternalLink>
+                          </span>
+                        ))}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </section>
+        </Panel>
+      </div>
 
       <div className="mt-3.5">
         <OtherToolsTable tools={OTHER_TOOLS} />
@@ -182,10 +188,10 @@ export default function AgentsPage() {
           <ul className="link-list">
             {counts.files.map((f) => (
               <li key={f.file} className="flex items-baseline justify-between gap-3 link-row">
-                <Link href={checkPath(f.signalId)} className={`${LINK} cover-link`}>
+                <IntentLink href={checkPath(f.signalId)} className={`${LINK} cover-link`}>
                   <code className={CODE}>{f.file}</code>
                   {f.qualifier && ` ${f.qualifier}`}
-                </Link>
+                </IntentLink>
                 <span className="tabular-nums">
                   {f.count} of {counts.total} ({percent(f.count, counts.total)})
                 </span>
@@ -215,4 +221,23 @@ export default function AgentsPage() {
       </p>
     </>
   );
+}
+
+function SupportMatrix() {
+  const docs: string[] = [];
+  const docIndex = (url: string | null) => {
+    if (url == null) return -1;
+    const i = docs.indexOf(url);
+    return i >= 0 ? i : docs.push(url) - 1;
+  };
+  const rows = supportMatrix().map((r) => ({
+    label: r.label,
+    href: r.modelId ? modelPath(r.modelId) : null,
+    cells: r.cells.map((c) => [c.value, docIndex(c.doc)] as [typeof c.value, number]),
+  }));
+  const columns = MATRIX_COLUMNS.map((c) => ({
+    label: c.label,
+    share: percent(c.repos(CENSUS_SUMMARY), CENSUS_SUMMARY.repos),
+  }));
+  return <SupportMatrixView columns={columns} docs={docs} rows={rows} reposLabel="Repos with it" />;
 }

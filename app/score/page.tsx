@@ -2,18 +2,20 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { CheckChecklist } from "@/components/CheckChecklist";
-import { FaqList } from "@/components/FaqList";
+import { FaqSection } from "@/components/FaqSection";
 import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreForm } from "@/components/LiveScoreForm";
 import { PageHeader } from "@/components/PageHeader";
-import { Panel, PanelHeading } from "@/components/Panel";
 import { RecentScores } from "@/components/RecentScores";
 import { getCheckStats } from "@/lib/check-stats";
 import { listLeaderboardOverall } from "@/lib/db";
+import { meetsLeadFloor } from "@/lib/leaderboard-meta";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
-import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { APP_NAME, APP_URL, OG_IMAGE_SIZE } from "@/lib/version";
+
+import { SCORE_FAQ } from "./faq";
 
 const OG_IMAGE = {
   url: "/og/score",
@@ -22,60 +24,6 @@ const OG_IMAGE = {
 };
 
 export const metadata: Metadata = staticPageMetadata("/score", OG_IMAGE);
-
-type FaqEntry = {
-  q: string;
-  a: string;
-  /** Turns one phrase of `a` into a link. `a` stays the plain-text source the JSON-LD needs. */
-  link?: { phrase: string; href: string };
-};
-
-const FAQ: FaqEntry[] = [
-  {
-    q: "What does the agent readiness check look at?",
-    a: `The code repository, not a website or a deployed app: AGENTS.md and the other files agents read, tests, CI, linter and type config, dev setup and the rest of the ${SIGNALS.length} checks. Each is weighted by how much each agent relies on it.`,
-    link: { phrase: `${SIGNALS.length} checks`, href: "/check" },
-  },
-  {
-    q: "Is it free? Do I need an account?",
-    a: "Free, with no signup and no account.",
-  },
-  {
-    q: "Can it write an AGENTS.md for my repo?",
-    a: "If the repo has none, the result includes a starter AGENTS.md drafted from the files the checks found, commands left for you to fill in. More on the AGENTS.md generator.",
-    link: { phrase: "AGENTS.md generator", href: GENERATOR_PATH },
-  },
-  {
-    q: "Which AI coding agent should I use for my codebase?",
-    a: "This page tells you which agent your repo is best set up for, not which writes the best code. Each agent reads different files (Claude Code loads CLAUDE.md, Cursor its rules files), so you get a score and fixes for each.",
-  },
-  {
-    q: "Does the repo have to be on the leaderboard?",
-    a: "No. Any public GitHub repo is scored right away. One already on the leaderboard opens its page, which also shows how the score changed since the last rescore.",
-  },
-  {
-    q: "Is this score different from the leaderboard score?",
-    a: "No. Same checks, same weights. The leaderboard clones each repo daily; this page rebuilds it from GitHub's file list, and a test checks both give the same numbers.",
-  },
-  {
-    q: "Do you save or list my repo anywhere?",
-    a: "No. The result is cached for up to an hour, then dropped. Nothing goes into our database or onto the leaderboard, and search engines are told not to index it. Your list of scored repos stays in your browser.",
-  },
-  {
-    q: "How up to date is the score?",
-    a: "It scores the latest commit and shows which one. Results are cached for an hour, so a very recent push may not show yet.",
-  },
-  {
-    q: "Does it work on private repos, GitLab, or Bitbucket?",
-    a: "Live Score scores public GitHub repos. A GitLab or Bitbucket repo already on the leaderboard opens its page, scored the same way; others are held back by API limits: GitLab returns 100 items per request, Bitbucket allows 60 requests an hour without a login. Private repos would need access we choose not to ask for; run the agent skill locally instead.",
-    link: { phrase: "the agent skill", href: "/skill" },
-  },
-  {
-    q: "Why won't a very large repo get a score?",
-    a: "Past 150,000 files and folders, rebuilding a repo takes longer than a page may run, so we say so rather than give a partial score. The agent skill scores it locally, with no size limit.",
-    link: { phrase: "The agent skill", href: "/skill" },
-  },
-];
 
 const JSON_LD = {
   "@graph": [
@@ -86,47 +34,21 @@ const JSON_LD = {
       name: "Live Score: agent readiness checker",
       isAccessibleForFree: true,
       description: PAGE_COPY["/score"].description,
-      publisher: { "@id": `${APP_URL}/#org` },
+      publisher: PUBLISHER_JSON_LD,
       operatingSystem: "Any",
       applicationCategory: "DeveloperApplication",
       offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
       browserRequirements: "Requires JavaScript-enabled modern browser",
     },
-    {
-      "@type": "FAQPage",
-      mainEntity: FAQ.map((entry) => ({
-        "@type": "Question",
-        name: entry.q,
-        acceptedAnswer: { "@type": "Answer", text: entry.a },
-      })),
-    },
   ],
 };
-
-// Splitting the rendered answer rather than storing a second, marked-up copy:
-// the JSON-LD needs plain text, and two copies of the same sentence is one copy
-// too many. A phrase that stops matching degrades to plain text, not a crash.
-function Answer({ entry }: { entry: FaqEntry }) {
-  const at = entry.link ? entry.a.indexOf(entry.link.phrase) : -1;
-  if (!entry.link || at === -1) return <>{entry.a}</>;
-
-  return (
-    <>
-      {entry.a.slice(0, at)}
-      <Link href={entry.link.href} className="prose-link">
-        {entry.link.phrase}
-      </Link>
-      {entry.a.slice(at + entry.link.phrase.length)}
-    </>
-  );
-}
 
 const EXAMPLES_SHOWN = 10;
 
 export default function ScoreIndexPage() {
   // Shown alongside the visitor's own scores, not replaced by them — otherwise
   // the curated list vanishes the moment someone scores anything.
-  const examples = listLeaderboardOverall().slice(0, EXAMPLES_SHOWN);
+  const examples = listLeaderboardOverall().filter(meetsLeadFloor).slice(0, EXAMPLES_SHOWN);
 
   return (
     <>
@@ -135,29 +57,34 @@ export default function ScoreIndexPage() {
       <PageHeader
         crumbs={{ current: { name: "Live Score", path: "/score" } }}
         title="Agent readiness checker for GitHub repos"
-        lead="Paste a public GitHub repo link for a score per AI coding agent, the one the repo is best set up for, and what to fix first. Free, no signup, nothing saved; same checks and weights as the leaderboard."
+        lead="Paste a public GitHub repo link to see how ready it is for AI coding agents: a score per agent, the one it is best set up for, and what to fix first. Free, no signup, nothing saved; same checks and weights as the leaderboard."
       >
         <LiveScoreForm />
 
         <p className="mt-3 text-[13px] text-muted">
-          GitLab and Bitbucket repos already on the leaderboard open their page; scoring others is coming soon.
+          GitLab and Bitbucket repos already on the leaderboard open their page; scoring others is coming soon. Private
+          or local repo:{" "}
+          <Link href="/skill" className="prose-link">
+            the agent skill
+          </Link>
+          . On every pull request:{" "}
+          <Link href="/action" className="prose-link">
+            the GitHub Action
+          </Link>
+          .
         </p>
       </PageHeader>
 
-      <RecentScores
-        past={examples.map((r) => ({ id: r.id, host: r.host, owner: r.owner, name: r.name, score: r.score ?? 0 }))}
-      />
+      <CheckChecklist rows={SIGNALS.map((s) => ({ id: s.id, label: s.label, ...getCheckStats(s.id) }))} />
 
       <div className="mt-3.5">
-        <CheckChecklist rows={SIGNALS.map((s) => ({ id: s.id, label: s.label, ...getCheckStats(s.id) }))} />
+        <RecentScores
+          past={examples.map((r) => ({ id: r.id, host: r.host, owner: r.owner, name: r.name, score: r.score ?? 0 }))}
+        />
       </div>
 
       <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>Questions</PanelHeading>
-
-          <FaqList items={FAQ.map((e) => ({ key: e.q, q: e.q, a: <Answer entry={e} /> }))} />
-        </Panel>
+        <FaqSection heading="Questions" items={SCORE_FAQ} />
       </div>
     </>
   );

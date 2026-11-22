@@ -11,25 +11,23 @@ const fix = (signalId: string, scoreGain: number) => ({
 });
 
 describe("suggestionSwitchProps", () => {
-  it("sends each fix's text once and keeps every agent's order and gains", () => {
-    const { agents, text } = suggestionSwitchProps([
+  it("keeps every agent's order and gains, and no fix text", () => {
+    const { agents, ...rest } = suggestionSwitchProps([
       { id: "a", label: "A", suggestions: [fix("tests", 4.2), fix("ci", 1)] },
       { id: "b", label: "B", suggestions: [fix("ci", 3.5)] },
       { id: "c", label: "C", suggestions: [] },
     ]);
-    assert.deepEqual(Object.keys(text).sort(), ["ci", "tests"]);
-    assert.deepEqual(text.ci, { label: "ci label", suggestion: "Add ci" });
+    assert.deepEqual(rest, {});
     assert.deepEqual(agents, [
       {
         id: "a",
-        label: "A",
         fixes: [
           ["tests", 4.2],
           ["ci", 1],
         ],
       },
-      { id: "b", label: "B", fixes: [["ci", 3.5]] },
-      { id: "c", label: "C", fixes: [] },
+      { id: "b", fixes: [["ci", 3.5]] },
+      { id: "c", fixes: [] },
     ]);
   });
 });

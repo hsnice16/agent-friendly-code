@@ -45,15 +45,15 @@ export const PAGE_COPY = {
     type: "website",
   },
   "/score": {
-    title: "Agent readiness checker for GitHub repos: free, no signup",
+    title: "Is your repo ready for AI coding agents? Free check",
     description:
-      "Score a public GitHub repo for AI coding agents: an agent readiness score per agent, the one it is best set up for, and what to fix first. Free, no signup.",
+      "Is your repo ready for AI coding agents? Paste a GitHub link for a score per agent, the agent it suits best and what to fix first. Free, no signup.",
     type: "website",
   },
   "/agents-md-generator": {
-    title: "AGENTS.md generator: draft one from your repo",
+    title: "AGENTS.md generator: free, from your GitHub repo",
     description:
-      "Draft an AGENTS.md from a scan of your public GitHub repo: where tests, CI and lint config live, commands left for you. Plus CLAUDE.md and Gemini stubs.",
+      "Free AGENTS.md generator: paste a public GitHub repo URL for a starter AGENTS.md drafted from its files, plus CLAUDE.md and GEMINI.md stubs. No signup.",
     type: "website",
   },
   "/language": {
@@ -132,7 +132,7 @@ export function staticPageMetadata(path: StaticPath, image: Image = DEFAULT_OG_I
 export const AGENTS_VS_CLAUDE_MD = {
   title: "AGENTS.md vs CLAUDE.md: which one should you use?",
   description:
-    "Use AGENTS.md, plus a CLAUDE.md that imports it if you use Claude Code. Which agents read each file, and what Claude Code does when a repo has both.",
+    "Use AGENTS.md, plus a CLAUDE.md that imports it for Claude Code. Which agents read each file, symlink vs @AGENTS.md import, and what popular repos do.",
 } as const;
 
 export const OTHER_LANGUAGES_TITLE = "Agent-friendly repos in other languages";

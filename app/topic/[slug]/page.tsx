@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
+
+import { CommonGapsPanel } from "@/components/CommonGapsPanel";
 import { HubLeaderboardTable } from "@/components/HubLeaderboardTable";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
+import { LeaderClause } from "@/components/LeaderClause";
 import { PageHeader } from "@/components/PageHeader";
+import { leaderSentence } from "@/lib/leaderboard-meta";
 import { getTopicGroups, getTopicPage, type TopicPage } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicDescription, topicPath, topicTitle } from "@/lib/topics";
 import { rowsItemList } from "@/lib/utils/board-item-list";
@@ -25,8 +29,7 @@ function description(t: TopicPage): string {
     label: t.label,
     count: t.rows.length,
     average: t.average,
-    top: `${t.top.owner}/${t.top.name}`,
-    topScore: t.top.score ?? 0,
+    leader: t.top && leaderSentence(t.top),
   });
 }
 
@@ -67,11 +70,14 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         lead={
           <>
             {t.rows.length} repos tagged {t.label} average <strong className="text-ink">{t.average.toFixed(1)}</strong>,{" "}
-            {vs} the leaderboard&apos;s {t.boardAverage.toFixed(1)}, and {percent(t.withAgentFile, t.rows.length)} of
-            them have an AGENTS.md or CLAUDE.md.
+            {vs} the leaderboard&apos;s {t.boardAverage.toFixed(1)}, and {percent(t.withAgentFile, t.rows.length)} have
+            an AGENTS.md or CLAUDE.md.
+            {t.top && <LeaderClause top={t.top} />}
           </>
         }
       />
+
+      <CommonGapsPanel label={t.label} gaps={t.gaps} />
 
       <HubLeaderboardTable
         q=""
@@ -81,7 +87,6 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         totalPages={1}
         rows={t.rows}
         clearSearchHref={path}
-        prefetch={false}
         activeLabel={`${t.label} repos, overall`}
       />
 
@@ -92,13 +97,13 @@ export default async function TopicPageView({ params }: { params: Promise<Params
         >
           <span>Related topics:</span>
           {t.related.map((g) => (
-            <Link key={g.slug} href={topicPath(g.slug)} className="dim-link">
+            <IntentLink key={g.slug} href={topicPath(g.slug)} className="dim-link">
               {g.label}
-            </Link>
+            </IntentLink>
           ))}
-          <Link href={TOPICS_PATH} className="arrow-link">
+          <IntentLink href={TOPICS_PATH} className="arrow-link">
             All topics →
-          </Link>
+          </IntentLink>
         </nav>
       )}
     </>

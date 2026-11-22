@@ -63,7 +63,7 @@ export default function AgentsMdGeneratorPage() {
       <PageHeader
         crumbs={{ current: { name: "AGENTS.md generator", path: PATH } }}
         title={PAGE_COPY[PATH].title}
-        lead="Paste a public GitHub repo link. If the repo has no AGENTS.md or CLAUDE.md, its score page includes a starter AGENTS.md drafted from what the scan finds, ready to copy. Free, no signup."
+        lead="A free AGENTS.md generator: paste a public GitHub repo URL and, if the repo has no AGENTS.md or CLAUDE.md, its score page drafts a starter AGENTS.md from what the scan finds, ready to copy. No signup. It also gives the one-line CLAUDE.md and the Gemini CLI setting that point those agents at it."
       >
         <LiveScoreForm />
       </PageHeader>

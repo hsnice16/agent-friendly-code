@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { AgentsMdExampleTable } from "@/components/AgentsMdExampleTable";
+import { CiteThis } from "@/components/CiteThis";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -18,13 +19,15 @@ import {
   sizeTitle,
 } from "@/lib/agents-md-size";
 import { SIZE_GROUP_MIN } from "@/lib/constants/scoring";
-import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
+import { listLeaderboardOverall } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { boardModified } from "@/lib/page-dates";
 import { checkPath, languageExamplesPath } from "@/lib/utils/check-path";
-import { percent } from "@/lib/utils/format";
+import { formatDate, percent } from "@/lib/utils/format";
+import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
 import { REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const NUMBER = new Intl.NumberFormat("en-US");
@@ -39,14 +42,15 @@ export function generateMetadata(): Metadata {
   const size = getSize();
   const title = sizeTitle(size.measured);
   const description = sizeDescription(size);
+  const image = ogImage(SIZE_REPORT_PATH, title);
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: SIZE_REPORT_PATH },
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
     openGraph: {
       ...OG_DEFAULTS,
-      images: [DEFAULT_OG_IMAGE],
+      images: [image],
       title,
       description,
       url: SIZE_REPORT_PATH,
@@ -55,7 +59,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
-function jsonLd(size: AgentsMdSize, contentChangedAt: number | null): Record<string, unknown> {
+function jsonLd(size: AgentsMdSize, modified: string | null): Record<string, unknown> {
   return {
     "@type": "Dataset",
     "@id": `${APP_URL}${SIZE_REPORT_PATH}#dataset`,
@@ -64,7 +68,7 @@ function jsonLd(size: AgentsMdSize, contentChangedAt: number | null): Record<str
     url: `${APP_URL}${SIZE_REPORT_PATH}`,
     keywords: ["AGENTS.md", "CLAUDE.md", "AGENTS.md size", "CLAUDE.md length", "AI coding agents"],
     isAccessibleForFree: true,
-    ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+    ...(modified ? { dateModified: modified } : {}),
     creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
     license: "https://opensource.org/licenses/MIT",
     isPartOf: { "@id": `${APP_URL}/#dataset` },
@@ -77,17 +81,20 @@ export default function AgentsMdSizePage() {
   const size = getSize();
   const q = size.quantiles;
   const median = chars(q?.p50 ?? null);
+  const modified = boardModified();
+  const asOf = modified ? formatDate(Date.parse(modified) / 1000) : null;
 
   return (
     <>
-      <JsonLd data={jsonLd(size, getLeaderboardStats().contentChangedAt)} />
+      <JsonLd data={jsonLd(size, modified)} />
       <PageHeader
         crumbs={{ current: { name: "AGENTS.md size", path: SIZE_REPORT_PATH } }}
         title="How long should an AGENTS.md be?"
         lead={
           <>
             <strong className="text-ink">
-              The median AGENTS.md or CLAUDE.md in {size.measured} popular open source repos is {median} characters
+              {asOf ? `As of ${asOf}, the` : "The"} median AGENTS.md or CLAUDE.md in {size.measured} popular open source
+              repos is {median} characters
             </strong>
             {q && (
               <>
@@ -98,6 +105,7 @@ export default function AgentsMdSizePage() {
             own docs advise.
           </>
         }
+        updated={modified}
       />
 
       <div className="grid grid-cols-1 gap-3.5 min-[420px]:grid-cols-2 lg:grid-cols-4">
@@ -189,9 +197,9 @@ export default function AgentsMdSizePage() {
           />
           <p className={`${PROSE} mt-3`}>
             Correlation, not cause. The{" "}
-            <Link href={checkPath("agents_md")} className="prose-link">
+            <IntentLink href={checkPath("agents_md")} className="prose-link">
               AGENTS.md check
-            </Link>{" "}
+            </IntentLink>{" "}
             is part of the score and gives files under 800 characters partial credit, so the gap between no file and a
             file is partly built in. Repos that keep a detailed file may also be the ones with the tests, CI and setup
             the rest of the score counts. Nothing here says a longer file makes an agent work better.
@@ -222,14 +230,20 @@ export default function AgentsMdSizePage() {
             </li>
             <li>
               The sample is the leaderboard, rescored daily. Adoption over time:{" "}
-              <Link href={REPORT_PATH} className="prose-link">
+              <IntentLink href={REPORT_PATH} className="prose-link">
                 {REPORT_TITLE}
-              </Link>
+              </IntentLink>
               .
             </li>
           </ul>
         </Panel>
       </div>
+
+      {asOf && (
+        <div className="mt-3.5">
+          <CiteThis title={sizeTitle(size.measured)} path={SIZE_REPORT_PATH} asOf={asOf} />
+        </div>
+      )}
     </>
   );
 }

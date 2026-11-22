@@ -2,8 +2,9 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ModelLeaderboard } from "@/components/ModelLeaderboard";
+import { languageExampleLinks } from "@/lib/agents-md-example-links";
 import { getLeaderboardStats } from "@/lib/db";
-import { getModelPanel } from "@/lib/leaderboard-files";
+import { getAgentsMdExamples, getModelPanel } from "@/lib/leaderboard-files";
 import { leaderboardMetadata } from "@/lib/leaderboard-meta";
 import { resolveLeaderboardView } from "@/lib/leaderboard-view";
 import { MODEL_BY_ID, MODELS } from "@/lib/scoring/weights";
@@ -34,6 +35,7 @@ export default async function ModelPage({ params }: Props) {
       view={resolveLeaderboardView(slug)}
       stats={getLeaderboardStats()}
       panel={getModelPanel(MODEL_BY_ID[slug])}
+      examples={languageExampleLinks(getAgentsMdExamples())}
     />
   );
 }

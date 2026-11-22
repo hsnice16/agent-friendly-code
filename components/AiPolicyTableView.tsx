@@ -1,10 +1,9 @@
 "use client";
 
-import Link from "next/link";
-
 import type { Stance } from "@/lib/ai-policy";
 import { repoPath } from "@/lib/utils/repo-path";
 
+import { IntentLink } from "./IntentLink";
 import { STANCE_CHIP } from "./stance-chip";
 
 // Labels and meanings arrive as props: lib/ai-policy.ts carries the whole policy dataset,
@@ -60,11 +59,10 @@ export function AiPolicyTableView({ groups }: { groups: PolicyGroup[] }) {
                   <tr key={p.key}>
                     <th scope="row" className="font-normal repo-cell">
                       {p.onBoard ? (
-                        // ~120 rows: scrolling past them would prefetch each repo page, a billed ISR read apiece.
-                        <Link href={repoPath(p)} prefetch={false} className="font-medium ink-link cover-link">
+                        <IntentLink href={repoPath(p)} className="font-medium ink-link cover-link">
                           {p.owner}/<wbr />
                           {p.name}
-                        </Link>
+                        </IntentLink>
                       ) : (
                         <span className="font-medium text-ink">
                           {p.owner}/<wbr />

@@ -1,8 +1,7 @@
-import Link from "next/link";
-
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 
 import { ExternalLink } from "./ExternalLink";
+import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
@@ -63,16 +62,16 @@ export function SizeAdvice({ median }: { median: string }) {
         </li>
         <li>
           Under 800 characters, the{" "}
-          <Link href={checkPath("agents_md")} className="prose-link">
+          <IntentLink href={checkPath("agents_md")} className="prose-link">
             AGENTS.md check
-          </Link>{" "}
+          </IntentLink>{" "}
           gives partial credit: a file that short rarely holds the commands and the traps.
         </li>
       </ul>
       <p className={`${PROSE} mt-3`}>
-        <Link href={checkSubPath("agents_md", "examples")} className="arrow-link">
+        <IntentLink href={checkSubPath("agents_md", "examples")} className="arrow-link">
           Real AGENTS.md examples →
-        </Link>
+        </IntentLink>
       </p>
     </Panel>
   );

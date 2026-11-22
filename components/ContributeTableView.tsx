@@ -1,11 +1,10 @@
 "use client";
 
-import Link from "next/link";
-
 import type { ContributePolicy } from "@/lib/contribute";
 import { compactStars } from "@/lib/utils/format";
 import { repoPath } from "@/lib/utils/repo-path";
 
+import { IntentLink } from "./IntentLink";
 import { ScoreNumber } from "./ScoreNumber";
 
 // On a phone the repo, its score and whether it has an agent file are the pick; the rest is on the repo page.
@@ -97,11 +96,10 @@ export function ContributeTableView({ rows, caption, showLanguage = true, policy
             <tr key={r.id}>
               <td className="text-right tabular-nums text-muted">{i + 1}</td>
               <td className="repo-cell">
-                {/* A long table: scrolling past it would prefetch each repo page, a billed ISR read apiece. */}
-                <Link href={repoPath(r)} prefetch={false} className="font-medium ink-link cover-link">
+                <IntentLink href={repoPath(r)} className="font-medium ink-link cover-link">
                   {r.owner}/<wbr />
                   {r.name}
-                </Link>
+                </IntentLink>
               </td>
               {showLanguage && <td className={`whitespace-nowrap text-ink-dim ${WIDE_ONLY}`}>{r.language ?? "—"}</td>}
               <td className={`num-cell ${WIDE_ONLY}`}>{compactStars(r.stars)}</td>

@@ -1,10 +1,9 @@
-import Link from "next/link";
-
 import { bestAgents, type ScoredRepo } from "@/lib/agent-scores";
 import { compactStars } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { repoPath } from "@/lib/utils/repo-path";
 
+import { IntentLink } from "./IntentLink";
 import { LINK } from "./link-class";
 import { ScoreNumber } from "./ScoreNumber";
 
@@ -32,9 +31,9 @@ export function RepoBestAgentTable({ rows, label }: { rows: ScoredRepo[]; label:
             return (
               <tr key={r.id}>
                 <th scope="row" className="font-medium">
-                  <Link href={repoPath(r)} className={`${LINK} cover-link`}>
+                  <IntentLink href={repoPath(r)} className={`${LINK} cover-link`}>
                     {r.owner}/{r.name}
-                  </Link>
+                  </IntentLink>
                   {r.stars != null && (
                     <span className="ml-1.5 text-[12px] font-normal text-muted">{compactStars(r.stars)}</span>
                   )}
@@ -46,9 +45,9 @@ export function RepoBestAgentTable({ rows, label }: { rows: ScoredRepo[]; label:
                   {best.map((m, i) => (
                     <span key={m.id}>
                       {i > 0 && ", "}
-                      <Link href={modelPath(m.id)} className="prose-link">
+                      <IntentLink href={modelPath(m.id)} className="prose-link">
                         {m.label}
-                      </Link>
+                      </IntentLink>
                     </span>
                   ))}
                   {score != null && <span className="tabular-nums text-muted"> · {score.toFixed(1)}</span>}

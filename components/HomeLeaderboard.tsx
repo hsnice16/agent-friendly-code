@@ -1,16 +1,19 @@
-import Link from "next/link";
-
 import { CHANGELOG } from "@/lib/changelog";
-import { HOSTS_TEXT } from "@/lib/leaderboard-meta";
+import { HOSTS_TEXT, pageRanks } from "@/lib/leaderboard-meta";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import type { LeaderboardStats } from "@/lib/types/db";
 import { checkSubPath } from "@/lib/utils/check-path";
+import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { APP_VERSION } from "@/lib/version";
+
+import { BoardKeyStat } from "./BoardKeyStat";
 import { HomeJsonLd } from "./HomeJsonLd";
+import { IntentLink } from "./IntentLink";
 import { LeaderboardBoard } from "./LeaderboardBoard";
 import { LiveScoreForm } from "./LiveScoreForm";
 import { PAGE_LEAD, PageHeader } from "./PageHeader";
 import { ReleaseAnnouncement } from "./ReleaseAnnouncement";
+import { TrackedLink } from "./TrackedLink";
 
 const CTA = "font-medium text-tip hover:text-ink";
 
@@ -20,6 +23,27 @@ type Props = {
 };
 
 export function HomeLeaderboard({ view, stats }: Props) {
+  if (view.page > 1) {
+    const { first, last } = pageRanks(view);
+    return (
+      <>
+        <HomeJsonLd view={view} contentChangedAt={stats.contentChangedAt} />
+        <PageHeader
+          title={`Leaderboard: ranks ${first}–${last}`}
+          lead={
+            <>
+              Page {view.page} of {view.totalPages}, ranked by the average of every agent&rsquo;s score.{" "}
+              <IntentLink href="/" className="prose-link">
+                Back to the top repos
+              </IntentLink>
+            </>
+          }
+        />
+        <LeaderboardBoard view={view} stats={stats} rationale={false} />
+      </>
+    );
+  }
+
   return (
     <>
       <HomeJsonLd view={view} contentChangedAt={stats.contentChangedAt} />
@@ -37,42 +61,52 @@ export function HomeLeaderboard({ view, stats }: Props) {
             </p>
           </div>
           <LiveScoreForm className="mt-3" />
+          <p className="m-0 mt-2.5 text-[13px] text-muted">
+            No AGENTS.md yet?{" "}
+            <TrackedLink
+              href={GENERATOR_PATH}
+              prefetch={false}
+              event={{ name: "generator_cta_click", page: "home" }}
+              className={CTA}
+            >
+              Draft one from your repo →
+            </TrackedLink>
+          </p>
         </div>
 
         <p className={`mt-4 ${PAGE_LEAD}`}>
           {/* Visitors click this line expecting a link. */}
           Repos from {HOSTS_TEXT},{" "}
-          <Link href="/methodology" className="prose-link">
+          <IntentLink href="/methodology" className="prose-link">
             scored on what each agent looks for
-          </Link>
+          </IntentLink>
           , then ranked.
         </p>
+        <BoardKeyStat />
 
         <p className="mt-3 max-w-[68ch] text-[13px] text-muted">
           Or check an{" "}
-          <Link href="/package" className={CTA}>
+          <IntentLink href="/package" className={CTA}>
             npm / PyPI / Cargo package
-          </Link>
+          </IntentLink>
           , run the{" "}
-          <Link href="/skill" className={CTA}>
+          <IntentLink href="/skill" className={CTA}>
             agent skill
-          </Link>{" "}
+          </IntentLink>{" "}
           locally, add the{" "}
-          <Link href="/action" className={CTA}>
+          <IntentLink href="/action" className={CTA}>
             GitHub Action
-          </Link>{" "}
+          </IntentLink>{" "}
           to score every pull request, or read{" "}
-          <Link href={checkSubPath("agents_md", "examples")} className={CTA}>
+          <IntentLink href={checkSubPath("agents_md", "examples")} className={CTA}>
             AGENTS.md examples
-          </Link>{" "}
+          </IntentLink>{" "}
           from popular repos.
         </p>
       </PageHeader>
 
-      {/* Announced only once the release it describes is the one deployed —
-          otherwise a version bump ahead of the changelog entry (or behind it)
-          would advertise the wrong thing. It points at the section that
-          release is about, so move it when the next one is cut. */}
+      {/* Only while the deployed version has its changelog entry. It points at
+          the section that release is about, so move it when the next is cut. */}
       {CHANGELOG[0]?.label === APP_VERSION && <ReleaseAnnouncement version={APP_VERSION} title={CHANGELOG[0].title} />}
 
       <LeaderboardBoard view={view} stats={stats} />

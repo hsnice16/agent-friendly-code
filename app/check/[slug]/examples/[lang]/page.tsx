@@ -1,28 +1,33 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { AgentsMdExampleTable } from "@/components/AgentsMdExampleTable";
 import { AgentsMdFrameworkGuide, AgentsMdGuidePanels } from "@/components/AgentsMdFrameworkGuide";
+import { BestAgentsMdExample } from "@/components/BestAgentsMdExample";
 import { CodeText } from "@/components/CodeText";
+import { GeneratorCallout } from "@/components/GeneratorCallout";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { frameworkLinksForLanguage, languageLinksForFramework } from "@/lib/agents-md-example-links";
 import {
   examplesByLanguage,
   type LanguageExamples,
   languageExamplesDescription,
   languageExamplesTitle,
 } from "@/lib/agents-md-examples";
+import { censusLookup, pickBestExample } from "@/lib/agents-md-examples-best";
 import {
   examplesByFramework,
   type FrameworkExamples,
   frameworkExamplesDescription,
   frameworkExamplesTitle,
 } from "@/lib/agents-md-frameworks";
-import { AUTHOR_JSON_LD } from "@/lib/author";
+import { CENSUS } from "@/lib/file-census";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { frameworkModified, rowsModified } from "@/lib/page-dates";
 import {
   CHECKS_CRUMB,
   checkCrumb,
@@ -33,9 +38,11 @@ import {
   languageExamplesPath,
 } from "@/lib/utils/check-path";
 import { hubPath } from "@/lib/utils/language";
+import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
-import { repoPath } from "@/lib/utils/repo-path";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+
+import { frameworkJsonLd, languageJsonLd } from "./json-ld";
 
 const SIGNAL_ID = "agents_md";
 
@@ -64,31 +71,6 @@ async function frameworkOf(params: Params): Promise<FrameworkExamples | null> {
   return examplesByFramework(getAgentsMdExamples()).find((f) => f.guide.slug === lang) ?? null;
 }
 
-function frameworkJsonLd(f: FrameworkExamples) {
-  const changed = Math.max(0, ...f.rows.map((r) => r.content_changed_at ?? 0));
-  const url = `${APP_URL}${frameworkExamplesPath(f.guide.slug)}`;
-  return {
-    "@type": "TechArticle",
-    headline: frameworkExamplesTitle(f),
-    description: frameworkExamplesDescription(f),
-    url,
-    image: `${APP_URL}${DEFAULT_OG_IMAGE.url}`,
-    about: [
-      { "@type": "Thing", name: "AGENTS.md" },
-      { "@type": "SoftwareApplication", name: f.guide.label },
-    ],
-    citation: f.guide.sources,
-    ...(changed > 0 ? { dateModified: new Date(changed * 1000).toISOString() } : {}),
-    author: AUTHOR_JSON_LD,
-    publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
-    mentions: f.rows.map((r) => ({
-      "@type": "SoftwareSourceCode",
-      name: `${r.owner}/${r.name}`,
-      url: `${APP_URL}${repoPath(r)}`,
-    })),
-  };
-}
-
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const framework = await frameworkOf(params);
   const lang = framework ? null : await languageOf(params);
@@ -108,47 +90,13 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   if (!meta) return {};
   const { path, title, description } = meta;
 
+  const image = ogImage(path, title);
   return {
     title: pageTitle(title),
     description,
     alternates: { canonical: path },
-    twitter: { ...TWITTER_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description },
-    openGraph: { ...OG_DEFAULTS, images: [DEFAULT_OG_IMAGE], title, description, url: path, type: "website" },
-  };
-}
-
-function jsonLd(lang: LanguageExamples) {
-  // Matches the sitemap's lastmod: the newest change among this language's repos.
-  const changed = Math.max(0, ...lang.rows.map((r) => r.content_changed_at ?? 0));
-  const url = `${APP_URL}${languageExamplesPath(lang.slug)}`;
-  return {
-    "@graph": [
-      {
-        "@type": "CollectionPage",
-        "@id": `${url}#page`,
-        url,
-        name: languageExamplesTitle(lang),
-        description: languageExamplesDescription(lang),
-        about: [
-          { "@type": "Thing", name: "AGENTS.md" },
-          { "@type": "ComputerLanguage", name: lang.label },
-        ],
-        ...(lang.guide ? { citation: lang.guide.sources } : {}),
-        isPartOf: { "@id": `${APP_URL}/#site` },
-        ...(changed > 0 ? { dateModified: new Date(changed * 1000).toISOString() } : {}),
-        mainEntity: {
-          "@type": "ItemList",
-          name: `${lang.label} repos with an AGENTS.md or CLAUDE.md`,
-          numberOfItems: lang.rows.length,
-          itemListElement: lang.rows.map((r, i) => ({
-            "@type": "ListItem",
-            position: i + 1,
-            name: `${r.owner}/${r.name}`,
-            url: `${APP_URL}${repoPath(r)}`,
-          })),
-        },
-      },
-    ],
+    twitter: { ...TWITTER_DEFAULTS, images: [image], title, description },
+    openGraph: { ...OG_DEFAULTS, images: [image], title, description, url: path, type: "website" },
   };
 }
 
@@ -167,12 +115,14 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
           }}
           title={`What to put in an AGENTS.md for ${framework.guide.label}`}
           lead={<CodeText text={framework.guide.intro} />}
+          updated={frameworkModified(framework)}
         />
         <AgentsMdFrameworkGuide
           framework={framework}
           others={examplesByFramework(getAgentsMdExamples())
             .filter((f) => f.guide.slug !== framework.guide.slug)
             .map((f) => f.guide)}
+          languages={languageLinksForFramework(getAgentsMdExamples(), framework.guide)}
         />
       </>
     );
@@ -182,15 +132,18 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
   if (!lang) notFound();
 
   const others = examplesByLanguage(getAgentsMdExamples()).filter((l) => l.slug !== lang.slug);
+  const frameworks = frameworkLinksForLanguage(getAgentsMdExamples(), lang.slug);
+  const best = pickBestExample(lang.rows, censusLookup(CENSUS.repos));
 
   return (
     <>
-      <JsonLd data={jsonLd(lang)} />
+      <JsonLd data={languageJsonLd(lang)} />
       <PageHeader
         crumbs={{
           parents: [...trail, { name: "Examples", path: examplesPath }],
           current: { name: lang.label, path: languageExamplesPath(lang.slug) },
         }}
+        updated={rowsModified(lang.rows)}
         title={
           lang.guide
             ? `What to put in an AGENTS.md for a ${lang.label} repo`
@@ -199,9 +152,15 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
         lead={lang.guide ? <CodeText text={lang.guide.intro} /> : <ExamplesSummary lang={lang} />}
       />
 
-      {lang.guide && <AgentsMdGuidePanels guide={lang.guide} />}
+      {best && <BestAgentsMdExample best={best} language={lang.label} />}
 
-      <div className={lang.guide ? "mt-3.5" : undefined}>
+      {lang.guide && (
+        <div className={best ? "mt-3.5" : undefined}>
+          <AgentsMdGuidePanels guide={lang.guide} />
+        </div>
+      )}
+
+      <div className={best || lang.guide ? "mt-3.5" : undefined}>
         <Panel>
           <PanelHeading>
             {lang.label} repos with an AGENTS.md or CLAUDE.md ({lang.rows.length})
@@ -220,35 +179,53 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
       </div>
 
       <div className="mt-3.5">
+        <GeneratorCallout page="language" />
+      </div>
+
+      <div className="mt-3.5">
         <Panel>
           <PanelHeading>More examples</PanelHeading>
           <ul className="m-0 mb-3 flex list-none flex-col p-0 text-[14.5px] text-ink-dim">
             <li className="link-row">
-              <Link href={examplesPath} className={`${LINK} cover-link`}>
+              <IntentLink href={examplesPath} className={`${LINK} cover-link`}>
                 Every language
-              </Link>
-              : all {getAgentsMdExamples().rows.length} files, with the longest and shortest that pass
+              </IntentLink>
+              : {getAgentsMdExamples().rows.length} files by language and framework, the longest and shortest that pass,
+              and a CSV of all of them
             </li>
             <li className="link-row">
-              <Link href={hubPath(lang.slug)} className={`${LINK} cover-link`}>
+              <IntentLink href={hubPath(lang.slug)} className={`${LINK} cover-link`}>
                 Most agent-friendly {lang.label} repos
-              </Link>
+              </IntentLink>
               : all {lang.total}, ranked on every check
             </li>
             <li className="link-row">
-              <Link href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={`${LINK} cover-link`}>
+              <IntentLink href={checkSubPath(SIGNAL_ID, "vs-claude-md")} className={`${LINK} cover-link`}>
                 AGENTS.md vs CLAUDE.md
-              </Link>
+              </IntentLink>
               : which file to write
             </li>
+            {frameworks.length > 0 && (
+              <li className="py-2">
+                {frameworks.map((f, i) => (
+                  <span key={f.href}>
+                    {i > 0 && " · "}
+                    <IntentLink href={f.href} className={LINK}>
+                      {f.label}
+                    </IntentLink>
+                  </span>
+                ))}
+                : {lang.label} frameworks, with what to put in the file
+              </li>
+            )}
           </ul>
           {others.length > 0 && (
             <ul className="m-0 flex list-none flex-wrap gap-x-4 gap-y-1.5 p-0 text-[14px] text-ink-dim">
               {others.map((l) => (
                 <li key={l.slug}>
-                  <Link href={languageExamplesPath(l.slug)} className={LINK}>
+                  <IntentLink href={languageExamplesPath(l.slug)} className={LINK}>
                     {l.label}
-                  </Link>{" "}
+                  </IntentLink>{" "}
                   <span className="tabular-nums text-muted">({l.rows.length})</span>
                 </li>
               ))}
@@ -265,9 +242,9 @@ function ExamplesSummary({ lang }: { lang: LanguageExamples }) {
     <>
       {lang.rows.length} of {lang.total} {lang.label} leaderboard repos have an AGENTS.md or CLAUDE.md at the root, and{" "}
       {lang.passing} are long enough to pass the{" "}
-      <Link href={checkPath(SIGNAL_ID)} className="prose-link">
+      <IntentLink href={checkPath(SIGNAL_ID)} className="prose-link">
         AGENTS.md check
-      </Link>{" "}
+      </IntentLink>{" "}
       in full. Most-starred first; each file name links to the file.
     </>
   );

@@ -72,10 +72,10 @@ export const AGENT_FILE_CHECKS: Record<string, CheckContent> = {
     fix: "Set `test-cmd` and `lint-cmd` to the commands your CI runs, turn on `auto-test`, and list AGENTS.md under `read:`.",
   },
   agent_skills: {
-    title: ".agents/skills: agent skills in open source repos",
+    title: "What are agent skills? SKILL.md, installing, and examples",
     description:
-      "What agent skills in .agents/skills are, which AI coding agents load them, how we score them, and how many popular open source repos ship them.",
-    what: "An agent skill is a folder in `.agents/skills/` holding a `SKILL.md`: a name and description in its frontmatter, then the steps for one task, such as running a single test or cutting a release. Agents read the descriptions up front and load a skill only when a task matches.",
+      "Agent skills are folders with a SKILL.md that agents load when a task matches: how to install one, which agents read .agents/skills, and who ships them.",
+    what: "An agent skill is a folder holding a `SKILL.md`: a `name` and `description` in its frontmatter, then the steps for one task, such as running a single test or cutting a release. Agents read only the descriptions up front and load a skill when a task matches. Install one with `npx skills add <owner>/<repo>`, or `gh skill install <owner>/<repo> <skill>` in GitHub CLI 2.90 or later; a repo's own skills go in `.agents/skills/`.",
     why: "AGENTS.md loads in full every time, so it must stay short. Skills hold longer task-specific steps without costing context on every task. Codex, Cursor, Devin, Gemini CLI, Kimi Code CLI, OpenHands and Pi all load `.agents/skills/`. Claude Code keeps its skills in `.claude/skills/` instead, and Aider has none, so the check does not count for them. Cursor and Devin also load `.claude/skills/`, but only `.agents/skills/` reaches all seven.",
     scoring: [
       "Full pass: at least one `.agents/skills/<name>/SKILL.md` at the repo root.",

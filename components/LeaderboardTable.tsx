@@ -7,6 +7,7 @@ import { sanitizeDescription } from "@/lib/utils/repo-about";
 import { repoPath } from "@/lib/utils/repo-path";
 import { BadgeAdoptedTag } from "./BadgeAdoptedTag";
 import { HostPill } from "./HostPill";
+import { IntentLink } from "./IntentLink";
 import { Medal } from "./Medal";
 import { OwnRepoTag } from "./OwnRepoTag";
 import { ScoreCell } from "./ScoreCell";
@@ -35,14 +36,12 @@ type Props = {
   loading?: boolean;
   /** Replaces the rows, e.g. when the board data failed to load. */
   notice?: ReactNode;
-  /** Off on the long hub lists: each visible row would prefetch a repo page, an ISR read. */
-  prefetch?: boolean;
 };
 
 // On the body, not each row: the board's HTML repeats a row's classes per row.
 // Not on the notice row, whose cell keeps its own padding.
 const ROW_CELLS =
-  "*:[&>td]:border-b *:[&>td]:border-line *:[&>td]:px-3 *:[&>td]:py-[13px] *:[&>td]:text-[15px] *:hover:[&>td]:bg-surface-hover *:last:[&>td]:border-b-0 sm:*:[&>td]:px-[18px]";
+  "board-cells *:[&>td]:border-b *:[&>td]:border-line *:[&>td]:px-3 *:[&>td]:py-[13px] *:[&>td]:text-[15px] *:hover:[&>td]:bg-surface-hover *:last:[&>td]:border-b-0 sm:*:[&>td]:px-[18px]";
 
 export function LeaderboardTable({
   q,
@@ -60,7 +59,6 @@ export function LeaderboardTable({
   busy = false,
   loading = false,
   notice,
-  prefetch,
 }: Props) {
   const inPlace = (fn?: () => void) =>
     fn
@@ -151,42 +149,40 @@ export function LeaderboardTable({
                 <tr
                   // biome-ignore lint/suspicious/noArrayIndexKey: stable position keeps ScoreBar mounted so width transitions animate across re-renders
                   key={i}
-                  className="relative cursor-pointer"
                 >
-                  <td className="tabular-nums text-muted">
+                  <td>
                     <Medal rank={rank} />
                   </td>
                   <td>
-                    <Link
+                    <IntentLink
                       href={repoPath(r)}
-                      prefetch={prefetch}
                       aria-label={`View ${r.owner}/${r.name} details`}
-                      className="font-medium ink-link [overflow-wrap:anywhere] cover-link"
+                      className="ink-link cover-link"
                     >
                       {r.owner}/{r.name}
-                    </Link>
+                    </IntentLink>
                     <OwnRepoTag repo={r} />
                     <HostPill host={r.host} />
                     {r.badge_embedded ? <BadgeAdoptedTag /> : null}
                     {/* No title tooltip: the row's link overlay covers it, and the repo page has the full text. */}
                     {description && <p className="row-desc">{description}</p>}
                   </td>
-                  <td className="num-cell wide-only">
+                  <td>
                     <span>{compactStars(r.stars)}</span>
                   </td>
-                  <td className="text-right">
+                  <td>
                     <ScoreCell score={r.score} />
                   </td>
                   {/* Below `sm` the table would scroll sideways; the repo page links the host anyway. */}
-                  <td className="wide-only">
+                  <td>
                     <a
                       href={r.url}
                       rel="noopener noreferrer"
                       target="_blank"
                       aria-label={`Open ${r.owner}/${r.name} on ${r.host} (new tab)`}
-                      className="relative inline-flex items-center gap-1 whitespace-nowrap dim-link"
+                      className="dim-link"
                     >
-                      open <span aria-hidden="true" className="icon-out [--icon-size:14px]" />
+                      open <span aria-hidden="true" className="icon-out" />
                     </a>
                   </td>
                 </tr>

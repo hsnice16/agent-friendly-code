@@ -14,7 +14,7 @@ export type ScoreSummary = {
   signalCount: number;
   best: (ModelFit & { tiedWith: number }) | null;
   worst: ModelFit | null;
-  worstGap: { label: string; scoreGain: number } | null;
+  worstGap: { signalId: string; label: string; scoreGain: number } | null;
 };
 
 export type RepoSummary = ScoreSummary & {
@@ -39,7 +39,7 @@ export function summarizeScore(modelScores: ModelScoreRow[], signals: SignalResu
     signalCount: signals.length,
     best: top ? { ...top, tiedWith: fits.filter((f) => f.score === top.score).length - 1 } : null,
     worst,
-    worstGap: gap ? { label: gap.label, scoreGain: gap.scoreGain } : null,
+    worstGap: gap ? { signalId: gap.signalId, label: gap.label, scoreGain: gap.scoreGain } : null,
   };
 }
 

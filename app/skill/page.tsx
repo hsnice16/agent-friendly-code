@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
-import { FaqList } from "@/components/FaqList";
+import { FaqSection } from "@/components/FaqSection";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -10,20 +10,12 @@ import { SkillsShRail } from "@/components/SkillsShRail";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { CLAUDE_HOOK_SNIPPET, CODEX_HOOK_SNIPPET, SCORE_BANDS, SKILL_FAQ } from "@/lib/skill-content";
 import { agentList } from "@/lib/utils/agent-list";
 import { ACTION_REPO_URL, APP_URL, SKILL_INSTALL_CMD, SKILL_LISTING_URL, SKILL_REPO_URL } from "@/lib/version";
 
 export const metadata: Metadata = staticPageMetadata("/skill");
-
-const FAQ_JSON_LD = {
-  "@type": "FAQPage",
-  mainEntity: SKILL_FAQ.map((entry) => ({
-    "@type": "Question",
-    name: entry.q,
-    acceptedAnswer: { "@type": "Answer", text: entry.a },
-  })),
-};
 
 const APPLICATION_JSON_LD = {
   "@graph": [
@@ -35,7 +27,7 @@ const APPLICATION_JSON_LD = {
       isAccessibleForFree: true,
       name: "Agent Friendly Skill",
       description: PAGE_COPY["/skill"].description,
-      publisher: { "@id": `${APP_URL}/#org` },
+      publisher: PUBLISHER_JSON_LD,
       operatingSystem: "macOS, Linux, Windows",
       applicationCategory: "DeveloperApplication",
       license: "https://opensource.org/licenses/MIT",
@@ -49,7 +41,6 @@ export default function SkillPage() {
   return (
     <>
       <JsonLd data={APPLICATION_JSON_LD} />
-      <JsonLd data={FAQ_JSON_LD} />
       <SkillsShRail />
 
       <PageHeader
@@ -169,11 +160,7 @@ export default function SkillPage() {
       </div>
 
       <div className="mt-3.5">
-        <Panel>
-          <PanelHeading>FAQ</PanelHeading>
-
-          <FaqList items={SKILL_FAQ.map((e) => ({ key: e.q, q: e.q, a: e.a }))} />
-        </Panel>
+        <FaqSection heading="FAQ" items={SKILL_FAQ} />
       </div>
 
       <div className="mt-3.5">

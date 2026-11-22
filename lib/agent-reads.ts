@@ -20,7 +20,15 @@ export type AgentReads = {
 // page copy, and every line is something the agent's docs state.
 export const AGENT_READS: Record<ModelId, AgentReads> = {
   "claude-code": {
-    files: ["CLAUDE.md", ".claude/CLAUDE.md", ".claude/rules/", "CLAUDE.local.md", "AGENTS.md", ".claude/AGENTS.md"],
+    files: [
+      "CLAUDE.md",
+      ".claude/CLAUDE.md",
+      ".claude/rules/",
+      "CLAUDE.local.md",
+      "AGENTS.md",
+      ".claude/AGENTS.md",
+      ".claude/skills/",
+    ],
     agentsMd: "fallback",
     claudeMd: true,
     note: "Reads AGENTS.md only when no CLAUDE.md, `.claude/CLAUDE.md` or CLAUDE.local.md is found (v2.1.277 and later). A CLAUDE.md that imports `@AGENTS.md` loads both, as does a setting.",
@@ -49,6 +57,7 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     note: "Looks for AGENTS.md before it starts coding and includes its first 16 KiB. Pulls CLAUDE.md and Cursor rule files into its Knowledge. Setup comes from its environment snapshot, which `.devin/blueprint.yaml` can define.",
     sources: [
       "https://docs.devin.ai/onboard-devin/agents-md",
+      "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
       "https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints",
     ],
   },

@@ -2,7 +2,15 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 import { CHECK_CONTENT } from "../lib/check-content";
 import { VS_AGENTS_MD } from "../lib/check-content/vs-agents-md";
-import { leaderboardDescription, leaderboardTitle } from "../lib/leaderboard-meta";
+import { LEAD_MIN_STARS, LEADERBOARD_FIRST_PAGE_SIZE, LEADERBOARD_PAGE_SIZE } from "../lib/constants/scoring";
+import {
+  boardLeader,
+  leaderboardDescription,
+  leaderboardMetadata,
+  leaderboardTitle,
+  meetsLeadFloor,
+  pageRanks,
+} from "../lib/leaderboard-meta";
 import type { LeaderboardView } from "../lib/leaderboard-view";
 import { MODELS } from "../lib/scoring/weights";
 import type { LeaderboardRow } from "../lib/types/db";
@@ -13,6 +21,7 @@ function view(over: Partial<LeaderboardView> = {}): LeaderboardView {
     owner: "a-rather-long-organisation",
     name: `an-even-longer-repository-name-${i}`,
     score: 90 - i / 10,
+    stars: 50_000,
   })) as unknown as LeaderboardRow[];
   return { page: 1, totalPages: 12, model: "overall", allRows: rows, ...over };
 }
@@ -69,5 +78,40 @@ describe("leaderboard metadata", () => {
 
   it("gives deeper pages their own title", () => {
     assert.notEqual(leaderboardTitle(view({ model: "aider", page: 2 })), leaderboardTitle(view({ model: "aider" })));
+  });
+
+  it("names the best repo above the star floor, not a tiny one ranked first", () => {
+    const rows = [
+      { owner: "tiny", name: "one", score: 100, stars: 2 },
+      { owner: "big", name: "two", score: 92.5, stars: LEAD_MIN_STARS },
+    ] as unknown as LeaderboardRow[];
+    assert.equal(boardLeader(rows)?.owner, "big");
+    assert.equal(boardLeader(rows.slice(0, 1)), undefined);
+    assert.deepEqual(rows.map(meetsLeadFloor), [false, true]);
+
+    const d = leaderboardDescription(view({ model: "claude-code", allRows: rows }));
+    assert.match(d, /big\/two \(92.5\)/);
+    assert.doesNotMatch(d, /tiny\/one/);
+  });
+
+  it("keeps page 2+ out of the index but crawlable, each its own canonical", () => {
+    assert.equal(leaderboardMetadata(view({ model: "cursor" })).robots, undefined);
+    for (const model of ["overall" as const, "cursor" as const]) {
+      const meta = leaderboardMetadata(view({ model, page: 2 }));
+      assert.deepEqual(meta.robots, { index: false, follow: true });
+      assert.equal(meta.alternates?.canonical, model === "overall" ? "/page/2" : "/model/cursor/page/2");
+    }
+  });
+});
+
+describe("pageRanks", () => {
+  it("gives the 1-based ranks each page shows, the last page cut short", () => {
+    const allRows = view().allRows;
+    assert.deepEqual(pageRanks({ page: 1, allRows }), { first: 1, last: LEADERBOARD_FIRST_PAGE_SIZE });
+    assert.deepEqual(pageRanks({ page: 2, allRows }), {
+      first: LEADERBOARD_FIRST_PAGE_SIZE + 1,
+      last: Math.min(allRows.length, LEADERBOARD_FIRST_PAGE_SIZE + LEADERBOARD_PAGE_SIZE),
+    });
+    assert.deepEqual(pageRanks({ page: 1, allRows: allRows.slice(0, 3) }), { first: 1, last: 3 });
   });
 });

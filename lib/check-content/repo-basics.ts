@@ -123,17 +123,17 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Cover branch naming, commit message style, the commands to run before pushing, and how review works. Keep agent-specific rules in AGENTS.md and link the two.",
   },
   pre_commit: {
-    title: "Pre-commit hooks: catching AI coding agent mistakes before CI",
-    metaTitle: "Pre-commit hooks: catch AI agent mistakes before CI",
+    title: "Do pre-commit hooks run when an AI coding agent commits?",
+    metaTitle: "Pre-commit hooks for AI coding agents, and --no-verify",
     description:
-      "Why git hooks help AI coding agents, which hook frameworks we detect, and how many popular open source repos use one.",
-    what: "This check looks for a git hook framework: pre-commit or prek, Husky (`.husky/`, or the `husky` key older versions read from `package.json`), Lefthook, simple-git-hooks, yorkie, overcommit, CaptainHook, GrumPHP, rusty-hook, cargo-husky or hk.",
+      "Do pre-commit hooks run when an AI agent commits? Yes, unless it passes --no-verify. Minimal pre-commit, Husky and Lefthook configs, and how to block it.",
+    what: "Yes: when an AI coding agent runs `git commit`, git runs your pre-commit hook and aborts the commit if it fails. But `git commit --no-verify` (or `-n`) skips it, so forbid that in AGENTS.md, or block it with an agent hook.",
     why: "A hook runs the formatter and linter at commit time, so an agent learns of a problem in seconds, not minutes later from a failed CI run.",
     scoring: [
-      "Full pass: a config for one of them at the repo root.",
+      "Full pass: a config at the repo root for pre-commit or prek, Husky (`.husky/`, or the `husky` key older versions read from `package.json`), Lefthook, simple-git-hooks, yorkie, overcommit, CaptainHook, GrumPHP, rusty-hook, cargo-husky or hk.",
       "Fail: none. Hooks set up any other way, such as a script that writes to `.git/hooks`, are not detected.",
     ],
-    fix: "Add one, running the formatter and linter on staged files. Keep it fast; slow checks belong in CI.",
+    fix: "Add one of the configs above, running the formatter and linter on staged files. Keep it fast; slow checks belong in CI.",
   },
   size: {
     title: "Codebase size: how large repos strain AI coding agents",

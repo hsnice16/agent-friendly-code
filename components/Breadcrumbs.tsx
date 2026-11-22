@@ -1,6 +1,5 @@
-import Link from "next/link";
-
 import { BreadcrumbJsonLd, breadcrumbTrail, type Crumb } from "./BreadcrumbJsonLd";
+import { IntentLink } from "./IntentLink";
 
 /** The visible trail and its BreadcrumbList, built from one list so they cannot disagree. */
 export function Breadcrumbs({ current, parents }: { current: Crumb; parents: Crumb[] }) {
@@ -19,9 +18,9 @@ export function Breadcrumbs({ current, parents }: { current: Crumb; parents: Cru
                   {c.name}
                 </span>
               ) : (
-                <Link href={c.path} className="tap-target text-muted hover:text-ink">
+                <IntentLink href={c.path} className="tap-target text-muted hover:text-ink">
                   {c.name}
-                </Link>
+                </IntentLink>
               )}
             </li>
           ))}

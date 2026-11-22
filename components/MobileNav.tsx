@@ -59,11 +59,14 @@ export function MobileNav({ links }: { links: NavLink[] }) {
         {open ? <X size={16} weight="bold" aria-hidden="true" /> : <List size={16} weight="bold" aria-hidden="true" />}
       </button>
 
-      {/* Always mounted so closing can fade too; `invisible` takes it out of the tab order. */}
+      {/* Always mounted so closing can fade too; `invisible` takes it out of the tab order.
+          Visibility flips at once on open, or the first link is still hidden when it's focused. */}
       <div
         id="mobile-nav-menu"
-        className={`absolute right-0 top-full z-30 mt-2 min-w-[180px] origin-top-right overflow-hidden rounded-lg border border-line bg-surface shadow-lg transition-[opacity,scale,visibility] duration-150 ease-out motion-reduce:transition-none ${
-          open ? "visible scale-100 opacity-100" : "invisible scale-95 opacity-0"
+        className={`absolute right-0 top-full z-30 mt-2 min-w-[180px] origin-top-right overflow-hidden rounded-lg border border-line bg-surface shadow-lg duration-150 ease-out motion-reduce:transition-none ${
+          open
+            ? "visible scale-100 opacity-100 transition-[opacity,scale]"
+            : "invisible scale-95 opacity-0 transition-[opacity,scale,visibility]"
         }`}
       >
         {links.map((l, i) => (

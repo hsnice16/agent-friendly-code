@@ -16,9 +16,10 @@ export type RepoReportData = {
   comparisons: { against: string; average: number; diff: number }[];
   starsRank: { rank: number; total: number; language: string } | null;
   language: string | null;
-  missing: { label: string; all: number; language: number | null }[];
-  rare: { label: string; all: number }[];
-  lift: { label: string; agents: number; maxGain: number } | null;
+  // Signal ids: the view looks the labels up in SIGNAL_TEXT.
+  missing: { id: string; all: number; language: number | null }[];
+  rare: { id: string; all: number }[];
+  lift: { id: string; agents: number; maxGain: number } | null;
 };
 
 const MISSING_LISTED = 3;
@@ -35,13 +36,17 @@ function standing(repo: RepoRow, summary: RepoSummary, board: LeaderboardRow[]) 
       ? board.filter((r) => r.language && languageSlug(r.language) === languageSlug(repo.language as string))
       : [];
 
-  const avg = averageScore(board);
-  const comparisons = [{ against: "leaderboard average", average: avg, diff: overall - avg }];
+  // Hundredths: the view prints tenths, and full floats only weigh down the payload.
+  const vs = (against: string, average: number) => ({
+    against,
+    average: Math.round(average * 100) / 100,
+    diff: Math.round((overall - average) * 100) / 100,
+  });
+  const comparisons = [vs("leaderboard average", averageScore(board))];
   let starsRank: RepoReportData["starsRank"] = null;
 
   if (lr && peers.length > 0) {
-    const langAvg = averageScore(peers);
-    comparisons.push({ against: `${lr.language} average`, average: langAvg, diff: overall - langAvg });
+    comparisons.push(vs(`${lr.language} average`, averageScore(peers)));
     if (repo.stars != null) {
       const rank = peers.filter((r) => (r.stars ?? 0) > (repo.stars ?? 0)).length + 1;
       starsRank = { rank, total: lr.total, language: lr.language };
@@ -53,10 +58,10 @@ function standing(repo: RepoRow, summary: RepoSummary, board: LeaderboardRow[]) 
 // "What to fix first" ranks fixes for one agent at a time; this is the one
 // fix that helps the most of them.
 function lift(signals: SignalResult[]): RepoReportData["lift"] {
-  const gains = new Map<string, { label: string; agents: number; maxGain: number }>();
+  const gains = new Map<string, { id: string; agents: number; maxGain: number }>();
   for (const m of MODELS) {
     for (const g of topImprovements(m.id, signals, signals.length)) {
-      const e = gains.get(g.signalId) ?? { label: g.label, agents: 0, maxGain: 0 };
+      const e = gains.get(g.signalId) ?? { id: g.signalId, agents: 0, maxGain: 0 };
       gains.set(g.signalId, { ...e, agents: e.agents + 1, maxGain: Math.max(e.maxGain, g.scoreGain) });
     }
   }
@@ -80,12 +85,12 @@ export function buildRepoReport(args: {
     .filter((s) => s.pass === 0 && readers(s.id) > 1 && rates[s.id] && !COVERED_ELSEWHERE.has(s.id))
     .sort((a, b) => rates[b.id].all - rates[a.id].all)
     .slice(0, MISSING_LISTED)
-    .map((s) => ({ label: s.label, ...rates[s.id] }));
+    .map((s) => ({ id: s.id, ...rates[s.id] }));
 
   // Compared as printed, or a 49.6% rate shows as "less common … 50%".
   const rare = signals
     .filter((s) => s.pass >= 1 && rates[s.id] && !COVERED_ELSEWHERE.has(s.id) && Math.round(rates[s.id].all * 100) < 50)
-    .map((s) => ({ label: s.label, all: rates[s.id].all }));
+    .map((s) => ({ id: s.id, all: rates[s.id].all }));
 
   return {
     ...standing(repo, summary, board),

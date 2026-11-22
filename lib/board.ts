@@ -1,5 +1,5 @@
 import { HOST_DOMAINS, type Host, isHost } from "@/lib/constants/hosts";
-import { LEADERBOARD_PAGE_SIZE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
+import { LEADERBOARD_FIRST_PAGE_SIZE, LEADERBOARD_PAGE_SIZE, MAX_SEARCH_LENGTH } from "@/lib/constants/scoring";
 import { DEFAULT_DIR, DEFAULT_SORT, isSortDir, isSortKey, type SortDir, type SortKey } from "@/lib/constants/sort";
 
 // Shared by the server pages and the browser board, so it must not import the
@@ -95,11 +95,26 @@ export function findBoardRepo(
   return r ? { host: r.h, owner: r.o, name: r.n } : null;
 }
 
-/** Which slice of a board `page` shows. Clamped, so a stale or hand-typed page still lands on rows. */
-export function pageSlice(total: number, page: number): { page: number; totalPages: number; startIdx: number } {
-  const totalPages = Math.max(1, Math.ceil(total / LEADERBOARD_PAGE_SIZE));
+export type PageSlice = { page: number; totalPages: number; startIdx: number; endIdx: number };
+
+/**
+ * Which slice of a board `page` shows: page 1 is shorter than the rest (see
+ * LEADERBOARD_FIRST_PAGE_SIZE). Clamped, so a stale or hand-typed page still lands on rows.
+ */
+export function pageSlice(total: number, page: number): PageSlice {
+  const rest = Math.max(0, total - LEADERBOARD_FIRST_PAGE_SIZE);
+  const totalPages = 1 + Math.ceil(rest / LEADERBOARD_PAGE_SIZE);
   const clamped = Number.isFinite(page) ? Math.min(totalPages, Math.max(1, Math.floor(page))) : 1;
-  return { page: clamped, totalPages, startIdx: (clamped - 1) * LEADERBOARD_PAGE_SIZE };
+  const startIdx = clamped === 1 ? 0 : LEADERBOARD_FIRST_PAGE_SIZE + (clamped - 2) * LEADERBOARD_PAGE_SIZE;
+  const size = clamped === 1 ? LEADERBOARD_FIRST_PAGE_SIZE : LEADERBOARD_PAGE_SIZE;
+  return { page: clamped, totalPages, startIdx, endIdx: Math.min(total, startIdx + size) };
+}
+
+/** The board page that shows a 1-based `rank`. */
+export function pageOfRank(rank: number): number {
+  return rank <= LEADERBOARD_FIRST_PAGE_SIZE
+    ? 1
+    : 2 + Math.floor((rank - LEADERBOARD_FIRST_PAGE_SIZE - 1) / LEADERBOARD_PAGE_SIZE);
 }
 
 export function boardRows(data: BoardData, model: string): BoardRow[] {
@@ -179,15 +194,13 @@ export function viewBoard(all: BoardRow[], query: BoardQuery): BoardView {
   const badged = query.badge ? hosted.filter((r) => r.badge_embedded === 1) : hosted;
   const matched = query.q ? badged.filter((r) => matchesQuery(r, query.q)) : badged;
   const sorted = sortRows(matched, query.sort, query.dir);
-  const { page, totalPages, startIdx } = pageSlice(sorted.length, query.page);
+  const { page, totalPages, startIdx, endIdx } = pageSlice(sorted.length, query.page);
   const ranks = boardRanks(all);
   return {
     page,
     startIdx,
     totalPages,
     total: sorted.length,
-    rows: sorted
-      .slice(startIdx, startIdx + LEADERBOARD_PAGE_SIZE)
-      .map((r, i) => ({ ...r, rank: ranks.get(r.id) ?? startIdx + i + 1 })),
+    rows: sorted.slice(startIdx, endIdx).map((r, i) => ({ ...r, rank: ranks.get(r.id) ?? startIdx + i + 1 })),
   };
 }

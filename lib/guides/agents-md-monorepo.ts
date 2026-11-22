@@ -9,7 +9,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
     "Yes, AGENTS.md can be nested. How Claude Code, Codex, Cursor, Copilot, Gemini CLI and others resolve per-package files, and what goes at the root.",
   lead: "Put one AGENTS.md at the repo root for what every package shares, and one in each package for its own commands and rules. Most agents read the file nearest the code they touch, but each finds nested files differently, and a few never look below the root.",
   published: "2026-11-16",
-  updated: "2026-11-16",
+  updated: "2026-11-22",
   about: ["AGENTS.md", "CLAUDE.md", "Monorepo", "AI coding agents"],
   sections: [
     {
@@ -23,6 +23,25 @@ export const AGENTS_MD_MONOREPO: Guide = {
         {
           kind: "p",
           text: "The spec doesn't fix when an agent loads a nested file. Some read every file from the root down to the directory you started in; some load a package's file once they open a file in it; some read only the root.",
+        },
+      ],
+    },
+    {
+      id: "steps",
+      heading: "How do I set up AGENTS.md in a monorepo?",
+      howTo: true,
+      blocks: [
+        {
+          kind: "list",
+          ordered: true,
+          items: [
+            "Write the root AGENTS.md: what each top-level directory holds, the one install command, repo-wide rules, and a line saying each package has its own file.",
+            "Add an AGENTS.md to each package with its build, test and lint commands, runnable from that directory.",
+            "If anyone uses Claude Code, put a one-line CLAUDE.md containing `@AGENTS.md` beside each AGENTS.md.",
+            "For Gemini CLI, list AGENTS.md in `context.fileName`; for Aider, list the package files under `read:`.",
+            "Keep the root file short: Codex stops at 32 KiB across every file on the path.",
+            "Check what loaded: `/memory` in Claude Code, `/memory show` in Gemini CLI.",
+          ],
         },
       ],
     },
@@ -262,4 +281,5 @@ export const AGENTS_MD_MONOREPO: Guide = {
     { href: guidePath("one-file-for-all-agents"), label: "One file for every agent" },
     { href: "/agents", label: "What each agent reads" },
   ],
+  languageExamples: true,
 };

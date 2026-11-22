@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 
 import { ContributeTable } from "@/components/ContributeTable";
+import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -16,6 +16,7 @@ import {
   contributeDescription,
 } from "@/lib/contribute";
 import { getLeaderboardStats, listLeaderboardOverall, listSignalFiles } from "@/lib/db";
+import { WEBSITE_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath } from "@/lib/utils/check-path";
 import { CONTRIBUTE_PATH, contributeAnchor, contributeLanguageHref } from "@/lib/utils/contribute-path";
 import { GUIDE_PATH } from "@/lib/utils/guide-path";
@@ -67,7 +68,7 @@ function jsonLd(list: ContributeList, contentChangedAt: number | null): Record<s
     url: `${APP_URL}${CONTRIBUTE_PATH}`,
     name: CONTRIBUTE_TITLE,
     description: contributeDescription(list),
-    isPartOf: { "@id": `${APP_URL}/#site` },
+    isPartOf: WEBSITE_JSON_LD,
     ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
     mainEntity: {
       "@type": "ItemList",
@@ -114,9 +115,9 @@ export default function ContributePage() {
         </p>
         <p className={`${PROSE} mt-2`}>
           {list.refused > 0 && <>Left out: {list.refused} that would qualify but whose policy refuses them. </>}
-          <Link href={AI_POLICY_REPORT_PATH} className="prose-link">
+          <IntentLink href={AI_POLICY_REPORT_PATH} className="prose-link">
             What {AI_POLICY.policies.length} projects&apos; AI policies say
-          </Link>
+          </IntentLink>
           .
         </p>
       </Panel>
@@ -156,9 +157,9 @@ export default function ContributePage() {
             />
             <p className={`${PROSE} mt-3 text-[13px]`}>
               Top {Math.min(CONTRIBUTE_LANGUAGE_TOP, l.rows.length)} of {l.eligible} {l.label} repos that qualify.{" "}
-              <Link href={hubPath(l.slug)} className="arrow-link">
+              <IntentLink href={hubPath(l.slug)} className="arrow-link">
                 Every {l.label} repo →
-              </Link>
+              </IntentLink>
             </p>
           </Panel>
         </div>
@@ -170,9 +171,9 @@ export default function ContributePage() {
           <ul className="m-0 ml-5 flex list-disc flex-col gap-1.5 text-[14.5px] leading-relaxed text-ink-dim">
             <li>
               A repo qualifies with a{" "}
-              <Link href={checkPath("contributing")} className="prose-link">
+              <IntentLink href={checkPath("contributing")} className="prose-link">
                 CONTRIBUTING guide
-              </Link>
+              </IntentLink>
               , a test suite and CI, as our checks find them in its tree.
             </li>
             <li>
@@ -200,12 +201,12 @@ export default function ContributePage() {
             <li>Start with an issue labelled for newcomers, and keep the change small.</li>
           </ul>
           <div className="mt-3 flex flex-col gap-1.5 text-[14.5px]">
-            <Link href="/score" className="arrow-link">
+            <IntentLink href="/score" className="arrow-link">
               Score a repo that isn&apos;t listed →
-            </Link>
-            <Link href={GUIDE_PATH} className="arrow-link">
+            </IntentLink>
+            <IntentLink href={GUIDE_PATH} className="arrow-link">
               Make your own repo agent-friendly →
-            </Link>
+            </IntentLink>
           </div>
         </Panel>
       </div>
