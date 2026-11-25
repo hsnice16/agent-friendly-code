@@ -1033,7 +1033,7 @@ exports.agentsMd = {
         let matched = null;
         let len = 0;
         for (const c of CANDIDATES) {
-            const hit = (0, helpers_1.firstExisting)(repo, [c]);
+            const hit = (0, helpers_1.firstFile)(repo, [c]);
             if (!hit) {
                 continue;
             }
@@ -1119,7 +1119,7 @@ exports.aiderConf = {
     improveSuggestion: "Add a `.aider.conf.yml` at the repo root with `test-cmd`, `lint-cmd` and `auto-test: true`, and list AGENTS.md under `read:`.",
     check: (repo) => {
         const rel = (0, helpers_1.resolveRelative)(repo, REL);
-        if (!rel) {
+        if (!rel || !(0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel))) {
             return {
                 pass: 0,
                 label: LABEL,
@@ -1279,6 +1279,8 @@ const CANDIDATES = [
     "docs/CONTRIBUTING.md",
     "docs/CONTRIBUTING.rst",
     "docs/CONTRIBUTING.adoc",
+    // A folder of guides (roc's `CONTRIBUTING/`) is entered through its README.
+    "CONTRIBUTING/README.md",
 ];
 exports.contributing = {
     id: "contributing",
@@ -1286,7 +1288,7 @@ exports.contributing = {
     description: "A contribution workflow the agent can follow.",
     improveSuggestion: "Add CONTRIBUTING.md describing branch naming, commit style, test commands, and the PR process.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES);
+        const m = (0, helpers_1.firstFile)(repo, CANDIDATES);
         if (m) {
             return {
                 pass: 1,
@@ -1388,7 +1390,7 @@ exports.cursorRules = {
             };
         }
         const legacy = (0, helpers_1.resolveRelative)(repo, ".cursorrules");
-        if (legacy) {
+        if (legacy && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, legacy))) {
             return {
                 pass: 0.5,
                 label: LABEL,
@@ -1551,21 +1553,16 @@ const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const helpers_1 = __nccwpck_require__(742);
 // Each inner list is one tool, counted once however many of its files are present:
-// Taskfile.yml beside its Taskfile.dist.yml override is still one Taskfile.
+// Taskfile.yml beside its Taskfile.dist.yml override is still one Taskfile, and
+// flake.nix beside shell.nix is still one Nix setup.
 const ARTIFACTS = [
     ["Makefile", "GNUmakefile", "BSDmakefile"],
-    [".devcontainer/devcontainer.json"],
-    [".devcontainer.json"],
-    ["flake.nix"],
-    ["shell.nix"],
-    ["default.nix"],
+    [".devcontainer/devcontainer.json", ".devcontainer.json"],
+    ["flake.nix", "shell.nix", "default.nix"],
     ["devenv.nix"],
     ["devbox.json"],
     ["Dockerfile", "Containerfile"],
-    ["docker-compose.yml"],
-    ["docker-compose.yaml"],
-    ["compose.yml"],
-    ["compose.yaml"],
+    ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"],
     ["justfile", ".justfile"],
     ["Taskfile.yml", "Taskfile.yaml", "Taskfile.dist.yml", "Taskfile.dist.yaml"],
     ["Rakefile", "Rakefile.rb"],
@@ -1664,7 +1661,7 @@ exports.devEnv = {
         for (const group of ARTIFACTS) {
             for (const f of group) {
                 const rel = resolve(f);
-                if (rel) {
+                if (rel && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel))) {
                     matches.push(rel);
                     break;
                 }
@@ -1699,14 +1696,16 @@ exports.devEnv = {
         const pkg = resolve("package.json");
         if (pkg) {
             try {
-                const j = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo));
-                if (j.scripts && Object.keys(j.scripts).length >= 3) {
+                const scripts = JSON.parse((0, helpers_1.readSafe)((0, node_path_1.join)(repo, pkg), repo))?.scripts;
+                // Object.keys on a string or array counts its characters or items, not scripts.
+                const n = scripts && typeof scripts === "object" && !Array.isArray(scripts) ? Object.keys(scripts).length : 0;
+                if (n >= 3) {
                     return {
                         pass: 0.6,
                         id: "dev_env",
                         matchedPath: pkg,
                         label: "Reproducible dev env",
-                        detail: `package.json has ${Object.keys(j.scripts).length} scripts`,
+                        detail: `package.json has ${n} scripts`,
                     };
                 }
             }
@@ -1777,7 +1776,7 @@ function withImports(repo, text) {
         const key = name.toLowerCase();
         if (!imported.has(key)) {
             const rel = (0, helpers_1.resolveRelative)(repo, name);
-            imported.set(key, rel ? (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo) : null);
+            imported.set(key, rel && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel)) ? (0, helpers_1.readSafe)((0, node_path_1.join)(repo, rel), repo) : null);
         }
         push(imported.get(key) ?? lines[i]);
     }
@@ -1790,7 +1789,7 @@ exports.geminiMd = {
     improveSuggestion: "Add a GEMINI.md at the repo root covering project goals, layout, setup commands, and conventions. Aim for 800+ chars of real guidance (not boilerplate).",
     check: (repo) => {
         const matched = (0, helpers_1.resolveRelative)(repo, "GEMINI.md");
-        if (!matched) {
+        if (!matched || !(0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, matched))) {
             return {
                 pass: 0,
                 label: LABEL,
@@ -2150,6 +2149,9 @@ const CANDIDATES = [
     "LICENSE-MIT",
     "LICENSE-APACHE",
 ];
+// A folder named like the file (kotlin's `license/`) is not one, but the
+// licence it holds is.
+const IN_FOLDER = ["license", "licence"].flatMap((d) => CANDIDATES.map((c) => `${d}/${c}`));
 // REUSE keeps one SPDX-named file per licence in `LICENSES/` and makes a root
 // LICENSE optional. Exact spelling: a `licenses/` folder is often vendored notices.
 function reuseLicenses(repo) {
@@ -2173,7 +2175,7 @@ exports.license = {
     description: "A license, so it's clear what may be done with the code.",
     improveSuggestion: "Add a LICENSE (or COPYING) file — MIT, Apache-2.0, BSD, GPL, etc. — at the repo root.",
     check: (repo) => {
-        const m = (0, helpers_1.firstExisting)(repo, CANDIDATES) ?? reuseLicenses(repo);
+        const m = (0, helpers_1.firstFile)(repo, CANDIDATES) ?? (0, helpers_1.firstFile)(repo, IN_FOLDER) ?? reuseLicenses(repo);
         if (m) {
             return {
                 pass: 1,
@@ -2633,7 +2635,7 @@ exports.openhandsSetup = {
     improveSuggestion: "Add a `.openhands/setup.sh` that installs dependencies and prepares the project so OpenHands can run tests and lints out of the box.",
     check: (repo) => {
         const rel = (0, helpers_1.resolveRelative)(repo, REL);
-        if (!rel) {
+        if (!rel || !(0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, rel))) {
             return {
                 pass: 0,
                 label: LABEL,
@@ -2840,6 +2842,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.size = void 0;
+exports.safeIgnoreLines = safeIgnoreLines;
 const node_fs_1 = __nccwpck_require__(24);
 const node_path_1 = __nccwpck_require__(760);
 const ignore_1 = __importDefault(__nccwpck_require__(298));
@@ -2847,17 +2850,63 @@ const helpers_1 = __nccwpck_require__(742);
 const BASELINE_IGNORE = ["node_modules", ".git", "vendor", "target", "dist", "build", ".next"];
 const CAP = 10000;
 const MAX_DEPTH = 8;
+// Folders holding only dotfiles add no files, so CAP alone never stops a tree of
+// them. Real walks reach CAP within ~2,300 folders (airflow, vscode).
+const MAX_DIRS = 20000;
+// `ignore` compiles each line to a backtracking regex and tests it against every
+// path, so a hostile .gitignore plus hostile file names can stall the walk. A
+// line's cost grows with the power of the `*`s sharing a segment, and the walk's
+// with lines × path length; both are bounded below. Real lines carry at most three
+// wildcards (`**/*.tfstate.*`). Dropping a line or a match can only raise the count.
+const MAX_IGNORE_LINES = 1000;
+const MAX_IGNORE_LINE_LENGTH = 256;
+const MAX_STARS_PER_SEGMENT = 2;
+const MAX_WILDCARDS = 3;
+// Roughly regex steps; real repos use under a third of it (airflow: 1.3e8).
+const IGNORE_WORK_BUDGET = 5e8;
+// A run of `**` segments means what one does, and nesting them is exponential.
+const GLOBSTAR_RUN = /(?<=^|\/)\*\*(?:\/\*\*)+(?=\/|$)/g;
+function segmentStars(line) {
+    return line.split("/").map((seg) => (seg === "**" ? 0 : (seg.match(/\*/g)?.length ?? 0)));
+}
+function safeIgnoreLines(text) {
+    const out = [];
+    for (const raw of text.split(/\r?\n/)) {
+        if (out.length >= MAX_IGNORE_LINES) {
+            break;
+        }
+        if (raw.trim() === "" || raw.startsWith("#") || raw.length > MAX_IGNORE_LINE_LENGTH) {
+            continue;
+        }
+        const line = raw.replace(GLOBSTAR_RUN, "**");
+        const stars = segmentStars(line);
+        const globstars = line.split("/").filter((seg) => seg === "**").length;
+        if (Math.max(...stars) <= MAX_STARS_PER_SEGMENT && stars.reduce((a, b) => a + b, globstars) <= MAX_WILDCARDS) {
+            out.push(line);
+        }
+    }
+    return out;
+}
+// What one path costs to test: two `*`s in a segment rescan it per candidate split.
+function matchWork(path, lines, quadratic) {
+    const longest = quadratic ? Math.max(...path.split("/").map((seg) => seg.length)) : 0;
+    return path.length * (lines + quadratic * longest);
+}
 exports.size = {
     id: "size",
     label: "Manageable size",
     description: "Very large repos strain the agent's context window.",
     improveSuggestion: "If possible, split into smaller modules or carve out a focused entry path. Document where to start in AGENTS.md.",
     check: (repo) => {
-        const ig = (0, ignore_1.default)().add(BASELINE_IGNORE);
-        ig.add((0, helpers_1.readSafe)((0, node_path_1.join)(repo, ".gitignore"), repo));
+        const base = (0, ignore_1.default)().add(BASELINE_IGNORE);
+        const lines = safeIgnoreLines((0, helpers_1.readSafe)((0, node_path_1.join)(repo, ".gitignore"), repo));
+        const ig = (0, ignore_1.default)().add(BASELINE_IGNORE).add(lines);
+        const quadratic = lines.filter((l) => segmentStars(l).some((n) => n > 1)).length;
         let count = 0;
+        let dirs = 0;
+        let work = 0;
         const visit = (dir, depth) => {
-            if (count > CAP || depth > MAX_DEPTH) {
+            if (count > CAP || depth > MAX_DEPTH || ++dirs > MAX_DIRS) {
                 return;
             }
             let entries = [];
@@ -2877,7 +2926,9 @@ exports.size = {
                     continue;
                 }
                 const rel = (0, node_path_1.relative)(repo, abs).split(node_path_1.sep).join("/");
-                if (ig.ignores(kind === "dir" ? `${rel}/` : rel)) {
+                const path = kind === "dir" ? `${rel}/` : rel;
+                work += matchWork(path, lines.length, quadratic);
+                if ((work <= IGNORE_WORK_BUDGET ? ig : base).ignores(path)) {
                     continue;
                 }
                 if (kind === "dir") {
@@ -2892,6 +2943,14 @@ exports.size = {
             }
         };
         visit(repo, 0);
+        if (dirs > MAX_DIRS) {
+            return {
+                pass: 0.2,
+                id: "size",
+                label: "Manageable size",
+                detail: `${MAX_DIRS.toLocaleString("en-US")}+ folders — very large`,
+            };
+        }
         if (count < 50) {
             return {
                 pass: 0.9,
