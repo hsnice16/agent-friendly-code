@@ -147,7 +147,7 @@ export function aiPolicyJsonLd(data: AiPolicyData = AI_POLICY): Record<string, u
       "@type": "Dataset",
       "@id": `${url}#dataset`,
       name: `${aiPolicyTitle(data)}, by stance`,
-      description: `Each written AI contribution policy we found in ${data.scanned} GitHub repos on the ${APP_NAME} leaderboard, classified by hand as bans, restricts, disclose, allows or welcomes.`,
+      description: `Each written AI contribution policy we found in ${data.scanned} GitHub repos on the ${APP_NAME} leaderboard, classified one at a time as bans, restricts, disclose, allows or welcomes.`,
       url,
       keywords: ["AI contribution policy", "AI-generated code", "open source", "CONTRIBUTING.md", "AI_POLICY.md"],
       isAccessibleForFree: true,

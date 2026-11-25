@@ -121,7 +121,7 @@ ${GUIDES.map((g) => `- [${g.name}](${APP_URL}${guidePath(g.slug)}): ${fillStats(
 - [Compare agents](${APP_URL}${COMPARE_PATH}): Claude Code vs Cursor, Codex vs Gemini CLI and more: how well leaderboard repos are set up for each, pair by pair (setup, not code quality)
 - [AGENTS.md sizes](${APP_URL}${SIZE_REPORT_PATH}): How long real AGENTS.md and CLAUDE.md files are, and how many pass Devin's 16 KiB and Codex's 32 KiB limits
 - [What's in an AGENTS.md](${APP_URL}${CONTENTS_REPORT_PATH}): Which sections ${CONTENTS_REPORT.files} real AGENTS.md and CLAUDE.md files have, how many give a test command, and how they point to other files; CSV (${APP_URL}${CONTENTS_REPORT_CSV_PATH})
-- [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, classified by hand
+- [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, each classified on its own
 - [Agent skills in repos](${APP_URL}${SKILLS_REPORT_PATH}): Which popular repos ship SKILL.md files in .agents/skills or .claude/skills, with counts per repo; CSV (${APP_URL}${SKILLS_REPORT_CSV_PATH})
 - [Projects to contribute to](${APP_URL}${CONTRIBUTE_PATH}): Open source projects with a CONTRIBUTING guide, tests and CI, by language, ready for agent-assisted work
 - [AGENTS.md generator](${APP_URL}${GENERATOR_PATH}): A starter AGENTS.md drafted from a scan of any public GitHub repo

@@ -240,7 +240,10 @@ export default function AiPolicyReportPage() {
               missed were checked by hand. We read each one in full, along with any policy it links to, and dropped
               sections that aren&apos;t about AI-assisted contributions.
             </li>
-            <li>Each policy was classified by hand on {day}. Policies change; the linked file is the current word.</li>
+            <li>
+              Each policy was read and classified one at a time, not by keyword, on {day}. Policies change; the linked
+              file is the current word.
+            </li>
           </ul>
         </Panel>
       </div>

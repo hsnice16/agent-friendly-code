@@ -4,7 +4,7 @@ import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
 
 /**
  * Written AI policies whose AI section raises the licensing or copyright of
- * AI-generated code, read by hand. A policy that only restates the project's
+ * AI-generated code, each read in full. A policy that only restates the project's
  * CLA or DCO for every contribution is not on it.
  */
 export const LICENSE_CITING = {

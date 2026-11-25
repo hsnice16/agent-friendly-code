@@ -13,6 +13,8 @@ export const ACTION_USES = `hsnice16/agent-friendly-action@${SIBLING_VERSION}`;
 export const SKILL_REPO_URL = "https://github.com/hsnice16/agent-friendly-skill";
 export const SKILL_INSTALL_CMD = `npx skills add hsnice16/agent-friendly-skill#${SIBLING_VERSION}`;
 export const SKILL_LISTING_URL = "https://www.skills.sh/hsnice16/agent-friendly-skill/agent-friendly";
+export const PRODUCT_HUNT_URL = "https://www.producthunt.com/products/agent-friendly-code";
+export const PEERLIST_URL = "https://peerlist.io/hsnice16/project/agent-friendly-code";
 
 // Falling back to the apex, never the *.vercel.app alias: next.config.ts
 // serves `X-Robots-Tag: noindex` there, so a missing env var would point
