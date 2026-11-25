@@ -360,6 +360,7 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/pocketbase/pocketbase",
     note: "PocketBase — open-source backend in a single Go file",
+    accept: ["archived"],
   },
   {
     url: "https://github.com/charmbracelet/bubbletea",
@@ -399,10 +400,6 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/godotengine/godot", note: "Godot game engine" },
   { url: "https://github.com/obsproject/obs-studio", note: "OBS Studio" },
   { url: "https://github.com/neovim/neovim", note: "Neovim editor" },
-  {
-    note: "ONNX Runtime — ML inference",
-    url: "https://github.com/microsoft/onnxruntime",
-  },
   {
     note: "ClickHouse — columnar OLAP database",
     url: "https://github.com/ClickHouse/ClickHouse",
@@ -612,8 +609,9 @@ export const SEEDS: Seed[] = [
     url: "https://github.com/livebook-dev/livebook",
   },
   {
-    url: "https://github.com/electric-sql/electric",
+    url: "https://github.com/neondatabase/electric",
     note: "ElectricSQL — Postgres sync engine (Elixir + TS)",
+    was: ["https://github.com/electric-sql/electric"],
   },
   {
     url: "https://github.com/plausible/analytics",
@@ -664,7 +662,11 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/penpot/penpot", note: "Penpot — open-source design platform (Clojure)" },
   { url: "https://github.com/logseq/logseq", note: "Logseq — knowledge management platform (Clojure)" },
   { url: "https://github.com/clj-kondo/clj-kondo", note: "clj-kondo — Clojure linter" },
-  { url: "https://github.com/facebook/infer", note: "Infer — static analyzer for Java, C and C++ (OCaml)" },
+  {
+    url: "https://github.com/meta/infer",
+    note: "Infer — static analyzer for Java, C and C++ (OCaml)",
+    was: ["https://github.com/facebook/infer"],
+  },
   { url: "https://github.com/ocaml/opam", note: "opam — OCaml package manager" },
 
   // --- AI-native: coding agents ---
@@ -900,6 +902,7 @@ export const SEEDS: Seed[] = [
   {
     url: "https://github.com/redpanda-data/redpanda",
     note: "Redpanda — Kafka-compatible streaming data platform (C++)",
+    accept: ["archived"],
   },
   { url: "https://github.com/apache/flink", note: "Apache Flink — stream + batch processing engine" },
   { url: "https://github.com/apache/beam", note: "Apache Beam — unified batch + streaming data processing" },
