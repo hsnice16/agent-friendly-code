@@ -73,4 +73,17 @@ describe("license signal", () => {
 
     assert.equal(r.pass, 1);
   });
+
+  test("pass=0 for a directory named LICENSE", () => {
+    fixture = makeFixture({ "LICENSE/x": "" });
+    assert.equal(license.check(fixture).pass, 0);
+  });
+
+  test("a licence folder counts through the licence file inside it", () => {
+    fixture = makeFixture({ "license/LICENSE.txt": "Apache-2.0", "license/NOTICE.txt": "" });
+    const r = license.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /license\/LICENSE\.txt$/);
+  });
 });

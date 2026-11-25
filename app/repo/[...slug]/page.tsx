@@ -12,6 +12,7 @@ import { ModelSuggestionsSwitch } from "@/components/ModelSuggestionsSwitch";
 import { PerModelScores } from "@/components/PerModelScores";
 import { RepoAddOns } from "@/components/RepoAddOns";
 import { RepoHero } from "@/components/RepoHero";
+import { RepoRecordView } from "@/components/RepoRecordView";
 import { RepoReport } from "@/components/RepoReport";
 import { Section, SectionRail } from "@/components/RepoSections";
 import { RepoSummary } from "@/components/RepoSummary";
@@ -25,6 +26,7 @@ import { checkRates } from "@/lib/check-rates";
 import { STRENGTHS_GAPS_VISIBLE_LIMIT } from "@/lib/constants/scoring";
 import { getModelScores } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
+import { repoRecord } from "@/lib/repo-record";
 import { topImprovements } from "@/lib/scoring/scorer";
 import { MODELS } from "@/lib/scoring/weights";
 import { starterIfMissing } from "@/lib/starter-agents-md";
@@ -102,6 +104,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
   const agentsMd = getAgentsMdExamples();
   const ownLength =
     instructions?.main?.state === "ok" ? fileLength(signals.find((s) => s.id === "agents_md")?.detail ?? null) : null;
+  const record = repoRecord(repo, signals);
   const starter = starterIfMissing(instructions, { ...repo, description: about.description }, signals);
 
   const slugOfLanguage = repo.language ? languageSlug(repo.language) : null;
@@ -127,6 +130,7 @@ export default async function Page({ params }: { params: Promise<Params> }) {
     { id: "fix-first", label: "What to fix first" },
     { id: "agent-scores", label: "Score for each agent" },
     instructions && { id: "agent-instructions", label: "Agent instructions" },
+    record && { id: "on-record", label: "On record" },
     { id: "all-checks", label: "All checks" },
     report && { id: "compare", label: "How it compares" },
     { id: "similar", label: "Similar repos" },
@@ -193,6 +197,12 @@ export default async function Page({ params }: { params: Promise<Params> }) {
               longerThan={ownLength == null ? undefined : longerThan(ownLength, agentsMd.rows)}
             />
             {starter && <GeneratorCallout page="repo" className="mt-4" starterOn="repo" />}
+          </Section>
+        )}
+
+        {record && (
+          <Section id="on-record">
+            <RepoRecordView slug={slug} record={record} />
           </Section>
         )}
 

@@ -3,6 +3,7 @@
 import Link from "next/link";
 
 import type { DirectoryRow } from "@/lib/footer-directory";
+import { PACKAGE_PATH } from "@/lib/utils/package-path";
 import { REPO_URL } from "@/lib/version";
 
 import { PeerlistBadge } from "./PeerlistBadge";
@@ -18,7 +19,7 @@ const FOOTER_LINKS_TOOLS = [
   { href: "/skill", label: "Agent Skill" },
   { href: "/action", label: "GitHub Action" },
   { href: "/score", label: "Live Score" },
-  { href: "/package", label: "Packages" },
+  { href: PACKAGE_PATH, label: "Packages" },
 ];
 
 const FOOTER_LINKS_LEGAL = [
@@ -89,6 +90,7 @@ export function SiteFooter({ directory, primary, year }: { directory: DirectoryR
             © {year}{" "}
             <a target="_blank" rel="noopener noreferrer" href="https://github.com/hsnice16" className="tap-target">
               Himanshu Singh
+              <span className="sr-only"> (new tab)</span>
             </a>
             <span aria-hidden="true"> ·</span>
           </span>
@@ -98,6 +100,7 @@ export function SiteFooter({ directory, primary, year }: { directory: DirectoryR
             also made{" "}
             <a target="_blank" rel="noopener" href="https://usetu.la/" className="tap-target">
               tula — crypto liquidation risk CLI
+              <span className="sr-only"> (new tab)</span>
             </a>
             <span aria-hidden="true"> ·</span>
           </span>
@@ -105,6 +108,7 @@ export function SiteFooter({ directory, primary, year }: { directory: DirectoryR
           <span>
             <a target="_blank" rel="noopener noreferrer" href={`${REPO_URL}/blob/main/LICENSE`} className="tap-target">
               MIT
+              <span className="sr-only"> (new tab)</span>
             </a>
             <span aria-hidden="true"> ·</span>
           </span>

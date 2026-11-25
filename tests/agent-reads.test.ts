@@ -22,6 +22,13 @@ describe("AGENT_READS", () => {
     }
   });
 
+  // /agents renders both lists in one row, keyed by URL.
+  it("adds only sources the weights don't already cite", () => {
+    for (const m of MODELS) {
+      for (const url of AGENT_READS[m.id].sources ?? []) assert.ok(!m.sources.includes(url), `${m.id}: ${url}`);
+    }
+  });
+
   // The /check prose names these agents by hand.
   it("agrees with the agents the check pages name", () => {
     const named = (text: string) => MODELS.filter((m) => text.includes(m.label)).map((m) => m.label);

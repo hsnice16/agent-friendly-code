@@ -14,7 +14,7 @@ Next.js 16 (App Router), React 19, TypeScript (strict), Tailwind CSS 4 (`@theme`
 
 ```bash
 bun install
-bun run prepare-hooks  # once — lefthook pre-commit: Biome, tsc, tests, db-leaks, file-length
+bun run prepare-hooks  # once — pre-commit hooks (CONTRIBUTING.md → Checks)
 bun run dev            # http://localhost:3000
 bun run test           # node --test + tsx
 bun x tsc --noEmit
@@ -28,7 +28,8 @@ bun run file-census    # agent-file paths across the board via the GitHub tree A
 bun run parity-check   # live-score path must equal `bun run score` (--pr for the PR subset)
 bun run check-db-leaks # local paths / tokens in data/rank.db or the files named — run before committing
 bun run indexnow       # submit sitemap URLs to IndexNow (--since <ISO time>, --dry-run)
-bun run agents-md-adoption # rebuild data/agents-md-adoption.json from every committed rank.db (not in a shallow clone)
+bun run agents-md-adoption # rebuild data/agents-md-adoption.json and agent-file-history.json from every committed rank.db (not in a shallow clone)
+bun run agents-md-contents # sections, commands and links in each board AGENTS.md as of its last scoring (needs GITHUB_TOKEN)
 ```
 
 Set `RANK_DB_PATH` to work on a copy of the database; `data/rank.db` is rewritten on `main` daily.
@@ -53,13 +54,15 @@ lib/
   version.ts  app and sibling constants (APP_URL, SIBLING_VERSION, install snippets, OG defaults)
   changelog.ts, roadmap.ts  what /changelog and /roadmap render
 scripts/      CLI entry points (run with tsx)
-proxy.ts      /language/<spelling> → canonical hub redirect
+proxy.ts      /language/<spelling> and the retired /language/<x>/agents → canonical hub
 tests/        node --test suites; fixtures/repo-meta/ holds recorded host API responses
 tasks/        per-version task files
 data/rank.db  committed database, refreshed by .github/workflows/scheduled-rescore.yml
 data/agents-md-adoption.json  AGENTS.md adoption series, rebuilt from rank.db's git history by the same workflow
+data/agent-file-history.json  per repo, the first snapshot each agent file was found in; rebuilt with the series
 data/file-census.json  agent-file paths in every GitHub repo on the board (`bun run file-census`, by hand)
 data/ai-policy.json   each project's stance on AI contributions, classified by hand from the census
+data/agents-md-contents.json  what each board AGENTS.md / CLAUDE.md contains, derived counts only (`bun run agents-md-contents`, by hand)
 ```
 
 ## I/O boundary
@@ -84,7 +87,7 @@ data/ai-policy.json   each project's stance on AI contributions, classified by h
 - **Analytics.** GA and Clarity load only when `location.host` is `APP_HOST`, so `bun run dev`, `next start` and previews send nothing.
 - **Browser storage.** A `"use client"` component may use `localStorage` (no accounts), through a `lib/` helper (`live-score/recents.ts`, `release-notice.ts`, `analytics-consent.ts`) wrapped in try/catch, read after mount so server HTML matches.
 - **Tailwind utilities and `@theme` tokens**; no hex in JSX, no static inline styles, no `@apply`. A class string repeated in 3+ components, or many times on one page, may become a plain-CSS `@utility` in `globals.css` (`card`, `pill`, `check-row`…): in a server component every class string ships twice per page, in the HTML and the RSC payload.
-- **Shared UI.** Every page opens with `PageHeader` (breadcrumbs on sub-pages; `updated` shows the byline and must equal the JSON-LD `dateModified`, from `lib/page-dates.ts` for board-derived pages). Controls use the `btn-primary` / `btn-secondary` / `field` utilities (`btn-sm` beside text or inside a card), data tables `table-wrap` + `data-table`, FAQs `FaqSection` (visible questions and FAQPage JSON-LD from one list, which Google needs to match), tags `chip`, standalone "X →" links `arrow-link`. Panel tones have fixed meanings (`Panel.tsx`), and a toned `PanelHeading` takes an `icon` (a CSS-mask utility in `globals.css`); a new variant is a new shared style, not a one-off.
+- **Shared UI.** Every page opens with `PageHeader` (breadcrumbs on sub-pages; `updated` shows the byline and must equal the JSON-LD `dateModified` and the sitemap `lastmod`, all from one helper (`lib/page-dates.ts`; `guideModified` for guides): the later of the page's copy date and what it lists, never a board-wide count. Editing a page's prose means bumping its copy date: `COPY` there, `CHECK_CONTENT[id].updated`, the guide's `updated` or the sitemap's `*_UPDATED`). Controls use the `btn-primary` / `btn-secondary` / `field` utilities (`btn-sm` beside text or inside a card), data tables `table-wrap` + `data-table`, FAQs `FaqSection` (visible questions and FAQPage JSON-LD from one list, which Google needs to match), tags `chip`, standalone "X →" links `arrow-link`. Panel tones have fixed meanings (`Panel.tsx`), and a toned `PanelHeading` takes an `icon` (a CSS-mask utility in `globals.css`); a new variant is a new shared style, not a one-off.
 - **Interaction.** A row, list item or tile that leads somewhere is one target, like a board row: its main link gets `cover-link` (inside `data-table`, `link-row` or `tile`), so all of it highlights on hover. A link in a list or table is an `IntentLink`, which prefetches on hover, focus or touch instead of in the viewport. `link-row` brings its own divider and height; don't add `py-*` or `divide-y`. Text links are `ink-link`, `dim-link`, `prose-link` (in muted prose) or `arrow-link`: hover changes the colour, never adds an underline. Motion stays CSS-only and off under `prefers-reduced-motion`.
 - **Comments say why, never what.** The shallow-clone note in `lib/clients/git.ts` is the model.
 - **File length**: `.ts` / `.tsx` under `app/`, `components/`, `lib/` stay ≤ 300 lines (pre-commit enforced). `scripts/` is exempt.
@@ -100,11 +103,11 @@ data/ai-policy.json   each project's stance on AI contributions, classified by h
 
 ## Sibling repos
 
-`../agent-friendly-action/` (PR score-diff Action) and `../agent-friendly-skill/` (agent skill) each vendor `lib/scoring/` into `src/scoring/` and ship one `@vercel/ncc` bundle in `dist/`. The three copies are kept in sync by hand.
+`../agent-friendly-action/` (PR score-diff Action) and `../agent-friendly-skill/` (agent skill) each vendor `lib/scoring/` into `src/scoring/` and ship one `@vercel/ncc` bundle (`dist/`; the skill's under `skills/agent-friendly/`). The three copies are kept in sync by hand.
 
 **Whenever you change `lib/scoring/`**, in both siblings: copy the changed files (same layout), keeping each sibling's deliberate prunes (listed in its AGENTS.md, e.g. `MODEL_BY_ID` in `weights.ts`), rebuild `dist/`, and, if scores or output change, add a line under "Unreleased" in `CHANGELOG.md`. Their CI checks `dist/` against `src/` but cannot see upstream drift. If a sibling is not checked out, say so; never skip it silently.
 
-Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` builds `ACTION_USES` and `SKILL_INSTALL_CMD`; the major is also written in `skills-lock.json` (`ref`), `.github/workflows/agent-friendly.yml` (`@v0`) and the `/action` and `/skill` FAQ copy. Change them together, only when both siblings cut a new major.
+Both siblings release the same major. `SIBLING_VERSION` in `lib/version.ts` builds `ACTION_USES` and `SKILL_INSTALL_CMD`; the major is also written in `skills-lock.json` (`ref`) and the `/action` and `/skill` FAQ copy. Change them together, only when both siblings cut a new major.
 
 ## Adding a signal
 

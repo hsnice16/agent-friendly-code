@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { LANGUAGE_HUB_MIN_REPOS } from "../lib/constants/scoring";
-import { averageScore, groupByLanguage, isHub, languageSlug } from "../lib/utils/language";
+import { averageScore, groupByLanguage, isHub, languageRedirect, languageSlug } from "../lib/utils/language";
 
 describe("languageSlug", () => {
   it("spells out languages whose names are only punctuation apart", () => {
@@ -53,5 +53,24 @@ describe("averageScore", () => {
   it("is 0, not NaN, for no rows", () => {
     assert.equal(averageScore([]), 0);
     assert.equal(averageScore([{ score: 40 }, { score: null }, { score: 80 }]), 40);
+  });
+});
+
+describe("languageRedirect", () => {
+  it("sends a spelling to its canonical hub and leaves the canonical one alone", () => {
+    assert.deepEqual(languageRedirect("/language/C%2B%2B"), { pathname: "/language/cpp", hash: "" });
+    assert.deepEqual(languageRedirect("/language/TypeScript"), { pathname: "/language/typescript", hash: "" });
+    assert.equal(languageRedirect("/language/typescript"), null);
+  });
+
+  it("sends the retired agents page, in any spelling, to the hub section in one hop", () => {
+    const agents = { pathname: "/language/kotlin", hash: "agents" };
+    assert.deepEqual(languageRedirect("/language/kotlin/agents"), agents);
+    assert.deepEqual(languageRedirect("/language/Kotlin/agents"), agents);
+  });
+
+  it("serves a path it cannot decode or slug as is", () => {
+    assert.equal(languageRedirect("/language/%E0%A4%A"), null);
+    assert.equal(languageRedirect("/language/%2B%2B/agents"), null);
   });
 });

@@ -1,4 +1,7 @@
 import { strict as assert } from "node:assert";
+import { mkdirSync, mkdtempSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { afterEach, describe, test } from "node:test";
 
 import { size } from "../../lib/scoring/signals/size";
@@ -89,5 +92,18 @@ describe("size signal", () => {
 
     assert.equal(r.pass, 0.2);
     assert.equal(r.detail, "10000+ files — very large");
+  });
+
+  test("stops at the folder cap on a tree of folders holding only dotfiles", () => {
+    fixture = mkdtempSync(join(tmpdir(), "afc-fixture-"));
+    for (let i = 0; i < 20_001; i++) {
+      const dir = join(fixture, `d${i}`);
+      mkdirSync(dir);
+      writeFileSync(join(dir, ".keep"), "");
+    }
+
+    const r = size.check(fixture);
+    assert.equal(r.pass, 0.2);
+    assert.equal(r.detail, "20,000+ folders — very large");
   });
 });

@@ -1,7 +1,7 @@
 import type { PairStats, WeightGap } from "@/lib/agent-scores";
 import type { ModelProfile } from "@/lib/scoring/weights";
 import { checkPath } from "@/lib/utils/check-path";
-import { languageAgentsPath } from "@/lib/utils/language";
+import { hubAgentsPath } from "@/lib/utils/language";
 
 import { IntentLink } from "./IntentLink";
 import { LINK } from "./link-class";
@@ -75,7 +75,7 @@ export function LanguageLeadTable({ a, b, languages }: Pair & { languages: PairS
           {languages.map((l) => (
             <tr key={l.slug}>
               <th scope="row" className="font-medium">
-                <IntentLink href={languageAgentsPath(l.slug)} className={`${LINK} cover-link`}>
+                <IntentLink href={hubAgentsPath(l.slug)} className={`${LINK} cover-link`}>
                   {l.label}
                 </IntentLink>
               </th>

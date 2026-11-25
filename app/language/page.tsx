@@ -29,7 +29,8 @@ export default function LanguagesPage() {
         title={PAGE_COPY["/language"].title}
         lead={
           <>
-            The leaderboard by language: each page ranks its repos and shows the checks they most often miss.
+            The leaderboard by language: each page ranks its repos, shows the checks they most often miss and, for the
+            larger languages, which agent they are best set up for.
             {hasTopics && (
               <>
                 {" "}

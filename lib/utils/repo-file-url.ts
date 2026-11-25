@@ -36,3 +36,19 @@ export function repoRawFileUrl(repo: RepoLocation, path: string): string | null 
   const gh = base.match(/^https:\/\/github\.com\/(.+)$/);
   return gh ? `https://raw.githubusercontent.com/${gh[1]}/${ref}` : null;
 }
+
+/** The file as it was at one commit, optionally at a line: a quote must keep pointing at what it quoted. */
+export function repoFileAtCommitUrl(
+  repo: { url: string; host: string },
+  sha: string,
+  path: string,
+  line?: number,
+): string {
+  const base = repo.url.replace(/\/+$/, "");
+  const ref = `${encodeURIComponent(sha)}/${segments(path)}`;
+  const anchor = line ? `#L${line}` : "";
+  if (repo.host === "gitlab") return `${base}/-/blob/${ref}${anchor}`;
+  if (repo.host === "bitbucket") return `${base}/src/${ref}${line ? `#lines-${line}` : ""}`;
+  // GitHub renders Markdown and drops the line anchor unless shown as plain text.
+  return `${base}/blob/${ref}${line ? `?plain=1${anchor}` : ""}`;
+}

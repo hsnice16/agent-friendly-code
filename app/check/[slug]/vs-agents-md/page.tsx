@@ -17,13 +17,14 @@ import { getCheckStats } from "@/lib/check-stats";
 import { CENSUS } from "@/lib/file-census";
 import { getInstructionFileCounts, reposWithBoth } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
-import { boardModified } from "@/lib/page-dates";
+import { vsAgentsMdModified } from "@/lib/page-dates";
 import { MODELS } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { agentList } from "@/lib/utils/agent-list";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ slug: string }>;
 
@@ -75,7 +76,7 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
   const path = checkSubPath(id, "vs-agents-md");
   const stats = getCheckStats(id);
   const both = reposWithBoth(id);
-  const modified = boardModified();
+  const modified = vsAgentsMdModified(id);
   const linked = rootLinksToAgentsMd(c.file);
   const files = getInstructionFileCounts();
   const agentsMdRepos = files.files.find((f) => f.file === "AGENTS.md")?.count ?? 0;
@@ -116,9 +117,9 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
           ],
           citation: c.sources,
           datePublished: "2026-11-04",
-          ...(modified ? { dateModified: modified } : {}),
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       <PageHeader

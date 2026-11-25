@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { entryKind, firstExisting, isFileEntry } from "./helpers";
+import { entryKind, firstFile, isFileEntry } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = [
@@ -18,6 +18,10 @@ const CANDIDATES = [
   "LICENSE-MIT",
   "LICENSE-APACHE",
 ];
+
+// A folder named like the file (kotlin's `license/`) is not one, but the
+// licence it holds is.
+const IN_FOLDER = ["license", "licence"].flatMap((d) => CANDIDATES.map((c) => `${d}/${c}`));
 
 // REUSE keeps one SPDX-named file per licence in `LICENSES/` and makes a root
 // LICENSE optional. Exact spelling: a `licenses/` folder is often vendored notices.
@@ -44,7 +48,7 @@ export const license: Signal = {
   description: "A license, so it's clear what may be done with the code.",
   improveSuggestion: "Add a LICENSE (or COPYING) file — MIT, Apache-2.0, BSD, GPL, etc. — at the repo root.",
   check: (repo) => {
-    const m = firstExisting(repo, CANDIDATES) ?? reuseLicenses(repo);
+    const m = firstFile(repo, CANDIDATES) ?? firstFile(repo, IN_FOLDER) ?? reuseLicenses(repo);
 
     if (m) {
       return {

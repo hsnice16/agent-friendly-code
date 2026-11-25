@@ -5,17 +5,11 @@ import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
-import { AI_POLICY, aiPolicyByRepo, repoKey, STANCE_LABEL } from "@/lib/ai-policy";
+import { AI_POLICY } from "@/lib/ai-policy";
 import { CONTRIBUTE_LANGUAGE_TOP, LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
-import {
-  buildContributeList,
-  CONTRIBUTE_SIGNAL_IDS,
-  CONTRIBUTE_TITLE,
-  type ContributeList,
-  type ContributeSignals,
-  contributeDescription,
-} from "@/lib/contribute";
-import { getLeaderboardStats, listLeaderboardOverall, listSignalFiles } from "@/lib/db";
+import { CONTRIBUTE_TITLE, type ContributeList, contributeDescription } from "@/lib/contribute";
+import { getContributeList } from "@/lib/contribute-data";
+import { contributeModified } from "@/lib/page-dates";
 import { WEBSITE_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath } from "@/lib/utils/check-path";
 import { CONTRIBUTE_PATH, contributeAnchor, contributeLanguageHref } from "@/lib/utils/contribute-path";
@@ -29,21 +23,8 @@ import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const CHIP = "chip tap-target border-line bg-surface-2 text-muted hover:border-line-strong hover:text-ink";
 
-function getList(): ContributeList {
-  const signals = Object.fromEntries(CONTRIBUTE_SIGNAL_IDS.map((id) => [id, listSignalFiles(id)])) as ContributeSignals;
-  const board = listLeaderboardOverall();
-  const found = aiPolicyByRepo();
-  const policies = new Map(
-    board.flatMap((r) => {
-      const p = found.get(repoKey(r));
-      return p ? [[r.id, { label: STANCE_LABEL[p.stance], url: p.url, refusesAi: p.stance === "bans" }] as const] : [];
-    }),
-  );
-  return buildContributeList(board, signals, policies);
-}
-
 export function generateMetadata(): Metadata {
-  const description = contributeDescription(getList());
+  const description = contributeDescription(getContributeList());
   const title = CONTRIBUTE_TITLE;
   return {
     title: pageTitle(title),
@@ -61,7 +42,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
-function jsonLd(list: ContributeList, contentChangedAt: number | null): Record<string, unknown> {
+function jsonLd(list: ContributeList): Record<string, unknown> {
   return {
     "@type": "CollectionPage",
     "@id": `${APP_URL}${CONTRIBUTE_PATH}#page`,
@@ -69,7 +50,7 @@ function jsonLd(list: ContributeList, contentChangedAt: number | null): Record<s
     name: CONTRIBUTE_TITLE,
     description: contributeDescription(list),
     isPartOf: WEBSITE_JSON_LD,
-    ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+    dateModified: contributeModified(list),
     mainEntity: {
       "@type": "ItemList",
       name: "Open source projects ready for AI-assisted contributions",
@@ -85,14 +66,15 @@ function jsonLd(list: ContributeList, contentChangedAt: number | null): Record<s
 }
 
 export default function ContributePage() {
-  const list = getList();
+  const list = getContributeList();
 
   return (
     <>
-      <JsonLd data={jsonLd(list, getLeaderboardStats().contentChangedAt)} />
+      <JsonLd data={jsonLd(list)} />
       <PageHeader
         crumbs={{ current: { name: "Contribute", path: CONTRIBUTE_PATH } }}
         title={CONTRIBUTE_TITLE}
+        updated={contributeModified(list)}
         lead={
           <>
             <strong className="text-ink">

@@ -19,15 +19,16 @@ import { listLeaderboardOverall } from "@/lib/db";
 import { CENSUS_SUMMARY as C } from "@/lib/file-census";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
-import { boardModified } from "@/lib/page-dates";
+import { vsClaudeMdModified } from "@/lib/page-dates";
 import { AGENTS_VS_CLAUDE_MD } from "@/lib/page-meta";
 import { MODELS } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath } from "@/lib/utils/check-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const SIGNAL_ID = "agents_md";
 const PATH = checkSubPath(SIGNAL_ID, "vs-claude-md");
@@ -77,7 +78,7 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
     notFound();
   }
 
-  const modified = boardModified();
+  const modified = vsClaudeMdModified();
   const counts = getInstructionFileCounts();
   const countOf = (file: string) => counts.files.find((f) => f.file === file)?.count ?? 0;
   const agentsMd = countOf("AGENTS.md");
@@ -123,9 +124,9 @@ export default async function AgentsMdVsClaudeMdPage({ params }: { params: Promi
           ],
           citation: VS_CLAUDE_MD_SOURCES,
           datePublished: "2026-10-21",
-          ...(modified ? { dateModified: modified } : {}),
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       <PageHeader

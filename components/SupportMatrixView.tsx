@@ -49,6 +49,7 @@ export function SupportMatrixView({ columns, docs, rows, reposLabel }: Props) {
                   {value ? (
                     <a href={docs[doc]} target="_blank" rel="noopener noreferrer" className="prose-link">
                       {TEXT[value]}
+                      <span className="sr-only"> (new tab)</span>
                     </a>
                   ) : (
                     "—"

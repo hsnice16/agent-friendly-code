@@ -21,6 +21,7 @@ import { hubPath } from "@/lib/utils/language";
 import { ogImage } from "@/lib/utils/og-image";
 import {
   AI_POLICY_REPORT_PATH,
+  CONTENTS_REPORT_PATH,
   REPORT_CSV_PATH,
   REPORT_PATH,
   REPORT_TITLE,
@@ -196,6 +197,10 @@ export default function AgentsMdReportPage() {
               How long the files are:{" "}
               <IntentLink href={SIZE_REPORT_PATH} className="prose-link">
                 AGENTS.md sizes
+              </IntentLink>
+              ; what is in them:{" "}
+              <IntentLink href={CONTENTS_REPORT_PATH} className="prose-link">
+                sections and commands
               </IntentLink>
               ; what projects allow agents to contribute:{" "}
               <IntentLink href={AI_POLICY_REPORT_PATH} className="prose-link">

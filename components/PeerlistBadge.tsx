@@ -27,6 +27,7 @@ export function PeerlistBadge({ className }: Props) {
         // Product Hunt's badge height, so the two sit as one row.
         className="h-[54px] w-auto"
       />
+      <span className="sr-only"> (new tab)</span>
     </a>
   );
 }

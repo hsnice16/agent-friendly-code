@@ -15,15 +15,17 @@ import { languageExampleLinks } from "@/lib/agents-md-example-links";
 import type { ExampleRow } from "@/lib/agents-md-examples";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { GUIDES, guideBySlug } from "@/lib/guides";
+import { getAgentBoard } from "@/lib/guides/agent-board";
 import { guideModified } from "@/lib/guides/modified";
 import { fillStats, getGuideStats } from "@/lib/guides/stats";
 import type { Guide, GuideBlock } from "@/lib/guides/types";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { GUIDE_CRUMB, guidePath } from "@/lib/utils/guide-path";
 import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ slug: string }>;
 
@@ -92,13 +94,13 @@ export default async function GuidePage({ params }: { params: Params }) {
           headline: title,
           description: fill(g.description),
           url: `${APP_URL}${path}`,
-          image: `${APP_URL}/og${path}`,
+          image: `${APP_URL}${ogImage(path, title).url}`,
           about: g.about.map((name) => ({ "@type": "Thing", name })),
           citation: g.sources,
           datePublished: g.published,
           dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       {howTo && <JsonLd data={howTo} />}
@@ -114,7 +116,7 @@ export default async function GuidePage({ params }: { params: Params }) {
           <div key={s.id} id={s.id} className="scroll-mt-24">
             <Panel tone={s.tone}>
               <PanelHeading tone={s.tone}>{s.heading}</PanelHeading>
-              <GuideBlocks blocks={s.blocks} fill={fill} examples={(b) => examplesFor(rows, b)} />
+              <GuideBlocks blocks={s.blocks} fill={fill} examples={(b) => examplesFor(rows, b)} board={getAgentBoard} />
             </Panel>
           </div>
         ))}

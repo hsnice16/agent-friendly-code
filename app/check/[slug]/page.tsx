@@ -9,6 +9,7 @@ import { CodeText } from "@/components/CodeText";
 import { GeneratorCallout } from "@/components/GeneratorCallout";
 import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
+import { LinkedText } from "@/components/LinkedText";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
@@ -23,8 +24,10 @@ import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { fullRate, getCheckStats } from "@/lib/check-stats";
 import { listSignalFiles } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { boardModified } from "@/lib/page-dates";
+import { licensePolicyNote } from "@/lib/license-policy";
+import { checkModified } from "@/lib/page-dates";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { CHECKS_CRUMB, checkCrumb, checkPath, checkSlug, checkSubPath, signalIdFromSlug } from "@/lib/utils/check-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
@@ -33,7 +36,7 @@ import { modelPath } from "@/lib/utils/leaderboard-href";
 import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
 import { SKILLS_REPORT_PATH } from "@/lib/utils/report-path";
-import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = { slug: string };
 
@@ -78,25 +81,26 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
   const stats = getCheckStats(id);
   const practice = Object.hasOwn(CHECK_PRACTICE, id) ? CHECK_PRACTICE[id] : null;
   const languages = [...stats.languages].sort((a, b) => fullRate(b.counts) - fullRate(a.counts));
-  const modified = boardModified();
+  const modified = checkModified(id);
   const hooks = id === "pre_commit" ? hookFrameworkCounts(listSignalFiles(id)) : null;
+  const licenseNote = id === "license" ? licensePolicyNote() : null;
   const skills = id === "agent_skills" ? getAgentSkillsReport() : null;
   const examples = id === "agents_md" ? getAgentsMdExamples() : null;
 
   return (
     <>
-      {/* dateModified is when the pass counts last moved; the prose has no tracked edit history, so no datePublished. */}
       <JsonLd
         data={{
           "@type": "TechArticle",
           headline: content.metaTitle ?? content.title,
           description: content.description,
           url: `${APP_URL}${checkPath(id)}`,
-          image: `${APP_URL}/og${checkPath(id)}`,
+          image: `${APP_URL}${ogImage(checkPath(id), signal.label).url}`,
           about: { "@type": "Thing", name: signal.label },
-          ...(modified ? { dateModified: modified } : {}),
+          datePublished: content.published,
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
 
@@ -117,6 +121,7 @@ export default async function CheckPage({ params }: { params: Promise<Params> })
           , {stats.partial} pass in part ({percent(stats.partial, stats.total)}) and {stats.none} fail (
           {percent(stats.none, stats.total)}).
           {hooks && <> By framework: {hooks.map((h) => `${h.framework} ${h.count}`).join(", ")}.</>}
+          {licenseNote && <LinkedText text={` ${licenseNote}`} />}
         </p>
       </Panel>
 

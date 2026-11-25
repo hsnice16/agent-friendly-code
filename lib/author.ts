@@ -8,5 +8,6 @@ export const AUTHOR_JSON_LD = {
   "@id": `${APP_URL}/about#author`,
   "@type": "Person",
   name: AUTHOR_NAME,
-  url: "https://github.com/hsnice16",
+  url: `${APP_URL}/about`,
+  sameAs: ["https://github.com/hsnice16"],
 };

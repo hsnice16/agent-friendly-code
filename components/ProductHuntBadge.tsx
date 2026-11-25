@@ -21,6 +21,7 @@ export function ProductHuntBadge({ className }: Props) {
         decoding="async"
         fetchPriority="low"
       />
+      <span className="sr-only"> (new tab)</span>
     </a>
   );
 }

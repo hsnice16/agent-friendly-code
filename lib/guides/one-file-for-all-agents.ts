@@ -38,16 +38,24 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
             ["Codex, Cursor, Devin, Kimi CLI, OpenHands, Pi, OpenCode", "Always", "Nothing"],
             [
               "GitHub Copilot",
-              "Cloud agent, code review, CLI and VS Code",
+              "Cloud agent, code review, CLI and VS Code ([docs](https://docs.github.com/en/copilot/reference/custom-instructions-support))",
               "A short `.github/copilot-instructions.md` for Chat on github.com and the other IDEs",
             ],
             [
               "Claude Code",
-              "Only when no CLAUDE.md, `.claude/CLAUDE.md` or CLAUDE.local.md exists (v2.1.277 and later)",
+              "Only when no CLAUDE.md, `.claude/CLAUDE.md` or CLAUDE.local.md exists (v2.1.277 and later) ([docs](https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md))",
               "A CLAUDE.md with `@AGENTS.md`, or a symlink",
             ],
-            ["Gemini CLI", "Once named in `context.fileName`", "A `settings.json` entry"],
-            ["Aider", "Once listed under `read:`", "A line in `.aider.conf.yml`"],
+            [
+              "Gemini CLI",
+              "Once named in `context.fileName` ([docs](https://geminicli.com/docs/cli/gemini-md/#customize-the-context-file-name))",
+              "A `settings.json` entry",
+            ],
+            [
+              "Aider",
+              "Once listed under `read:` ([docs](https://aider.chat/docs/usage/conventions.html#always-load-conventions))",
+              "A line in `.aider.conf.yml`",
+            ],
           ],
         },
       ],
@@ -64,21 +72,21 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
             [
               "Import",
               "A CLAUDE.md containing `@AGENTS.md`, plus any Claude-only lines below it",
-              "Works on every OS and in sessions that read only CLAUDE.md; one extra small file",
+              "Works on every OS and in sessions that read only CLAUDE.md ([docs](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)); one extra small file",
             ],
             [
               "Symlink",
               "`ln -s AGENTS.md CLAUDE.md`",
-              "No second file to read, but breaks on Windows clones without `core.symlinks`; no room for Claude-only lines",
+              "No second file to read, but breaks on Windows clones without `core.symlinks` ([docs](https://git-scm.com/docs/git-config#Documentation/git-config.txt-coresymlinks)); no room for Claude-only lines",
             ],
             [
               "No CLAUDE.md",
               "Rely on Claude Code reading AGENTS.md when no CLAUDE.md exists",
-              "Needs v2.1.277+; any CLAUDE.local.md turns it off; before v2.1.281, Bedrock and telemetry-disabled sessions read only CLAUDE.md",
+              "Needs v2.1.277+; any CLAUDE.local.md turns it off; before v2.1.281, Bedrock and telemetry-disabled sessions read only CLAUDE.md ([docs](https://code.claude.com/docs/en/memory#when-agents-md-support-is-unavailable))",
             ],
             [
               "Setting",
-              "Set Project instructions in `/config` to `claude-md-and-agents-md`",
+              "Set Project instructions in `/config` to `claude-md-and-agents-md` ([docs](https://code.claude.com/docs/en/memory#choose-which-instruction-files-load))",
               "Per user, not per repo: contributors who don't set it don't get it",
             ],
           ],
@@ -92,7 +100,7 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Put `@AGENTS.md` in a CLAUDE.md beside it. Claude reads the imported file first, then the rest of CLAUDE.md, so Claude-only instructions go below the import. Anthropic's docs say the import never makes Claude read AGENTS.md twice, whatever the Project instructions setting.",
+          text: "Put `@AGENTS.md` in a CLAUDE.md beside it. Claude reads the imported file first, then the rest of CLAUDE.md, so Claude-only instructions go below the import ([docs](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)). Anthropic's docs say the import never makes Claude read AGENTS.md twice, whatever the Project instructions setting ([docs](https://code.claude.com/docs/en/memory#remove-an-earlier-agents-md-workaround)).",
         },
         { kind: "snippet", caption: "CLAUDE.md", text: IMPORT },
       ],
@@ -105,9 +113,9 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
         {
           kind: "list",
           items: [
-            "Windows: creating a symlink needs Administrator rights or Developer Mode, and unless `core.symlinks` is enabled Git checks a committed symlink out as a plain file holding the link text, so that clone's CLAUDE.md is the one line `AGENTS.md`. Git probes and may set `core.symlinks` to false on clone. If anyone works on Windows, use the import.",
-            "Editing: Claude reads through the link, but its Edit and Write tools won't write through a symlink; they edit the target, AGENTS.md, instead.",
-            "Symlinks to network or UNC paths aren't followed.",
+            "Windows: creating a symlink needs Administrator rights or Developer Mode, and unless `core.symlinks` is enabled Git checks a committed symlink out as a plain file holding the link text, so that clone's CLAUDE.md is the one line `AGENTS.md` ([docs](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)). Git probes and may set `core.symlinks` to false on clone ([docs](https://git-scm.com/docs/git-config#Documentation/git-config.txt-coresymlinks)). If anyone works on Windows, use the import.",
+            "Editing: Claude reads through the link, but its Edit and Write tools won't write through a symlink; they edit the target, AGENTS.md, instead ([docs](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)).",
+            "Symlinks to network or UNC paths aren't followed ([docs](https://code.claude.com/docs/en/memory#share-rules-across-projects-with-symlinks)).",
           ],
         },
       ],
@@ -118,17 +126,17 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Gemini CLI reads GEMINI.md by default; `context.fileName` in `settings.json` takes a name or a list. Keep GEMINI.md in the list if you have one.",
+          text: "Gemini CLI reads GEMINI.md by default; `context.fileName` in `settings.json` takes a name or a list ([docs](https://geminicli.com/docs/cli/gemini-md/#customize-the-context-file-name)). Keep GEMINI.md in the list if you have one.",
         },
         { kind: "snippet", caption: "settings.json (Gemini CLI)", text: GEMINI },
         {
           kind: "p",
-          text: "Aider's docs describe no file it finds on its own. List AGENTS.md under `read:` in `.aider.conf.yml` (a list takes several), or pass `--read AGENTS.md`.",
+          text: "Aider's docs describe no file it finds on its own. List AGENTS.md under `read:` in `.aider.conf.yml` (a list takes several), or pass `--read AGENTS.md` ([docs](https://aider.chat/docs/usage/conventions.html#always-load-conventions)).",
         },
         { kind: "snippet", caption: ".aider.conf.yml", text: AIDER },
         {
           kind: "p",
-          text: "Copilot's cloud agent, code review and CLI read AGENTS.md and also a root CLAUDE.md or GEMINI.md, and VS Code reads AGENTS.md (its Local harness once `chat.useAgentsMdFile` is on). Chat on github.com, Visual Studio, JetBrains, Xcode and Eclipse don't list AGENTS.md; they read `.github/copilot-instructions.md`, so keep a short one with the essentials. The Copilot guide has the per-surface table.",
+          text: "Copilot's cloud agent, code review and CLI read AGENTS.md and also a root CLAUDE.md or GEMINI.md, and VS Code reads AGENTS.md (its Local harness once `chat.useAgentsMdFile` is on) ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)). Chat on github.com, Visual Studio, JetBrains, Xcode and Eclipse don't list AGENTS.md ([docs](https://docs.github.com/en/copilot/reference/custom-instructions-support)); they read `.github/copilot-instructions.md`, so keep a short one with the essentials. The Copilot guide has the per-surface table.",
         },
       ],
     },
@@ -207,6 +215,7 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
     "https://geminicli.com/docs/cli/gemini-md/",
     "https://aider.chat/docs/usage/conventions.html",
     "https://docs.github.com/en/copilot/reference/custom-instructions-support",
+    "https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference",
     "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions",
     "https://agents.md/",
   ],

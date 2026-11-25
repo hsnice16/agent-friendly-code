@@ -74,7 +74,7 @@ export function AiPolicyTableView({ groups }: { groups: PolicyGroup[] }) {
                       <Chip stance={g.stance} label={g.label} />
                     </td>
                     <td className="min-w-[12rem] text-ink-dim">{p.summary}</td>
-                    <td className="mono-cell [overflow-wrap:anywhere]">
+                    <td className="mono-cell min-w-[9.5rem] [overflow-wrap:anywhere]">
                       <a
                         href={p.url}
                         target="_blank"

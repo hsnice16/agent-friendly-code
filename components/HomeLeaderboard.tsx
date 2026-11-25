@@ -4,6 +4,7 @@ import type { LeaderboardView } from "@/lib/leaderboard-view";
 import type { LeaderboardStats } from "@/lib/types/db";
 import { checkSubPath } from "@/lib/utils/check-path";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
+import { PACKAGE_PATH } from "@/lib/utils/package-path";
 import { APP_VERSION } from "@/lib/version";
 
 import { BoardKeyStat } from "./BoardKeyStat";
@@ -86,7 +87,7 @@ export function HomeLeaderboard({ view, stats }: Props) {
 
         <p className="mt-3 max-w-[68ch] text-[13px] text-muted">
           Or check an{" "}
-          <IntentLink href="/package" className={CTA}>
+          <IntentLink href={PACKAGE_PATH} className={CTA}>
             npm / PyPI / Cargo package
           </IntentLink>
           , run the{" "}

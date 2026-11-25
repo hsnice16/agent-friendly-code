@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const FLUTTER: FrameworkGuide = {
   slug: "flutter",
+  published: "2026-11-16",
   label: "Flutter",
   kind: "app",
   languages: ["Dart"],

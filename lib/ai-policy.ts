@@ -1,6 +1,8 @@
 import raw from "@/data/ai-policy.json";
 
 import { AUTHOR_JSON_LD } from "./author";
+import { PUBLISHER_JSON_LD } from "./site-json-ld";
+import { ogImage } from "./utils/og-image";
 import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
 import { APP_NAME, APP_URL } from "./version";
 
@@ -134,9 +136,11 @@ export function aiPolicyJsonLd(data: AiPolicyData = AI_POLICY): Record<string, u
       headline: aiPolicyTitle(data),
       description: aiPolicyDescription(data),
       url,
+      image: `${APP_URL}${ogImage(AI_POLICY_REPORT_PATH, aiPolicyTitle(data)).url}`,
+      datePublished: "2026-11-16",
       dateModified: data.checked,
       author: AUTHOR_JSON_LD,
-      publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+      publisher: PUBLISHER_JSON_LD,
       about: [{ "@type": "Thing", name: "AI-assisted contributions to open source" }],
     },
     {
@@ -148,7 +152,7 @@ export function aiPolicyJsonLd(data: AiPolicyData = AI_POLICY): Record<string, u
       keywords: ["AI contribution policy", "AI-generated code", "open source", "CONTRIBUTING.md", "AI_POLICY.md"],
       isAccessibleForFree: true,
       dateModified: data.checked,
-      creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+      creator: PUBLISHER_JSON_LD,
       license: "https://opensource.org/licenses/MIT",
       isPartOf: { "@id": `${APP_URL}/#dataset` },
       variableMeasured: ["Stance on AI-assisted contributions", "Disclosure required", "Human-written PR text"],

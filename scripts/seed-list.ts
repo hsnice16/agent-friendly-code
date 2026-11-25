@@ -256,10 +256,6 @@ export const SEEDS: Seed[] = [
   { url: "https://github.com/aio-libs/aiohttp", note: "aiohttp — async HTTP client / server" },
   { url: "https://github.com/tqdm/tqdm", note: "tqdm — fast, extensible progress bar" },
   { url: "https://github.com/astral-sh/uv", note: "uv — Python package + project manager" },
-  {
-    url: "https://github.com/TrapEmAll/UnityScraper",
-    note: "UnityScraper — Xbox 360 data downloader, set up for agents",
-  },
 
   // --- GitHub, Rust ---
   {

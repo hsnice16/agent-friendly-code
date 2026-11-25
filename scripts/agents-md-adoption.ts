@@ -3,6 +3,7 @@ import { copyFileSync, mkdtempSync, renameSync, rmSync, writeFileSync } from "no
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
+import { finishHistory, historyJson, newHistory, parseFileHistory, recordSnapshot } from "../lib/agent-file-history";
 import {
   type AdoptionPoint,
   type AdoptionSeries,
@@ -20,10 +21,22 @@ import { readSnapshotRows } from "../lib/db-snapshot";
 // that fails or is discarded leaves nothing to reconcile.
 const DB = "data/rank.db";
 const OUT = "data/agents-md-adoption.json";
+const HISTORY_OUT = "data/agent-file-history.json";
 
 const git = (...args: string[]) => execFileSync("git", args, { maxBuffer: 1 << 30 });
 
-type Snapshot = { at: Date; write: (to: string) => void };
+type Snapshot = { at: Date; scorer: string; write: (to: string) => void };
+
+// The checks' code as of a commit. A rescore commits rank.db on top of the code
+// that scored it, so this is the version that wrote that snapshot.
+const SIGNALS_DIR = "lib/scoring/signals";
+const scorerAt = (rev: string) => {
+  try {
+    return git("rev-parse", `${rev}:${SIGNALS_DIR}`).toString().trim();
+  } catch {
+    return "";
+  }
+};
 
 function snapshots(): Snapshot[] {
   if (git("rev-parse", "--is-shallow-repository").toString().trim() === "true") {
@@ -35,12 +48,12 @@ function snapshots(): Snapshot[] {
     .split("\n")
     .map((line) => {
       const [sha, at] = line.split(" ");
-      return { at: new Date(at), write: (to) => writeFileSync(to, git("show", `${sha}:${DB}`)) };
+      return { at: new Date(at), scorer: scorerAt(sha), write: (to) => writeFileSync(to, git("show", `${sha}:${DB}`)) };
     });
 
   // The rescore job runs this before its rank.db is committed; today's point is that file.
   if (git("hash-object", DB).toString().trim() !== git("rev-parse", `HEAD:${DB}`).toString().trim()) {
-    list.push({ at: new Date(), write: (to) => copyFileSync(DB, to) });
+    list.push({ at: new Date(), scorer: scorerAt("HEAD"), write: (to) => copyFileSync(DB, to) });
   }
   return list;
 }
@@ -50,6 +63,7 @@ function main() {
   const dir = mkdtempSync(join(tmpdir(), "afc-adoption-"));
   const file = join(dir, "rank.db");
   const points: AdoptionPoint[] = [];
+  const history = newHistory();
   let first: ReturnType<typeof repoFlags> | null = null;
   let last: ReturnType<typeof repoFlags> | null = null;
 
@@ -58,6 +72,8 @@ function main() {
       rmSync(file, { force: true });
       s.write(file);
       const rows = readSnapshotRows(file);
+      // Every snapshot, even below MIN_REPOS: a repo's first day on the board is one.
+      recordSnapshot(history, s.date, rows, s.scorer);
       const point = snapshotPoint(s.date, rows);
       if (point.repos < MIN_REPOS) continue;
       points.push(point);
@@ -89,8 +105,14 @@ function main() {
   writeFileSync(`${OUT}.tmp`, json);
   renameSync(`${OUT}.tmp`, OUT);
 
+  const perRepo = finishHistory(history);
+  parseFileHistory(JSON.parse(historyJson(perRepo)));
+  writeFileSync(`${HISTORY_OUT}.tmp`, historyJson(perRepo));
+  renameSync(`${HISTORY_OUT}.tmp`, HISTORY_OUT);
+
   const latest = points.at(-1);
   console.log(`${OUT}: ${points.length} days, ${points[0]?.date} to ${latest?.date}, ${latest?.repos} repos now`);
+  console.log(`${HISTORY_OUT}: ${Object.keys(perRepo).length} repos with an agent file on record`);
 }
 
 main();

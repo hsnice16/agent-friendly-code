@@ -33,4 +33,9 @@ describe("openhandsSetup signal", () => {
     assert.equal(r.pass, 1);
     assert.match(r.matchedPath ?? "", /\.openhands\/setup\.sh$/);
   });
+
+  test("pass=0 for a directory named setup.sh", () => {
+    fixture = makeFixture({ ".openhands/setup.sh/x": "" });
+    assert.equal(openhandsSetup.check(fixture).pass, 0);
+  });
 });

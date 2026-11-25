@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { characters, readSafe, resolveRelative } from "./helpers";
+import { characters, isFileEntry, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = ".openhands/setup.sh";
@@ -15,7 +15,7 @@ export const openhandsSetup: Signal = {
   check: (repo) => {
     const rel = resolveRelative(repo, REL);
 
-    if (!rel) {
+    if (!rel || !isFileEntry(repo, join(repo, rel))) {
       return {
         pass: 0,
         label: LABEL,

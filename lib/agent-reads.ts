@@ -40,7 +40,7 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     note: "Reads AGENTS.md before any work, one per directory from the repo root down to the working directory, up to 32 KiB combined; AGENTS.override.md replaces the AGENTS.md beside it.",
   },
   cursor: {
-    files: [".cursor/rules/*.mdc", "AGENTS.md", "CLAUDE.md", ".agents/skills/"],
+    files: [".cursor/rules/*.mdc", "AGENTS.md", "CLAUDE.md", ".agents/skills/", ".claude/skills/"],
     agentsMd: "always",
     claudeMd: true,
     note: "Project rules are `.mdc` files in `.cursor/rules/`, subfolders included; a plain `.md` there is ignored. AGENTS.md is read at the root and in subdirectories, combined, the more specific winning. CLAUDE.md is read the same way; the docs describe one at the root. A root `.cursorrules` is legacy and will be deprecated.",
@@ -51,13 +51,19 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     ],
   },
   devin: {
-    files: ["AGENTS.md", "CLAUDE.md", ".cursor/rules/*.mdc", ".devin/blueprint.yaml", ".agents/skills/"],
+    files: [
+      "AGENTS.md",
+      "CLAUDE.md",
+      ".cursor/rules/*.mdc",
+      ".devin/blueprint.yaml",
+      ".agents/skills/",
+      ".claude/skills/",
+    ],
     agentsMd: "always",
     claudeMd: true,
-    note: "Looks for AGENTS.md before it starts coding and includes its first 16 KiB. Pulls CLAUDE.md and Cursor rule files into its Knowledge. Setup comes from its environment snapshot, which `.devin/blueprint.yaml` can define.",
+    note: "Looks for AGENTS.md before it starts coding and includes its first 16 KiB. Pulls CLAUDE.md and Cursor rule files into its Knowledge, which its docs mark deprecated in favour of Skills. Setup comes from its environment snapshot, which `.devin/blueprint.yaml` can define.",
     sources: [
       "https://docs.devin.ai/onboard-devin/agents-md",
-      "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
       "https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints",
     ],
   },
@@ -126,14 +132,17 @@ export const OTHER_TOOLS: OtherTool[] = [
       "AGENTS.md",
       "CLAUDE.md",
       "GEMINI.md",
+      ".agents/skills/",
+      ".claude/skills/",
     ],
     agentsMd: "Cloud agent, code review, CLI and VS Code",
     answer:
-      "On some surfaces. Copilot cloud agent, code review and CLI read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. In VS Code, the Copilot harness finds AGENTS.md files the same way; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones with the experimental `chat.useNestedAgentsMdFiles`. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat in Visual Studio, JetBrains, Eclipse or Xcode.",
+      "On some surfaces. Copilot cloud agent, code review and CLI read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. In VS Code, the Copilot harness combines every AGENTS.md on its path; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones with the experimental `chat.useNestedAgentsMdFiles`. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat in Visual Studio, JetBrains, Eclipse or Xcode.",
     sources: [
       "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions",
       "https://docs.github.com/en/copilot/reference/custom-instructions-support",
       "https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference",
+      "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
     ],
   },
   {
@@ -146,11 +155,11 @@ export const OTHER_TOOLS: OtherTool[] = [
   },
   {
     name: "OpenCode",
-    files: ["AGENTS.md", "CLAUDE.md", "opencode.json"],
+    files: ["AGENTS.md", "CLAUDE.md", "opencode.json", ".agents/skills/", ".claude/skills/"],
     agentsMd: "Yes, CLAUDE.md as fallback",
     answer:
-      "Yes. OpenCode finds AGENTS.md by traversing up from the current directory, and uses a CLAUDE.md only if no AGENTS.md exists. The global file is `~/.config/opencode/AGENTS.md`. Other files, such as `packages/*/AGENTS.md` in a monorepo, go in the `instructions` list in `opencode.json`.",
-    sources: ["https://opencode.ai/docs/rules/"],
+      "Yes. OpenCode loads every AGENTS.md from the current directory up to the project root, after the global `~/.config/opencode/AGENTS.md`, and reads CLAUDE.md in any directory without one. Reading a file below it, such as one in a monorepo package, also loads the AGENTS.md files on the way. Other instruction files go in the `instructions` list in `opencode.json`.",
+    sources: ["https://opencode.ai/docs/rules/", "https://opencode.ai/docs/skills/"],
   },
   {
     name: "Devin Desktop (formerly Windsurf)",

@@ -9,7 +9,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
     "Windsurf became Devin Desktop on June 2, 2026. Where rules go now, what still reads .windsurfrules, the trigger frontmatter, and when AGENTS.md is enough.",
   lead: "Windsurf became Devin Desktop on June 2, 2026. Project rules now go in `.devin/rules/*.md`; `.windsurf/rules/` and a root `.windsurfrules` are still read as fallbacks, so nothing you have breaks. For rules your team shares across agents, an AGENTS.md does the same job, and most other agents read it too.",
   published: "2026-11-16",
-  updated: "2026-11-16",
+  updated: "2026-11-25",
   about: ["Windsurf", "Devin Desktop", "Cascade", "AGENTS.md", "AI coding agents"],
   sections: [
     {
@@ -18,7 +18,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: 'The Windsurf app became Devin Desktop through an over-the-air update. Its FAQ says it "continues to read all of your existing Windsurf rules" and nothing needs to change. What changed is the preferred location: `.devin/` is now the primary workspace directory, `.windsurf/` the fallback.',
+          text: 'The Windsurf app became Devin Desktop through an over-the-air update ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#when-is-this-happening)). Its FAQ says it "continues to read all of your existing Windsurf rules" and nothing needs to change ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules)). What changed is the preferred location: `.devin/` is now the primary workspace directory, `.windsurf/` the fallback ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#workspace-level-directories-inside-repositories)).',
         },
         {
           kind: "p",
@@ -38,26 +38,38 @@ export const DEVIN_DESKTOP_RULES: Guide = {
             [
               "`.devin/rules/*.md`",
               "Project, one rule per file",
-              "Preferred; takes precedence over `.windsurf/rules/`",
+              "Preferred; takes precedence over `.windsurf/rules/` ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules))",
             ],
-            ["`.devin/global_rules.md`", "Project, one always-on file", "Current"],
-            ["`~/.devin/rules/*.md`, `~/.devin/global_rules.md`", "You, in every project", "Current"],
+            [
+              "`.devin/global_rules.md`",
+              "Project, one always-on file",
+              "Current ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+            ],
+            [
+              "`~/.devin/rules/*.md`, `~/.devin/global_rules.md`",
+              "You, in every project",
+              "Current ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+            ],
             [
               "`AGENTS.md`, `AGENT.md`, `AGENTS.local.md`",
               "Always-on rules, per directory",
-              "Current; read from the workspace root down to the working directory",
+              "Current; read from the workspace root down to the working directory ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md))",
             ],
-            ["`.windsurf/rules/*.md`, `.windsurf/global_rules.md`", "Project", "Legacy; imported by default"],
+            [
+              "`.windsurf/rules/*.md`, `.windsurf/global_rules.md`",
+              "Project",
+              "Legacy; imported by default ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+            ],
             [
               "`.windsurfrules`",
               "Project, single file at the workspace root",
-              "Legacy; still read, with no `.devinrules` equivalent",
+              "Legacy; still read, with no `.devinrules` equivalent ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules))",
             ],
           ],
         },
         {
           kind: "p",
-          text: "System-wide rules that enterprise admins deploy move from the Windsurf system directories (on macOS, `/Library/Application Support/Windsurf/`) to the Devin ones (`/Library/Application Support/Devin/`); both are read.",
+          text: "System-wide rules that enterprise admins deploy move from the Windsurf system directories (on macOS, `/Library/Application Support/Windsurf/`) to the Devin ones (`/Library/Application Support/Devin/`); both are read ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#system-level-configuration-admin-managed-per-machine)).",
         },
       ],
     },
@@ -67,7 +79,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Each rule is a Markdown file whose `trigger:` frontmatter decides when it applies:",
+          text: "Each rule is a Markdown file whose `trigger:` frontmatter decides when it applies ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files)):",
         },
         {
           kind: "table",
@@ -102,7 +114,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
         },
         {
           kind: "p",
-          text: "Both directories hold one Markdown file per rule, so moving from `.windsurf/rules/` is a directory rename. Devin Desktop can also import `.cursor/rules` `.mdc` files into `.devin/rules/`.",
+          text: "Both directories hold one Markdown file per rule, so moving from `.windsurf/rules/` is a directory rename. Devin Desktop can also import `.cursor/rules` `.mdc` files into `.devin/rules/` ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules)).",
         },
       ],
     },
@@ -117,7 +129,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
         },
         {
           kind: "p",
-          text: "AGENTS.local.md is read too, for personal rules kept out of version control.",
+          text: "AGENTS.local.md is read too, for personal rules kept out of version control ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md)).",
         },
       ],
     },
@@ -127,7 +139,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "In `.devin/workflows/` (or the legacy `.windsurf/workflows/`), one Markdown file each, capped at 12,000 characters. Run one in Cascade with `/name-of-workflow`. Personal global workflows stay in `~/.codeium/windsurf/global_workflows/`.",
+          text: "In `.devin/workflows/` (or the legacy `.windsurf/workflows/`), one Markdown file each, capped at 12,000 characters ([docs](https://docs.devin.ai/desktop/cascade/workflows#workflow-storage-locations)). Run one in Cascade with `/name-of-workflow`. Personal global workflows stay in `~/.codeium/windsurf/global_workflows/`.",
         },
       ],
     },
@@ -137,7 +149,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "It pulls them into its Knowledge: Devin's docs list `.windsurf`, `.rules`, `.mdc`, `.cursorrules`, CLAUDE.md and AGENTS.md among the files it reads. It also looks for AGENTS.md before it starts coding and includes the first 16 KiB of each.",
+          text: "It pulls them into its Knowledge: Devin's docs list `.windsurf`, `.rules`, `.mdc`, `.cursorrules`, CLAUDE.md and AGENTS.md among the files it reads. The same docs mark Knowledge deprecated, moving to Skills in Plugins ([docs](https://docs.devin.ai/onboard-devin/knowledge-onboarding)). It also looks for AGENTS.md before it starts coding and includes the first 16 KiB of each ([docs](https://docs.devin.ai/onboard-devin/agents-md#creating-an-agents-md-file)).",
         },
       ],
     },

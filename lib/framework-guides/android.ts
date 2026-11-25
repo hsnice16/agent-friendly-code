@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const ANDROID: FrameworkGuide = {
   slug: "android",
+  published: "2026-11-16",
   label: "Android",
   kind: "app",
   languages: ["Kotlin", "Java"],

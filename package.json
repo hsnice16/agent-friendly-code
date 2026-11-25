@@ -23,6 +23,7 @@
     "check-db-leaks": "tsx scripts/check-db-leaks.ts",
     "indexnow": "tsx scripts/indexnow.ts",
     "agents-md-adoption": "tsx scripts/agents-md-adoption.ts",
+    "agents-md-contents": "tsx scripts/agents-md-contents.ts",
     "prepare-hooks": "lefthook install",
     "test": "node --import tsx --test 'tests/**/*.test.ts'"
   },

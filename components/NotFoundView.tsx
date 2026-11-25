@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 
+import { PACKAGE_PATH } from "@/lib/utils/package-path";
 import { IntentLink } from "./IntentLink";
 import { PageHeader } from "./PageHeader";
 import { Panel, PanelHeading } from "./Panel";
@@ -17,7 +18,7 @@ const DESTINATIONS = [
     blurb: "Score any public GitHub repo from its latest commit.",
   },
   {
-    href: "/package",
+    href: PACKAGE_PATH,
     label: "Packages",
     blurb: "Look up the same scores by npm, PyPI or Cargo package name.",
   },

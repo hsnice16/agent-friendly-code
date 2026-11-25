@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { characters, MAX_READ_BYTES, readSafe, resolveRelative } from "./helpers";
+import { characters, isFileEntry, MAX_READ_BYTES, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "GEMINI.md";
@@ -52,7 +52,7 @@ function withImports(repo: string, text: string): string {
     const key = name.toLowerCase();
     if (!imported.has(key)) {
       const rel = resolveRelative(repo, name);
-      imported.set(key, rel ? readSafe(join(repo, rel), repo) : null);
+      imported.set(key, rel && isFileEntry(repo, join(repo, rel)) ? readSafe(join(repo, rel), repo) : null);
     }
     push(imported.get(key) ?? lines[i]);
   }
@@ -69,7 +69,7 @@ export const geminiMd: Signal = {
   check: (repo) => {
     const matched = resolveRelative(repo, "GEMINI.md");
 
-    if (!matched) {
+    if (!matched || !isFileEntry(repo, join(repo, matched))) {
       return {
         pass: 0,
         label: LABEL,

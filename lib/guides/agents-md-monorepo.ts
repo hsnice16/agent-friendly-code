@@ -9,7 +9,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
     "Yes, AGENTS.md can be nested. How Claude Code, Codex, Cursor, Copilot, Gemini CLI and others resolve per-package files, and what goes at the root.",
   lead: "Put one AGENTS.md at the repo root for what every package shares, and one in each package for its own commands and rules. Most agents read the file nearest the code they touch, but each finds nested files differently, and a few never look below the root.",
   published: "2026-11-16",
-  updated: "2026-11-22",
+  updated: "2026-11-25",
   about: ["AGENTS.md", "CLAUDE.md", "Monorepo", "AI coding agents"],
   sections: [
     {
@@ -18,7 +18,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Yes. The agents.md spec says to place an AGENTS.md in each package: the one closest to the edited file wins, and an explicit instruction in chat overrides everything. The file is plain Markdown with no required fields, so a package file is just a shorter AGENTS.md.",
+          text: "Yes. The agents.md spec says to place an AGENTS.md in each package: the one closest to the edited file wins, and an explicit instruction in chat overrides everything. The file is plain Markdown with no required fields ([spec](https://agents.md/#faq)), so a package file is just a shorter AGENTS.md.",
         },
         {
           kind: "p",
@@ -56,62 +56,62 @@ export const AGENTS_MD_MONOREPO: Guide = {
           rows: [
             [
               "Claude Code",
-              "CLAUDE.md, `.claude/CLAUDE.md` and CLAUDE.local.md from the working directory and every directory above it, joined root first. AGENTS.md and `.claude/AGENTS.md` the same way, but only when none of those CLAUDE.md files exist.",
-              "A subdirectory's CLAUDE.md loads once Claude reads, writes or edits a file there; its AGENTS.md loads when Claude reads a file there and that directory has no CLAUDE.md.",
+              "CLAUDE.md, `.claude/CLAUDE.md` and CLAUDE.local.md from the working directory and every directory above it, joined root first ([docs](https://code.claude.com/docs/en/memory#how-claude-md-files-load)). AGENTS.md and `.claude/AGENTS.md` the same way, but only when none of those CLAUDE.md files exist ([docs](https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md)).",
+              "A subdirectory's CLAUDE.md loads once Claude reads, writes or edits a file there ([docs](https://code.claude.com/docs/en/memory#how-claude-md-files-load)); its AGENTS.md loads when Claude reads a file there and that directory has no CLAUDE.md ([docs](https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md)).",
             ],
             [
               "Codex",
-              "From the project root (usually the Git root) down to the working directory, at most one file per directory: `AGENTS.override.md`, else AGENTS.md, else a fallback name. Joined root first; closer files override earlier ones.",
-              "Not read: only directories on the path to where you started count. Start Codex inside the package.",
+              "From the project root (usually the Git root) down to the working directory, at most one file per directory: `AGENTS.override.md`, else AGENTS.md, else a fallback name. Joined root first; closer files override earlier ones ([docs](https://learn.chatgpt.com/docs/agent-configuration/agents-md#how-codex-discovers-guidance)).",
+              "Not read: only directories on the path to where you started count ([docs](https://learn.chatgpt.com/docs/agent-configuration/agents-md#how-codex-discovers-guidance)). Start Codex inside the package.",
             ],
             [
               "Cursor",
-              "AGENTS.md in the project root and in subdirectories, combined, the more specific taking precedence. CLAUDE.md is read like AGENTS.md; the docs describe one at the root.",
+              "AGENTS.md in the project root and in subdirectories, combined, the more specific taking precedence ([docs](https://cursor.com/docs/rules#agentsmd)). A CLAUDE.md is read the same way and always applied; the help page describes one at the project root ([help](https://cursor.com/help/customization/rules#how-does-claudemd-work-in-cursor)).",
               "Read. Rules in `.cursor/rules/*.mdc` can also scope to a package with `globs`.",
             ],
             [
               "Copilot cloud agent",
-              "Any number of AGENTS.md files anywhere in the repo; the nearest one in the directory tree takes precedence.",
+              "Any number of AGENTS.md files anywhere in the repo; the nearest one in the directory tree takes precedence ([docs](https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions#creating-custom-instructions)).",
               "Read.",
             ],
             [
               "Copilot CLI",
-              "The repo root, the working directory, every directory between them, and directories on the path to a file it is working on.",
+              "The repo root, the working directory, every directory between them, and directories on the path to a file it is working on ([docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions#types-of-custom-instructions)).",
               "Read along the path of each file it works on.",
             ],
             [
               "Copilot in VS Code",
-              "Copilot harness: root, working directory, intermediate directories and paths to files it works with, combined. Local harness: the root file needs `chat.useAgentsMdFile`.",
-              "Local harness: only with `chat.useNestedAgentsMdFiles`, which is experimental and off by default.",
+              "Copilot harness: root, working directory, intermediate directories and paths to files it works with, combined. Local harness: the root file needs `chat.useAgentsMdFile` ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
+              "Local harness: only with `chat.useNestedAgentsMdFiles`, which is experimental and off by default ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
             ],
             [
               "Gemini CLI",
-              "GEMINI.md in the workspace directories and their parents. AGENTS.md only once listed in `context.fileName`.",
-              "When a tool touches a file, it scans that directory and its ancestors up to a trusted root.",
+              "GEMINI.md in the workspace directories and their parents ([docs](https://geminicli.com/docs/cli/gemini-md/#understand-the-context-hierarchy)). AGENTS.md only once listed in `context.fileName` ([docs](https://geminicli.com/docs/cli/gemini-md/#customize-the-context-file-name)).",
+              "When a tool touches a file, it scans that directory and its ancestors up to a trusted root ([docs](https://geminicli.com/docs/cli/gemini-md/#understand-the-context-hierarchy)).",
             ],
             [
               "OpenCode",
-              "AGENTS.md found by walking up from the current directory; CLAUDE.md if there is no AGENTS.md.",
-              "Not documented. List package files in `instructions`, e.g. `packages/*/AGENTS.md`.",
+              "AGENTS.md found by walking up from the current directory; CLAUDE.md if there is no AGENTS.md ([docs](https://opencode.ai/docs/rules/#claudemd-fallback)).",
+              "Read: reading a file or listing a directory loads any AGENTS.md between it and the workspace, nearest first ([docs](https://opencode.ai/docs/rules/#discovery)).",
             ],
             [
               "Devin",
-              'Looks for AGENTS.md before it starts coding, at the root "or anywhere else", and includes the first 16 KiB of each file.',
+              'Looks for AGENTS.md before it starts coding, at the root "or anywhere else", and includes the first 16 KiB of each file ([docs](https://docs.devin.ai/onboard-devin/agents-md#creating-an-agents-md-file)).',
               "Which file wins between nested ones is not documented.",
             ],
             [
               "Devin Desktop (ex-Windsurf)",
-              "AGENTS.md, AGENTS.local.md and AGENT.md as always-on rules, in each directory from the workspace root to the working directory.",
+              "AGENTS.md, AGENTS.local.md and AGENT.md as always-on rules, in each directory from the workspace root to the working directory ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md)).",
               "Not documented beyond that path.",
             ],
             [
               "Antigravity",
-              "AGENTS.md or GEMINI.md in the folder and its parents up to the repo root, plus `.agents/AGENTS.md` and `.agents/rules/*.md`.",
-              "Not loaded. Open the package as the workspace.",
+              "AGENTS.md or GEMINI.md in the folder and its parents up to the repo root, plus `.agents/AGENTS.md` and `.agents/rules/*.md` ([docs](https://antigravity.google/docs/rules#directory-scoped-rules)).",
+              "Not loaded ([docs](https://antigravity.google/docs/rules#directory-scoped-rules)). Open the package as the workspace.",
             ],
             [
               "Aider",
-              "Nothing automatically. Files load only when listed under `read:` in `.aider.conf.yml` or passed with `--read`.",
+              "Nothing automatically. Files load only when listed under `read:` in `.aider.conf.yml` or passed with `--read` ([docs](https://aider.chat/docs/usage/conventions.html#always-load-conventions)).",
               "Only what you list.",
             ],
           ],
@@ -129,11 +129,11 @@ export const AGENTS_MD_MONOREPO: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Yes: 32 KiB combined by default (`project_doc_max_bytes`). Codex adds files root first and stops at the limit, so a long root file can crowd out the package file closest to your work, the one that matters most. Keep the root short, or raise the limit in your Codex config. Codex skips empty files.",
+          text: "Yes: 32 KiB combined by default (`project_doc_max_bytes`) ([docs](https://learn.chatgpt.com/docs/agent-configuration/agents-md#how-codex-discovers-guidance)). Codex adds files root first and stops at the limit, so a long root file can crowd out the package file closest to your work, the one that matters most. Keep the root short, or raise the limit in your Codex config. Codex skips empty files.",
         },
         {
           kind: "p",
-          text: "Devin caps each file instead, at its first 16 KiB. Claude Code caps files it loads on demand at 40,000 characters each on a 200K context window, and Anthropic suggests under 200 lines per CLAUDE.md.",
+          text: "Devin caps each file instead, at its first 16 KiB ([docs](https://docs.devin.ai/onboard-devin/agents-md#creating-an-agents-md-file)). Claude Code caps files it loads on demand at 40,000 characters each on a 200K context window ([docs](https://code.claude.com/docs/en/memory#claude-ignores-the-end-of-my-subdirectory-claude-md)), and Anthropic suggests under 200 lines per CLAUDE.md ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)).",
         },
       ],
     },
@@ -191,7 +191,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
         },
         {
           kind: "p",
-          text: "Claude Code reads AGENTS.md only where it finds no CLAUDE.md, so one CLAUDE.md anywhere above hides every AGENTS.md. A one-line CLAUDE.md importing `@AGENTS.md` beside each file keeps both loading; Anthropic's docs say the import never makes Claude read the file twice. A symlink also works, but Git checks it out as a plain text file on Windows unless `core.symlinks` is on.",
+          text: "Claude Code reads AGENTS.md only where it finds no CLAUDE.md, so one CLAUDE.md anywhere above hides every AGENTS.md ([docs](https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md)). A one-line CLAUDE.md importing `@AGENTS.md` beside each file keeps both loading; Anthropic's docs say the import never makes Claude read the file twice ([docs](https://code.claude.com/docs/en/memory#remove-an-earlier-agents-md-workaround)). A symlink also works, but Git checks it out as a plain text file on Windows unless `core.symlinks` is on ([docs](https://code.claude.com/docs/en/memory#share-one-file-with-other-coding-tools)).",
         },
       ],
     },
@@ -204,10 +204,10 @@ export const AGENTS_MD_MONOREPO: Guide = {
           kind: "list",
           items: [
             "Keep the root CLAUDE.md (or AGENTS.md) to what every session needs; it loads every time.",
-            "Put package detail in that package's file, which loads only once Claude works there.",
-            "Use `.claude/rules/*.md` with a `paths:` glob list for rules tied to file types, not directories; such a rule loads when Claude reads, writes or edits a matching file.",
-            "Use `claudeMdExcludes` in settings to skip other teams' CLAUDE.md files by path or glob.",
-            "Run `/memory` to see which files loaded, or `/context all` for the list under Memory files.",
+            "Put package detail in that package's file, which loads only once Claude works there ([docs](https://code.claude.com/docs/en/memory#how-claude-md-files-load)).",
+            "Use `.claude/rules/*.md` with a `paths:` glob list for rules tied to file types, not directories; such a rule loads when Claude reads, writes or edits a matching file ([docs](https://code.claude.com/docs/en/memory#path-specific-rules)).",
+            "Use `claudeMdExcludes` in settings to skip other teams' CLAUDE.md files by path or glob ([docs](https://code.claude.com/docs/en/memory#exclude-specific-claude-md-files)).",
+            "Run `/context all` to see which files loaded, under Memory files ([docs](https://code.claude.com/docs/en/memory#set-up-a-project-claude-md)).",
           ],
         },
       ],
@@ -258,7 +258,8 @@ export const AGENTS_MD_MONOREPO: Guide = {
     "https://agents.md/",
     "https://code.claude.com/docs/en/memory",
     "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
-    "https://cursor.com/docs/context/rules",
+    "https://cursor.com/docs/rules",
+    "https://cursor.com/help/customization/rules",
     "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions",
     "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions",
     "https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference",

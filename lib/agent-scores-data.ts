@@ -7,7 +7,7 @@ import type { LanguageGroup } from "./utils/language";
 type Data = { rows: ScoredRepo[]; presence: FilePresence; languages: LanguageGroup<ScoredRepo>[] };
 
 // Per process, keyed on dbVersion, as check-stats is: every compare and
-// language-agents page of a static build reads every agent's board.
+// language hub of a static build reads every agent's board.
 let memo: { key: string; data: Data } | null = null;
 
 function load(): Data {

@@ -1,3 +1,4 @@
+import { CONTENTS_REPORT } from "@/lib/agents-md-contents-data";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { ADOPTION } from "@/lib/agents-md-report";
@@ -11,6 +12,7 @@ import { GUIDES } from "@/lib/guides";
 import { fillStats, getGuideStats } from "@/lib/guides/stats";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { compareLines, keyFacts, languageLines } from "@/lib/llms-sections";
+import { PAGE_COPY } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
@@ -23,9 +25,12 @@ import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { guidePath } from "@/lib/utils/guide-path";
 import { OTHER_LANGUAGES_PATH } from "@/lib/utils/language";
 import { modelPath } from "@/lib/utils/leaderboard-href";
+import { PACKAGE_PATH } from "@/lib/utils/package-path";
 import { repoPath } from "@/lib/utils/repo-path";
 import {
   AI_POLICY_REPORT_PATH,
+  CONTENTS_REPORT_CSV_PATH,
+  CONTENTS_REPORT_PATH,
   REPORT_CSV_PATH,
   REPORT_PATH,
   REPORT_TITLE,
@@ -115,17 +120,20 @@ ${vsLines}
 ${GUIDES.map((g) => `- [${g.name}](${APP_URL}${guidePath(g.slug)}): ${fillStats(g.description, guideStats)}`).join("\n")}
 - [Compare agents](${APP_URL}${COMPARE_PATH}): Claude Code vs Cursor, Codex vs Gemini CLI and more: how well leaderboard repos are set up for each, pair by pair (setup, not code quality)
 - [AGENTS.md sizes](${APP_URL}${SIZE_REPORT_PATH}): How long real AGENTS.md and CLAUDE.md files are, and how many pass Devin's 16 KiB and Codex's 32 KiB limits
+- [What's in an AGENTS.md](${APP_URL}${CONTENTS_REPORT_PATH}): Which sections ${CONTENTS_REPORT.files} real AGENTS.md and CLAUDE.md files have, how many give a test command, and how they point to other files; CSV (${APP_URL}${CONTENTS_REPORT_CSV_PATH})
 - [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, classified by hand
 - [Agent skills in repos](${APP_URL}${SKILLS_REPORT_PATH}): Which popular repos ship SKILL.md files in .agents/skills or .claude/skills, with counts per repo; CSV (${APP_URL}${SKILLS_REPORT_CSV_PATH})
 - [Projects to contribute to](${APP_URL}${CONTRIBUTE_PATH}): Open source projects with a CONTRIBUTING guide, tests and CI, by language, ready for agent-assisted work
 - [AGENTS.md generator](${APP_URL}${GENERATOR_PATH}): A starter AGENTS.md drafted from a scan of any public GitHub repo
-- [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks
+- [Languages](${APP_URL}/language): The leaderboard split by programming language, with each language's most-missed checks and which agent its repos are best set up for
 - [Other languages](${APP_URL}${OTHER_LANGUAGES_PATH}): Repos in languages too small for their own hub, grouped by language
 ${hasTopics ? `- [Topics](${APP_URL}${TOPICS_PATH}): The leaderboard split by repo topic, one ranked page per topic\n` : ""}- [Methodology](${APP_URL}/methodology): How scores are computed: signals, weights, limitations
-- [Package lookup](${APP_URL}/package): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
+- [Package lookup](${APP_URL}${PACKAGE_PATH}): Resolve npm / PyPI / Cargo packages to their source-repo agent-friendliness score
 - [Live Score](${APP_URL}/score): Score any public GitHub repository on demand, on the leaderboard or not
 - [Roadmap](${APP_URL}/roadmap): Upcoming versions
 - [Skill](${APP_URL}/skill): Agent skill that scores the repo you are in — install snippet, the agent it is best set up for, score → model class, optional SessionStart hooks for Claude Code / Codex
+- [Privacy policy](${APP_URL}/privacy): ${PAGE_COPY["/privacy"].description}
+- [Terms of use](${APP_URL}/terms): ${PAGE_COPY["/terms"].description}
 - [Sitemap](${APP_URL}/sitemap.xml): Every indexed URL
 
 ## Agent comparisons

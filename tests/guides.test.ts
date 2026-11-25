@@ -4,8 +4,10 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { GUIDE_NOTES, GUIDES } from "../lib/guides";
+import { getAgentBoard } from "../lib/guides/agent-board";
 import { fillStats, getGuideStats, statKeys } from "../lib/guides/stats";
 import type { Guide } from "../lib/guides/types";
+import { MODELS } from "../lib/scoring/weights";
 import { MAX_DESCRIPTION_LENGTH, MAX_TITLE_LENGTH, pageTitle } from "../lib/utils/page-title";
 
 function strings(g: Guide): string[] {
@@ -25,6 +27,8 @@ function blockStrings(b: Guide["sections"][number]["blocks"][number]): string[] 
       return [b.caption];
     case "examples":
       return [];
+    case "agentBoard":
+      return Object.values(b.benchmarks);
   }
 }
 
@@ -79,6 +83,17 @@ describe("guides", () => {
 
   it("each have one hub note", () => {
     assert.deepEqual(Object.keys(GUIDE_NOTES).sort(), GUIDES.map((g) => g.slug).sort());
+  });
+
+  it("give every agent on the board a dated benchmark note", () => {
+    for (const g of GUIDES)
+      for (const s of g.sections)
+        for (const b of s.blocks)
+          if (b.kind === "agentBoard") {
+            assert.match(b.checked, DATE, g.slug);
+            assert.deepEqual(Object.keys(b.benchmarks).sort(), MODELS.map((m) => m.id).sort(), g.slug);
+          }
+    assert.equal(getAgentBoard().rows.length, MODELS.length);
   });
 
   it("keep section ids unique within a guide", () => {

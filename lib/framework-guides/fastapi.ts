@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const FASTAPI: FrameworkGuide = {
   slug: "fastapi",
+  published: "2026-11-04",
   label: "FastAPI",
   kind: "service",
   languages: ["Python"],

@@ -10,6 +10,7 @@ import { GUIDE_PATH, guidePath } from "@/lib/utils/guide-path";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import {
   AI_POLICY_REPORT_PATH,
+  CONTENTS_REPORT_PATH,
   REPORT_PATH,
   REPORT_TITLE,
   SIZE_REPORT_PATH,
@@ -56,6 +57,7 @@ export function footerDirectoryRows(): DirectoryRow[] {
         { label: "Projects to contribute to", href: CONTRIBUTE_PATH },
         { label: REPORT_TITLE, href: REPORT_PATH },
         { label: "AGENTS.md sizes", href: SIZE_REPORT_PATH },
+        { label: "What's in an AGENTS.md", href: CONTENTS_REPORT_PATH },
         { label: "Agent skills in repos", href: SKILLS_REPORT_PATH },
         { label: "AI contribution policies", href: AI_POLICY_REPORT_PATH },
       ],

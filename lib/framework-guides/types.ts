@@ -11,6 +11,8 @@ export type AgentsMdGuide = {
 };
 
 export type FrameworkGuide = AgentsMdGuide & {
+  /** YYYY-MM-DD its examples page first shipped. */
+  published: string;
   /** For the description and JSON-LD: what kind of thing it is. */
   kind: string;
   /** Primary languages of an app built on it; a repo in another (a Python monorepo with a Next.js UI) lists after these. */

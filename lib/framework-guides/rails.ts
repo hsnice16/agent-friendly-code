@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const RAILS: FrameworkGuide = {
   slug: "rails",
+  published: "2026-11-04",
   label: "Rails",
   kind: "app",
   languages: ["Ruby"],

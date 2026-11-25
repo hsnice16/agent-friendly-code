@@ -2,6 +2,8 @@ import type { CheckContent } from "./types";
 
 export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   readme: {
+    published: "2026-10-12",
+    updated: "2026-11-20",
     title: "README: how much a repo needs for AI coding agents",
     description:
       "Why a detailed README helps AI coding agents, how we score README length, and how popular open source repos compare.",
@@ -16,6 +18,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Cover what the project does, how to install it, the most-used commands, and where the main code lives. That usually clears 1,000 characters.",
   },
   tests: {
+    published: "2026-10-12",
+    updated: "2026-11-25",
     title: "Test suites: why AI coding agents need tests they can find",
     description:
       "Why AI coding agents depend on a test suite, how we detect tests in a repo, and how many popular open source repos pass.",
@@ -24,12 +28,14 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     scoring: [
       "Full pass: a `tests/`, `test/`, `__tests__/`, `spec/`, `specs/`, `testsuite/` or `src/test/` directory; a `tests/`, `test/`, `__tests__/`, `spec/` or `src/test/` in a top-level folder, or a source set such as `app/src/test/` or `src/commonTest/`; or a test project such as .NET's `App.Tests/` or Xcode's `AppTests/`.",
       "Full pass: test-named files within four folder levels, such as `*.test.ts`, `*_test.go`, `test_*.py`, `*Test.java`, `*_spec.rb`, `*_unittest.cc`, Perl's `t/*.t` or a root `test.js`. Tests kept beside the code are a suite too.",
-      "70%: no test files, but `package.json` has a `test` script other than npm's placeholder.",
+      "70%: no test files, but `package.json` has a `test` script other than npm's placeholder or a bare `exit`, `true` or `echo`.",
       "Fail: none of these. We check that tests exist, not that they pass.",
     ],
     fix: "Keep tests where your language expects them and put the command that runs them in AGENTS.md.",
   },
   ci: {
+    published: "2026-10-12",
+    updated: "2026-11-20",
     title: "CI configuration: what AI coding agents learn from your pipeline",
     metaTitle: "CI config: what AI coding agents learn from your pipeline",
     description:
@@ -44,6 +50,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Add a workflow that runs tests and the linter on every pull request, using the commands you document for local use.",
   },
   linter: {
+    published: "2026-10-12",
+    updated: "2026-11-22",
     title: "Linter and formatter config: instant feedback for AI coding agents",
     metaTitle: "Linters and formatters: instant feedback for AI agents",
     description:
@@ -59,6 +67,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Commit your language's standard linter config and put the lint command in AGENTS.md. A linter on default settings leaves no file to find.",
   },
   deps_manifest: {
+    published: "2026-10-12",
+    updated: "2026-11-20",
     title: "Dependency manifests: letting AI coding agents rebuild your environment",
     metaTitle: "Dependency manifests: how AI agents rebuild your setup",
     description:
@@ -72,6 +82,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Commit the manifest at the repo root, with its lockfile so an agent installs the versions you do.",
   },
   dev_env: {
+    published: "2026-10-12",
+    updated: "2026-11-22",
     title: "Reproducible dev environments: one-command setup for AI coding agents",
     metaTitle: "Reproducible dev environments: one-command agent setup",
     description:
@@ -87,6 +99,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Add a Makefile or justfile with `setup`, `test` and `lint` targets, and a devcontainer or Dockerfile that installs the toolchain.",
   },
   type_config: {
+    published: "2026-10-12",
+    updated: "2026-11-20",
     title: "Type configuration: static types help AI coding agents read code",
     metaTitle: "Type config: static types help AI coding agents read code",
     description:
@@ -102,19 +116,26 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "TypeScript or JavaScript: commit a `tsconfig.json` or `jsconfig.json`. Python: add mypy or Pyright and commit its config. Other typed languages pass once their build file is committed.",
   },
   license: {
+    published: "2026-10-12",
+    updated: "2026-11-25",
     title: "License files: what AI coding agents may do with your code",
     description:
-      "Why a license file matters when AI coding agents work in a repo, which files we detect, and how many popular open source repos have one.",
-    what: "This check looks for a license file at the repo root: `LICENSE` or `LICENCE` (bare, `.md` or `.txt`), `COPYING`, `UNLICENSE`, `LICENSE-MIT` or `LICENSE-APACHE`, or a REUSE `LICENSES/` folder with at least one licence text.",
-    why: "A license tells an agent, and whoever runs it, whether the code may be copied, modified or redistributed. Every profile weighs it low: it doesn't change how well an agent edits code.",
-    scoring: ["Full pass: one of these at the repo root.", "Fail: none. We do not read which license it is."],
+      "What a license decides when AI agents copy or contribute code, which files we detect, and how license files line up with AI contribution policies.",
+    what: "This check looks for a license file at the repo root: `LICENSE`, `LICENCE` or `COPYING` (bare, `.md` or `.txt`), `UNLICENSE`, `LICENSE-MIT` or `LICENSE-APACHE`, a REUSE `LICENSES/` folder with at least one licence text, or one of those files inside a `license/` folder.",
+    why: "A license tells whoever runs an agent whether the code may be copied, modified or redistributed, and on what terms a contribution is accepted. Every profile weighs it low: it doesn't change how well an agent edits code.",
+    scoring: [
+      "Full pass: one of these at the repo root or in a `license/` or `licence/` folder.",
+      "Fail: none. We do not read which license it is.",
+    ],
     fix: "Add a `LICENSE` file at the repo root. A license named only in `package.json` or the README does not pass.",
   },
   contributing: {
+    published: "2026-10-12",
+    updated: "2026-11-25",
     title: "CONTRIBUTING guides: a workflow AI coding agents can follow",
     description:
       "Why a CONTRIBUTING guide helps AI coding agents, where we look for one, and how many popular open source repos have it.",
-    what: "This check looks for `CONTRIBUTING.md`, or its `.rst`, `.adoc` or extensionless form, at the repo root, in `.github/` or in `docs/`.",
+    what: "This check looks for `CONTRIBUTING.md`, `.rst` or `.adoc` at the repo root, in `.github/` or in `docs/`, an extensionless `CONTRIBUTING` at the root, or a root `CONTRIBUTING/` folder's `README.md`.",
     why: "A contributing guide holds the rules a pull request is judged by: branch names, commit style, required checks. An agent opening pull requests needs them as much as a new contributor.",
     scoring: [
       "Full pass: a contributing guide in one of those three places.",
@@ -123,6 +144,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Cover branch naming, commit message style, the commands to run before pushing, and how review works. Keep agent-specific rules in AGENTS.md and link the two.",
   },
   pre_commit: {
+    published: "2026-10-12",
+    updated: "2026-11-22",
     title: "Do pre-commit hooks run when an AI coding agent commits?",
     metaTitle: "Pre-commit hooks for AI coding agents, and --no-verify",
     description:
@@ -136,6 +159,8 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
     fix: "Add one of the configs above, running the formatter and linter on staged files. Keep it fast; slow checks belong in CI.",
   },
   size: {
+    published: "2026-10-12",
+    updated: "2026-11-25",
     title: "Codebase size: how large repos strain AI coding agents",
     description:
       "Why very large repos are harder for AI coding agents, how we count files, and how popular open source repos are spread across the size bands.",
@@ -146,7 +171,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
       "90%: under 50 files.",
       "80%: 500 to 1,999 files.",
       "50%: 2,000 to 4,999 files.",
-      "20%: 5,000 files or more.",
+      "20%: 5,000 files or more, or over 20,000 folders.",
     ],
     fix: "Don't shrink a project for a score. Tell the agent where to start: name the main entry points in AGENTS.md, and give each monorepo package its own instructions file.",
   },

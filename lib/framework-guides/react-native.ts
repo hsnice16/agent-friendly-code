@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const REACT_NATIVE: FrameworkGuide = {
   slug: "react-native",
+  published: "2026-11-16",
   label: "React Native",
   kind: "app",
   languages: ["TypeScript", "JavaScript"],

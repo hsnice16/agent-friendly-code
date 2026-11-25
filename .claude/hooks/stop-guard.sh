@@ -5,6 +5,10 @@
 
 set -eu
 
+# The hook inherits the session's cwd; from a subdirectory the pathspecs below
+# match nothing and every change reads as "no changes".
+cd "${CLAUDE_PROJECT_DIR:-.}"
+
 input="$(cat)"
 
 if printf '%s' "$input" | grep -qE '"stop_hook_active"[[:space:]]*:[[:space:]]*true'; then

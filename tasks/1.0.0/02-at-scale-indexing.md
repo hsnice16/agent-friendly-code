@@ -37,10 +37,15 @@ These two tasks ship together as "production at scale": Postgres unblocks the cr
 - v1.0.0 delivery: **10k repos** across top-starred + trending + submitted.
 - 100k and 1M are throughput questions, not design questions. Leave them to a separate v1.x when we hit them.
 
+## Indexing guardrail
+
+Crawler-discovered repo pages are `noindex, follow` and stay out of the sitemap by default. A repo page becomes indexable only when it carries something beyond the shared template: repo-specific facts (agent-file history, census paths, an AI policy) or a maintainer claim. Thousands of near-identical pages are what Google's scaled content abuse policy describes, and templated repo pages are the likeliest source of the site's existing "Crawled – currently not indexed" backlog.
+
 ## Acceptance
 
 - Crawler indexes ≥ 10k public GitHub repos without exceeding rate limits (verified over a 7-day run).
 - Each indexed repo has a non-null score for every model in `lib/scoring/weights.ts`.
 - `/api/repos` returns paginated results that include crawler-sourced entries (not only seeds).
 - A submitted repo lands in the DB within ≤ 15 minutes of submission.
+- Crawler-sourced repo pages without repo-specific content are `noindex, follow` and absent from the sitemap.
 - Deletion path: if a repo is archived or deleted upstream, next crawl marks it accordingly (don't serve stale rankings).

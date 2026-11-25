@@ -1,6 +1,6 @@
 import { join } from "node:path";
 
-import { readSafe, resolveRelative } from "./helpers";
+import { isFileEntry, readSafe, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = ".aider.conf.yml";
@@ -24,7 +24,7 @@ export const aiderConf: Signal = {
   check: (repo) => {
     const rel = resolveRelative(repo, REL);
 
-    if (!rel) {
+    if (!rel || !isFileEntry(repo, join(repo, rel))) {
       return {
         pass: 0,
         label: LABEL,

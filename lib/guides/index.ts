@@ -1,3 +1,4 @@
+import { AGENTS_MD_IGNORED } from "./agents-md-ignored";
 import { AGENTS_MD_MONOREPO } from "./agents-md-monorepo";
 import { AGENTS_MD_VS_SKILLS } from "./agents-md-vs-skills";
 import { CLAUDE_MD } from "./claude-md";
@@ -14,6 +15,7 @@ export const GUIDES: Guide[] = [
   ONE_FILE_FOR_ALL_AGENTS,
   AGENTS_MD_VS_SKILLS,
   AGENTS_MD_MONOREPO,
+  AGENTS_MD_IGNORED,
   DEVIN_DESKTOP_RULES,
   LLMS_TXT_VS_AGENTS_MD,
   CODING_AGENT_BENCHMARKS,
@@ -26,6 +28,7 @@ export const GUIDE_NOTES: Record<string, string> = {
   "one-file-for-all-agents": "symlink or import",
   "agents-md-vs-skills": "what goes where",
   "agents-md-monorepo": "nested files, per agent",
+  "agents-md-ignored": "why an agent skips it",
   "devin-desktop-rules": "formerly Windsurf",
   "llms-txt-vs-agents-md": "website file vs repo file",
   "coding-agent-benchmarks": "what SWE-bench and others measure",

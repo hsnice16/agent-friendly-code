@@ -2,7 +2,7 @@ import { AGENT_READS, type AgentsMdUse, OTHER_TOOLS } from "./agent-reads";
 import { MODELS, type ModelId } from "./scoring/weights";
 
 /** When the answers below were last read against each agent's docs. */
-export const AGENT_DOCS_CHECKED = "2026-11-16";
+export const AGENT_DOCS_CHECKED = "2026-11-25";
 
 // The answer opens with this so it can never disagree with AGENT_READS, which the table shows.
 const LEAD: Record<AgentsMdUse, string> = {
@@ -20,7 +20,7 @@ const DETAIL: Record<ModelId, string> = {
   cursor:
     "Cursor reads AGENTS.md at the project root and in subdirectories, the more specific winning, and reads CLAUDE.md the same way (its docs describe one at the root). Its own project rules are `.mdc` files in `.cursor/rules/`.",
   devin:
-    "Devin looks for AGENTS.md anywhere in the repo before it starts coding, and includes the first 16 KiB of each. It also pulls CLAUDE.md and Cursor rule files into its Knowledge.",
+    "Devin looks for AGENTS.md anywhere in the repo before it starts coding, and includes the first 16 KiB of each. It also pulls CLAUDE.md and Cursor rule files into its Knowledge, which its docs mark deprecated in favour of Skills.",
   "kimi-cli":
     "Kimi Code CLI reads AGENTS.md or `.kimi-code/AGENTS.md` from the project, and `/init` writes one. Its docs name no CLAUDE.md fallback.",
   openhands:

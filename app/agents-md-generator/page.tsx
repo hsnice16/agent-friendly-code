@@ -8,6 +8,7 @@ import { LiveScoreForm } from "@/components/LiveScoreForm";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { starterIfMissing } from "@/lib/starter-agents-md";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
@@ -57,6 +58,7 @@ export default function AgentsMdGeneratorPage() {
           applicationCategory: "DeveloperApplication",
           operatingSystem: "Any",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
 

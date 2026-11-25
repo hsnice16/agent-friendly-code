@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const IOS: FrameworkGuide = {
   slug: "ios",
+  published: "2026-11-16",
   label: "iOS",
   kind: "app",
   languages: ["Swift"],

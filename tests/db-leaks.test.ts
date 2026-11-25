@@ -30,6 +30,17 @@ describe("findLeaks", () => {
     assert.deepEqual(labels, ["GitHub token", "GitLab token", "AWS key", "private key"]);
   });
 
+  test("flags Google, npm and Stripe keys", () => {
+    const labels = findLeaks(bytes(`AIza${"d".repeat(35)} npm_${"e".repeat(36)} sk_live_${"f".repeat(24)}`)).map(
+      (l) => l.label,
+    );
+    assert.deepEqual(labels, ["Google API key", "npm token", "Stripe key"]);
+  });
+
+  test("passes prefixes that are only words", () => {
+    assert.deepEqual(findLeaks(bytes("npm_config_cache sk_live_short AIzaShort")), []);
+  });
+
   test("reports a token by its prefix only", () => {
     assert.equal(findLeaks(bytes(`ghp_${"a".repeat(36)}`))[0].match, "ghp_aaaa…");
   });

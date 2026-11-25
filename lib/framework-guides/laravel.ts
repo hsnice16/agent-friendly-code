@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const LARAVEL: FrameworkGuide = {
   slug: "laravel",
+  published: "2026-11-16",
   label: "Laravel",
   kind: "app",
   languages: ["PHP", "Blade"],

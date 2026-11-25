@@ -165,7 +165,7 @@ describe("readSnapshotRows", () => {
     db.close();
 
     assert.deepEqual(readSnapshotRows(file), [
-      { url: "https://github.com/a/one", signalId: "agents_md", pass: 1, detail: null, matchedPath: null },
+      { repoId: 1, url: "https://github.com/a/one", signalId: "agents_md", pass: 1, detail: null, matchedPath: null },
     ]);
   });
 });

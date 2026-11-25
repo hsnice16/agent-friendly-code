@@ -98,4 +98,9 @@ describe("cursorRules signal", () => {
     fixture = makeFixture({ ".cursor/rules/a.mdc": "rule", ".cursor/rules/b.mdc/x": "" });
     assert.equal(cursorRules.check(fixture).detail, "1 .mdc file in .cursor/rules/");
   });
+
+  test("pass=0 for a directory named .cursorrules", () => {
+    fixture = makeFixture({ ".cursorrules/x": "" });
+    assert.equal(cursorRules.check(fixture).pass, 0);
+  });
 });

@@ -57,4 +57,22 @@ describe("contributing signal", () => {
     assert.equal(r.pass, 1);
     assert.match(r.matchedPath ?? "", /\.github\/CONTRIBUTING\.adoc$/);
   });
+
+  test("a directory named CONTRIBUTING.md does not count, so the next candidate is found", () => {
+    fixture = makeFixture({ "CONTRIBUTING.md/x": "", ".github/CONTRIBUTING.md": "# How" });
+    const r = contributing.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /\.github\/CONTRIBUTING\.md$/);
+  });
+
+  test("pass=0 when the only candidate is a directory", () => {
+    fixture = makeFixture({ "CONTRIBUTING/x": "" });
+    assert.equal(contributing.check(fixture).pass, 0);
+  });
+
+  test("a CONTRIBUTING folder counts through its README", () => {
+    fixture = makeFixture({ "CONTRIBUTING/README.md": "# Contributing" });
+    assert.equal(contributing.check(fixture).pass, 1);
+  });
 });

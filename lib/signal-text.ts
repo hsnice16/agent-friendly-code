@@ -2,7 +2,7 @@
 // ship to the browser, and passing this text as props repeated it in every repo
 // page's HTML and RSC payload. tests/signal-text.test.ts keeps it equal to the registry.
 
-export type SignalText = { label: string; suggestion: string };
+type SignalText = { label: string; suggestion: string };
 
 export const SIGNAL_TEXT: Record<string, SignalText> = {
   agent_skills: {

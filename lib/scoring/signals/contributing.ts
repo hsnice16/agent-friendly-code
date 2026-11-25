@@ -1,4 +1,4 @@
-import { firstExisting } from "./helpers";
+import { firstFile } from "./helpers";
 import type { Signal } from "./types";
 
 const CANDIDATES = [
@@ -12,6 +12,8 @@ const CANDIDATES = [
   "docs/CONTRIBUTING.md",
   "docs/CONTRIBUTING.rst",
   "docs/CONTRIBUTING.adoc",
+  // A folder of guides (roc's `CONTRIBUTING/`) is entered through its README.
+  "CONTRIBUTING/README.md",
 ];
 
 export const contributing: Signal = {
@@ -20,7 +22,7 @@ export const contributing: Signal = {
   description: "A contribution workflow the agent can follow.",
   improveSuggestion: "Add CONTRIBUTING.md describing branch naming, commit style, test commands, and the PR process.",
   check: (repo) => {
-    const m = firstExisting(repo, CANDIDATES);
+    const m = firstFile(repo, CANDIDATES);
 
     if (m) {
       return {

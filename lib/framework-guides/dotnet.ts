@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const DOTNET: FrameworkGuide = {
   slug: "dotnet",
+  published: "2026-11-16",
   label: ".NET",
   kind: "app",
   languages: ["C#"],

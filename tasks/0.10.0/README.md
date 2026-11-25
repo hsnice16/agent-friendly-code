@@ -22,4 +22,12 @@
 - Guides, check pages, comparisons and reports show who wrote them and when they last changed.
 - Share images for guides, agent comparisons, reports and AGENTS.md example pages.
 - AGENTS.md vs CLAUDE.md covers the `@AGENTS.md` import and the symlink, with what popular repos do.
+- New report: what 260 real AGENTS.md and CLAUDE.md files contain, section by section (topics, test commands, links and imports, rules), with quoted examples and a CSV.
+- Repo pages have an "On record" section: when the board first found each agent file, agent files below the root, which agents read them, and the project's AI contribution policy.
+- New guide: why a coding agent ignores AGENTS.md, with per-agent load rules, limits and how to confirm the file loaded, each linked to the agent's docs.
+- Agent boards end with a "Set up a repo for <agent>" panel: setup steps, the files it reads and how to check they loaded.
+- Language hubs with enough repos answer which agent those repos are best set up for; `/language/<x>/agents` redirects there.
+- `/about` lists the work behind the site and says how it is made, including where AI is used.
+- Scoring fixes: a hostile `.gitignore` can no longer stall Live Score, the Action or the skill; a folder named like an agent file no longer counts as one; the dev-environment check counts each tool once.
+- A page's "Updated" date moves only when its own text or the repos it lists change, not on every rescore.
 - The pre-commit check page has copyable pre-commit, Husky and Lefthook configs and a Claude Code hook that blocks `--no-verify`.

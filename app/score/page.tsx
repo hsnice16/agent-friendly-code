@@ -13,17 +13,15 @@ import { meetsLeadFloor } from "@/lib/leaderboard-meta";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNALS } from "@/lib/scoring/signals";
 import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
-import { APP_NAME, APP_URL, OG_IMAGE_SIZE } from "@/lib/version";
+import { ogImage } from "@/lib/utils/og-image";
+import { APP_NAME, APP_URL } from "@/lib/version";
 
 import { SCORE_FAQ } from "./faq";
 
-const OG_IMAGE = {
-  url: "/og/score",
-  ...OG_IMAGE_SIZE,
-  alt: `${APP_NAME} — Live Score: any public GitHub repo, on demand`,
-};
-
-export const metadata: Metadata = staticPageMetadata("/score", OG_IMAGE);
+export const metadata: Metadata = staticPageMetadata(
+  "/score",
+  ogImage("/score", `${APP_NAME} — Live Score: any public GitHub repo, on demand`),
+);
 
 const JSON_LD = {
   "@graph": [

@@ -5,28 +5,31 @@ import {
   frameworkExamplesTitle,
 } from "@/lib/agents-md-frameworks";
 import { AUTHOR_JSON_LD } from "@/lib/author";
-import { frameworkModified, rowsModified } from "@/lib/page-dates";
-import { WEBSITE_JSON_LD } from "@/lib/site-json-ld";
+import { frameworkModified, languageExamplesModified } from "@/lib/page-dates";
+import { PUBLISHER_JSON_LD, WEBSITE_JSON_LD } from "@/lib/site-json-ld";
 import { frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
+import { ogImage } from "@/lib/utils/og-image";
 import { repoPath } from "@/lib/utils/repo-path";
-import { APP_NAME, APP_URL } from "@/lib/version";
+import { APP_URL } from "@/lib/version";
 
 export function frameworkJsonLd(f: FrameworkExamples) {
-  const url = `${APP_URL}${frameworkExamplesPath(f.guide.slug)}`;
+  const path = frameworkExamplesPath(f.guide.slug);
+  const title = frameworkExamplesTitle(f);
   return {
     "@type": "TechArticle",
-    headline: frameworkExamplesTitle(f),
+    headline: title,
     description: frameworkExamplesDescription(f),
-    url,
-    image: `${APP_URL}/og${frameworkExamplesPath(f.guide.slug)}`,
+    url: `${APP_URL}${path}`,
+    image: `${APP_URL}${ogImage(path, title).url}`,
     about: [
       { "@type": "Thing", name: "AGENTS.md" },
-      { "@type": "SoftwareApplication", name: f.guide.label },
+      { "@type": "Thing", name: f.guide.label },
     ],
     citation: f.guide.sources,
+    datePublished: f.guide.published,
     dateModified: frameworkModified(f),
     author: AUTHOR_JSON_LD,
-    publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+    publisher: PUBLISHER_JSON_LD,
     mentions: f.rows.map((r) => ({
       "@type": "SoftwareSourceCode",
       name: `${r.owner}/${r.name}`,
@@ -36,7 +39,7 @@ export function frameworkJsonLd(f: FrameworkExamples) {
 }
 
 export function languageJsonLd(lang: LanguageExamples) {
-  const changed = rowsModified(lang.rows);
+  const changed = languageExamplesModified(lang);
   const url = `${APP_URL}${languageExamplesPath(lang.slug)}`;
   return {
     "@graph": [

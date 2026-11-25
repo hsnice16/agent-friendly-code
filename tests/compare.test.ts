@@ -13,21 +13,14 @@ import {
   weightGaps,
 } from "../lib/agent-scores";
 import { SETUP_TIP } from "../lib/agent-setup-tips";
-import {
-  COMPARE_HUB_DESCRIPTION,
-  compareDescription,
-  compareHubTitle,
-  compareTitle,
-  languageAgentsDescription,
-  languageAgentsTitle,
-} from "../lib/compare-copy";
+import { COMPARE_HUB_DESCRIPTION, compareDescription, compareHubTitle, compareTitle } from "../lib/compare-copy";
 import { COMPARE_PAIRS, pairBySlug } from "../lib/compare-pairs";
 import { LANGUAGE_AGENTS_MIN_REPOS } from "../lib/constants/scoring";
 import { SIGNAL_BY_ID } from "../lib/scoring/signals";
 import { MODEL_BY_ID, MODELS, type ModelId } from "../lib/scoring/weights";
 import type { LeaderboardRow } from "../lib/types/db";
 import { comparePath } from "../lib/utils/compare-path";
-import { languageAgentsPath } from "../lib/utils/language";
+import { hubAgentsPath } from "../lib/utils/language";
 import { MAX_DESCRIPTION_LENGTH, MAX_TITLE_LENGTH } from "../lib/utils/page-title";
 
 // How each id is spelled in a slug: people search "codex", not "gpt-5-codex".
@@ -72,7 +65,7 @@ describe("COMPARE_PAIRS", () => {
 
   it("builds one path per page", () => {
     assert.equal(comparePath("claude-code-vs-cursor"), "/compare/claude-code-vs-cursor");
-    assert.equal(languageAgentsPath("cpp"), "/language/cpp/agents");
+    assert.equal(hubAgentsPath("cpp"), "/language/cpp#agents");
   });
 });
 
@@ -92,16 +85,6 @@ describe("page copy", () => {
     assert.equal(new Set(COMPARE_PAIRS.map(compareTitle)).size, COMPARE_PAIRS.length);
     assert.ok(compareHubTitle(9999).length <= MAX_TITLE_LENGTH);
     assert.ok(COMPARE_HUB_DESCRIPTION.length <= MAX_DESCRIPTION_LENGTH);
-  });
-
-  it("keeps language titles and descriptions inside the limits, even for a long name", () => {
-    for (const label of ["Rust", "C++", "JavaScript", "Jupyter Notebook", "A".repeat(80)]) {
-      const title = languageAgentsTitle(label, 999);
-      if (label.length < 40) assert.ok(title.length <= MAX_TITLE_LENGTH, title);
-      const top = { label: "Kimi Code CLI", average: 100 };
-      if (label.length < 40) assert.ok(languageAgentsDescription(label, 999, top).length <= MAX_DESCRIPTION_LENGTH);
-    }
-    assert.equal(languageAgentsTitle("Rust", 45), "Which AI coding agent are 45 Rust repos set up for?");
   });
 
   it("has a setup tip for every agent", () => {

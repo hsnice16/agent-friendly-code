@@ -32,6 +32,7 @@ import type { RepoRow } from "@/lib/types/db";
 import { agentInstructions } from "@/lib/utils/agent-instructions";
 import { hostLabel } from "@/lib/utils/format";
 import { isModelId } from "@/lib/utils/model-id";
+import { ogImage } from "@/lib/utils/og-image";
 import { sanitizeDescription, sanitizeTopics, topicsColumn } from "@/lib/utils/repo-about";
 import { agentFileShare } from "@/lib/utils/repo-page-data";
 import { liveScorePath, repoPath, withQuery } from "@/lib/utils/repo-path";
@@ -39,7 +40,7 @@ import { summarizeScore } from "@/lib/utils/repo-summary";
 import { scoreTier } from "@/lib/utils/score";
 import { similarNote, similarRepos } from "@/lib/utils/similar-repos";
 import { suggestionSwitchProps } from "@/lib/utils/suggestion-switch";
-import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 // lib/live-score/score.ts and http.ts time out inside this cap.
 export const maxDuration = 60;
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   const path = liveScorePath({ host, owner, name });
   // The card 404s for a host outside SUPPORTED_HOSTS.
   const image = SUPPORTED_HOSTS.includes(parsed.host)
-    ? { url: `/og${path}`, ...OG_IMAGE_SIZE, alt: `${owner}/${name} — agent-friendliness score` }
+    ? ogImage(path, `${owner}/${name} — agent-friendliness score`)
     : DEFAULT_OG_IMAGE;
 
   return {

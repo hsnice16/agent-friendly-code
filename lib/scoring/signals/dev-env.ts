@@ -5,21 +5,16 @@ import { createResolver, entryKind, isFileEntry, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 // Each inner list is one tool, counted once however many of its files are present:
-// Taskfile.yml beside its Taskfile.dist.yml override is still one Taskfile.
+// Taskfile.yml beside its Taskfile.dist.yml override is still one Taskfile, and
+// flake.nix beside shell.nix is still one Nix setup.
 const ARTIFACTS: string[][] = [
   ["Makefile", "GNUmakefile", "BSDmakefile"],
-  [".devcontainer/devcontainer.json"],
-  [".devcontainer.json"],
-  ["flake.nix"],
-  ["shell.nix"],
-  ["default.nix"],
+  [".devcontainer/devcontainer.json", ".devcontainer.json"],
+  ["flake.nix", "shell.nix", "default.nix"],
   ["devenv.nix"],
   ["devbox.json"],
   ["Dockerfile", "Containerfile"],
-  ["docker-compose.yml"],
-  ["docker-compose.yaml"],
-  ["compose.yml"],
-  ["compose.yaml"],
+  ["docker-compose.yml", "docker-compose.yaml", "compose.yml", "compose.yaml"],
   ["justfile", ".justfile"],
   ["Taskfile.yml", "Taskfile.yaml", "Taskfile.dist.yml", "Taskfile.dist.yaml"],
   ["Rakefile", "Rakefile.rb"],
@@ -126,7 +121,7 @@ export const devEnv: Signal = {
     for (const group of ARTIFACTS) {
       for (const f of group) {
         const rel = resolve(f);
-        if (rel) {
+        if (rel && isFileEntry(repo, join(repo, rel))) {
           matches.push(rel);
           break;
         }
@@ -164,15 +159,17 @@ export const devEnv: Signal = {
     const pkg = resolve("package.json");
     if (pkg) {
       try {
-        const j = JSON.parse(readSafe(join(repo, pkg), repo));
+        const scripts = JSON.parse(readSafe(join(repo, pkg), repo))?.scripts;
+        // Object.keys on a string or array counts its characters or items, not scripts.
+        const n = scripts && typeof scripts === "object" && !Array.isArray(scripts) ? Object.keys(scripts).length : 0;
 
-        if (j.scripts && Object.keys(j.scripts).length >= 3) {
+        if (n >= 3) {
           return {
             pass: 0.6,
             id: "dev_env",
             matchedPath: pkg,
             label: "Reproducible dev env",
-            detail: `package.json has ${Object.keys(j.scripts).length} scripts`,
+            detail: `package.json has ${n} scripts`,
           };
         }
       } catch {}

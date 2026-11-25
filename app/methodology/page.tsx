@@ -26,6 +26,13 @@ export default function MethodologyPage() {
         lead="What we check, the formula, and what we can't check yet."
       >
         <p className="mt-2 mb-0 text-[13px] text-muted">{weightsChangedText()}</p>
+        <p className="mt-1 mb-0 text-[13px] text-muted">
+          Who builds it, and how the site is made:{" "}
+          <IntentLink href="/about#how-its-made" className="prose-link">
+            About
+          </IntentLink>
+          .
+        </p>
       </PageHeader>
 
       <Panel tone="warn">

@@ -9,6 +9,9 @@ const PATTERNS: { label: string; re: RegExp }[] = [
   { label: "GitHub token", re: /gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}/g },
   { label: "GitLab token", re: /glpat-[A-Za-z0-9_-]{20}/g },
   { label: "AWS key", re: /AKIA[0-9A-Z]{16}/g },
+  { label: "Google API key", re: /AIza[0-9A-Za-z_-]{35}/g },
+  { label: "npm token", re: /npm_[A-Za-z0-9]{36}/g },
+  { label: "Stripe key", re: /[rs]k_live_[A-Za-z0-9]{24,}/g },
   // A bare `sk-` prefix would match slugs like `task-…`.
   { label: "API key", re: /sk-(?:ant|proj)-[A-Za-z0-9_-]{20,}/g },
   { label: "Slack token", re: /xox[abprs]-[A-Za-z0-9-]{10,}/g },

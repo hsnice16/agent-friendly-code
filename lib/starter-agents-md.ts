@@ -134,7 +134,7 @@ export const COMPANION_FILES: CompanionFile[] = [
   },
   {
     agent: "GitHub Copilot",
-    note: "Its cloud agent, code review and CLI read AGENTS.md. No extra file needed.",
+    note: "Its cloud agent, code review, CLI and VS Code chat read AGENTS.md. No extra file needed.",
     source: "https://docs.github.com/en/copilot/reference/custom-instructions-support",
   },
   {

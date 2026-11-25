@@ -20,7 +20,7 @@ import {
 import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { CHECK_CONTENT } from "@/lib/check-content";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { boardModified } from "@/lib/page-dates";
+import { examplesModified } from "@/lib/page-dates";
 import { MODELS } from "@/lib/scoring/weights";
 import { WEBSITE_JSON_LD } from "@/lib/site-json-ld";
 import {
@@ -70,7 +70,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
-function jsonLd(ex: AgentsMdExamples, modified: string | null) {
+function jsonLd(ex: AgentsMdExamples, modified: string) {
   return {
     "@graph": [
       {
@@ -82,7 +82,7 @@ function jsonLd(ex: AgentsMdExamples, modified: string | null) {
         about: { "@type": "Thing", name: "AGENTS.md" },
         isPartOf: WEBSITE_JSON_LD,
         associatedMedia: { "@type": "DataDownload", encodingFormat: "text/csv", contentUrl: `${APP_URL}${CSV_PATH}` },
-        ...(modified ? { dateModified: modified } : {}),
+        dateModified: modified,
         // The most-starred only: all of them would be the page's heaviest part, twice (HTML and RSC payload).
         mainEntity: {
           "@type": "ItemList",
@@ -108,7 +108,7 @@ export default async function AgentsMdExamplesPage({ params }: { params: Promise
   const ex = getAgentsMdExamples();
   const frameworks = examplesByFramework(ex);
   const rest = examplesWithoutLanguagePage(ex);
-  const modified = boardModified();
+  const modified = examplesModified();
   const readers = MODELS.map((m) => ({ m, weight: m.weights[SIGNAL_ID] ?? 0 }))
     .filter((r) => r.weight > 0)
     .sort((a, b) => b.weight - a.weight);

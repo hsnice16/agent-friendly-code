@@ -150,4 +150,19 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
     ],
     sources: [CLAUDE_BEST_PRACTICES, COPILOT_SETUP],
   },
+  license: {
+    heading: "What does a license decide when agents copy or contribute code?",
+    items: [
+      "With no license, default copyright applies: no one may reproduce, distribute or create derivative works from the code. GitHub's terms still let others view and fork a public repo.",
+      "On GitHub, content added to a repo with a license notice is licensed under the same terms, and whoever adds it states they have the right to. That covers code an agent wrote.",
+      "The Apache Software Foundation accepts AI output only if the tool's terms let you license it, and any third-party code in it is used with permission, such as under a compatible license.",
+      "Benchmarks pick repos by license too: SWE-Bench Pro's public and held-out repos carry strong copyleft licenses such as the GPL, to reduce contamination.",
+    ],
+    sources: [
+      "https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/licensing-a-repository",
+      "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+      "https://www.apache.org/legal/generative-tooling.html",
+      "https://labs.scale.com/leaderboard/swe_bench_pro",
+    ],
+  },
 };

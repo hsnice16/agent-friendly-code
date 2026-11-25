@@ -46,9 +46,27 @@ export function hubPath(slug: string): string {
   return `/language/${slug}`;
 }
 
-// Two segments, so proxy.ts's single-segment matcher never redirects it.
-export function languageAgentsPath(slug: string): string {
-  return `${hubPath(slug)}/agents`;
+export const HUB_AGENTS_ID = "agents";
+
+export function hubAgentsPath(slug: string): string {
+  return `${hubPath(slug)}#${HUB_AGENTS_ID}`;
+}
+
+/**
+ * Where proxy.ts sends `/language/<spelling>` and the retired `/language/<spelling>/agents`,
+ * or null to serve the path as is. Both resolve in one hop.
+ */
+export function languageRedirect(pathname: string): { pathname: string; hash: string } | null {
+  const [slug, ...rest] = pathname.slice("/language/".length).split("/");
+  let canonical: string;
+  try {
+    canonical = languageSlug(decodeURIComponent(slug));
+  } catch {
+    return null;
+  }
+  if (!canonical) return null;
+  if (rest.length > 0) return { pathname: hubPath(canonical), hash: HUB_AGENTS_ID };
+  return canonical === slug ? null : { pathname: hubPath(canonical), hash: "" };
 }
 
 export const OTHER_LANGUAGES_PATH = "/language/other";

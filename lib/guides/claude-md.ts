@@ -66,7 +66,7 @@ export const CLAUDE_MD: Guide = {
         },
         {
           kind: "p",
-          text: "Claude treats it as context, not enforced configuration. What must happen every time, such as a check before each commit, belongs in a hook; what must never happen, in `permissions.deny`.",
+          text: "Claude treats it as context, not enforced configuration ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)). What must happen every time, such as a check before each commit, belongs in a hook; what must never happen, in `permissions.deny`.",
         },
         {
           kind: "p",
@@ -96,11 +96,11 @@ export const CLAUDE_MD: Guide = {
         },
         {
           kind: "p",
-          text: "At launch Claude Code loads CLAUDE.md and CLAUDE.local.md from the working directory and every directory above it, joined root first, so a project instruction lands after a user one. A subdirectory's CLAUDE.md loads once Claude reads, writes or edits a file there. Files that load on demand are capped at 40,000 characters each on a 200K context window; past that Claude gets only the start.",
+          text: "At launch Claude Code loads CLAUDE.md and CLAUDE.local.md from the working directory and every directory above it, joined root first, so a project instruction lands after a user one. A subdirectory's CLAUDE.md loads once Claude reads, writes or edits a file there ([docs](https://code.claude.com/docs/en/memory#how-claude-md-files-load)). Files that load on demand are capped at 40,000 characters each on a 200K context window; past that Claude gets only the start ([docs](https://code.claude.com/docs/en/memory#claude-ignores-the-end-of-my-subdirectory-claude-md)).",
         },
         {
           kind: "p",
-          text: "CLAUDE.local.md loads alongside CLAUDE.md and is treated the same; it's for your sandbox URLs and test data. Trap: it counts as a CLAUDE.md, so adding one stops Claude Code reading the repo's AGENTS.md in its place.",
+          text: "CLAUDE.local.md loads alongside CLAUDE.md and is treated the same; it's for your sandbox URLs and test data ([docs](https://code.claude.com/docs/en/memory#choose-where-to-put-claude-md-files)). Trap: it counts as a CLAUDE.md, so adding one stops Claude Code reading the repo's AGENTS.md in its place ([docs](https://code.claude.com/docs/en/memory#when-claude-code-reads-agents-md)).",
         },
       ],
     },
@@ -111,16 +111,16 @@ export const CLAUDE_MD: Guide = {
         {
           kind: "list",
           items: [
-            'Write instructions concrete enough to check: "Run `npm test` before committing", not "Test your changes"; "API handlers live in `src/api/handlers/`", not "Keep files organized".',
-            "Group lines under headings and bullets; Anthropic's docs say Claude follows organised sections better than dense paragraphs.",
-            "Remove contradictions: of two conflicting instructions, Claude may pick either. `/doctor prompt-audit` (v2.1.283 and later) reports stale and conflicting lines across your instruction files without editing them.",
+            'Write instructions concrete enough to check: "Run `npm test` before committing", not "Test your changes"; "API handlers live in `src/api/handlers/`", not "Keep files organized" ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)).',
+            "Group lines under headings and bullets; Anthropic's docs say Claude follows organised sections better than dense paragraphs ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)).",
+            "Remove contradictions: of two conflicting instructions, Claude may pick either ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)). `/doctor prompt-audit` (v2.1.283 and later) reports stale and conflicting lines across your instruction files without editing them ([docs](https://code.claude.com/docs/en/memory#audit-your-instruction-files)).",
             "Leave out what Claude finds by reading the code. The file is for what it can't discover: the one test command that works, the directory nobody should touch.",
-            "Block-level HTML comments are stripped before the file reaches Claude, so maintainer notes cost no context.",
+            "Block-level HTML comments are stripped before the file reaches Claude, so maintainer notes cost no context ([docs](https://code.claude.com/docs/en/memory#how-claude-md-files-load)).",
           ],
         },
         {
           kind: "p",
-          text: "`/init` drafts one from the codebase (build commands, test instructions, conventions it finds); where a CLAUDE.md exists it suggests improvements instead of overwriting. With `CLAUDE_CODE_NEW_INIT=1` it also reads AGENTS.md, `.devin/rules/`, `.windsurf/rules/`, `.windsurfrules` and `.clinerules` and folds in what applies.",
+          text: "`/init` drafts one from the codebase (build commands, test instructions, conventions it finds); where a CLAUDE.md exists it suggests improvements instead of overwriting ([docs](https://code.claude.com/docs/en/memory#set-up-a-project-claude-md)). With `CLAUDE_CODE_NEW_INIT=1` it also reads AGENTS.md, `.devin/rules/`, `.windsurf/rules/`, `.windsurfrules` and `.clinerules` and folds in what applies ([docs](https://code.claude.com/docs/en/memory#migrate-instructions-from-other-tools)).",
         },
         { kind: "snippet", caption: "CLAUDE.md (starter template)", text: TEMPLATE },
       ],
@@ -132,7 +132,7 @@ export const CLAUDE_MD: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Anthropic's target is under 200 lines per file: longer files use more context and are followed less closely. The only hard limit: Claude Code skips a file over 4 MiB. Splitting into `@imports` tidies a file but saves nothing, since imports load with the file that imports them. What saves context is moving rules for part of the codebase into path-scoped `.claude/rules/` files or subdirectory CLAUDE.md files, which load only when Claude works there.",
+          text: "Anthropic's target is under 200 lines per file: longer files use more context and are followed less closely ([docs](https://code.claude.com/docs/en/memory#write-effective-instructions)). The only hard limit: Claude Code skips a file over 4 MiB ([docs](https://code.claude.com/docs/en/memory#my-claude-md-is-too-large)). Splitting into `@imports` tidies a file but saves nothing, since imports load with the file that imports them. What saves context is moving rules for part of the codebase into path-scoped `.claude/rules/` files or subdirectory CLAUDE.md files, which load only when Claude works there.",
         },
         {
           kind: "p",
@@ -146,7 +146,7 @@ export const CLAUDE_MD: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Write `@path/to/file` anywhere in a CLAUDE.md and that file is expanded into context beside it. Relative paths resolve from the importing file, not the working directory; absolute and `~/` paths work too. Imports can nest up to four hops. A path in a code span or fenced block isn't imported, so backticks keep it as text. The first time a project imports a file from outside the working directory, Claude Code asks you to approve it.",
+          text: "Write `@path/to/file` anywhere in a CLAUDE.md and that file is expanded into context beside it. Relative paths resolve from the importing file, not the working directory; absolute and `~/` paths work too. Imports can nest up to four hops. A path in a code span or fenced block isn't imported, so backticks keep it as text. The first time a project imports a file from outside the working directory, Claude Code asks you to approve it ([docs](https://code.claude.com/docs/en/memory#import-additional-files)).",
         },
         { kind: "snippet", caption: "CLAUDE.md with imports", text: IMPORTS },
         {
@@ -161,7 +161,7 @@ export const CLAUDE_MD: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Every `.md` file under `.claude/rules/` is found recursively. A rule without frontmatter loads at launch with the same priority as `.claude/CLAUDE.md`. A rule with a `paths:` glob list loads only when Claude reads, writes or edits a matching file, so it costs nothing in sessions that never touch those files. `~/.claude/rules/` does the same for every project on your machine.",
+          text: "Every `.md` file under `.claude/rules/` is found recursively. A rule without frontmatter loads at launch with the same priority as `.claude/CLAUDE.md` ([docs](https://code.claude.com/docs/en/memory#set-up-rules)). A rule with a `paths:` glob list loads only when Claude reads, writes or edits a matching file, so it costs nothing in sessions that never touch those files ([docs](https://code.claude.com/docs/en/memory#path-specific-rules)). `~/.claude/rules/` does the same for every project on your machine ([docs](https://code.claude.com/docs/en/memory#user-level-rules)).",
         },
         { kind: "snippet", caption: ".claude/rules/api.md", text: RULE },
         {
@@ -177,10 +177,10 @@ export const CLAUDE_MD: Guide = {
         {
           kind: "list",
           items: [
-            "`/memory` lists the CLAUDE.md, CLAUDE.local.md and other memory files in use, and opens one to edit.",
-            "`/context all` shows the loaded files under Memory files.",
-            "The `InstructionsLoaded` hook logs which CLAUDE.md and rules files load, when and why: useful for path-scoped rules and subdirectory files.",
-            "In a monorepo, the `claudeMdExcludes` setting skips other teams' CLAUDE.md files by path or glob. It can't exclude the managed file.",
+            "`/memory` lists CLAUDE.md, CLAUDE.local.md and other memory file locations, and opens one to edit ([docs](https://code.claude.com/docs/en/memory#view-and-edit-with-%2Fmemory)).",
+            "`/context all` shows the loaded files under Memory files ([docs](https://code.claude.com/docs/en/memory#set-up-a-project-claude-md)).",
+            "The `InstructionsLoaded` hook logs which CLAUDE.md and rules files load, when and why: useful for path-scoped rules and subdirectory files ([docs](https://code.claude.com/docs/en/memory#troubleshoot-memory-issues)).",
+            "In a monorepo, the `claudeMdExcludes` setting skips other teams' CLAUDE.md files by path or glob. It can't exclude the managed file ([docs](https://code.claude.com/docs/en/memory#exclude-specific-claude-md-files)).",
           ],
         },
       ],

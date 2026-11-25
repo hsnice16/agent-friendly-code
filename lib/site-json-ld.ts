@@ -1,6 +1,18 @@
-import { APP_DESCRIPTION, APP_NAME, APP_URL, REPO_URL } from "./version";
+import {
+  ACTION_REPO_URL,
+  APP_DESCRIPTION,
+  APP_NAME,
+  APP_URL,
+  REPO_URL,
+  SKILL_LISTING_URL,
+  SKILL_REPO_URL,
+} from "./version";
+
+const ACTION_MARKETPLACE_URL = "https://github.com/marketplace/actions/agent-friendly-score-diff";
 
 const ORG_ID = `${APP_URL}/#org`;
+// For a node in the home page graph, which carries the full Organization.
+export const ORG_REF = { "@id": ORG_ID };
 const SITE_ID = `${APP_URL}/#site`;
 
 /**
@@ -13,8 +25,8 @@ export const SITE_JSON_LD_NODES: Record<string, unknown>[] = [
     "@id": ORG_ID,
     url: APP_URL,
     name: APP_NAME,
-    sameAs: [REPO_URL],
-    logo: `${APP_URL}/icon.svg`,
+    sameAs: [REPO_URL, ACTION_REPO_URL, SKILL_REPO_URL, ACTION_MARKETPLACE_URL, SKILL_LISTING_URL],
+    logo: `${APP_URL}/logo.png`,
   },
   {
     "@type": "WebSite",
@@ -22,7 +34,7 @@ export const SITE_JSON_LD_NODES: Record<string, unknown>[] = [
     url: APP_URL,
     name: APP_NAME,
     description: APP_DESCRIPTION,
-    publisher: { "@id": ORG_ID },
+    publisher: ORG_REF,
   },
   {
     "@type": "WebApplication",
@@ -32,7 +44,7 @@ export const SITE_JSON_LD_NODES: Record<string, unknown>[] = [
     operatingSystem: "Any",
     isAccessibleForFree: true,
     description: APP_DESCRIPTION,
-    publisher: { "@id": ORG_ID },
+    publisher: ORG_REF,
     applicationCategory: "DeveloperApplication",
     offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
     browserRequirements: "Requires JavaScript-enabled modern browser",

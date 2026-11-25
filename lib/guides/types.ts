@@ -1,4 +1,6 @@
-// Prose in every string goes through CodeText, so `backticks` render as code.
+import type { ModelId } from "../scoring/weights";
+
+// Prose goes through LinkedText: `backticks` render as code, [label](url) as links.
 // `{{key}}` in a string is replaced from getGuideStats(); tests/guides.test.ts
 // fails the build on a key it can't fill, so a number never ships as a token.
 export type GuideBlock =
@@ -7,7 +9,12 @@ export type GuideBlock =
   | { kind: "table"; head: string[]; rows: string[][]; caption?: string }
   | { kind: "snippet"; caption: string; text: string; wrap?: boolean }
   /** Board repos whose instructions file is this one, most-starred first. */
-  | { kind: "examples"; file: "AGENTS.md" | "CLAUDE.md"; limit: number; language?: string };
+  | { kind: "examples"; file: "AGENTS.md" | "CLAUDE.md"; limit: number; language?: string }
+  /**
+   * One row per agent: its board average, median and own-file share, beside a
+   * benchmark note copied by hand from each leaderboard on `checked`.
+   */
+  | { kind: "agentBoard"; checked: string; benchmarks: Record<ModelId, string> };
 
 export type GuideSection = {
   id: string;

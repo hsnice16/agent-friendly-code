@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const DJANGO: FrameworkGuide = {
   slug: "django",
+  published: "2026-11-04",
   label: "Django",
   kind: "project",
   languages: ["Python"],

@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const SPRING_BOOT: FrameworkGuide = {
   slug: "spring-boot",
+  published: "2026-11-16",
   label: "Spring Boot",
   kind: "app",
   languages: ["Java", "Kotlin"],

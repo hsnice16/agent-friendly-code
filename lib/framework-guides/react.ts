@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const REACT: FrameworkGuide = {
   slug: "react",
+  published: "2026-11-16",
   label: "React",
   kind: "app",
   languages: ["TypeScript", "JavaScript"],

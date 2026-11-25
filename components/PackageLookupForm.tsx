@@ -6,6 +6,7 @@ import { type FormEvent, useState } from "react";
 
 import { track } from "@/lib/analytics-events";
 import { REGISTRIES, type Registry } from "@/lib/clients/registries";
+import { packagePath } from "@/lib/utils/package-path";
 
 export function PackageLookupForm() {
   const router = useRouter();
@@ -21,7 +22,7 @@ export function PackageLookupForm() {
       return;
     }
     track({ name: "package_lookup", registry });
-    router.push(`/package/${registry}/${encodeURIComponent(trimmed)}`);
+    router.push(packagePath(registry, trimmed));
   };
 
   return (

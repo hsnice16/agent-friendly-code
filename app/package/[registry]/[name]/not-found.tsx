@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { IntentLink } from "@/components/IntentLink";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PACKAGE_PATH } from "@/lib/utils/package-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const TITLE = "Package not found";
@@ -33,7 +34,7 @@ export default function PackageNotFound() {
         </PanelHeading>
         <p className="m-0 text-[14.5px] leading-relaxed text-ink-dim">
           Names are looked up exactly as the registry spells them, scope included (<code>@scope/name</code> on npm).{" "}
-          <IntentLink href="/package" className="prose-link">
+          <IntentLink href={PACKAGE_PATH} className="prose-link">
             Look up another package
           </IntentLink>
           , or paste the repo link into{" "}

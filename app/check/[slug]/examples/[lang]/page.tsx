@@ -27,7 +27,7 @@ import {
 } from "@/lib/agents-md-frameworks";
 import { CENSUS } from "@/lib/file-census";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { frameworkModified, rowsModified } from "@/lib/page-dates";
+import { frameworkModified, languageExamplesModified } from "@/lib/page-dates";
 import {
   CHECKS_CRUMB,
   checkCrumb,
@@ -143,7 +143,7 @@ export default async function LanguageExamplesPage({ params }: { params: Params 
           parents: [...trail, { name: "Examples", path: examplesPath }],
           current: { name: lang.label, path: languageExamplesPath(lang.slug) },
         }}
-        updated={rowsModified(lang.rows)}
+        updated={languageExamplesModified(lang)}
         title={
           lang.guide
             ? `What to put in an AGENTS.md for a ${lang.label} repo`

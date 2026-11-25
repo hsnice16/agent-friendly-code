@@ -21,7 +21,8 @@ import {
 import { SIZE_GROUP_MIN } from "@/lib/constants/scoring";
 import { listLeaderboardOverall } from "@/lib/db";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
-import { boardModified } from "@/lib/page-dates";
+import { sizeReportModified } from "@/lib/page-dates";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { formatDate, percent } from "@/lib/utils/format";
 import { ogImage } from "@/lib/utils/og-image";
@@ -59,7 +60,7 @@ export function generateMetadata(): Metadata {
   };
 }
 
-function jsonLd(size: AgentsMdSize, modified: string | null): Record<string, unknown> {
+function jsonLd(size: AgentsMdSize, modified: string): Record<string, unknown> {
   return {
     "@type": "Dataset",
     "@id": `${APP_URL}${SIZE_REPORT_PATH}#dataset`,
@@ -68,8 +69,8 @@ function jsonLd(size: AgentsMdSize, modified: string | null): Record<string, unk
     url: `${APP_URL}${SIZE_REPORT_PATH}`,
     keywords: ["AGENTS.md", "CLAUDE.md", "AGENTS.md size", "CLAUDE.md length", "AI coding agents"],
     isAccessibleForFree: true,
-    ...(modified ? { dateModified: modified } : {}),
-    creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+    dateModified: modified,
+    creator: PUBLISHER_JSON_LD,
     license: "https://opensource.org/licenses/MIT",
     isPartOf: { "@id": `${APP_URL}/#dataset` },
     variableMeasured: ["Instruction file length (characters)", "Overall agent-readiness score"],
@@ -81,8 +82,8 @@ export default function AgentsMdSizePage() {
   const size = getSize();
   const q = size.quantiles;
   const median = chars(q?.p50 ?? null);
-  const modified = boardModified();
-  const asOf = modified ? formatDate(Date.parse(modified) / 1000) : null;
+  const modified = sizeReportModified();
+  const asOf = formatDate(Date.parse(modified) / 1000);
 
   return (
     <>
@@ -93,8 +94,8 @@ export default function AgentsMdSizePage() {
         lead={
           <>
             <strong className="text-ink">
-              {asOf ? `As of ${asOf}, the` : "The"} median AGENTS.md or CLAUDE.md in {size.measured} popular open source
-              repos is {median} characters
+              As of {asOf}, the median AGENTS.md or CLAUDE.md in {size.measured} popular open source repos is {median}{" "}
+              characters
             </strong>
             {q && (
               <>
@@ -239,11 +240,9 @@ export default function AgentsMdSizePage() {
         </Panel>
       </div>
 
-      {asOf && (
-        <div className="mt-3.5">
-          <CiteThis title={sizeTitle(size.measured)} path={SIZE_REPORT_PATH} asOf={asOf} />
-        </div>
-      )}
+      <div className="mt-3.5">
+        <CiteThis title={sizeTitle(size.measured)} path={SIZE_REPORT_PATH} asOf={asOf} />
+      </div>
     </>
   );
 }

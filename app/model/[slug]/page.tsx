@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
 import { ModelLeaderboard } from "@/components/ModelLeaderboard";
+import { ModelSetupPanel } from "@/components/ModelSetupPanel";
 import { languageExampleLinks } from "@/lib/agents-md-example-links";
 import { getLeaderboardStats } from "@/lib/db";
 import { getAgentsMdExamples, getModelPanel } from "@/lib/leaderboard-files";
@@ -30,12 +31,15 @@ export default async function ModelPage({ params }: Props) {
   }
 
   return (
-    <ModelLeaderboard
-      model={slug}
-      view={resolveLeaderboardView(slug)}
-      stats={getLeaderboardStats()}
-      panel={getModelPanel(MODEL_BY_ID[slug])}
-      examples={languageExampleLinks(getAgentsMdExamples())}
-    />
+    <>
+      <ModelLeaderboard
+        model={slug}
+        view={resolveLeaderboardView(slug)}
+        stats={getLeaderboardStats()}
+        panel={getModelPanel(MODEL_BY_ID[slug])}
+        examples={languageExampleLinks(getAgentsMdExamples())}
+      />
+      <ModelSetupPanel modelId={slug} modelLabel={MODEL_BY_ID[slug].label} />
+    </>
   );
 }

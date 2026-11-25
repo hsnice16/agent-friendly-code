@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const VUE: FrameworkGuide = {
   slug: "vue",
+  published: "2026-11-16",
   label: "Vue",
   kind: "app",
   languages: ["TypeScript", "JavaScript", "Vue"],

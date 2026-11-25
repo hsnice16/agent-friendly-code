@@ -159,7 +159,8 @@ export function LeaderboardTable({
                       aria-label={`View ${r.owner}/${r.name} details`}
                       className="ink-link cover-link"
                     >
-                      {r.owner}/{r.name}
+                      {r.owner}/<wbr />
+                      {r.name}
                     </IntentLink>
                     <OwnRepoTag repo={r} />
                     <HostPill host={r.host} />

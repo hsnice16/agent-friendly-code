@@ -119,4 +119,9 @@ describe("geminiMd signal", () => {
     assert.equal(geminiMd.check(fixture).pass, 1);
     assert.ok(performance.now() - start < 3000, `took ${performance.now() - start} ms`);
   });
+
+  test("pass=0 for a directory named GEMINI.md", () => {
+    fixture = makeFixture({ "GEMINI.md/x": "" });
+    assert.equal(geminiMd.check(fixture).pass, 0);
+  });
 });

@@ -77,7 +77,7 @@ export const cursorRules: Signal = {
     }
 
     const legacy = resolveRelative(repo, ".cursorrules");
-    if (legacy) {
+    if (legacy && isFileEntry(repo, join(repo, legacy))) {
       return {
         pass: 0.5,
         label: LABEL,

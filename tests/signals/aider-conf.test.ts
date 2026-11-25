@@ -62,4 +62,9 @@ describe("aiderConf signal", () => {
     fixture = makeFixture({ ".aider.conf.yml": "  \n" });
     assert.equal(aiderConf.check(fixture).pass, 0.2);
   });
+
+  test("pass=0 for a directory named .aider.conf.yml", () => {
+    fixture = makeFixture({ ".aider.conf.yml/x": "" });
+    assert.equal(aiderConf.check(fixture).pass, 0);
+  });
 });

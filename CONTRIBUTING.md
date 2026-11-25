@@ -4,21 +4,16 @@ Read [AGENTS.md](./AGENTS.md) first: stack, conventions, the I/O boundary and se
 
 ## Setup
 
-```bash
-bun install
-bun run prepare-hooks   # once
-bun run dev             # http://localhost:3000
-bun run test            # Node ≥ 22
-```
+Commands: [AGENTS.md → Commands](./AGENTS.md#commands).
 
-`data/rank.db` is committed and rewritten on `main` daily by `.github/workflows/scheduled-rescore.yml`. Don't commit a local re-seed unless the change needs it; on a conflict, take `main`'s copy (`git checkout --theirs -- data/rank.db`) and re-seed. `data/agents-md-adoption.json` is rewritten with it: on a conflict take `main`'s copy or rerun `bun run agents-md-adoption`.
+`data/rank.db` is committed and rewritten on `main` daily by `.github/workflows/scheduled-rescore.yml`. Don't commit a local re-seed unless the change needs it; on a conflict, take `main`'s copy (`git checkout origin/main -- data/rank.db`; during a rebase `--theirs` is your branch) and re-seed. `data/agents-md-adoption.json` and `data/agent-file-history.json` are rewritten with it: on a conflict take `main`'s copies or rerun `bun run agents-md-adoption`.
 
 ## Changing the seed list
 
 `scripts/seed-list.ts` is the full set of ranked repos. `bun run seed` makes the database match it, so editing the list is the whole change; the next rescore applies it.
 
 - **Add** — append `{ url, note }`.
-- **Remove** — delete the entry; its row and scores go. One run deletes at most 10 rows, since a broken list looks like a mass removal; set `SEED_MAX_PRUNE` for a deliberate bulk removal.
+- **Remove** — delete the entry; its row and scores go. A run that would delete more than 10 aborts with nothing changed, since a broken list looks like a mass removal; set `SEED_MAX_PRUNE` for a deliberate bulk removal.
 - **Rename or transfer** — set `url` to the new address and add the old one to `was: [...]`. The row keeps its id and history, and old page, badge and API URLs keep working. Never drop a `was` entry: READMEs embed the old badge URL.
 - **Keep despite an audit finding** — add its kind to `accept`, e.g. `accept: ["archived"]`.
 

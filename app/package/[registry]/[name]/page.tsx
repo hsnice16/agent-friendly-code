@@ -9,6 +9,7 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { ScoreNumber } from "@/components/ScoreNumber";
 import { isRegistry } from "@/lib/clients/registries";
 import { lookupPackage } from "@/lib/package-lookup";
+import { PACKAGE_PATH, packagePath } from "@/lib/utils/package-path";
 import { repoPath } from "@/lib/utils/repo-path";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -27,8 +28,7 @@ export async function generateMetadata({
   }
 
   const title = `${registry}/${name}`;
-  // A scoped npm name holds a slash, which unencoded would be two path segments.
-  const path = `/package/${registry}/${encodeURIComponent(name)}`;
+  const path = packagePath(registry, name);
   const description = `How ready the ${registry} package "${name}" and its source repo are for AI coding agents.`;
 
   // Never indexed, scored or not: the page is a pointer to the source repo's
@@ -66,8 +66,8 @@ export default async function Page({ params }: { params: Promise<{ registry: str
   return (
     <>
       <Breadcrumbs
-        parents={[{ name: "Packages", path: "/package" }]}
-        current={{ name: `${registry}/${name}`, path: `/package/${registry}/${encodeURIComponent(name)}` }}
+        parents={[{ name: "Packages", path: PACKAGE_PATH }]}
+        current={{ name: `${registry}/${name}`, path: packagePath(registry, name) }}
       />
 
       <Panel>

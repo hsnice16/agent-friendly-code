@@ -9,7 +9,7 @@ import { boardLeader, LEADER_QUALIFIER } from "./leaderboard-meta";
 import { checkPath } from "./utils/check-path";
 import { comparePath } from "./utils/compare-path";
 import { percent } from "./utils/format";
-import { averageScore, hubPath, isHub, languageAgentsPath } from "./utils/language";
+import { averageScore, hubAgentsPath, hubPath, isHub } from "./utils/language";
 import { modelPath } from "./utils/leaderboard-href";
 import { repoPath } from "./utils/repo-path";
 import { REPORT_PATH, SIZE_REPORT_PATH } from "./utils/report-path";
@@ -62,7 +62,7 @@ export function languageLines(): string {
   return getLanguageGroups()
     .filter(isHub)
     .map((g) => {
-      const agents = withAgents.has(g.slug) ? `; [which agent they suit](${APP_URL}${languageAgentsPath(g.slug)})` : "";
+      const agents = withAgents.has(g.slug) ? `; [which agent they suit](${APP_URL}${hubAgentsPath(g.slug)})` : "";
       return `- [${safe(g.label)}](${APP_URL}${hubPath(g.slug)}): ${g.rows.length} repos, average ${averageScore(g.rows).toFixed(1)}${agents}`;
     })
     .join("\n");

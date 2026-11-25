@@ -2,6 +2,8 @@ import { notFound } from "next/navigation";
 
 import { getAgentSkillsReport } from "@/lib/agent-skills-data";
 import { agentSkillsDescription, agentSkillsTitle } from "@/lib/agent-skills-report";
+import { CONTENTS_REPORT } from "@/lib/agents-md-contents-data";
+import { contentsDescription, contentsTitle } from "@/lib/agents-md-contents-report";
 import { ADOPTION } from "@/lib/agents-md-report";
 import { buildAgentsMdSize, sizeDescription, sizeTitle } from "@/lib/agents-md-size";
 import { aiPolicyDescription, aiPolicyTitle } from "@/lib/ai-policy";
@@ -11,6 +13,7 @@ import { pageCard } from "@/lib/og-card";
 import { formatDay, percent } from "@/lib/utils/format";
 import {
   AI_POLICY_REPORT_PATH,
+  CONTENTS_REPORT_PATH,
   REPORT_PATH,
   REPORT_TITLE,
   SIZE_REPORT_PATH,
@@ -39,6 +42,11 @@ const CARDS: Record<string, () => { title: string; sub: string; path: string }> 
     const r = getAgentSkillsReport();
     return { title: agentSkillsTitle(r), sub: agentSkillsDescription(r), path: SKILLS_REPORT_PATH };
   },
+  [CONTENTS_REPORT_PATH]: () => ({
+    title: contentsTitle(CONTENTS_REPORT),
+    sub: contentsDescription(CONTENTS_REPORT),
+    path: CONTENTS_REPORT_PATH,
+  }),
 };
 
 const slugOf = (path: string) => path.slice("/report/".length);

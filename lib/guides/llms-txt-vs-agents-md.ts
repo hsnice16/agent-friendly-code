@@ -18,13 +18,13 @@ export const LLMS_TXT_VS_AGENTS_MD: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "A proposal by Jeremy Howard (llmstxt.org, September 2024) for a `/llms.txt` Markdown file that gives websites LLM-friendly content. It sits at the site root, or at a path within it covering the pages below. Its spec notes it is used most for software documentation, where coding agents follow it to API references and tutorials.",
+          text: "A proposal by Jeremy Howard (llmstxt.org, September 2024) for a `/llms.txt` Markdown file that gives websites LLM-friendly content. It sits at the site root, or at a path within it covering the pages below. Its spec notes it is used most for software documentation, where coding agents follow it to API references and tutorials ([spec](https://llmstxt.org/#proposal)).",
         },
         {
           kind: "list",
           ordered: true,
           items: [
-            "An H1 with the project or site name: the only required section.",
+            "An H1 with the project or site name: the only required section ([spec](https://llmstxt.org/#format)).",
             "A blockquote with a short summary.",
             "Optional paragraphs of detail, without headings.",
             "H2 sections of link lists: `[name](url): notes`.",
@@ -33,7 +33,7 @@ export const LLMS_TXT_VS_AGENTS_MD: Guide = {
         },
         {
           kind: "p",
-          text: "The same proposal suggests serving a Markdown copy of each page at its URL plus `.md`.",
+          text: "The same proposal suggests serving a Markdown copy of each page at its URL plus `.md` ([spec](https://llmstxt.org/#proposal)).",
         },
       ],
     },
@@ -131,7 +131,7 @@ export const LLMS_TXT_VS_AGENTS_MD: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "llms.txt is a static file a model can fetch. MCP (Model Context Protocol) is an open standard for connecting AI applications to external systems, such as data sources and tools, to query or act through. A docs MCP server can answer searches; an llms.txt only points to pages.",
+          text: "llms.txt is a static file a model can fetch. MCP (Model Context Protocol) is an open standard for connecting AI applications to external systems, such as data sources and tools, to query or act through ([docs](https://modelcontextprotocol.io/docs/getting-started/intro)). A docs MCP server can answer searches; an llms.txt only points to pages.",
         },
       ],
     },

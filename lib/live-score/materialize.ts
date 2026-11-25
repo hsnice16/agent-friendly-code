@@ -120,7 +120,7 @@ async function fetchContent(
     try {
       const rel = relative(root, realpathSync.native(join(dest, hit)));
       // A placeholder's raw URL would serve a link the scorer never follows.
-      if (!rel || rel.startsWith("..") || isAbsolute(rel) || placeholders.has(rel)) continue;
+      if (!rel || rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel) || placeholders.has(rel)) continue;
       if (i >= nearStart && !wanted.has(rel)) nearFetches++;
       wanted.add(rel);
     } catch {}

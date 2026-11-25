@@ -1,9 +1,14 @@
 import type { ExampleRow } from "@/lib/agents-md-examples";
+import type { AgentBoard } from "@/lib/guides/agent-board";
 import type { GuideBlock } from "@/lib/guides/types";
+import { percent } from "@/lib/utils/format";
+import { modelPath } from "@/lib/utils/leaderboard-href";
 
 import { AgentsMdExampleTable } from "./AgentsMdExampleTable";
 import { CodeText } from "./CodeText";
 import { CopySnippet } from "./CopySnippet";
+import { IntentLink } from "./IntentLink";
+import { LinkedText } from "./LinkedText";
 
 const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
@@ -12,25 +17,26 @@ type Props = {
   /** Fills a string's `{{stat}}` tokens; every string goes through it before render. */
   fill: (text: string) => string;
   examples: (block: Extract<GuideBlock, { kind: "examples" }>) => ExampleRow[];
+  board: () => AgentBoard;
 };
 
-export function GuideBlocks({ blocks, fill, examples }: Props) {
+export function GuideBlocks({ blocks, fill, examples, board }: Props) {
   return (
     <div className="flex flex-col gap-3">
       {blocks.map((b, i) => (
         // biome-ignore lint/suspicious/noArrayIndexKey: a guide's blocks are static and never reorder
-        <Block key={i} b={b} fill={fill} examples={examples} />
+        <Block key={i} b={b} fill={fill} examples={examples} board={board} />
       ))}
     </div>
   );
 }
 
-function Block({ b, fill, examples }: { b: GuideBlock } & Omit<Props, "blocks">) {
+function Block({ b, fill, examples, board }: { b: GuideBlock } & Omit<Props, "blocks">) {
   switch (b.kind) {
     case "p":
       return (
         <p className={PROSE}>
-          <CodeText text={fill(b.text)} />
+          <LinkedText text={fill(b.text)} />
         </p>
       );
     case "list": {
@@ -42,7 +48,7 @@ function Block({ b, fill, examples }: { b: GuideBlock } & Omit<Props, "blocks">)
           {b.items.map((item, i) => (
             // biome-ignore lint/suspicious/noArrayIndexKey: static items; the text itself may hold an unfilled {{stat}}
             <li key={i}>
-              <CodeText text={fill(item)} />
+              <LinkedText text={fill(item)} />
             </li>
           ))}
         </Tag>
@@ -70,7 +76,7 @@ function Block({ b, fill, examples }: { b: GuideBlock } & Omit<Props, "blocks">)
                   {row.map((cell, c) => (
                     // biome-ignore lint/suspicious/noArrayIndexKey: columns are fixed by the head
                     <td key={c} className={c === 0 ? "font-medium text-ink" : "text-ink-dim"}>
-                      <CodeText text={fill(cell)} />
+                      <LinkedText text={fill(cell)} />
                     </td>
                   ))}
                 </tr>
@@ -96,5 +102,51 @@ function Block({ b, fill, examples }: { b: GuideBlock } & Omit<Props, "blocks">)
           showLanguage={b.language == null}
         />
       );
+    case "agentBoard":
+      return <AgentBoardTable block={b} board={board()} />;
   }
+}
+
+function AgentBoardTable({ block, board }: { block: Extract<GuideBlock, { kind: "agentBoard" }>; board: AgentBoard }) {
+  const caption = "Each agent's benchmark standing beside how the leaderboard's repos are set up for it";
+  return (
+    <div>
+      {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+      <section className="table-wrap" tabIndex={0} aria-label={caption}>
+        <table className="data-table text-[13.5px]">
+          <caption className="sr-only">{caption}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Agent</th>
+              <th scope="col">Benchmarks</th>
+              <th scope="col">Board average (median)</th>
+              <th scope="col">Repos with its own file</th>
+            </tr>
+          </thead>
+          <tbody className="text-ink-dim">
+            {board.rows.map((r) => (
+              <tr key={r.id}>
+                <th scope="row" className="font-medium">
+                  <IntentLink href={modelPath(r.id)} className="prose-link">
+                    {r.label}
+                  </IntentLink>
+                </th>
+                <td>{block.benchmarks[r.id]}</td>
+                <td className="tabular-nums">
+                  {r.average.toFixed(1)} ({r.median?.toFixed(1) ?? "—"})
+                </td>
+                <td>
+                  {r.file}: {r.fileCount} ({percent(r.fileCount, board.total)})
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </section>
+      <p className="mt-1.5 mb-0 text-[13px] text-muted">
+        Board columns: {board.total} repos{board.scoredOn && `, last rescored ${board.scoredOn}`}. Benchmarks: each
+        leaderboard as of {block.checked}.
+      </p>
+    </div>
+  );
 }

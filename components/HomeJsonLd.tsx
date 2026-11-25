@@ -1,6 +1,6 @@
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { SIGNALS } from "@/lib/scoring/signals";
-import { SITE_JSON_LD_NODES } from "@/lib/site-json-ld";
+import { ORG_REF, SITE_JSON_LD_NODES } from "@/lib/site-json-ld";
 import { agentList } from "@/lib/utils/agent-list";
 import { boardItemList } from "@/lib/utils/board-item-list";
 import { APP_NAME, APP_URL, APP_VERSION } from "@/lib/version";
@@ -37,7 +37,7 @@ export function homeJsonLdGraph({ view, contentChangedAt }: HomeJsonLdProps): Re
       keywords: ["AI coding agents", "AGENTS.md", "CLAUDE.md", "agent readiness", "open source repositories"],
       isAccessibleForFree: true,
       ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
-      creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+      creator: ORG_REF,
       license: "https://opensource.org/licenses/MIT",
       distribution: {
         "@type": "DataDownload",

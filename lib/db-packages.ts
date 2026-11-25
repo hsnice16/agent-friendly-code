@@ -16,7 +16,7 @@ export function getTopPackagesByRegistry(registry: string, limit: number): TopPa
          JOIN repo r ON r.url = pa.repo_url
         WHERE pa.registry = ?
           AND r.overall_score IS NOT NULL
-        ORDER BY r.overall_score DESC
+        ORDER BY r.overall_score DESC, pa.name
         LIMIT ?`,
     )
     .all(registry, limit) as TopPackageRow[];

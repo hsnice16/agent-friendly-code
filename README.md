@@ -42,7 +42,7 @@ Read-only JSON, no key:
 - `GET /api/repo/<id>` — one repo by internal id.
 - `GET /api/package/<registry>/<name>` — npm, PyPI or Cargo package → its source repo's score.
 
-Feeds: `/changelog.xml` (Atom) and CSVs at `/report/agents-md.csv`, `/report/agent-skills.csv` and `/check/agents-md/examples.csv`.
+Feeds: `/changelog.xml` (Atom) and CSVs at `/report/agents-md.csv`, `/report/agents-md-contents.csv`, `/report/agent-skills.csv` and `/check/agents-md/examples.csv`.
 
 The skill and the Action vendor the scorer and never call the API.
 

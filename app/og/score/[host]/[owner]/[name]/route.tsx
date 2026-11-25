@@ -6,13 +6,8 @@ import { SUPPORTED_HOSTS } from "@/lib/live-score/supported";
 import { repoScoreCard } from "@/lib/og-card";
 import { hostLabel } from "@/lib/utils/format";
 
-// A cold card scores the repo, same as its page.
+// Outside /score/ for the reason app/og/score/route.tsx gives. A cold card scores the repo, same as its page.
 export const maxDuration = 60;
-
-// Outside /score/ for the reason app/og/score/route.tsx gives. Previews are
-// fetched by every chat app a link is pasted into, so the card keeps the
-// page's hour: the same cache entry, and a CDN copy for as long.
-const CACHE_CONTROL = LIVE_CACHE_CONTROL;
 
 export async function GET(_request: Request, { params }: { params: Promise<LiveTarget> }) {
   const target = await params;
@@ -33,6 +28,7 @@ export async function GET(_request: Request, { params }: { params: Promise<LiveT
     score: score.overall.toFixed(1),
     context: [hostLabel(target.host), score.language],
   });
-  card.headers.set("Cache-Control", CACHE_CONTROL);
+  // Every chat app a link is pasted into fetches the card, so it keeps the page's hour.
+  card.headers.set("Cache-Control", LIVE_CACHE_CONTROL);
   return card;
 }

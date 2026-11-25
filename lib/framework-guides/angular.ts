@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const ANGULAR: FrameworkGuide = {
   slug: "angular",
+  published: "2026-11-16",
   label: "Angular",
   kind: "app",
   languages: ["TypeScript"],

@@ -138,7 +138,7 @@ export function ownFile(model: ModelProfile): { file: string; signalId: string }
   return { file: AGENT_READS[model.id].files[0] === "CLAUDE.md" ? "CLAUDE.md" : "AGENTS.md", signalId: "agents_md" };
 }
 
-/** Languages with enough repos for a "best agent" page, most repos first. */
+/** Languages with enough repos for a hub agents section, most repos first. */
 export function agentLanguages(rows: ScoredRepo[]): LanguageGroup<ScoredRepo>[] {
   return groupByLanguage(rows).filter((g) => g.rows.length >= LANGUAGE_AGENTS_MIN_REPOS);
 }

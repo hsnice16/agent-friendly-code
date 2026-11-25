@@ -100,4 +100,17 @@ describe("agentsMd signal", () => {
     assert.equal(r.pass, 0.2);
     assert.match(r.matchedPath ?? "", /CLAUDE\.md$/);
   });
+
+  test("a directory named AGENTS.md is not a file, so CLAUDE.md beside it is read", () => {
+    fixture = makeFixture({ "AGENTS.md/x": "", "CLAUDE.md": "x".repeat(900) });
+    const r = agentsMd.check(fixture);
+
+    assert.equal(r.pass, 1);
+    assert.match(r.matchedPath ?? "", /CLAUDE\.md$/);
+  });
+
+  test("pass=0 when the only candidates are directories", () => {
+    fixture = makeFixture({ "AGENTS.md/x": "", "CLAUDE.md/y": "" });
+    assert.equal(agentsMd.check(fixture).pass, 0);
+  });
 });

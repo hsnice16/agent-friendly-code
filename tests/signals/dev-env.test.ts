@@ -2,7 +2,7 @@ import { strict as assert } from "node:assert";
 import { afterEach, describe, test } from "node:test";
 
 import { devEnv } from "../../lib/scoring/signals/dev-env";
-import { makeFixture, removeFixture } from "../_helpers";
+import { type FixtureFiles, makeFixture, removeFixture } from "../_helpers";
 
 describe("devEnv signal", () => {
   let fixture = "";
@@ -115,5 +115,31 @@ describe("devEnv signal", () => {
     const r = devEnv.check(fixture);
 
     assert.equal(r.pass, 0.7);
+  });
+
+  test("counts each tool once: Compose, Nix and devcontainer spellings", () => {
+    const sets: FixtureFiles[] = [
+      { "compose.yaml": "services: {}", "docker-compose.yml": "services: {}" },
+      { "flake.nix": "{}", "shell.nix": "{}", "default.nix": "{}" },
+      { ".devcontainer.json": "{}", ".devcontainer/devcontainer.json": "{}" },
+    ];
+    for (const files of sets) {
+      fixture = makeFixture(files);
+      const r = devEnv.check(fixture);
+      removeFixture(fixture);
+      fixture = "";
+
+      assert.equal(r.pass, 0.7, Object.keys(files).join(", "));
+    }
+  });
+
+  test("a directory named like an artifact does not count", () => {
+    fixture = makeFixture({ "Makefile/x": "", "Dockerfile/y": "" });
+    assert.equal(devEnv.check(fixture).pass, 0);
+  });
+
+  test("package.json scripts must be an object", () => {
+    fixture = makeFixture({ "package.json": JSON.stringify({ scripts: "npm run build && npm test" }) });
+    assert.equal(devEnv.check(fixture).pass, 0);
   });
 });

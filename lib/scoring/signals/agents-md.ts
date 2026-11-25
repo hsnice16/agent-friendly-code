@@ -1,4 +1,4 @@
-import { characters, firstExisting, readSafe } from "./helpers";
+import { characters, firstFile, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 // Only Claude Code reads the `.claude/` names, so a root file wins over them.
@@ -17,7 +17,7 @@ export const agentsMd: Signal = {
     let len = 0;
 
     for (const c of CANDIDATES) {
-      const hit = firstExisting(repo, [c]);
+      const hit = firstFile(repo, [c]);
       if (!hit) {
         continue;
       }

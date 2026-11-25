@@ -5,9 +5,10 @@ import { LEAD_MIN_STARS } from "@/lib/constants/scoring";
 import type { LeaderboardView } from "@/lib/leaderboard-view";
 import { MODEL_BY_ID } from "@/lib/scoring/weights";
 import type { LeaderboardRow } from "@/lib/types/db";
-import { boardPagePath } from "@/lib/utils/leaderboard-href";
+import { boardPagePath, modelPath } from "@/lib/utils/leaderboard-href";
+import { ogImage } from "@/lib/utils/og-image";
 import { fitDescription, pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, DEFAULT_OG_IMAGE, OG_DEFAULTS, OG_IMAGE_SIZE, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_NAME, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 const HOME_TITLE = `${APP_NAME} — is your codebase ready for AI agents?`;
 
@@ -92,7 +93,7 @@ export function leaderboardMetadata(view: LeaderboardView): Metadata {
   const image =
     view.model === "overall"
       ? DEFAULT_OG_IMAGE
-      : { url: `/og/model/${view.model}`, ...OG_IMAGE_SIZE, alt: modelBoardTitle(MODEL_BY_ID[view.model].label) };
+      : ogImage(modelPath(view.model), modelBoardTitle(MODEL_BY_ID[view.model].label));
 
   return {
     title: { absolute: title },

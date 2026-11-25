@@ -12,22 +12,30 @@ import { AUTHOR_JSON_LD } from "@/lib/author";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getCheckStats } from "@/lib/check-stats";
 import { START_WITH_CHECKS as START_WITH } from "@/lib/constants/scoring";
-import { getLeaderboardStats } from "@/lib/db";
 import { FILE_CHECKS, GUIDE_THEMES } from "@/lib/guide-content";
 import { guideExplainers } from "@/lib/guide-explainers";
 import { GUIDE_NOTES, GUIDES } from "@/lib/guides";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { checksBySummedWeight } from "@/lib/leaderboard-model-panel";
+import { guideHubModified } from "@/lib/page-dates";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
 import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { GUIDE_PATH, guidePath } from "@/lib/utils/guide-path";
-import { AI_POLICY_REPORT_PATH, REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
+import {
+  AI_POLICY_REPORT_PATH,
+  CONTENTS_REPORT_PATH,
+  REPORT_PATH,
+  REPORT_TITLE,
+  SIZE_REPORT_PATH,
+  SKILLS_REPORT_PATH,
+} from "@/lib/utils/report-path";
+import { APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
 
 const PATH = GUIDE_PATH;
 
@@ -50,6 +58,8 @@ const DATA_PAGES = [
   { href: COMPARE_PATH, label: "Compare agents", note: "how repos are set up for each, pair by pair" },
   { href: REPORT_PATH, label: REPORT_TITLE, note: "how adoption has grown" },
   { href: SIZE_REPORT_PATH, label: "How long AGENTS.md files are", note: "sizes of real files" },
+  { href: CONTENTS_REPORT_PATH, label: "What's in an AGENTS.md", note: "sections and test commands in real files" },
+  { href: SKILLS_REPORT_PATH, label: "Agent skills in repos", note: "which repos ship SKILL.md files" },
   { href: AI_POLICY_REPORT_PATH, label: "AI contribution policies", note: "what projects allow" },
   { href: CONTRIBUTE_PATH, label: "Projects to contribute to", note: "ready for agent-assisted work" },
 ];
@@ -62,7 +72,6 @@ const TOOLS = [
 ];
 
 export default function GuidePage() {
-  const { contentChangedAt } = getLeaderboardStats();
   const { title, description } = PAGE_COPY[PATH];
   const agentsMd = getCheckStats("agents_md");
   const passRate = (id: string) => {
@@ -71,6 +80,7 @@ export default function GuidePage() {
   };
   const startHere = new Set(checksBySummedWeight(START_WITH).map((c) => c.id));
   const ex = getAgentsMdExamples();
+  const modified = guideHubModified();
 
   return (
     <>
@@ -87,15 +97,16 @@ export default function GuidePage() {
           ],
           datePublished: "2026-11-04",
           hasPart: SIGNALS.map((s) => ({ "@type": "WebPage", name: s.label, url: `${APP_URL}${checkPath(s.id)}` })),
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       {/* The meta title carries the search wording ("best practices", "AI-ready"); the heading reads as a how-to. */}
       <PageHeader
         crumbs={{ current: { name: "Guide", path: PATH } }}
         title="How to make your codebase agent-friendly"
+        updated={modified}
         lead={
           <>
             An agent-friendly, AI-ready codebase writes down what the code doesn&apos;t say and gives the agent a way to

@@ -19,6 +19,7 @@ import {
 } from "@/lib/agent-skills-report";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { MODELS } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath } from "@/lib/utils/check-path";
 import { compactStars, formatDay, percent } from "@/lib/utils/format";
 import { guidePath } from "@/lib/utils/guide-path";
@@ -63,9 +64,10 @@ function jsonLd(r: AgentSkillsReport) {
         headline: agentSkillsTitle(r),
         description: agentSkillsDescription(r),
         url,
+        image: `${APP_URL}${ogImage(SKILLS_REPORT_PATH, agentSkillsTitle(r)).url}`,
         dateModified: r.date,
         author: AUTHOR_JSON_LD,
-        publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+        publisher: PUBLISHER_JSON_LD,
         about: [{ "@type": "Thing", name: "Agent skills (SKILL.md)" }],
       },
       {
@@ -77,7 +79,7 @@ function jsonLd(r: AgentSkillsReport) {
         keywords: ["agent skills", "SKILL.md", ".agents/skills", ".claude/skills", "open source"],
         isAccessibleForFree: true,
         dateModified: r.date,
-        creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+        creator: PUBLISHER_JSON_LD,
         license: "https://opensource.org/licenses/MIT",
         distribution: {
           "@type": "DataDownload",

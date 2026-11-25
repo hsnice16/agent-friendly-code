@@ -21,8 +21,9 @@ import { COMPARE_PAIRS, type ComparePair, pairBySlug } from "@/lib/compare-pairs
 import { LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { distinctSourceLabels } from "@/lib/leaderboard-model-panel";
-import { boardModified } from "@/lib/page-dates";
+import { compareModified } from "@/lib/page-dates";
 import { MODEL_BY_ID, type ModelProfile } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { COMPARE_CRUMB, comparePath } from "@/lib/utils/compare-path";
 import { percent } from "@/lib/utils/format";
@@ -30,7 +31,7 @@ import { GUIDE_PATH } from "@/lib/utils/guide-path";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { ogImage } from "@/lib/utils/og-image";
 import { pageTitle } from "@/lib/utils/page-title";
-import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
+import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ pair: string }>;
 
@@ -75,7 +76,7 @@ export default async function ComparePage({ params }: { params: Params }) {
   const gaps = weightGaps(a, b);
   const files = getInstructionFileCounts();
   const sources = [...new Set([a, b].flatMap((m) => [...m.sources, ...(AGENT_READS[m.id].sources ?? [])]))];
-  const modified = boardModified();
+  const modified = compareModified(pair);
   const others = COMPARE_PAIRS.filter((p) => p.slug !== pair.slug);
 
   const ownFileRow = {
@@ -103,13 +104,13 @@ export default async function ComparePage({ params }: { params: Params }) {
           headline: title,
           description: compareDescription(pair, stats),
           url: `${APP_URL}${path}`,
-          image: `${APP_URL}/og${path}`,
-          about: [a, b].map((m) => ({ "@type": "SoftwareApplication", name: m.label })),
+          image: `${APP_URL}${ogImage(path, title).url}`,
+          about: [a, b].map((m) => ({ "@type": "Thing", name: m.label })),
           citation: sources,
           datePublished: "2026-11-16",
-          ...(modified ? { dateModified: modified } : {}),
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       <PageHeader

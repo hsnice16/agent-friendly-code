@@ -4,16 +4,19 @@ import { notFound } from "next/navigation";
 import { CommonGapsPanel } from "@/components/CommonGapsPanel";
 import { HubLeaderboardTable } from "@/components/HubLeaderboardTable";
 import { IntentLink } from "@/components/IntentLink";
+import { LanguageAgentsSection } from "@/components/LanguageAgentsSection";
 import { LeaderClause } from "@/components/LeaderClause";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
+import { fileShares } from "@/lib/agent-files";
+import { agentStandings } from "@/lib/agent-scores";
+import { getAgentLanguages, getFilePresence } from "@/lib/agent-scores-data";
 import { frameworkLinksForLanguage } from "@/lib/agents-md-example-links";
 import { examplesByLanguage } from "@/lib/agents-md-examples";
-import { LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
 import { getHub, getLanguageGroups, type Hub } from "@/lib/language-hubs";
 import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import { leaderSentence } from "@/lib/leaderboard-meta";
 import { languageExamplesPath } from "@/lib/utils/check-path";
-import { hubPath, hubTitle, isHub, languageAgentsPath } from "@/lib/utils/language";
+import { HUB_AGENTS_ID, hubPath, hubTitle, isHub } from "@/lib/utils/language";
 import { fitDescription, pageTitle } from "@/lib/utils/page-title";
 import { DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
@@ -63,6 +66,8 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
   const path = hubPath(hub.slug);
   const examples = examplesByLanguage(getAgentsMdExamples()).find((l) => l.slug === hub.slug);
   const frameworks = frameworkLinksForLanguage(getAgentsMdExamples(), hub.slug);
+  // Same rows as the hub, with each agent's score; absent below LANGUAGE_AGENTS_MIN_REPOS.
+  const agents = getAgentLanguages().find((g) => g.slug === hub.slug);
 
   return (
     <>
@@ -93,11 +98,11 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
             .
           </p>
         )}
-        {hub.rows.length >= LANGUAGE_AGENTS_MIN_REPOS && (
+        {agents && (
           <p className="mt-2.5 mb-0 text-[14.5px]">
-            <IntentLink href={languageAgentsPath(hub.slug)} className="arrow-link whitespace-normal">
+            <a href={`#${HUB_AGENTS_ID}`} className="arrow-link whitespace-normal">
               Which AI coding agent {hub.label} repos are best set up for →
-            </IntentLink>
+            </a>
           </p>
         )}
       </PageHeader>
@@ -114,6 +119,18 @@ export default async function LanguageHubPage({ params }: { params: Promise<Para
         clearSearchHref={path}
         activeLabel={`${hub.label} repos, overall`}
       />
+
+      {agents && (
+        <LanguageAgentsSection
+          label={hub.label}
+          repos={agents.rows.length}
+          standings={agentStandings(agents.rows)}
+          shares={fileShares(
+            agents.rows.map((r) => r.id),
+            getFilePresence(),
+          )}
+        />
+      )}
     </>
   );
 }

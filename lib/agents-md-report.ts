@@ -1,6 +1,7 @@
 import raw from "@/data/agents-md-adoption.json";
 
 import { type AdoptionSeries, parseAdoption, SERIES_LABEL } from "./agents-md-adoption";
+import { PUBLISHER_JSON_LD } from "./site-json-ld";
 import { OTHER_FILES } from "./utils/agent-instructions";
 import { REPORT_CSV_PATH, REPORT_PATH, REPORT_TITLE } from "./utils/report-path";
 import { APP_NAME, APP_URL } from "./version";
@@ -21,7 +22,7 @@ export function adoptionDatasetJsonLd(series: AdoptionSeries = ADOPTION): Record
     isAccessibleForFree: true,
     temporalCoverage: `${first.date}/${last.date}`,
     dateModified: last.date,
-    creator: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+    creator: PUBLISHER_JSON_LD,
     license: "https://opensource.org/licenses/MIT",
     isPartOf: { "@id": `${APP_URL}/#dataset` },
     distribution: {

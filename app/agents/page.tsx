@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { AgentReadsView } from "@/components/AgentReadsView";
 import { AgentsMdFaq } from "@/components/AgentsMdFaq";
-import { CodeText } from "@/components/CodeText";
-import { ExternalLink } from "@/components/ExternalLink";
 import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
@@ -14,18 +13,19 @@ import { AGENT_READS, agentsUsingAgentsMd, OTHER_TOOLS } from "@/lib/agent-reads
 import { MATRIX_COLUMNS, supportMatrix } from "@/lib/agent-support-matrix";
 import { AGENT_DOCS_CHECKED, agentsMdFaq } from "@/lib/agents-faq";
 import { AUTHOR_JSON_LD } from "@/lib/author";
-import { getLeaderboardStats } from "@/lib/db";
 import { CENSUS_SUMMARY } from "@/lib/file-census";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { sourceLabel } from "@/lib/leaderboard-model-panel";
+import { agentsModified } from "@/lib/page-dates";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { MODELS } from "@/lib/scoring/weights";
+import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { agentList } from "@/lib/utils/agent-list";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
-import { APP_NAME, APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
+import { APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
 
 export const metadata: Metadata = staticPageMetadata("/agents");
 
@@ -34,11 +34,11 @@ const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const CODE = "font-mono text-[13px] text-ink";
 
 export default function AgentsPage() {
-  const { contentChangedAt } = getLeaderboardStats();
   const counts = getInstructionFileCounts();
   const always = agentsUsingAgentsMd("always");
   const viaSetting = agentsUsingAgentsMd("setting");
   const faqs = agentsMdFaq();
+  const modified = agentsModified();
 
   return (
     <>
@@ -49,16 +49,17 @@ export default function AgentsPage() {
           description: PAGE_COPY[PATH].description,
           url: `${APP_URL}${PATH}`,
           image: `${APP_URL}${DEFAULT_OG_IMAGE.url}`,
-          about: MODELS.map((m) => ({ "@type": "SoftwareApplication", name: m.label })),
+          about: MODELS.map((m) => ({ "@type": "Thing", name: m.label })),
           datePublished: "2026-10-21",
-          ...(contentChangedAt != null ? { dateModified: new Date(contentChangedAt * 1000).toISOString() } : {}),
+          dateModified: modified,
           author: AUTHOR_JSON_LD,
-          publisher: { "@type": "Organization", name: APP_NAME, url: APP_URL },
+          publisher: PUBLISHER_JSON_LD,
         }}
       />
       <PageHeader
         crumbs={{ current: { name: "Agents", path: PATH } }}
         title={PAGE_COPY[PATH].title}
+        updated={modified}
         lead={
           <>
             Most agents read AGENTS.md: {agentList(always)}. Claude Code reads CLAUDE.md and falls back to AGENTS.md.{" "}
@@ -85,52 +86,20 @@ export default function AgentsPage() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Files each agent reads</PanelHeading>
-          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
-          <section className="table-wrap" tabIndex={0} aria-label="Files each agent reads">
-            <table className="data-table min-w-[620px] text-[14px]">
-              <caption className="sr-only">Repo files each AI coding agent reads</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Agent</th>
-                  <th scope="col">Reads from the repo</th>
-                  <th scope="col">Notes</th>
-                </tr>
-              </thead>
-              <tbody>
-                {MODELS.map((m) => {
-                  const reads = AGENT_READS[m.id];
-                  return (
-                    <tr key={m.id} className="align-top">
-                      <th scope="row" className="font-medium">
-                        <IntentLink href={modelPath(m.id)} className={`${LINK} cover-link`}>
-                          {m.label}
-                        </IntentLink>
-                      </th>
-                      <td>
-                        <ul className="m-0 list-none p-0">
-                          {reads.files.map((f) => (
-                            <li key={f}>
-                              <code className={CODE}>{f}</code>
-                            </li>
-                          ))}
-                        </ul>
-                      </td>
-                      <td className="text-ink-dim">
-                        <CodeText text={reads.note} />{" "}
-                        {[...m.sources, ...(reads.sources ?? [])].map((url) => (
-                          <span key={url} className="mr-2 text-[12.5px]">
-                            <ExternalLink href={url} title={url}>
-                              {sourceLabel(url)}
-                            </ExternalLink>
-                          </span>
-                        ))}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </section>
+          <AgentReadsView
+            rows={MODELS.map((m) => {
+              const reads = AGENT_READS[m.id];
+              return {
+                id: m.id,
+                files: reads.files,
+                note: reads.note,
+                sources: [...m.sources, ...(reads.sources ?? [])].map((url): [string, string] => [
+                  url,
+                  sourceLabel(url),
+                ]),
+              };
+            })}
+          />
         </Panel>
       </div>
 

@@ -46,25 +46,3 @@ export const COMPARE_HUB_DESCRIPTION =
 export function compareHubTitle(repos: number): string {
   return firstFit([`AI coding agents compared across ${repos} repos`, "AI coding agents compared"]);
 }
-
-// Not "best agent for X": every language page would crown the same agent, and
-// for a reason in the weights (see the page's caveat), not in the language.
-export function languageAgentsTitle(label: string, repos: number): string {
-  return firstFit([
-    `Which AI coding agent are ${repos} ${label} repos set up for?`,
-    `Which AI coding agent are ${label} repos set up for?`,
-    `AI coding agents for ${label} repos`,
-  ]);
-}
-
-export function languageAgentsDescription(
-  label: string,
-  repos: number,
-  top: { label: string; average: number },
-): string {
-  return fitDescription(
-    `How well ${repos} popular ${label} repos are set up for each AI coding agent, and the instruction files they use.`,
-    `${top.label} scores highest, at ${top.average.toFixed(1)}.`,
-    "Setup, not code quality.",
-  );
-}

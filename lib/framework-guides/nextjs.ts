@@ -2,6 +2,7 @@ import type { FrameworkGuide } from "./types";
 
 export const NEXTJS: FrameworkGuide = {
   slug: "nextjs",
+  published: "2026-11-04",
   label: "Next.js",
   kind: "app",
   languages: ["TypeScript", "JavaScript"],

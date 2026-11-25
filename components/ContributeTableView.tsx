@@ -120,6 +120,7 @@ export function ContributeTableView({ rows, caption, showLanguage = true, policy
                   {r.policy?.url ? (
                     <a href={r.policy.url} target="_blank" rel="nofollow noopener noreferrer" className="prose-link">
                       {r.policy.label}
+                      <span className="sr-only"> (new tab)</span>
                     </a>
                   ) : (
                     (r.policy?.label ?? (r.host === "github" ? "none found" : "not scanned"))

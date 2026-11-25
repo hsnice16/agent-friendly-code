@@ -3,6 +3,8 @@ import { median } from "./utils/median";
 
 /** One leaderboard repo's row for one check, from one snapshot of the database. */
 export type SnapshotRow = {
+  /** Survives a rename, which changes `url`. */
+  repoId?: number;
   url: string;
   signalId: string | null;
   pass: number | null;

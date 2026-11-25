@@ -6,8 +6,9 @@ import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
 import { getTopPackagesByRegistry } from "@/lib/db";
 import { staticPageMetadata } from "@/lib/page-meta";
+import { PACKAGE_PATH, packagePath } from "@/lib/utils/package-path";
 
-export const metadata: Metadata = staticPageMetadata("/package");
+export const metadata: Metadata = staticPageMetadata(PACKAGE_PATH);
 
 const EXAMPLES = [
   { registry: "npm", name: "axios" },
@@ -27,7 +28,7 @@ export default function PackageIndexPage() {
   return (
     <>
       <PageHeader
-        crumbs={{ current: { name: "Packages", path: "/package" } }}
+        crumbs={{ current: { name: "Packages", path: PACKAGE_PATH } }}
         title="Packages"
         lead="Type an npm, PyPI or crates.io package name to see how ready its source repo is for AI coding agents."
       />
@@ -51,7 +52,7 @@ export default function PackageIndexPage() {
           <ul className="m-0 grid list-none grid-cols-1 gap-2 p-0 sm:grid-cols-2">
             {EXAMPLES.map(({ registry, name }) => (
               <li key={`${registry}/${name}`}>
-                <IntentLink href={`/package/${registry}/${name}`} className="block tile text-ink">
+                <IntentLink href={packagePath(registry, name)} className="block tile text-ink">
                   <span className="font-mono text-[13px] text-muted">{registry}</span>
                   <span className="mx-1.5 text-muted">/</span>
                   <span className="font-medium">{name}</span>
@@ -84,7 +85,7 @@ export default function PackageIndexPage() {
               {topRows.map((row) => (
                 <li key={`${row.registry}/${row.name}`}>
                   <IntentLink
-                    href={`/package/${row.registry}/${encodeURIComponent(row.name)}`}
+                    href={packagePath(row.registry, row.name)}
                     className="flex items-center justify-between tile text-ink"
                   >
                     <span className="truncate">

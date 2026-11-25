@@ -15,7 +15,7 @@ type Copy = { title: string; description: string; type: "website" | "article" };
 export const PAGE_COPY = {
   "/about": {
     title: "About",
-    description: `Who built ${APP_NAME}, why, how repos are chosen, and what it is not. Independent, MIT-licensed, tied to no AI agent company.`,
+    description: `Who built ${APP_NAME}, why, how it is made and how repos are chosen. Independent, MIT-licensed, tied to no AI agent company.`,
     type: "article",
   },
   "/methodology": {
@@ -53,7 +53,7 @@ export const PAGE_COPY = {
   "/agents-md-generator": {
     title: "AGENTS.md generator: free, from your GitHub repo",
     description:
-      "Free AGENTS.md generator: paste a public GitHub repo URL for a starter AGENTS.md drafted from its files, plus CLAUDE.md and GEMINI.md stubs. No signup.",
+      "Free AGENTS.md generator: paste a public GitHub repo URL for a starter AGENTS.md from its files, plus a CLAUDE.md import and Gemini CLI setting. No signup.",
     type: "website",
   },
   "/language": {

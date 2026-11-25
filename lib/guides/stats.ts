@@ -36,6 +36,7 @@ export const getGuideStats = cache((): Record<string, string> => {
     anyRootLink: String(C.anyRootLink),
     claudeImportsAgents: String(C.claudeImportsAgents),
     twoUnlinkedFiles: String(C.twoUnlinkedFiles),
+    rootBothFiles: String(C.rootBoth),
     copilotRepos: String(C.copilot),
     copilotPct: percent(C.copilot, C.repos),
     copilotPathRepos: String(C.copilotPath),
