@@ -839,6 +839,7 @@ exports.DEFAULT_SUGGESTION_LIMIT = 3;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.bandFor = bandFor;
+exports.bestModel = bestModel;
 exports.formatSummary = formatSummary;
 const scoring_1 = __nccwpck_require__(792);
 function bandFor(overall) {
@@ -850,10 +851,12 @@ function bandFor(overall) {
     }
     return "low";
 }
+function bestModel(scores) {
+    return scores.slice().sort((a, b) => b.score - a.score)[0];
+}
 function formatSummary(score) {
     const band = bandFor(score.overall);
-    const sorted = score.modelScores.slice().sort((a, b) => b.score - a.score);
-    const best = sorted[0];
+    const best = bestModel(score.modelScores);
     const head = `agent-friendly: ${score.overall} (${band})`;
     const tail = best ? ` · best: ${best.modelLabel} ${best.score}` : "";
     return `${head}${tail}\n`;
@@ -987,8 +990,10 @@ exports.agentSkills = {
                 names = (0, node_fs_1.readdirSync)((0, node_path_1.join)(repo, dir)).sort();
             }
             catch { }
+            // One resolver, or each name re-lists the skills folder.
+            const resolve = (0, helpers_1.createResolver)(repo);
             const skills = names
-                .map((n) => (0, helpers_1.resolveRelative)(repo, `${dir}/${n}/SKILL.md`))
+                .map((n) => resolve(`${dir}/${n}/SKILL.md`))
                 .filter((p) => !!p && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, p)));
             if (skills.length > 0) {
                 return {
@@ -1341,7 +1346,7 @@ function mdcFiles(repo, rel, depth, out) {
         const child = `${rel}/${e}`;
         const kind = (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, child));
         if (kind === "dir") {
-            if (depth < SUBFOLDER_DEPTH)
+            if (depth < SUBFOLDER_DEPTH && (0, helpers_1.isRealDir)((0, node_path_1.join)(repo, child)))
                 mdcFiles(repo, child, depth + 1, out);
         }
         else if (e.toLowerCase().endsWith(".mdc") && (0, helpers_1.isFileEntry)(repo, (0, node_path_1.join)(repo, child))) {
@@ -1352,8 +1357,11 @@ function mdcFiles(repo, rel, depth, out) {
 /** Every `.cursor/rules/` folder, the root one first. */
 function rulesDirs(repo) {
     const found = [];
+    // One resolver for the whole scan: a fresh one re-lists every parent per folder,
+    // which is quadratic on a root with thousands of folders.
+    const resolve = (0, helpers_1.createResolver)(repo);
     const visit = (rel, depth) => {
-        const dir = (0, helpers_1.resolveRelative)(repo, rel ? `${rel}/.cursor/rules` : ".cursor/rules");
+        const dir = resolve(rel ? `${rel}/.cursor/rules` : ".cursor/rules");
         if (dir && (0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, dir)) === "dir")
             found.push(dir);
         if (depth >= PARENT_DEPTH)
@@ -1362,7 +1370,7 @@ function rulesDirs(repo) {
             if (SKIP.has(e) || e.toLowerCase() === ".cursor")
                 continue;
             const child = rel ? `${rel}/${e}` : e;
-            if ((0, helpers_1.entryKind)(repo, (0, node_path_1.join)(repo, child)) === "dir")
+            if ((0, helpers_1.isRealDir)((0, node_path_1.join)(repo, child)))
                 visit(child, depth + 1);
         }
     };
@@ -1847,6 +1855,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MAX_READ_BYTES = void 0;
 exports.characters = characters;
 exports.entryKind = entryKind;
+exports.isRealDir = isRealDir;
 exports.createResolver = createResolver;
 exports.resolveRelative = resolveRelative;
 exports.resolveAllRelative = resolveAllRelative;
@@ -1889,6 +1898,15 @@ function entryKind(repo, abs) {
     catch {
         // Dangling, or unreadable.
         return null;
+    }
+}
+// Walks descend only into real folders: `l -> .` at every level multiplies a walk by its fan-out.
+function isRealDir(abs) {
+    try {
+        return (0, node_fs_1.lstatSync)(abs).isDirectory();
+    }
+    catch {
+        return false;
     }
 }
 function indexDir(dir, cache) {
@@ -2044,7 +2062,8 @@ function walkFind(root, match, maxDepth = 3, maxHits = 1) {
                 continue;
             }
             if (kind === "dir") {
-                visit(abs, depth + 1, relNext);
+                if (isRealDir(abs))
+                    visit(abs, depth + 1, relNext);
             }
             else if (match(relNext)) {
                 hits.push(relNext);
@@ -2925,13 +2944,15 @@ exports.size = {
                 if (!kind) {
                     continue;
                 }
+                // A link to a folder counts as the one file git stores.
+                const descend = kind === "dir" && (0, helpers_1.isRealDir)(abs);
                 const rel = (0, node_path_1.relative)(repo, abs).split(node_path_1.sep).join("/");
-                const path = kind === "dir" ? `${rel}/` : rel;
+                const path = descend ? `${rel}/` : rel;
                 work += matchWork(path, lines.length, quadratic);
                 if ((work <= IGNORE_WORK_BUDGET ? ig : base).ignores(path)) {
                     continue;
                 }
-                if (kind === "dir") {
+                if (descend) {
                     visit(abs, depth + 1);
                 }
                 else {
@@ -3642,10 +3663,6 @@ const PROJECT_ROOT_MARKERS = [
     "package.json",
     "pyproject.toml",
 ];
-function bestModelId(scores) {
-    const sorted = scores.slice().sort((a, b) => b.score - a.score);
-    return sorted[0]?.modelId;
-}
 function buildWarnings(target) {
     const hasMarker = PROJECT_ROOT_MARKERS.some((m) => (0, node_fs_1.existsSync)((0, node_path_1.join)(target, m)));
     if (hasMarker) {
@@ -3657,7 +3674,7 @@ function buildWarnings(target) {
 }
 const KNOWN_FLAGS = new Set(["--summary", "--json", "--help", "-h"]);
 const USAGE = [
-    "Usage: agent-friendly-skill [path] [--summary] [--json]",
+    "Usage: node <skill-dir>/dist/index.js [path] [--summary] [--json]",
     "",
     "Scores the repo at <path> (default: cwd) and prints the result.",
     "",
@@ -3678,6 +3695,10 @@ function main() {
         node_process_1.stderr.write(`agent-friendly: unknown option ${unknown.join(", ")}\n\n${USAGE}`);
         (0, node_process_1.exit)(2);
     }
+    if (positional.length > 1) {
+        node_process_1.stderr.write(`agent-friendly: expected one path, got ${positional.length}\n\n${USAGE}`);
+        (0, node_process_1.exit)(2);
+    }
     const target = (0, node_path_1.resolve)(positional[0] ?? process.cwd());
     if (!(0, node_fs_1.existsSync)(target) || !(0, node_fs_1.statSync)(target).isDirectory()) {
         node_process_1.stderr.write(`agent-friendly: not a directory: ${target}\n`);
@@ -3685,8 +3706,8 @@ function main() {
     }
     const score = (0, scorer_1.scoreRepo)(target);
     const warnings = buildWarnings(target);
-    const topModel = bestModelId(score.modelScores);
-    const improvements = topModel ? (0, scorer_1.topImprovements)(topModel, score.signals) : [];
+    const topModel = (0, format_1.bestModel)(score.modelScores);
+    const improvements = topModel ? (0, scorer_1.topImprovements)(topModel.modelId, score.signals) : [];
     if (flags.has("--summary")) {
         for (const w of warnings) {
             node_process_1.stderr.write(`agent-friendly: ${w}\n`);
