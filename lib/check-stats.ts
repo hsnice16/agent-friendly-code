@@ -4,6 +4,7 @@ import { MODELS, type ModelProfile } from "./scoring/weights";
 import type { LeaderboardRow } from "./types/db";
 import { HAS_FILE_PASS } from "./utils/agent-instructions";
 import { groupByLanguage, isHub } from "./utils/language";
+import { weightShare } from "./utils/readers";
 
 export type PassCounts = {
   total: number;
@@ -50,11 +51,7 @@ function computeCheckStats(signalId: string, board: LeaderboardRow[]): CheckStat
     languages: groupByLanguage(rows)
       .filter(isHub)
       .map((g) => ({ slug: g.slug, label: g.label, counts: count(g.rows.map(pass)) })),
-    // Share of the agent's total weight, since the profiles do not sum to the same number.
-    agents: MODELS.map((model) => {
-      const sum = Object.values(model.weights).reduce((a, b) => a + b, 0);
-      return { model, share: sum === 0 ? 0 : (model.weights[signalId] ?? 0) / sum };
-    })
+    agents: MODELS.map((model) => ({ model, share: weightShare(model, signalId) }))
       .filter((a) => a.share > 0)
       .sort((a, b) => b.share - a.share),
   };

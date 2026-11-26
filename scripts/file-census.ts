@@ -143,6 +143,17 @@ const collapse = (s: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
+// Closing `#`s are stripped by hand: `(.*?)\s*#*\s*$`, the obvious pattern,
+// backtracks quadratically on a hostile line. Null where that pattern's `.`
+// would have hit a line terminator.
+function headingText(raw: string): string | null {
+  const t = raw.trimEnd();
+  let i = t.length;
+  while (i > 0 && t[i - 1] === "#") i--;
+  const text = t.slice(0, i).trimEnd();
+  return /[\r\u2028\u2029]/.test(text) ? null : text;
+}
+
 type Section = { heading: string | null; level: number; start: number; ownEnd: number; end: number };
 
 function sections(lines: string[]): Section[] {
@@ -156,8 +167,9 @@ function sections(lines: string[]): Section[] {
       return;
     }
     if (fence) return;
-    const h = line.match(/^\s{0,3}(#{1,6})\s+(.*?)\s*#*\s*$/);
-    if (h) heads.push({ heading: h[2], level: h[1].length, line: i });
+    const h = line.match(/^\s{0,3}(#{1,6})\s+([\s\S]*)$/);
+    const heading = h && headingText(h[2]);
+    if (h && heading != null) heads.push({ heading, level: h[1].length, line: i });
   });
   return heads.map((h, k) => {
     const next = heads[k + 1];

@@ -34,13 +34,6 @@ const META_TIMEOUT_MS = 15_000;
 
 const repoSegment = (p: ParsedRepo) => `${encodeURIComponent(p.owner)}/${encodeURIComponent(p.name)}`;
 
-// Metadata only: a private repo reads as unknown. To refuse private repos, use
-// fetchRepoMetaOrPrivate.
-export async function fetchRepoMeta(parsed: ParsedRepo): Promise<RepoMeta | null> {
-  const meta = await fetchRepoMetaOrPrivate(parsed);
-  return meta === "private" ? null : meta;
-}
-
 // "private" is distinct from null (unknown) so the live path can refuse to
 // score without mistaking a failed metadata call for a missing repo.
 export async function fetchRepoMetaOrPrivate(parsed: ParsedRepo): Promise<RepoMeta | "private" | null> {

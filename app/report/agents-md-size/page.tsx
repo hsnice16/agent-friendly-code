@@ -6,6 +6,7 @@ import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { ReportStat } from "@/components/ReportStat";
 import { SizeBuckets, SizeQuantiles } from "@/components/SizeDistribution";
 import { SizeGroupTable } from "@/components/SizeGroupTable";
@@ -30,7 +31,6 @@ import { pageTitle } from "@/lib/utils/page-title";
 import { REPORT_PATH, REPORT_TITLE, SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const NUMBER = new Intl.NumberFormat("en-US");
 const chars = (n: number | null) => (n == null ? "—" : NUMBER.format(n));
 const score = (n: number | null) => (n == null ? "—" : String(Math.round(n)));

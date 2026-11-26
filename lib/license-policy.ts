@@ -1,5 +1,6 @@
-import { AI_POLICY, type AiPolicyData, repoKey } from "./ai-policy";
+import { AI_POLICY, type AiPolicyData } from "./ai-policy";
 import { listLeaderboardOverall, listSignalPasses } from "./db";
+import { repoKey } from "./utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
 
 /**

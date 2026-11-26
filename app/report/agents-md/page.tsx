@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { ReportBar, ReportStat } from "@/components/ReportStat";
 import { SERIES_LABEL } from "@/lib/agents-md-adoption";
 import { ADOPTION, adoptionDatasetJsonLd } from "@/lib/agents-md-report";
@@ -31,7 +32,6 @@ import { REPO_URL } from "@/lib/version";
 
 export const metadata: Metadata = staticPageMetadata(REPORT_PATH, ogImage(REPORT_PATH, REPORT_TITLE));
 
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const NUMBER = new Intl.NumberFormat("en-US");
 
 // Points are the difference of the rounded shares shown beside them, so the three always add up.

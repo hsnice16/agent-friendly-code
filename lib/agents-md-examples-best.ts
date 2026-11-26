@@ -3,6 +3,7 @@ import type { CensusRepo } from "./file-census-summary";
 import { median } from "./utils/median";
 import { repoOwnership } from "./utils/own-repo";
 import { repoRawFileUrl } from "./utils/repo-file-url";
+import { repoKey } from "./utils/repo-path";
 
 // Devin includes only the first 16 KiB, so a longer file is not one to copy whole.
 const DEVIN_LIMIT = 16 * 1024;
@@ -19,9 +20,8 @@ export type BestExample = {
 type CensusLookup = (row: Pick<ExampleRow, "host" | "owner" | "name">) => CensusRepo | undefined;
 
 export function censusLookup(repos: CensusRepo[]): CensusLookup {
-  const key = (r: { host: string; owner: string; name: string }) => `${r.host}/${r.owner}/${r.name}`.toLowerCase();
-  const byKey = new Map(repos.filter((r) => !r.error).map((r) => [key(r), r]));
-  return (row) => byKey.get(key(row));
+  const byKey = new Map(repos.filter((r) => !r.error).map((r) => [repoKey(r), r]));
+  return (row) => byKey.get(repoKey(row));
 }
 
 const copyable = (r: ExampleRow) =>

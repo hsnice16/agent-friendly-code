@@ -5,6 +5,7 @@ import { csvField } from "./utils/csv";
 import { median } from "./utils/median";
 import { fitDescription } from "./utils/page-title";
 import { repoFileUrl } from "./utils/repo-file-url";
+import { repoKey } from "./utils/repo-path";
 
 export type SkillRepo = {
   host: string;
@@ -38,7 +39,6 @@ export type AgentSkillsReport = {
 };
 
 const TREND_POINTS = 6;
-const key = (r: { host: string; owner: string; name: string }) => `${r.host}/${r.owner}/${r.name}`.toLowerCase();
 const total = (r: Pick<SkillRepo, "agents" | "claude">) => r.agents + r.claude;
 
 export function buildAgentSkillsReport(
@@ -47,12 +47,12 @@ export function buildAgentSkillsReport(
   skillFiles: SignalFile[],
   points: AdoptionPoint[],
 ): AgentSkillsReport {
-  const onBoard = new Map(board.map((r) => [key(r), r]));
+  const onBoard = new Map(board.map((r) => [repoKey(r), r]));
   const rootDir = new Set(skillFiles.filter((f) => f.pass >= 1).map((f) => f.repoId));
   const read = census.repos.filter((r) => !r.error);
 
   const all: SkillRepo[] = read.map((c) => {
-    const b = onBoard.get(key(c)) ?? null;
+    const b = onBoard.get(repoKey(c)) ?? null;
     return {
       host: c.host,
       owner: c.owner,
@@ -64,7 +64,7 @@ export function buildAgentSkillsReport(
     };
   });
   const byCount = (a: SkillRepo, b: SkillRepo) =>
-    total(b) - total(a) || b.other - a.other || (b.stars ?? 0) - (a.stars ?? 0) || key(a).localeCompare(key(b));
+    total(b) - total(a) || b.other - a.other || (b.stars ?? 0) - (a.stars ?? 0) || repoKey(a).localeCompare(repoKey(b));
   const rows = all.filter((r) => total(r) > 0).sort(byCount);
 
   // Evenly spaced from the first point the series measured skills in, ending on the latest.
@@ -85,7 +85,7 @@ export function buildAgentSkillsReport(
     medianSkills: median(rows.map(total)),
     elsewhereOnly: all
       .filter((r) => total(r) === 0 && r.other > 0)
-      .sort((a, b) => b.other - a.other || key(a).localeCompare(key(b))),
+      .sort((a, b) => b.other - a.other || repoKey(a).localeCompare(repoKey(b))),
     trend,
   };
 }

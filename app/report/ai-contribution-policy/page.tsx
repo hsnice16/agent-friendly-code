@@ -6,6 +6,7 @@ import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { ReportBar, ReportStat } from "@/components/ReportStat";
 import {
   AI_POLICY,
@@ -30,8 +31,6 @@ import { pageTitle } from "@/lib/utils/page-title";
 import { repoPath } from "@/lib/utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "@/lib/utils/report-path";
 import { OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export function generateMetadata(): Metadata {
   const title = aiPolicyTitle();

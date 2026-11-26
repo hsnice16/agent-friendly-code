@@ -2,6 +2,11 @@ import { isHost } from "@/lib/constants/hosts";
 
 export type RepoIdentity = { host: string; owner: string; name: string };
 
+/** Hosts match names case-insensitively, so one repo has one key however it is spelled. */
+export function repoKey(r: RepoIdentity): string {
+  return `${r.host}/${r.owner}/${r.name}`.toLowerCase();
+}
+
 // Host leads the path because `owner/name` is only unique within a host — the
 // board carries GitHub, GitLab and Bitbucket repos side by side.
 export function repoPath({ host, owner, name }: RepoIdentity): string {

@@ -7,6 +7,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LiveScoreForm } from "@/components/LiveScoreForm";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { starterIfMissing } from "@/lib/starter-agents-md";
@@ -18,7 +19,6 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { APP_URL } from "@/lib/version";
 
 const PATH = GENERATOR_PATH;
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export const metadata: Metadata = staticPageMetadata(PATH);
 

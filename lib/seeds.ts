@@ -1,6 +1,7 @@
 import { type ParsedRepo, parseRepoUrl } from "./clients/github";
 import type { RepoName, ScoreTime, SeedTarget } from "./types/db";
 import { obj, str } from "./utils/json";
+import { repoKey } from "./utils/repo-path";
 
 export const FINDING_KINDS = [
   "unparseable",
@@ -43,8 +44,6 @@ export const PRIVATE_EXIT_CODE = 3;
 
 export const STALE_AFTER_SECONDS = 7 * 24 * 60 * 60;
 
-const key = (p: RepoName): string => `${p.host}/${p.owner}/${p.name}`.toLowerCase();
-
 /**
  * Throws rather than skipping a bad entry: the result decides which rows the
  * seed run deletes, and a seed that silently drops out is a deleted repo.
@@ -80,20 +79,20 @@ export function localFindings(seeds: Seed[]): Finding[] {
     if (s.url.endsWith("/") || s.url.endsWith(".git")) out.push({ url: s.url, kind: "non-canonical-url" });
     if (!s.note?.trim()) out.push({ url: s.url, kind: "missing-note" });
 
-    const first = seen.get(key(p));
+    const first = seen.get(repoKey(p));
     if (first) out.push({ url: s.url, kind: "duplicate", detail: `same repo as ${first}` });
-    else seen.set(key(p), s.url);
+    else seen.set(repoKey(p), s.url);
   }
 
   // A former name that is also a current seed would redirect one live repo to another.
   for (const s of seeds) {
     for (const w of s.was ?? []) {
       const p = parseRepoUrl(w);
-      const owner = p && seen.get(key(p));
+      const owner = p && seen.get(repoKey(p));
 
       if (!p) out.push({ url: s.url, kind: "bad-was", detail: `unparseable former URL ${w}` });
       else if (owner) out.push({ url: s.url, kind: "bad-was", detail: `former URL ${w} is the seed ${owner}` });
-      else seen.set(key(p), s.url);
+      else seen.set(repoKey(p), s.url);
     }
   }
 
@@ -163,7 +162,7 @@ export function freshnessFindings(seeds: Seed[], rows: ScoreTime[], now: number)
   const scored = new Map<string, number | null>();
   for (const r of rows) {
     const p = parseRepoUrl(r.url);
-    if (p) scored.set(key(p), r.lastScoredAt);
+    if (p) scored.set(repoKey(p), r.lastScoredAt);
   }
 
   const newest = Math.max(0, ...rows.map((r) => r.lastScoredAt ?? 0));
@@ -176,14 +175,14 @@ export function freshnessFindings(seeds: Seed[], rows: ScoreTime[], now: number)
 
   for (const s of seeds) {
     const names = [s.url, ...(s.was ?? [])].map(parseRepoUrl).filter((p): p is ParsedRepo => p !== null);
-    const hit = names.find((p) => scored.has(key(p)));
+    const hit = names.find((p) => scored.has(repoKey(p)));
 
     if (!hit) {
       out.push({ url: s.url, kind: "unscored", detail: "no row in data/rank.db" });
       continue;
     }
 
-    const at = scored.get(key(hit)) ?? 0;
+    const at = scored.get(repoKey(hit)) ?? 0;
     if (newest - at > STALE_AFTER_SECONDS) {
       out.push({
         url: s.url,

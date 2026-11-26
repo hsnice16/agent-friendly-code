@@ -61,8 +61,9 @@ export function MobileNav({ links }: { links: NavLink[] }) {
 
       {/* Always mounted so closing can fade too; `invisible` takes it out of the tab order.
           Visibility flips at once on open, or the first link is still hidden when it's focused. */}
-      <div
+      <nav
         id="mobile-nav-menu"
+        aria-label="Primary"
         className={`absolute right-0 top-full z-30 mt-2 min-w-[180px] origin-top-right overflow-hidden rounded-lg border border-line bg-surface shadow-lg duration-150 ease-out motion-reduce:transition-none ${
           open
             ? "visible scale-100 opacity-100 transition-[opacity,scale]"
@@ -86,7 +87,7 @@ export function MobileNav({ links }: { links: NavLink[] }) {
           <span>Build</span>
           <VersionPill />
         </div>
-      </div>
+      </nav>
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
 import { CodeText } from "@/components/CodeText";
+import { CompareGrid, type CompareGridRow } from "@/components/CompareGrid";
 import { CopySnippet } from "@/components/CopySnippet";
 import { ExternalLink } from "@/components/ExternalLink";
 import { IntentLink } from "@/components/IntentLink";
@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { agentsReading, agentsUsingAgentsMd } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
@@ -27,11 +28,6 @@ import { pageTitle } from "@/lib/utils/page-title";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ slug: string }>;
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
-const COLS = "sm:grid-cols-[minmax(7rem,0.8fr)_1fr_1fr] sm:gap-x-4";
-// Each cell's column name: shown when the row stacks, kept for screen readers once the header row shows.
-const CELL_LABEL = "font-medium text-muted sm:sr-only";
 
 // The census records root symlinks and GEMINI.md paths, but no Cursor rule paths.
 function rootLinksToAgentsMd(file: string): { count: number; of: number; date: string } | null {
@@ -81,17 +77,17 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
   const files = getInstructionFileCounts();
   const agentsMdRepos = files.files.find((f) => f.file === "AGENTS.md")?.count ?? 0;
   const readers = agentsReading(c.file);
-  const rows: { aspect: string; theirs: ReactNode; agentsMd: ReactNode }[] = [
-    ...c.rows.map((r) => ({ ...r, theirs: <CodeText text={r.theirs} />, agentsMd: <CodeText text={r.agentsMd} /> })),
+  const rows: CompareGridRow[] = [
+    ...c.rows.map((r) => ({ aspect: r.aspect, a: <CodeText text={r.theirs} />, b: <CodeText text={r.agentsMd} /> })),
     {
       aspect: "Repos with one",
-      theirs: `${stats.present} of ${stats.total} (${percent(stats.present, stats.total)})`,
-      agentsMd: `${agentsMdRepos} of ${files.total} (${percent(agentsMdRepos, files.total)})`,
+      a: `${stats.present} of ${stats.total} (${percent(stats.present, stats.total)})`,
+      b: `${agentsMdRepos} of ${files.total} (${percent(agentsMdRepos, files.total)})`,
     },
     {
       aspect: "Agents that read it",
-      theirs: `${readers.length} of ${MODELS.length}: ${agentList(readers)}`,
-      agentsMd: (
+      a: `${readers.length} of ${MODELS.length}: ${agentList(readers)}`,
+      b: (
         <>
           {agentsUsingAgentsMd("always").length} of {MODELS.length};{" "}
           <IntentLink href="/agents" className="prose-link">
@@ -131,27 +127,7 @@ export default async function VsAgentsMdPage({ params }: { params: Params }) {
 
       <Panel>
         <PanelHeading>How do they differ?</PanelHeading>
-        {/* A <dl>, not a table: below sm each row stacks, labelling its own cells, so no column clips on a phone. */}
-        <div aria-hidden="true" className={`hidden border-b border-line py-2 text-[12.5px] text-muted sm:grid ${COLS}`}>
-          <span />
-          <span className="font-medium">{c.name}</span>
-          <span className="font-medium">AGENTS.md</span>
-        </div>
-        <dl className="m-0 text-[14px]">
-          {rows.map((r) => (
-            <div key={r.aspect} className={`grid gap-1 border-b border-line py-2.5 last:border-b-0 sm:gap-y-0 ${COLS}`}>
-              <dt className="font-medium text-ink">{r.aspect}</dt>
-              <dd className="m-0 text-ink-dim">
-                <span className={CELL_LABEL}>{c.name}: </span>
-                {r.theirs}
-              </dd>
-              <dd className="m-0 text-ink-dim">
-                <span className={CELL_LABEL}>AGENTS.md: </span>
-                {r.agentsMd}
-              </dd>
-            </div>
-          ))}
-        </dl>
+        <CompareGrid heads={[c.name, "AGENTS.md"]} rows={rows} />
         <p className={`${PROSE} mt-3 text-[13px]`}>
           {both} of the {stats.present} repos with {c.name} also have an AGENTS.md or CLAUDE.md. Empty files don&apos;t
           count.

@@ -13,6 +13,7 @@ import { LinkedText } from "@/components/LinkedText";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { SkillsCensusPanel } from "@/components/SkillsCensusPanel";
 import { getAgentSkillsReport } from "@/lib/agent-skills-data";
 import { frameworkExampleLinks, languageExampleLinks } from "@/lib/agents-md-example-links";
@@ -41,7 +42,6 @@ import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 type Params = { slug: string };
 
 const SKILLS_SHOWN = 10;
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export const dynamicParams = false;
 

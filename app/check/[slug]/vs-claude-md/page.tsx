@@ -9,6 +9,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { type ReadsRow, ReadsTableView, type SetupCard, SetupsView } from "@/components/VsClaudeMdViews";
 import { AGENT_READS, type AgentsMdUse, OTHER_TOOLS } from "@/lib/agent-reads";
 import { AUTHOR_JSON_LD } from "@/lib/author";
@@ -35,8 +36,6 @@ const PATH = checkSubPath(SIGNAL_ID, "vs-claude-md");
 const EXAMPLES_PER_SETUP = 3;
 
 const { title: TITLE, description: DESCRIPTION } = AGENTS_VS_CLAUDE_MD;
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 const AGENTS_MD_CELL: Record<AgentsMdUse, string> = {
   always: "Yes",

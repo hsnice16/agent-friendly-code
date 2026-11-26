@@ -1,4 +1,6 @@
-export type RepoHost = "github" | "gitlab" | "bitbucket" | "unknown";
+import type { Host } from "./constants/hosts";
+
+export type RepoHost = Host;
 
 export type ParsedRepo = {
   name: string;

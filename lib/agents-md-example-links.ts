@@ -3,19 +3,18 @@ import { examplesByFramework } from "./agents-md-frameworks";
 import type { FrameworkGuide } from "./framework-guides/types";
 import { frameworkExamplesPath, languageExamplesPath } from "./utils/check-path";
 import { languageSlug } from "./utils/language";
+import { repoKey } from "./utils/repo-path";
 
 export type ExampleLink = { href: string; label: string };
 
 type Examples = Pick<AgentsMdExamples, "rows" | "languages">;
-type RepoKey = { host: string; owner: string; name: string; language: string | null };
-
-const keyOf = (r: Omit<RepoKey, "language">) => `${r.host}/${r.owner}/${r.name}`.toLowerCase();
+type ExampleRepo = { host: string; owner: string; name: string; language: string | null };
 
 /** Only pages that are built: a language or framework under its minimum has no page. */
-export function exampleLinksForRepo(ex: Examples, repo: RepoKey): ExampleLink[] {
+export function exampleLinksForRepo(ex: Examples, repo: ExampleRepo): ExampleLink[] {
   const slug = repo.language ? languageSlug(repo.language) : null;
   const lang = slug ? examplesByLanguage(ex).find((l) => l.slug === slug) : undefined;
-  const key = keyOf(repo);
+  const key = repoKey(repo);
   const framework = examplesByFramework(ex).find(
     (f) => f.guide.frameworkRepo.toLowerCase() === key || f.guide.repos.some((k) => k.toLowerCase() === key),
   );

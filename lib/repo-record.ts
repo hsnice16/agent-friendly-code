@@ -1,13 +1,14 @@
 import rawHistory from "@/data/agent-file-history.json";
 
 import { type FileHistory, type HistoryKey, parseFileHistory } from "./agent-file-history";
-import { AI_POLICY, type AiPolicyData, repoKey, STANCE_LABEL, type Stance, stanceAnchor } from "./ai-policy";
+import { AI_POLICY, type AiPolicyData, STANCE_LABEL, type Stance, stanceAnchor } from "./ai-policy";
 import { CENSUS, type CensusRepo } from "./file-census";
 import { type FileReaders, fileReaders, type RootFiles } from "./repo-readers";
 import type { SignalResult } from "./scoring/signals";
 import { hasAgentFile, OTHER_FILES } from "./utils/agent-instructions";
 import { formatDay } from "./utils/format";
 import { repoFileUrl } from "./utils/repo-file-url";
+import { repoKey } from "./utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
 
 const HISTORY = parseFileHistory(rawHistory);

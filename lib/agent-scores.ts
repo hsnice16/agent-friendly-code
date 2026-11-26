@@ -7,6 +7,7 @@ import type { LeaderboardRow } from "./types/db";
 import { OTHER_FILES } from "./utils/agent-instructions";
 import { groupByLanguage, type LanguageGroup } from "./utils/language";
 import { median } from "./utils/median";
+import { weightShare } from "./utils/readers";
 
 export type ScoredRepo = LeaderboardRow & { scores: Partial<Record<ModelId, number>> };
 
@@ -112,16 +113,9 @@ export function agentStandings(rows: ScoredRepo[]): AgentStanding[] {
 
 export type WeightGap = { id: string; label: string; shareA: number; shareB: number };
 
-// Share of the agent's total weight, as check-stats uses: the profiles do not
-// sum to the same number, so raw weights would overstate the heavier profile.
-function share(model: ModelProfile, id: string): number {
-  const sum = Object.values(model.weights).reduce((s, w) => s + w, 0);
-  return sum === 0 ? 0 : (model.weights[id] ?? 0) / sum;
-}
-
 /** The checks the two agents weigh most differently, widest first; a tie keeps SIGNALS order. */
 export function weightGaps(a: ModelProfile, b: ModelProfile, limit = WEIGHT_GAP_LIMIT): WeightGap[] {
-  return SIGNALS.map((s) => ({ id: s.id, label: s.label, shareA: share(a, s.id), shareB: share(b, s.id) }))
+  return SIGNALS.map((s) => ({ id: s.id, label: s.label, shareA: weightShare(a, s.id), shareB: weightShare(b, s.id) }))
     .filter((g) => Math.abs(g.shareA - g.shareB) > 1e-9)
     .sort((x, y) => Math.abs(y.shareA - y.shareB) - Math.abs(x.shareA - x.shareB))
     .slice(0, limit);

@@ -5,6 +5,7 @@ import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { AI_POLICY } from "@/lib/ai-policy";
 import { CONTRIBUTE_LANGUAGE_TOP, LANGUAGE_AGENTS_MIN_REPOS } from "@/lib/constants/scoring";
 import { CONTRIBUTE_TITLE, type ContributeList, contributeDescription } from "@/lib/contribute";
@@ -20,7 +21,6 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_URL, DEFAULT_OG_IMAGE, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const CHIP = "chip tap-target border-line bg-surface-2 text-muted hover:border-line-strong hover:text-ink";
 
 export function generateMetadata(): Metadata {

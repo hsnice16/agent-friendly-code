@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PAGE_LEAD, PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { ScoreGapList } from "@/components/ScoreGapList";
 import { AGENT_READS } from "@/lib/agent-reads";
 import { comparePair, ownFile, weightGaps } from "@/lib/agent-scores";
@@ -34,8 +35,6 @@ import { pageTitle } from "@/lib/utils/page-title";
 import { APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
 type Params = Promise<{ pair: string }>;
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 export const dynamicParams = false;
 

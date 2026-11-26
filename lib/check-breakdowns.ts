@@ -1,5 +1,6 @@
 import { CENSUS, type CensusRepo } from "./file-census";
 import type { LeaderboardRow, SignalFile } from "./types/db";
+import { repoKey } from "./utils/repo-path";
 
 // Keyed on the file the pre_commit signal matched, so a new candidate there lands in "other" until named here.
 function hookFramework(path: string): string {
@@ -26,8 +27,6 @@ export function hookFrameworkCounts(files: SignalFile[]): { framework: string; c
 
 type Starred = Pick<LeaderboardRow, "host" | "owner" | "name" | "stars">;
 
-const key = (r: { host: string; owner: string; name: string }) => `${r.host}/${r.owner}/${r.name}`.toLowerCase();
-
 const isRoot = (paths: string[], base: string) => paths.some((p) => p.toLowerCase() === base);
 
 /** How a repo with both root files relates them, matching summarizeCensus's rootBoth split. */
@@ -39,11 +38,11 @@ function setupOf(r: CensusRepo): "import" | "symlink" | "separate" | null {
 
 /** The most-starred census repos using each setup; only repos still on the board, since each links to its page. */
 export function setupExamples(board: Starred[], limit: number): Record<"import" | "symlink" | "separate", string[]> {
-  const stars = new Map(board.map((b) => [key(b), b.stars ?? 0]));
-  const starsOf = (r: CensusRepo) => stars.get(key(r)) ?? 0;
+  const stars = new Map(board.map((b) => [repoKey(b), b.stars ?? 0]));
+  const starsOf = (r: CensusRepo) => stars.get(repoKey(r)) ?? 0;
   const out = { import: [] as CensusRepo[], symlink: [] as CensusRepo[], separate: [] as CensusRepo[] };
   for (const r of CENSUS.repos) {
-    const s = r.error || !stars.has(key(r)) ? null : setupOf(r);
+    const s = r.error || !stars.has(repoKey(r)) ? null : setupOf(r);
     if (s) out[s].push(r);
   }
   const top = (rs: CensusRepo[]) =>

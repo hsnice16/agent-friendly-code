@@ -8,6 +8,7 @@ import { LINK } from "@/components/link-class";
 import { OtherToolsTable } from "@/components/OtherToolsTable";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { SupportMatrixView } from "@/components/SupportMatrixView";
 import { AGENT_READS, agentsUsingAgentsMd, OTHER_TOOLS } from "@/lib/agent-reads";
 import { MATRIX_COLUMNS, supportMatrix } from "@/lib/agent-support-matrix";
@@ -30,7 +31,6 @@ import { APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
 export const metadata: Metadata = staticPageMetadata("/agents");
 
 const PATH = "/agents";
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const CODE = "font-mono text-[13px] text-ink";
 
 export default function AgentsPage() {

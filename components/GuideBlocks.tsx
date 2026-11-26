@@ -9,8 +9,7 @@ import { CodeText } from "./CodeText";
 import { CopySnippet } from "./CopySnippet";
 import { IntentLink } from "./IntentLink";
 import { LinkedText } from "./LinkedText";
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
+import { PROSE } from "./prose-class";
 
 type Props = {
   blocks: GuideBlock[];

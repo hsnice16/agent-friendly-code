@@ -2,6 +2,7 @@ import type { AgentsMdExamples, ExampleRow } from "./agents-md-examples";
 import { FRAMEWORKS } from "./framework-guides";
 import type { FrameworkGuide } from "./framework-guides/types";
 import { fitDescription } from "./utils/page-title";
+import { repoKey } from "./utils/repo-path";
 
 /** Below this, the examples table is too thin to be worth a page. */
 export const FRAMEWORK_EXAMPLES_MIN = 3;
@@ -14,14 +15,12 @@ export type FrameworkExamples = {
   own: ExampleRow | null;
 };
 
-const key = (r: Pick<ExampleRow, "host" | "owner" | "name">) => `${r.host}/${r.owner}/${r.name}`.toLowerCase();
-
 /** Frameworks with enough repos on the board whose file has content, most files first. Rows in the framework's language lead. */
 export function examplesByFramework(
   ex: Pick<AgentsMdExamples, "rows">,
   frameworks: FrameworkGuide[] = FRAMEWORKS,
 ): FrameworkExamples[] {
-  const byKey = new Map(ex.rows.map((r) => [key(r), r]));
+  const byKey = new Map(ex.rows.map((r) => [repoKey(r), r]));
   return frameworks
     .map((guide) => {
       const rows = guide.repos.flatMap((k) => byKey.get(k.toLowerCase()) ?? []);

@@ -3,7 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { afterEach, describe, test } from "node:test";
 
-import { fetchRepoMeta, parseRepoUrl } from "../lib/clients/github";
+import { fetchRepoMetaOrPrivate, parseRepoUrl } from "../lib/clients/github";
 
 // Trimmed recorded responses (axios/axios, inkscape/inkscape, snakeyaml/snakeyaml).
 const fixture = (host: string) =>
@@ -19,9 +19,12 @@ function serve(routes: Record<string, unknown>): void {
   }) as typeof fetch;
 }
 
-const meta = (url: string) => fetchRepoMeta(parseRepoUrl(url)!);
+const meta = async (url: string) => {
+  const m = await fetchRepoMetaOrPrivate(parseRepoUrl(url)!);
+  return m === "private" ? null : m;
+};
 
-describe("fetchRepoMeta description and topics", () => {
+describe("fetchRepoMetaOrPrivate description and topics", () => {
   afterEach(() => {
     globalThis.fetch = realFetch;
   });

@@ -8,6 +8,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import { ReportStat } from "@/components/ReportStat";
 import { agentsReading } from "@/lib/agent-reads";
 import { getAgentSkillsReport } from "@/lib/agent-skills-data";
@@ -29,7 +30,6 @@ import { repoPath } from "@/lib/utils/repo-path";
 import { SKILLS_REPORT_CSV_PATH, SKILLS_REPORT_PATH } from "@/lib/utils/report-path";
 import { APP_NAME, APP_URL, OG_DEFAULTS, TWITTER_DEFAULTS } from "@/lib/version";
 
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 const CODE = "font-mono text-[13px] text-ink";
 const TOP = 25;
 const ELSEWHERE_NAMED = 6;

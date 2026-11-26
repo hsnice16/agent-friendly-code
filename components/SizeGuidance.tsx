@@ -3,8 +3,7 @@ import { checkPath, checkSubPath } from "@/lib/utils/check-path";
 import { ExternalLink } from "./ExternalLink";
 import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
+import { PROSE } from "./prose-class";
 
 // Official docs only: each line below restates its linked page, so check there before rewording.
 const CLAUDE_MEMORY = "https://code.claude.com/docs/en/memory";

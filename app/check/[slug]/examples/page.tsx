@@ -10,6 +10,7 @@ import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
 import { PageHeader } from "@/components/PageHeader";
 import { Panel, PanelHeading } from "@/components/Panel";
+import { PROSE } from "@/components/prose-class";
 import {
   type AgentsMdExamples,
   examplesDescription,
@@ -45,8 +46,6 @@ const SIGNAL_ID = "agents_md";
 const PATH = checkSubPath(SIGNAL_ID, "examples");
 const CSV_PATH = `${PATH}.csv`;
 const TOP_STARRED = 20;
-
-const PROSE = "m-0 max-w-[76ch] text-[14.5px] leading-relaxed text-ink-dim";
 
 // Only AGENTS.md is common enough to fill an examples page; every other slug is a 404.
 export const dynamicParams = false;

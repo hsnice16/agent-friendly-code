@@ -3,6 +3,7 @@ import raw from "@/data/ai-policy.json";
 import { AUTHOR_JSON_LD } from "./author";
 import { PUBLISHER_JSON_LD } from "./site-json-ld";
 import { ogImage } from "./utils/og-image";
+import { repoKey } from "./utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
 import { APP_NAME, APP_URL } from "./version";
 
@@ -70,8 +71,7 @@ export function parseAiPolicy(input: unknown): AiPolicyData {
 
 export const AI_POLICY = parseAiPolicy(raw);
 
-export const repoKey = (r: { host: string; owner: string; name: string }) =>
-  `${r.host}/${r.owner}/${r.name}`.toLowerCase();
+export { repoKey };
 
 export function aiPolicyByRepo(data: AiPolicyData = AI_POLICY): Map<string, { stance: Stance; url: string }> {
   return new Map(data.policies.map((p) => [repoKey(p), { stance: p.stance, url: p.url }]));
