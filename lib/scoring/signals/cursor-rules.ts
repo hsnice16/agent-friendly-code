@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { entryKind, isFileEntry, resolveRelative } from "./helpers";
+import { createResolver, entryKind, isFileEntry, isRealDir, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "Cursor rules (.cursor/rules)";
@@ -27,7 +27,7 @@ function mdcFiles(repo: string, rel: string, depth: number, out: string[]): void
     const child = `${rel}/${e}`;
     const kind = entryKind(repo, join(repo, child));
     if (kind === "dir") {
-      if (depth < SUBFOLDER_DEPTH) mdcFiles(repo, child, depth + 1, out);
+      if (depth < SUBFOLDER_DEPTH && isRealDir(join(repo, child))) mdcFiles(repo, child, depth + 1, out);
     } else if (e.toLowerCase().endsWith(".mdc") && isFileEntry(repo, join(repo, child))) {
       out.push(child);
     }
@@ -37,15 +37,18 @@ function mdcFiles(repo: string, rel: string, depth: number, out: string[]): void
 /** Every `.cursor/rules/` folder, the root one first. */
 function rulesDirs(repo: string): string[] {
   const found: string[] = [];
+  // One resolver for the whole scan: a fresh one re-lists every parent per folder,
+  // which is quadratic on a root with thousands of folders.
+  const resolve = createResolver(repo);
   const visit = (rel: string, depth: number) => {
-    const dir = resolveRelative(repo, rel ? `${rel}/.cursor/rules` : ".cursor/rules");
+    const dir = resolve(rel ? `${rel}/.cursor/rules` : ".cursor/rules");
     if (dir && entryKind(repo, join(repo, dir)) === "dir") found.push(dir);
     if (depth >= PARENT_DEPTH) return;
 
     for (const e of list(repo, rel || ".")) {
       if (SKIP.has(e) || e.toLowerCase() === ".cursor") continue;
       const child = rel ? `${rel}/${e}` : e;
-      if (entryKind(repo, join(repo, child)) === "dir") visit(child, depth + 1);
+      if (isRealDir(join(repo, child))) visit(child, depth + 1);
     }
   };
 

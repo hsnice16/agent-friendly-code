@@ -1,7 +1,7 @@
 import { readdirSync } from "node:fs";
 import { join } from "node:path";
 
-import { entryKind, isFileEntry, resolveRelative } from "./helpers";
+import { createResolver, entryKind, isFileEntry, resolveRelative } from "./helpers";
 import type { Signal } from "./types";
 
 const LABEL = "Skills (.agents/skills)";
@@ -23,8 +23,10 @@ export const agentSkills: Signal = {
         names = readdirSync(join(repo, dir)).sort();
       } catch {}
 
+      // One resolver, or each name re-lists the skills folder.
+      const resolve = createResolver(repo);
       const skills = names
-        .map((n) => resolveRelative(repo, `${dir}/${n}/SKILL.md`))
+        .map((n) => resolve(`${dir}/${n}/SKILL.md`))
         .filter((p): p is string => !!p && isFileEntry(repo, join(repo, p)));
 
       if (skills.length > 0) {

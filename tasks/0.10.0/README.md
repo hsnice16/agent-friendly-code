@@ -28,6 +28,6 @@
 - Agent boards end with a "Set up a repo for <agent>" panel: setup steps, the files it reads and how to check they loaded.
 - Language hubs with enough repos answer which agent those repos are best set up for; `/language/<x>/agents` redirects there.
 - `/about` lists the work behind the site and says how it is made, including where AI is used.
-- Scoring fixes: a hostile `.gitignore` can no longer stall Live Score, the Action or the skill; a folder named like an agent file no longer counts as one; the dev-environment check counts each tool once.
+- Scoring fixes: a hostile `.gitignore` can no longer stall Live Score, the Action or the skill; a folder named like an agent file no longer counts as one; the dev-environment check counts each tool once; a repo of folder links or thousands of folders can no longer stall Live Score, the Action or the skill.
 - A page's "Updated" date moves only when its own text or the repos it lists change, not on every rescore.
 - The pre-commit check page has copyable pre-commit, Husky and Lefthook configs and a Claude Code hook that blocks `--no-verify`.
