@@ -138,7 +138,7 @@ List it in `app/sitemap.ts` and `app/llms.txt/route.ts`. A share card of its own
 ## Security
 
 - Clones are `git clone --depth 1 --single-branch`, no submodules. Nothing from a clone is ever executed or installed.
-- Repo contents are untrusted. The scorer never follows a symlink out of the tree, reads only regular files, stops at `MAX_READ_BYTES` (1 MiB), and keeps every pattern linear on a hostile file (`gemini-md.ts` says why); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
+- Repo contents are untrusted. The scorer never follows a symlink out of the tree, never descends into a linked folder in its walks, reads only regular files, stops at `MAX_READ_BYTES` (1 MiB), and keeps every pattern linear on a hostile file (`gemini-md.ts` says why); the siblings run it on local trees. The materializer writes a placeholder for any link target outside the tree.
 - `/score/[host]/[owner]/[name]`, its OG card and the badge for a repo off the board turn visitor input into host API calls and a temp directory. `parseLiveTarget` (`lib/live-score/cached.ts`) and `safeAbsolute` (`lib/live-score/materialize.ts`) are the guards; `tests/live-*.test.ts` and `tests/symlink-containment.test.ts` cover them. Never weaken either.
 - Private repos are never scored, live or by CLI, even when the token can read them.
 - `dangerouslySetInnerHTML` appears only in `components/JsonLd.tsx` (server-built JSON-LD, `<` escaped) and `BoardPendingScript.tsx` (a constant string). Owner-written repo descriptions and topics reach JSON-LD only after `lib/utils/repo-about.ts` sanitises them, and never reach OG images.

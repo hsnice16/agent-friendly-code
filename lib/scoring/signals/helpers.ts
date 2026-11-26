@@ -56,6 +56,15 @@ export function entryKind(repo: string, abs: string): EntryKind | null {
   }
 }
 
+// Walks descend only into real folders: `l -> .` at every level multiplies a walk by its fan-out.
+export function isRealDir(abs: string): boolean {
+  try {
+    return lstatSync(abs).isDirectory();
+  } catch {
+    return false;
+  }
+}
+
 // Path lookups are case-insensitive: README / LICENSE / CONTRIBUTING casing
 // varies in the wild (`readme.md`, `Readme.md`, `README.MD`), and exact
 // matching scores those files as missing on case-sensitive filesystems.
@@ -254,7 +263,7 @@ export function walkFind(root: string, match: (rel: string) => boolean, maxDepth
       }
 
       if (kind === "dir") {
-        visit(abs, depth + 1, relNext);
+        if (isRealDir(abs)) visit(abs, depth + 1, relNext);
       } else if (match(relNext)) {
         hits.push(relNext);
 

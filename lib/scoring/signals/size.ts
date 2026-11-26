@@ -2,7 +2,7 @@ import { readdirSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 import ignore from "ignore";
-import { entryKind, readSafe } from "./helpers";
+import { entryKind, isRealDir, readSafe } from "./helpers";
 import type { Signal } from "./types";
 
 const BASELINE_IGNORE = ["node_modules", ".git", "vendor", "target", "dist", "build", ".next"];
@@ -100,14 +100,16 @@ export const size: Signal = {
           continue;
         }
 
+        // A link to a folder counts as the one file git stores.
+        const descend = kind === "dir" && isRealDir(abs);
         const rel = relative(repo, abs).split(sep).join("/");
-        const path = kind === "dir" ? `${rel}/` : rel;
+        const path = descend ? `${rel}/` : rel;
         work += matchWork(path, lines.length, quadratic);
         if ((work <= IGNORE_WORK_BUDGET ? ig : base).ignores(path)) {
           continue;
         }
 
-        if (kind === "dir") {
+        if (descend) {
           visit(abs, depth + 1);
         } else {
           count++;

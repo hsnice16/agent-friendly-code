@@ -116,3 +116,34 @@ describe("scorer never follows a link out of the repo", () => {
     assert.equal(readSafe(fifo), "");
   });
 });
+
+describe("walks stay bounded on a hostile tree", () => {
+  // Walked through, k `l -> .` links per folder cost k^depth visits: 40 took minutes.
+  it("does not walk through directory links", () => {
+    const dir = repo({ "a/x.txt": "", "a/.cursor/rules/r.mdc": "" });
+    for (let i = 0; i < 3; i++) symlinkSync(".", join(dir, "a", `l${i}`));
+    symlinkSync("a", join(dir, "b"));
+
+    const seen: string[] = [];
+    walkFind(dir, (rel) => seen.push(rel) < 0, 4, 1);
+    assert.deepEqual(seen, ["a/.cursor/rules/r.mdc", "a/x.txt"]);
+
+    assert.equal(signal(dir, "cursor_rules")?.detail, "1 .mdc file in .cursor/rules/ folders");
+    assert.equal(signal(dir, "size")?.detail, "5 files — very small");
+  });
+
+  // A fresh resolver per folder re-listed the root each time: 5,000 folders took 13 s.
+  it("scans thousands of folders for rules and skills in linear time", () => {
+    const dir = repo();
+    for (let i = 0; i < 5000; i++) {
+      mkdirSync(join(dir, `d${i}`));
+      mkdirSync(join(dir, ".agents", "skills", `s${i}`), { recursive: true });
+    }
+
+    const start = performance.now();
+    signal(dir, "cursor_rules");
+    signal(dir, "agent_skills");
+    const ms = performance.now() - start;
+    assert.ok(ms < 5000, `${ms.toFixed(0)}ms`);
+  });
+});
