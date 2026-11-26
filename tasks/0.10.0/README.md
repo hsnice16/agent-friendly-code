@@ -20,6 +20,7 @@
 - Repo pages: each summary tile opens the board page, agent board, check or language hub it describes; the AGENTS.md row says how its length compares with the rest of the board.
 - Topic pages open with the top repo and list the checks their repos most often miss.
 - Guides, check pages, comparisons and reports show who wrote them and when they last changed.
+- Guides link each claim to the agent's docs; the coding agent benchmarks guide and the license check page are rewritten from sources and board data.
 - Share images for guides, agent comparisons, reports and AGENTS.md example pages.
 - AGENTS.md vs CLAUDE.md covers the `@AGENTS.md` import and the symlink, with what popular repos do.
 - New report: what 260 real AGENTS.md and CLAUDE.md files contain, section by section (topics, test commands, links and imports, rules), with quoted examples and a CSV.
@@ -28,6 +29,7 @@
 - Agent boards end with a "Set up a repo for <agent>" panel: setup steps, the files it reads and how to check they loaded.
 - Language hubs with enough repos answer which agent those repos are best set up for; `/language/<x>/agents` redirects there.
 - `/about` lists the work behind the site and says how it is made, including where AI is used.
-- Scoring fixes: a hostile `.gitignore` can no longer stall Live Score, the Action or the skill; a folder named like an agent file no longer counts as one; the dev-environment check counts each tool once; a repo of folder links or thousands of folders can no longer stall Live Score, the Action or the skill.
+- Scoring fixes: a hostile `.gitignore` can no longer stall Live Score, the Action or the skill; a folder named like an agent file, `LICENSE` or `CONTRIBUTING.md` no longer counts as that file; the dev-environment check counts each tool once; a repo of folder links or thousands of folders can no longer stall Live Score, the Action or the skill.
 - A page's "Updated" date moves only when its own text or the repos it lists change, not on every rescore.
 - The pre-commit check page has copyable pre-commit, Husky and Lefthook configs and a Claude Code hook that blocks `--no-verify`.
+- The agent skills check page lists every SKILL.md frontmatter field from the Agent Skills spec, with an example skill.

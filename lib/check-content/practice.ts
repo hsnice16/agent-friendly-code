@@ -150,6 +150,35 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
     ],
     sources: [CLAUDE_BEST_PRACTICES, COPILOT_SETUP],
   },
+  // Searches landing here ask for the spec's frontmatter fields by name.
+  agent_skills: {
+    heading: "What goes in a SKILL.md? The format and frontmatter fields",
+    items: [
+      "A skill is a folder named after the skill, holding `SKILL.md`: YAML frontmatter, then Markdown instructions in any format. Optional `scripts/`, `references/` and `assets/` folders hold code, docs and templates it points to.",
+      "Only `name` and `description` are required. `name` must match the folder name: 1-64 lowercase letters, digits and hyphens, with no hyphen at either end or two in a row.",
+      "The description says what the skill does and when to use it, in up to 1,024 characters. Agents load every skill's name and description at startup, so its keywords decide when a skill is picked.",
+      "The body loads only once a skill is picked, and files in its folders only when needed. The spec advises keeping `SKILL.md` under 500 lines and its instructions under 5,000 tokens; move the rest into `references/`.",
+    ],
+    table: {
+      caption: "SKILL.md frontmatter fields in the Agent Skills spec",
+      rows: [
+        ["Field", "Required", "What it holds"],
+        ["`name`", "Yes", "1-64 lowercase letters, digits and hyphens; matches the folder name"],
+        ["`description`", "Yes", "1-1,024 characters: what the skill does and when to use it"],
+        ["`license`", "No", "A license name or the name of a bundled license file"],
+        ["`compatibility`", "No", "Up to 500 characters of environment needs; most skills don't need it"],
+        ["`metadata`", "No", "A map of string keys to string values, for properties the spec doesn't define"],
+        ["`allowed-tools`", "No", "Space-separated tools pre-approved to run; experimental, support varies by agent"],
+      ],
+    },
+    snippets: [
+      {
+        caption: ".agents/skills/run-one-test/SKILL.md",
+        text: "---\nname: run-one-test\ndescription: Run a single test file and report failures. Use when asked to test one file or debug a failing test.\n---\n\nRun `bun run test path/to/file.test.ts` and report the failing assertions.\n",
+      },
+    ],
+    sources: ["https://agentskills.io/specification"],
+  },
   license: {
     heading: "What does a license decide when agents copy or contribute code?",
     items: [

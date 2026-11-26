@@ -9,7 +9,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
     "Yes, AGENTS.md can be nested. How Claude Code, Codex, Cursor, Copilot, Gemini CLI and others resolve per-package files, and what goes at the root.",
   lead: "Put one AGENTS.md at the repo root for what every package shares, and one in each package for its own commands and rules. Most agents read the file nearest the code they touch, but each finds nested files differently, and a few never look below the root.",
   published: "2026-11-16",
-  updated: "2026-11-25",
+  updated: "2026-11-27",
   about: ["AGENTS.md", "CLAUDE.md", "Monorepo", "AI coding agents"],
   sections: [
     {
@@ -82,7 +82,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
             [
               "Copilot in VS Code",
               "Copilot harness: root, working directory, intermediate directories and paths to files it works with, combined. Local harness: the root file needs `chat.useAgentsMdFile` ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
-              "Local harness: only with `chat.useNestedAgentsMdFiles`, which is experimental and off by default ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
+              "Local harness: only with `chat.useNestedAgentsMdFiles` on as well, which is experimental and off by default ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
             ],
             [
               "Gemini CLI",

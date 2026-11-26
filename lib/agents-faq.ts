@@ -2,7 +2,7 @@ import { AGENT_READS, type AgentsMdUse, OTHER_TOOLS } from "./agent-reads";
 import { MODELS, type ModelId } from "./scoring/weights";
 
 /** When the answers below were last read against each agent's docs. */
-export const AGENT_DOCS_CHECKED = "2026-11-25";
+export const AGENT_DOCS_CHECKED = "2026-11-27";
 
 // The answer opens with this so it can never disagree with AGENT_READS, which the table shows.
 const LEAD: Record<AgentsMdUse, string> = {

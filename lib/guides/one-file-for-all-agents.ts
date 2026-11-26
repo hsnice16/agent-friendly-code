@@ -19,7 +19,7 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
     "Keep one AGENTS.md for Claude Code, Codex, Cursor, Copilot, Gemini CLI and Aider: symlink or @import CLAUDE.md, and the settings the rest need.",
   lead: "Write the rules once in AGENTS.md. Most agents read it as is; for Claude Code, add a CLAUDE.md that contains `@AGENTS.md` (or is a symlink to it); for Gemini CLI and Aider, name AGENTS.md in their settings. Of {{censusRepos}} popular GitHub repos, {{claudeImportsAgents}} import AGENTS.md from CLAUDE.md and {{claudeLinksToAgents}} symlink it.",
   published: "2026-11-16",
-  updated: "2026-11-16",
+  updated: "2026-11-27",
   about: ["AGENTS.md", "CLAUDE.md", "Symlink", "AI coding agents"],
   sections: [
     {
@@ -35,7 +35,7 @@ export const ONE_FILE_FOR_ALL_AGENTS: Guide = {
           caption: "What each coding agent needs to read a repo's AGENTS.md",
           head: ["Agent", "Reads AGENTS.md", "What to add"],
           rows: [
-            ["Codex, Cursor, Devin, Kimi CLI, OpenHands, Pi, OpenCode", "Always", "Nothing"],
+            ["Codex, Cursor, Devin, Kimi Code CLI, OpenHands, Pi, OpenCode", "Always", "Nothing"],
             [
               "GitHub Copilot",
               "Cloud agent, code review, CLI and VS Code ([docs](https://docs.github.com/en/copilot/reference/custom-instructions-support))",

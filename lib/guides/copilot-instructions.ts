@@ -31,7 +31,7 @@ export const COPILOT_INSTRUCTIONS: Guide = {
     "Where copilot-instructions.md goes, which Copilot features read it, applyTo path files, AGENTS.md and CLAUDE.md support, and why instructions get ignored.",
   lead: "GitHub Copilot reads repository instructions from `.github/copilot-instructions.md`. Its cloud agent, code review, CLI and VS Code also read AGENTS.md, so keep shared rules there and use copilot-instructions.md for the essentials and Copilot-only notes.",
   published: "2026-11-16",
-  updated: "2026-11-25",
+  updated: "2026-11-27",
   about: ["GitHub Copilot", "copilot-instructions.md", "AGENTS.md", "AI coding agents"],
   sections: [
     {
@@ -112,7 +112,7 @@ export const COPILOT_INSTRUCTIONS: Guide = {
           items: [
             "Copilot CLI reads instruction files at the repo root, the working directory, every directory between, and directories on the path of a file it works on; it also reads `.claude/CLAUDE.md` ([docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions#types-of-custom-instructions)). `@relative/path` references work in copilot-instructions.md, AGENTS.md and CLAUDE.md, not in GEMINI.md or `.instructions.md` files ([docs](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions#referencing-other-files)).",
             "VS Code's Copilot harness finds AGENTS.md at the repo root, the working directory, the directories between, and along the paths of files it works with, and combines them ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)).",
-            "VS Code's Local harness reads the root AGENTS.md only with `chat.useAgentsMdFile` on; nested files also need `chat.useNestedAgentsMdFiles`, experimental and off by default ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)). `chat.useClaudeMdFile` adds CLAUDE.md, `.claude/CLAUDE.md`, `~/.claude/CLAUDE.md` and CLAUDE.local.md ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_local-harness-settings)).",
+            "VS Code's Local harness reads the root AGENTS.md only with `chat.useAgentsMdFile` on; nested files also need `chat.useNestedAgentsMdFiles`, experimental and off by default ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_nested-project-instructions)). `chat.useClaudeMdFile` adds CLAUDE.md, `.claude/CLAUDE.md`, `~/.claude/CLAUDE.md` and CLAUDE.local.md ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference#_local-harness-settings)). The Local harness is deprecated and will be removed in February 2027 ([docs](https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference)).",
           ],
         },
       ],

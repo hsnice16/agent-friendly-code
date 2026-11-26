@@ -28,7 +28,7 @@ function PracticeTable({ table }: { table: NonNullable<CheckPractice["table"]> }
           {rows.map(([label, ...cells]) => (
             <tr key={label}>
               <th scope="row" className="font-medium">
-                {label}
+                <CodeText text={label} />
               </th>
               {cells.map((c, i) => (
                 <td key={head[i + 1]}>

@@ -137,7 +137,7 @@ export const OTHER_TOOLS: OtherTool[] = [
     ],
     agentsMd: "Cloud agent, code review, CLI and VS Code",
     answer:
-      "On some surfaces. Copilot cloud agent, code review and CLI read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. In VS Code, the Copilot harness combines every AGENTS.md on its path; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones with the experimental `chat.useNestedAgentsMdFiles`. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat in Visual Studio, JetBrains, Eclipse or Xcode.",
+      "On some surfaces. Copilot cloud agent, code review and CLI read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. In VS Code, the Copilot harness combines every AGENTS.md on its path; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones only with the experimental `chat.useNestedAgentsMdFiles` on as well. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat in Visual Studio, JetBrains, Eclipse or Xcode.",
     sources: [
       "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions",
       "https://docs.github.com/en/copilot/reference/custom-instructions-support",
@@ -158,7 +158,7 @@ export const OTHER_TOOLS: OtherTool[] = [
     files: ["AGENTS.md", "CLAUDE.md", "opencode.json", ".agents/skills/", ".claude/skills/"],
     agentsMd: "Yes, CLAUDE.md as fallback",
     answer:
-      "Yes. OpenCode loads every AGENTS.md from the current directory up to the project root, after the global `~/.config/opencode/AGENTS.md`, and reads CLAUDE.md in any directory without one. Reading a file below it, such as one in a monorepo package, also loads the AGENTS.md files on the way. Other instruction files go in the `instructions` list in `opencode.json`.",
+      "Yes. OpenCode loads every AGENTS.md from the current directory up to the home directory (the project root, for a project outside it), after the global `~/.config/opencode/AGENTS.md`, and reads CLAUDE.md in any directory without one. Reading a file below it, such as one in a monorepo package, also loads the AGENTS.md files on the way. Other instruction files go in the `instructions` list in `opencode.json`.",
     sources: ["https://opencode.ai/docs/rules/", "https://opencode.ai/docs/skills/"],
   },
   {
