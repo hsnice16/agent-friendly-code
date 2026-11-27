@@ -10,6 +10,28 @@ type ChangelogEntry = {
 
 export const CHANGELOG: ChangelogEntry[] = [
   {
+    label: "0.9.6",
+    date: "2026-11-27",
+    title: "What your AGENTS.md covers",
+    weightChange: "Cursor and Devin AGENTS.md and Kimi Code CLI size reweighted",
+    highlights: [
+      "Reweights after a fresh audit of each agent's docs: Cursor and Devin count AGENTS.md for more (0.8 → 1.0 and 0.6 → 0.9), and Kimi Code CLI repo size a little more (0.4 → 0.5).",
+      "The agent comparison pages are folded into `/agents` as one table of pair averages; `/compare` links redirect there.",
+      "Repo pages with an AGENTS.md or CLAUDE.md say what it covers against every file on the board: its sections and the common ones it lacks, its test command, what it links to, and its never / do not / avoid lines.",
+      'Repo pages have an "On record" section: when the board first found each agent file, agent files below the root, which agents read them, and the project\'s AI contribution policy. Each summary tile opens the page it describes.',
+      "Two new reports, each with a CSV: which popular repos ship agent skills, with a trend, and what the board's AGENTS.md and CLAUDE.md files contain, section by section.",
+      'A guide to why a coding agent ignores AGENTS.md, with each agent\'s load rules, limits and how to confirm the file loaded; agent boards end with a "Set up a repo for <agent>" panel from the same docs.',
+      "`/agents` has a matrix of which agent reads which instructions file, each cell linked to its docs, with how many repos have each file.",
+      "AGENTS.md examples lead with languages and offer every file as a CSV; each language page opens with a real file and a one-line `curl` to copy it. Language hubs with enough repos say which agent their repos suit best.",
+      "Agent boards open with the ranking after a one-line summary naming the best repo with 100+ stars; later pages hold 50 rows. Topic pages open with the top repo and the checks their repos most often miss.",
+      "The AGENTS.md generator is linked across the site, and repo pages and Live Score results without an AGENTS.md open their starter draft in place.",
+      "Check pages: copyable pre-commit, Husky and Lefthook configs with a Claude Code hook that blocks `--no-verify`; every SKILL.md frontmatter field with an example skill; and AGENTS.md vs CLAUDE.md covers the `@AGENTS.md` import and the symlink.",
+      "Guides, check pages and reports show who wrote them and when they last changed, link each claim to the agent's docs, and have share images. A page's \"Updated\" date moves only when its own text or repos change.",
+      "Scoring fixes: a hostile `.gitignore`, folder links or thousands of folders can no longer stall Live Score, the Action or the skill; a folder named like an agent file, `LICENSE` or `CONTRIBUTING.md` no longer counts as that file; the dev-environment check counts each tool once.",
+      "`/changelog.xml`, an Atom feed of releases, and `/about`, which lists the work behind the site and where AI is used.",
+    ],
+  },
+  {
     label: "0.9.5",
     date: "2026-11-20",
     title: "Every language's own files count",

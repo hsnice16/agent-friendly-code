@@ -23,6 +23,6 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: hsnice16/agent-friendly-action@b276a211cfb3f4db490ba85c638f42367bf0538f # v0.1.12
+      - uses: hsnice16/agent-friendly-action@f5f68e975192dc2006af6e3984121455d6816fd1 # v0.1.13
         with:
           agents-badge-token: ${{ secrets.AGENTS_BADGE_TOKEN }}

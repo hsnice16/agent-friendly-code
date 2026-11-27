@@ -3368,7 +3368,7 @@ exports.MODELS = [
             gemini_md: 0,
             license: 0.3,
             aider_conf: 0,
-            agents_md: 0.8,
+            agents_md: 1.0,
             agent_skills: 0.4,
             pre_commit: 0.3,
             type_config: 1.0,
@@ -3381,9 +3381,10 @@ exports.MODELS = [
     {
         id: "devin",
         label: "Devin",
-        rationale: "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs; a committed `.devin/blueprint.yaml` defines that environment. CI config files alone aren't what the docs ask for — a runnable dev environment is. Pulls Cursor rule files into its Knowledge and discovers skills in `.agents/skills/`.",
+        rationale: "Works in a Linux virtual machine booted from a snapshot that already has the repo cloned and its tools, dependencies, environment variables and secrets set up, then installs, lints, builds and tests like any developer, per Cognition's environment docs; a committed `.devin/blueprint.yaml` defines that environment. CI config files alone aren't what the docs ask for — a runnable dev environment is. Reads AGENTS.md before it starts coding, up to 16 KiB of each file automatically, per its AGENTS.md docs. Pulls Cursor rule files into its Knowledge and discovers skills in `.agents/skills/`.",
         sources: [
             "https://docs.devin.ai/onboard-devin/environment",
+            "https://docs.devin.ai/onboard-devin/agents-md",
             "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
             "https://docs.devin.ai/product-guides/skills",
         ],
@@ -3397,7 +3398,7 @@ exports.MODELS = [
             license: 0.3,
             gemini_md: 0,
             aider_conf: 0,
-            agents_md: 0.6,
+            agents_md: 0.9,
             agent_skills: 0.4,
             cursor_rules: 0.3,
             pre_commit: 0.5,
@@ -3438,7 +3439,7 @@ exports.MODELS = [
     {
         id: "kimi-cli",
         label: "Kimi Code CLI",
-        rationale: "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Skills load from `.agents/skills/`. Runs shell commands step-by-step under approval modes rather than in a sandbox VM, and dispatches `explore` sub-agents with isolated contexts to map a codebase, so a large tree costs it less than a single-context agent.",
+        rationale: "Reads AGENTS.md as its native instruction surface (root or `.kimi-code/AGENTS.md`) per Moonshot's Kimi Code docs, and `/init` generates one. Its docs name no CLAUDE.md fallback, but the check passes on CLAUDE.md too. Skills load from `.agents/skills/`. Runs shell commands step-by-step under approval modes rather than in a sandbox VM, and can dispatch `explore` sub-agents with isolated contexts, though since 2.3.2 only when asked (a prompt, AGENTS.md or a skill).",
         sources: [
             "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md",
             "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md",
@@ -3446,7 +3447,7 @@ exports.MODELS = [
         ],
         weights: {
             ci: 0.4,
-            size: 0.4,
+            size: 0.5,
             tests: 0.9,
             readme: 0.7,
             linter: 0.6,
@@ -3550,6 +3551,7 @@ exports.MODELS = [
         sources: [
             "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md",
             "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/skills.md",
+            "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/security.md",
         ],
         weights: {
             ci: 0.4,
