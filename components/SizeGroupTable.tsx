@@ -14,7 +14,8 @@ export function SizeGroupTable({
   valueHeading: string;
 }) {
   return (
-    <div className="table-wrap">
+    // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region
+    <section className="table-wrap" tabIndex={0} aria-label={caption}>
       <table className="data-table text-[14px] tabular-nums">
         <caption className="sr-only">{caption}</caption>
         <thead>
@@ -46,6 +47,6 @@ export function SizeGroupTable({
           ))}
         </tbody>
       </table>
-    </div>
+    </section>
   );
 }

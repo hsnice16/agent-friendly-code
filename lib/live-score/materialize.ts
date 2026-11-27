@@ -37,6 +37,7 @@ async function linkTargets(
   deadline?: AbortSignal,
 ): Promise<Set<string>> {
   const placeholders = new Set(symlinks.slice(MAX_LINK_LOOKUPS).map((e) => e.path));
+  const linked: string[] = [];
   let blobLookups = 0;
 
   const text = async (res: Response) => new TextDecoder().decode(await readCapped(res, MAX_LINK_TARGET_BYTES));
@@ -75,6 +76,7 @@ async function linkTargets(
     try {
       rmSync(abs, { force: true });
       symlinkSync(target, abs);
+      linked.push(entry.path);
     } catch {
       placeholders.add(entry.path);
       try {
@@ -82,6 +84,25 @@ async function linkTargets(
       } catch {}
     }
   });
+
+  // The check above reads one target as text. Links that each stay inside can
+  // chain (`x -> y/../..`, `y -> ../../r`) to a real path outside, which only
+  // exists once every link is written.
+  const root = realpathSync.native(dest);
+  for (const path of linked) {
+    const abs = join(dest, path);
+    let rel: string;
+    try {
+      rel = relative(root, realpathSync.native(abs));
+    } catch {
+      continue; // Dangling, as a clone has it.
+    }
+    if (rel === ".." || rel.startsWith(`..${sep}`) || isAbsolute(rel)) {
+      placeholders.add(path);
+      rmSync(abs, { force: true });
+      writeFileSync(abs, "");
+    }
+  }
 
   return placeholders;
 }

@@ -18,7 +18,6 @@ import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH } from "@/lib/topics";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
-import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { formatDay } from "@/lib/utils/format";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
@@ -113,12 +112,11 @@ ${SIGNALS.map((s) => `- [${s.label}](${APP_URL}${checkPath(s.id)}): ${CHECK_CONT
 - [Guide: make a repo ready for AI coding agents](${APP_URL}/guide): The checks grouped into what to do, with pass rates and links to every check, agent file and tool
 - [${REPORT_TITLE}](${APP_URL}${REPORT_PATH}): Share of leaderboard repos with AGENTS.md or CLAUDE.md, from snapshots on most days since ${formatDay(ADOPTION.points[0].date)}; today's split by language and other agent files; CSV (${APP_URL}${REPORT_CSV_PATH})
 - [Checks](${APP_URL}/check): Agent-ready codebase checklist — every check: what it looks for, how to pass it, how many leaderboard repos do
-- [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent from its docs, with how many leaderboard repos have each file
+- [Which files each agent reads](${APP_URL}/agents): AGENTS.md, CLAUDE.md, GEMINI.md, .cursor/rules and the rest, per agent from its docs, with how many leaderboard repos have each file and how repos score for each pair of agents (setup, not code quality)
 - [AGENTS.md vs CLAUDE.md](${APP_URL}${checkSubPath("agents_md", "vs-claude-md")}): Which one to use, which agents read each, and what Claude Code does when a repo has both
 ${vsLines}
 - [AGENTS.md examples](${APP_URL}${checkSubPath("agents_md", "examples")}): Every AGENTS.md and CLAUDE.md on the leaderboard, linked to the file, with length, stars and score${languageLinks ? `; by language: ${languageLinks}` : ""}${frameworkLinks ? `; by framework, with what to put in the file: ${frameworkLinks}` : ""}
 ${GUIDES.map((g) => `- [${g.name}](${APP_URL}${guidePath(g.slug)}): ${fillStats(g.description, guideStats)}`).join("\n")}
-- [Compare agents](${APP_URL}${COMPARE_PATH}): Claude Code vs Cursor, Codex vs Gemini CLI and more: how well leaderboard repos are set up for each, pair by pair (setup, not code quality)
 - [AGENTS.md sizes](${APP_URL}${SIZE_REPORT_PATH}): How long real AGENTS.md and CLAUDE.md files are, and how many pass Devin's 16 KiB and Codex's 32 KiB limits
 - [What's in an AGENTS.md](${APP_URL}${CONTENTS_REPORT_PATH}): Which sections ${CONTENTS_REPORT.files} real AGENTS.md and CLAUDE.md files have, how many give a test command, and how they point to other files; CSV (${APP_URL}${CONTENTS_REPORT_CSV_PATH})
 - [AI contribution policies](${APP_URL}${AI_POLICY_REPORT_PATH}): What ${AI_POLICY.policies.length} open source projects' own policies say about AI-assisted contributions, each classified on its own

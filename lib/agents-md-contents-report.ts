@@ -39,7 +39,7 @@ export type QuoteCandidate = ContentsQuote & { stars: number | null };
 
 export type ContentsData = { generatedAt: string; quotes: ContentsQuote[]; repos: ContentsRepo[] };
 
-type Read = ContentsRepo & Omit<FileAnatomy, "quotes">;
+export type ContentsRead = ContentsRepo & Omit<FileAnatomy, "quotes">;
 
 export type TopicRow = { id: TopicId; label: string; files: number; medianChars: number | null };
 
@@ -78,10 +78,10 @@ export type ContentsReport = {
   quotes: ContentsQuote[];
 };
 
-const isRead = (r: ContentsRepo): r is Read => !r.error && r.chars != null;
-const count = (rows: Read[], f: (r: Read) => boolean) => rows.filter(f).length;
+export const isRead = (r: ContentsRepo): r is ContentsRead => !r.error && r.chars != null;
+const count = (rows: ContentsRead[], f: (r: ContentsRead) => boolean) => rows.filter(f).length;
 const isAgentsMd = (r: Pick<ContentsRepo, "path">) => r.path.toLowerCase() === "agents.md";
-const bodyHeadings = (r: Read) => r.headings - (r.titled ? 1 : 0);
+const bodyHeadings = (r: ContentsRead) => r.headings - (r.titled ? 1 : 0);
 
 export function buildContentsReport(data: ContentsData): ContentsReport {
   const rows = data.repos.filter(isRead);

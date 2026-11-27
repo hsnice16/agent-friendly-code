@@ -35,7 +35,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   ci: {
     published: "2026-10-12",
-    updated: "2026-11-20",
+    updated: "2026-11-27",
     title: "CI configuration: what AI coding agents learn from your pipeline",
     metaTitle: "CI config: what AI coding agents learn from your pipeline",
     description:
@@ -51,13 +51,13 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   linter: {
     published: "2026-10-12",
-    updated: "2026-11-22",
+    updated: "2026-11-27",
     title: "Linter and formatter config: instant feedback for AI coding agents",
     metaTitle: "Linters and formatters: instant feedback for AI agents",
     description:
       "Why a committed linter or formatter config helps AI coding agents, which tools we detect, and how many popular open source repos have one.",
     what: "This check looks for a committed linter or formatter config: ESLint, Prettier, Biome, Ruff, rustfmt, Clippy, golangci-lint, RuboCop, clang-format, Checkstyle and dozens of others across languages.",
-    why: "A linter makes style checkable: the agent runs it and fixes the errors instead of copying the nearest file. Aider lints after every edit by default; without a config it has nothing to lint against.",
+    why: "A linter makes style checkable: the agent runs it and fixes the errors instead of copying the nearest file. Aider lints every file it edits by default, but with its built-in linters unless `lint-cmd` runs yours.",
     scoring: [
       "Full pass: a config file for a supported tool, at the repo root or in a top-level folder such as `src/`.",
       "Also a full pass: linter settings inside a shared file, such as a `[tool.ruff]`, `[tool.black]`, `[tool.flake8]`, `[tool.pylint]`, `[tool.isort]` or `[tool.mypy]` section in `pyproject.toml`, a `[flake8]` section in `tox.ini` or `setup.cfg`, `eslintConfig` or `prettier` in `package.json`, `[lints]` in `Cargo.toml`, an `addFmt` step in `build.zig`, or Spotless, Checkstyle, PMD, Error Prone, detekt or ktlint in a Gradle or Maven build file. A Checkstyle XML two folders down also counts.",
@@ -83,7 +83,7 @@ export const REPO_BASIC_CHECKS: Record<string, CheckContent> = {
   },
   dev_env: {
     published: "2026-10-12",
-    updated: "2026-11-22",
+    updated: "2026-11-27",
     title: "Reproducible dev environments: one-command setup for AI coding agents",
     metaTitle: "Reproducible dev environments: one-command agent setup",
     description:

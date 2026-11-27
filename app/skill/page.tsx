@@ -101,7 +101,8 @@ export default function SkillPage() {
             <code className="text-ink-dim">/model</code> (or your agent&apos;s equivalent).
           </p>
 
-          <div className="table-wrap">
+          {/* biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region */}
+          <section className="table-wrap" tabIndex={0} aria-label="Suggested model class for each score band">
             <table className="data-table text-[13.5px]">
               <caption className="sr-only">Suggested model class for each score band</caption>
               <thead>
@@ -122,7 +123,7 @@ export default function SkillPage() {
                 ))}
               </tbody>
             </table>
-          </div>
+          </section>
         </Panel>
       </div>
 

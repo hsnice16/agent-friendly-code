@@ -7,7 +7,6 @@ import { ADOPTION } from "@/lib/agents-md-report";
 import { AI_POLICY } from "@/lib/ai-policy";
 import { LATEST_RELEASE_DATE } from "@/lib/changelog";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
-import { COMPARE_PAIRS } from "@/lib/compare-pairs";
 import { PRIVACY_UPDATED, TERMS_UPDATED } from "@/lib/constants/legal";
 import { getLeaderboardStats, listLeaderboardOverall } from "@/lib/db";
 import { GUIDES } from "@/lib/guides";
@@ -17,8 +16,6 @@ import { getAgentsMdExamples } from "@/lib/leaderboard-files";
 import {
   agentsModified,
   checkModified,
-  compareHubModified,
-  compareModified,
   contributeModified,
   examplesModified,
   frameworkModified,
@@ -36,7 +33,6 @@ import { MODELS } from "@/lib/scoring/weights";
 import { getTopicGroups } from "@/lib/topic-pages";
 import { TOPICS_PATH, topicPath } from "@/lib/topics";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
-import { COMPARE_PATH, comparePath } from "@/lib/utils/compare-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { guidePath } from "@/lib/utils/guide-path";
@@ -146,8 +142,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     entry(AI_POLICY_REPORT_PATH, 0.7, "monthly", AI_POLICY.checked),
     entry(CONTENTS_REPORT_PATH, 0.7, "monthly", CONTENTS_REPORT.date),
     entry(CONTRIBUTE_PATH, 0.7, "weekly", contributeModified()),
-    entry(COMPARE_PATH, 0.6, "weekly", compareHubModified()),
-    ...COMPARE_PAIRS.map((p) => entry(comparePath(p.slug), 0.6, "weekly", compareModified(p))),
     entry(GENERATOR_PATH, 0.6, "weekly", GENERATOR_UPDATED),
   ];
 

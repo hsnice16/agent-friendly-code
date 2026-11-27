@@ -17,7 +17,7 @@ export const AGENTS_MD_IGNORED: Guide = {
     "Which files Claude Code, Codex, Cursor, Gemini CLI, Aider and others read, what outranks AGENTS.md, size caps, and how to check what each agent loaded.",
   lead: "Usually one of four things: the agent doesn't read AGENTS.md without a setting (Gemini CLI, Aider); another file outranks it (a CLAUDE.md in Claude Code, an AGENTS.override.md in Codex or Pi); it sits outside the directories the agent searches; or it's past the agent's size cap (Codex 32 KiB combined, Devin 16 KiB per file). Ask the agent what it loaded before you rewrite the file.",
   published: "2026-11-25",
-  updated: "2026-11-25",
+  updated: "2026-11-27",
   about: ["AGENTS.md", "CLAUDE.md", "AI coding agents", "Troubleshooting"],
   sections: [
     {
@@ -142,7 +142,7 @@ export const AGENTS_MD_IGNORED: Guide = {
       blocks: [
         {
           kind: "p",
-          text: `Agents find nested files differently: Codex and Pi read only the directories on the path to where you started, Claude Code loads a subdirectory's file once it reads a file there, Cursor combines them all, Devin CLI loads one once it reaches that directory, and Kimi Code and OpenHands don't document it. The [monorepo guide](${guidePath("agents-md-monorepo")}) covers each agent and what to put at the root.`,
+          text: `Agents find nested files differently: Codex and Pi read only the directories on the path to where you started, Claude Code loads a subdirectory's file once it reads a file there, Cursor combines them all, Devin CLI loads one once it reaches that directory, and Kimi Code CLI and OpenHands don't document it. The [monorepo guide](${guidePath("agents-md-monorepo")}) covers each agent and what to put at the root.`,
         },
       ],
     },
@@ -177,7 +177,7 @@ export const AGENTS_MD_IGNORED: Guide = {
     },
     {
       q: "Do I need to restart the agent after editing AGENTS.md?",
-      a: "For Codex, yes: it builds its instructions once per run. Gemini CLI has `/memory reload`, Kimi Code CLI and Pi have `/reload`. The other agents' docs don't say, so start a new session to be sure.",
+      a: "For Codex, yes: it builds its instructions once per run. Gemini CLI has `/memory reload`, Pi has `/reload`, and Kimi Code CLI reloads AGENTS.md on its own. The other agents' docs don't say, so start a new session to be sure.",
     },
     {
       q: "Is AGENTS.md case-sensitive?",

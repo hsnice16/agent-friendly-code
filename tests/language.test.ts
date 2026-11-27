@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import { describe, it } from "node:test";
 
 import { LANGUAGE_HUB_MIN_REPOS } from "../lib/constants/scoring";
-import { averageScore, groupByLanguage, isHub, languageRedirect, languageSlug } from "../lib/utils/language";
+import {
+  averageScore,
+  groupByLanguage,
+  hubAgentsPath,
+  isHub,
+  languageRedirect,
+  languageSlug,
+} from "../lib/utils/language";
 
 describe("languageSlug", () => {
   it("spells out languages whose names are only punctuation apart", () => {
@@ -67,6 +74,7 @@ describe("languageRedirect", () => {
     const agents = { pathname: "/language/kotlin", hash: "agents" };
     assert.deepEqual(languageRedirect("/language/kotlin/agents"), agents);
     assert.deepEqual(languageRedirect("/language/Kotlin/agents"), agents);
+    assert.equal(hubAgentsPath("kotlin"), `${agents.pathname}#${agents.hash}`);
   });
 
   it("serves a path it cannot decode or slug as is", () => {

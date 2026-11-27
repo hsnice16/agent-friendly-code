@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 
 import { BOARD_REDIRECTS } from "./lib/board-redirects";
+import { COMPARE_ANCHOR } from "./lib/compare-pairs";
 import { APP_HOST, APP_URL } from "./lib/version";
 
 // `noindex` keeps the production alias out of search, but each visit still renders a
@@ -85,6 +86,8 @@ const config: NextConfig = {
       { source: "/favicon.ico", destination: "/icon.svg", permanent: true },
       ...ALIAS_REDIRECT,
       ...BOARD_REDIRECTS,
+      // The per-pair pages were mostly template; their averages now sit on /agents.
+      { source: "/compare/:pair*", destination: COMPARE_ANCHOR, permanent: true },
     ];
   },
 

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AgentReadsView } from "@/components/AgentReadsView";
 import { AgentsMdFaq } from "@/components/AgentsMdFaq";
+import { ComparePairsView } from "@/components/ComparePairsView";
 import { IntentLink } from "@/components/IntentLink";
 import { JsonLd } from "@/components/JsonLd";
 import { LINK } from "@/components/link-class";
@@ -11,9 +12,12 @@ import { Panel, PanelHeading } from "@/components/Panel";
 import { PROSE } from "@/components/prose-class";
 import { SupportMatrixView } from "@/components/SupportMatrixView";
 import { AGENT_READS, agentsUsingAgentsMd, OTHER_TOOLS } from "@/lib/agent-reads";
+import { pairSplit } from "@/lib/agent-scores";
+import { getScoredRepos } from "@/lib/agent-scores-data";
 import { MATRIX_COLUMNS, supportMatrix } from "@/lib/agent-support-matrix";
 import { AGENT_DOCS_CHECKED, agentsMdFaq } from "@/lib/agents-faq";
 import { AUTHOR_JSON_LD } from "@/lib/author";
+import { COMPARE_PAIRS } from "@/lib/compare-pairs";
 import { CENSUS_SUMMARY } from "@/lib/file-census";
 import { getInstructionFileCounts } from "@/lib/leaderboard-files";
 import { sourceLabel } from "@/lib/leaderboard-model-panel";
@@ -23,7 +27,6 @@ import { MODELS } from "@/lib/scoring/weights";
 import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { agentList } from "@/lib/utils/agent-list";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
-import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { formatDay, percent } from "@/lib/utils/format";
 import { modelPath } from "@/lib/utils/leaderboard-href";
 import { APP_URL, DEFAULT_OG_IMAGE } from "@/lib/version";
@@ -65,7 +68,7 @@ export default function AgentsPage() {
             Most agents read AGENTS.md: {agentList(always)}. Claude Code reads CLAUDE.md and falls back to AGENTS.md.{" "}
             {agentList(viaSetting)} read their own files, and AGENTS.md only when configured to. Checked against each
             agent&apos;s docs on {formatDay(AGENT_DOCS_CHECKED)}. How repos are set up for each, side by side:{" "}
-            <Link href={COMPARE_PATH} className="prose-link">
+            <Link href="#compare" className="prose-link">
               compare agents
             </Link>
             .
@@ -101,6 +104,10 @@ export default function AgentsPage() {
             })}
           />
         </Panel>
+      </div>
+
+      <div id="compare" className="mt-3.5 scroll-mt-20">
+        <ComparePairs />
       </div>
 
       <div className="mt-3.5">
@@ -209,4 +216,32 @@ function SupportMatrix() {
     share: percent(c.repos(CENSUS_SUMMARY), CENSUS_SUMMARY.repos),
   }));
   return <SupportMatrixView columns={columns} docs={docs} rows={rows} reposLabel="Repos with it" />;
+}
+
+function ComparePairs() {
+  const rows = getScoredRepos();
+  return (
+    <Panel>
+      <PanelHeading>How do repos score for each pair of agents?</PanelHeading>
+      <ComparePairsView
+        pairs={COMPARE_PAIRS.map(({ a, b }) => {
+          const s = pairSplit(rows, a, b);
+          // Rounded as shown, so the payload carries no float tail.
+          return {
+            a,
+            b,
+            avgA: Number(s.avgA.toFixed(1)),
+            avgB: Number(s.avgB.toFixed(1)),
+            aHigher: s.aHigher,
+            bHigher: s.bHigher,
+          };
+        })}
+      />
+      <p className={`${PROSE} mt-3 text-[13px]`}>
+        Averages over the board&apos;s repos scored for both agents. &ldquo;Higher for each&rdquo; counts the repos that
+        score higher for the first agent, then the second; the rest tie. Scores measure how well a repo is set up for an
+        agent, not which agent writes better code.
+      </p>
+    </Panel>
+  );
 }

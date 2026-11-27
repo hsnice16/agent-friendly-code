@@ -111,7 +111,7 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
     sources: [
       "https://git-scm.com/docs/githooks",
       "https://code.claude.com/docs/en/hooks",
-      "https://cursor.com/docs/agent/hooks",
+      "https://cursor.com/docs/hooks",
       "https://pre-commit.com/",
       "https://typicode.github.io/husky/get-started.html",
       "https://github.com/lint-staged/lint-staged",
@@ -125,7 +125,7 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
       "A dev container defines one isolated environment everyone runs. With Claude Code installed in it, Claude's commands execute in the container, not on your machine, while its edits appear in your local repo.",
       "Claude Code installs through its Dev Container Feature in `.devcontainer/devcontainer.json`, below. Anthropic's reference container adds `init-firewall.sh` to limit outbound traffic.",
       "Inside the container, as a non-root user, you can run `--dangerously-skip-permissions`. The docs warn this doesn't stop a malicious project taking anything the container can reach, so use it only with trusted repos.",
-      "Cloud agents read their own setup file: Copilot's cloud agent runs `.github/workflows/copilot-setup-steps.yml` (the job must be named `copilot-setup-steps`), and Devin reads `.devin/blueprint.yaml`.",
+      "Cloud agents read their own setup file: Copilot's cloud agent, on GitHub Actions, runs `.github/workflows/copilot-setup-steps.yml` (the job must be named `copilot-setup-steps`), and Devin reads `.devin/blueprint.yaml`.",
     ],
     snippets: [
       {
@@ -145,7 +145,7 @@ export const CHECK_PRACTICE: Record<string, CheckPractice> = {
     items: [
       "CI records what a change must pass. Claude Code's docs list tests, the typecheck and CI as how you know work is done.",
       "Copy CI's exact install, lint and test commands into AGENTS.md, so the agent runs them before pushing instead of learning from a red build.",
-      "Copilot's cloud agent can build the project and run its tests and linters in its own environment; `copilot-setup-steps.yml` installs what they need first.",
+      "Copilot's cloud agent can build the project and run its tests and linters in its own environment; on GitHub Actions, `copilot-setup-steps.yml` installs what they need first.",
       "An agent can also watch CI. Claude Code's docs show `/loop 15m check CI on this branch, and if it's red pull the failing job's log, fix it and push`.",
     ],
     sources: [CLAUDE_BEST_PRACTICES, COPILOT_SETUP],

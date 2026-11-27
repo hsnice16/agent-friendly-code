@@ -3,7 +3,6 @@ import { SIGNALS } from "@/lib/scoring/signals";
 import { MODELS } from "@/lib/scoring/weights";
 import { TOPICS_PATH } from "@/lib/topics";
 import { checkPath, checkSubPath } from "@/lib/utils/check-path";
-import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
 import { GUIDE_PATH, guidePath } from "@/lib/utils/guide-path";
@@ -53,7 +52,6 @@ export function footerDirectoryRows(): DirectoryRow[] {
           return g ? [{ label: g.name, href: guidePath(slug) }] : [];
         }),
         { label: "AGENTS.md generator", href: GENERATOR_PATH },
-        { label: "Compare agents", href: COMPARE_PATH },
         { label: "Projects to contribute to", href: CONTRIBUTE_PATH },
         { label: REPORT_TITLE, href: REPORT_PATH },
         { label: "AGENTS.md sizes", href: SIZE_REPORT_PATH },

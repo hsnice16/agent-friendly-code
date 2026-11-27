@@ -73,6 +73,14 @@ describe("materialize keeps links inside the tree", () => {
     assert.equal(readFileSync(victim, "utf8"), "original");
   });
 
+  it("leaves a placeholder for a chain of links that resolves outside", async () => {
+    serve([link("p/q/x"), link("p/q/y"), file("r/f")], { "p/q/x": "y/../..", "p/q/y": "../../r" });
+    const dir = dest();
+    await materialize("github", "o", "n", "abc", dir);
+    assert.ok(lstatSync(join(dir, "p/q/x")).isFile(), "the escaping link becomes a placeholder");
+    assert.equal(readlinkSync(join(dir, "p/q/y")), "../../r");
+  });
+
   it("caps blob lookups for dangling links", async () => {
     const calls: string[] = [];
     const tree = Array.from({ length: 300 }, (_, i) => link(`l${i}`));

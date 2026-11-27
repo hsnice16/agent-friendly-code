@@ -12,6 +12,7 @@ import { examplesByFramework } from "@/lib/agents-md-frameworks";
 import { AUTHOR_JSON_LD } from "@/lib/author";
 import { VS_AGENTS_MD } from "@/lib/check-content/vs-agents-md";
 import { getCheckStats } from "@/lib/check-stats";
+import { COMPARE_ANCHOR } from "@/lib/compare-pairs";
 import { START_WITH_CHECKS as START_WITH } from "@/lib/constants/scoring";
 import { FILE_CHECKS, GUIDE_THEMES } from "@/lib/guide-content";
 import { guideExplainers } from "@/lib/guide-explainers";
@@ -23,7 +24,6 @@ import { PAGE_COPY, staticPageMetadata } from "@/lib/page-meta";
 import { SIGNAL_BY_ID, SIGNALS } from "@/lib/scoring/signals";
 import { PUBLISHER_JSON_LD } from "@/lib/site-json-ld";
 import { checkPath, checkSubPath, frameworkExamplesPath, languageExamplesPath } from "@/lib/utils/check-path";
-import { COMPARE_PATH } from "@/lib/utils/compare-path";
 import { CONTRIBUTE_PATH } from "@/lib/utils/contribute-path";
 import { percent } from "@/lib/utils/format";
 import { GENERATOR_PATH } from "@/lib/utils/generator-path";
@@ -54,7 +54,7 @@ const AGENT_FILES = [
 ];
 
 const DATA_PAGES = [
-  { href: COMPARE_PATH, label: "Compare agents", note: "how repos are set up for each, pair by pair" },
+  { href: COMPARE_ANCHOR, label: "Compare agents", note: "how repos are set up for each, pair by pair" },
   { href: REPORT_PATH, label: REPORT_TITLE, note: "how adoption has grown" },
   { href: SIZE_REPORT_PATH, label: "How long AGENTS.md files are", note: "sizes of real files" },
   { href: CONTENTS_REPORT_PATH, label: "What's in an AGENTS.md", note: "sections and test commands in real files" },

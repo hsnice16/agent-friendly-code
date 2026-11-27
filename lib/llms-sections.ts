@@ -1,13 +1,12 @@
 import { agentStandings, pairSplit } from "./agent-scores";
 import { getAgentLanguages, getScoredRepos } from "./agent-scores-data";
-import { pairLabels } from "./compare-copy";
-import { COMPARE_PAIRS } from "./compare-pairs";
+import { COMPARE_ANCHOR, COMPARE_PAIRS } from "./compare-pairs";
 import { getLeaderboardStats, listLeaderboardOverall } from "./db";
 import { commonGaps, getLanguageGroups } from "./language-hubs";
 import { getAgentsMdExamples } from "./leaderboard-files";
 import { boardLeader, LEADER_QUALIFIER } from "./leaderboard-meta";
+import { MODEL_BY_ID } from "./scoring/weights";
 import { checkPath } from "./utils/check-path";
-import { comparePath } from "./utils/compare-path";
 import { percent } from "./utils/format";
 import { averageScore, hubAgentsPath, hubPath, isHub } from "./utils/language";
 import { modelPath } from "./utils/leaderboard-href";
@@ -52,8 +51,8 @@ export function compareLines(): string {
   const rows = getScoredRepos();
   return COMPARE_PAIRS.map((p) => {
     const s = pairSplit(rows, p.a, p.b);
-    const { a, b } = pairLabels(p);
-    return `- [${a} vs ${b}](${APP_URL}${comparePath(p.slug)}): ${a} ${s.avgA.toFixed(1)} vs ${b} ${s.avgB.toFixed(1)} across ${s.n} repos`;
+    const [a, b] = [MODEL_BY_ID[p.a].label, MODEL_BY_ID[p.b].label];
+    return `- [${a} vs ${b}](${APP_URL}${COMPARE_ANCHOR}): ${a} ${s.avgA.toFixed(1)} vs ${b} ${s.avgB.toFixed(1)} across ${s.n} repos`;
   }).join("\n");
 }
 

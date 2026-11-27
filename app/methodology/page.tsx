@@ -54,11 +54,18 @@ export default function MethodologyPage() {
       <div className="mt-3.5">
         <Panel>
           <PanelHeading>Score formula</PanelHeading>
-          <pre className="m-0 overflow-x-auto rounded-lg border border-line bg-surface-2 px-4 py-3.5 font-mono text-[13px] leading-relaxed text-ink-dim">
-            {`per-agent score = Σ(check.pass × agent.weight[check]) / Σ(agent.weight) × 100
+          <section
+            // biome-ignore lint/a11y/noNoninteractiveTabindex: keyboard users can only scroll a focusable region
+            tabIndex={0}
+            aria-label="Score formula"
+            className="overflow-x-auto rounded-lg border border-line bg-surface-2"
+          >
+            <pre className="m-0 px-4 py-3.5 font-mono text-[13px] leading-relaxed text-ink-dim">
+              {`per-agent score = Σ(check.pass × agent.weight[check]) / Σ(agent.weight) × 100
 overall         = mean(per-agent scores)
 improvement     = closing a gap unlocks  (1 - pass) × weight / Σweight × 100  points`}
-          </pre>
+            </pre>
+          </section>
 
           <p className="mt-3 text-[13.5px] leading-relaxed text-ink-dim">
             <code className="font-mono text-[12.5px] text-ink">check.pass</code> is a number from{" "}

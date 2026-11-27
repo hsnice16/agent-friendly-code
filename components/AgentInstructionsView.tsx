@@ -7,6 +7,7 @@ import { GENERATOR_PATH, STARTER_ID } from "@/lib/utils/generator-path";
 import { SIZE_REPORT_PATH } from "@/lib/utils/report-path";
 
 import { CopySnippet } from "./CopySnippet";
+import { InfoRow } from "./InfoRow";
 import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
 
@@ -49,15 +50,6 @@ function Mark({ ok }: { ok: boolean }) {
     <span aria-hidden="true" className={`mr-1.5 font-semibold ${ok ? "text-ok" : "text-bad"}`}>
       {ok ? "✓" : "✗"}
     </span>
-  );
-}
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="info-row">
-      <dt className="text-[13px] font-medium text-muted">{label}</dt>
-      <dd className="m-0 break-words text-[14.5px] text-ink-dim">{children}</dd>
-    </div>
   );
 }
 
@@ -164,17 +156,17 @@ export function AgentInstructionsView({
         agents also read a file of their own.
       </p>
       <dl className="m-0">
-        <Row label="AGENTS.md / CLAUDE.md">
+        <InfoRow label="AGENTS.md / CLAUDE.md">
           <MainFile main={main} absentMain={absentMain} />
-        </Row>
-        <Row label="Agent-specific files">
+        </InfoRow>
+        <InfoRow label="Agent-specific files">
           <OtherFiles others={others} absentOthers={absentOthers} />
-        </Row>
-        <Row label="Repos that have one">
+        </InfoRow>
+        <InfoRow label="Repos that have one">
           <HowCommon share={share} examplesHref={examplesHref} />
-        </Row>
+        </InfoRow>
         {examples.length > 0 && (
-          <Row label="Examples to copy">
+          <InfoRow label="Examples to copy">
             {examples.map((e, i) => (
               <Fragment key={e.href}>
                 {i > 0 && <span className="text-muted"> · </span>}
@@ -183,7 +175,7 @@ export function AgentInstructionsView({
                 </IntentLink>
               </Fragment>
             ))}
-          </Row>
+          </InfoRow>
         )}
       </dl>
       {starter && (

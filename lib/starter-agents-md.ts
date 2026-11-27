@@ -140,7 +140,7 @@ export const COMPANION_FILES: CompanionFile[] = [
   {
     agent: "Cursor",
     note: "Reads AGENTS.md at the root and in subdirectories. Add `.cursor/rules/*.mdc` only for rules scoped to some files.",
-    source: "https://cursor.com/docs/context/rules",
+    source: "https://cursor.com/docs/rules",
   },
   {
     agent: "Codex",

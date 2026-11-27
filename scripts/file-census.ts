@@ -137,11 +137,21 @@ const USAGE_CUE =
   /generat|assist|written|writ(e|ing) (code|it)|author|produc|\btools?\b|disclos|polic|use of|\busing\b|\busage\b|slop|hallucinat/i;
 
 const mentionsAi = (s: string) => AI_TERM_STRICT.test(s) || AI_TERM_LOOSE.test(s);
-const collapse = (s: string) =>
-  s
-    .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
+// Comments are cut by hand: `<!--[\s\S]*?-->` rescans to the end for every
+// unclosed `<!--`, quadratic on a hostile file.
+function stripComments(s: string): string {
+  let out = "";
+  let at = 0;
+  for (let open = s.indexOf("<!--"); open >= 0; open = s.indexOf("<!--", at)) {
+    const close = s.indexOf("-->", open + 4);
+    if (close < 0) break;
+    out += `${s.slice(at, open)} `;
+    at = close + 3;
+  }
+  return out + s.slice(at);
+}
+
+const collapse = (s: string) => stripComments(s).replace(/\s+/g, " ").trim();
 
 // Closing `#`s are stripped by hand: `(.*?)\s*#*\s*$`, the obvious pattern,
 // backtracks quadratically on a hostile line. Null where that pattern's `.`
@@ -173,7 +183,9 @@ function sections(lines: string[]): Section[] {
   });
   return heads.map((h, k) => {
     const next = heads[k + 1];
-    const closer = heads.slice(k + 1).find((o) => o.level <= h.level);
+    let c = k + 1;
+    while (c < heads.length && heads[c].level > h.level) c++;
+    const closer = heads[c];
     return {
       heading: h.heading,
       level: h.level,
@@ -199,7 +211,8 @@ function aiSection(text: string): { heading: string | null } | null {
     const own = paragraphs(lines.slice(s.start, s.ownEnd));
     const hit = own.some((para) => {
       // A table of contents links to the AI section without being it.
-      const p = para.replace(/\[[^\]]*\]\(#[^)]*\)/g, "");
+      // Each class stops at the next opener, so a run of `[` can't backtrack quadratically.
+      const p = para.replace(/\[[^[\]\n]*\]\(#[^()\n]*\)/g, "");
       return (mentionsAi(p) || headingAi) && CONTRIBUTION_TERM.test(p) && (USAGE_CUE.test(p) || headingAi);
     });
     if (hit) return { heading };

@@ -14,6 +14,7 @@ import {
   type QuoteCandidate,
 } from "../lib/agents-md-contents-report";
 import { type InstructionFileRow, readInstructionFiles } from "../lib/db-snapshot";
+import { MAX_READ_BYTES } from "../lib/scoring/signals/helpers";
 import { fileLength, hasAgentFile } from "../lib/utils/agent-instructions";
 
 try {
@@ -41,8 +42,6 @@ if (!(LIMIT > 0)) {
 // Sequential with a pause: a by-hand run has no deadline, and GitHub's secondary limits punish bursts.
 const DELAY_MS = 250;
 const MAX_ATTEMPTS = 5;
-// The scorer reads at most 1 MiB of a file.
-const MAX_BYTES = 1024 * 1024;
 
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -100,7 +99,7 @@ async function text(url: string, cacheKey: string): Promise<string | null> {
   const res = await get(url);
   if (!res) return null;
   const body = Buffer.from(await res.arrayBuffer())
-    .subarray(0, MAX_BYTES)
+    .subarray(0, MAX_READ_BYTES)
     .toString("utf8");
   if (file) writeFileSync(file, body);
   return body;

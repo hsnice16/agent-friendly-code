@@ -126,6 +126,15 @@ jobs:
           name: rescore
           path: /tmp/rescore
 
+      # The rescore job's check shared a job with dependency code; this one runs
+      # none. Mirrors lib/db-leaks.ts; -q keeps a match out of the public log.
+      - name: Re-check the artifact for leaks
+        run: |
+          if LC_ALL=C grep -aqE '/Users/|/home/|/var/folders/|/private/var/|/tmp/afc-|[A-Za-z]:[\\/]Users[\\/]|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|glpat-[A-Za-z0-9_-]{20}|AKIA[0-9A-Z]{16}|AIza[0-9A-Za-z_-]{35}|npm_[A-Za-z0-9]{36}|[rs]k_live_[A-Za-z0-9]{24,}|sk-(ant|proj)-[A-Za-z0-9_-]{20,}|xox[abprs]-[A-Za-z0-9-]{10,}|-----BEGIN [A-Z ]*PRIVATE KEY-----' /tmp/rescore/rank.db /tmp/rescore/agents-md-adoption.json /tmp/rescore/agent-file-history.json; then
+            echo "::error::A leak pattern is in the rescore artifact; run bun run check-db-leaks on it."
+            exit 1
+          fi
+
       - name: Commit if the repo set, a score, badge adoption or repo metadata changed
         id: commit
         run: |

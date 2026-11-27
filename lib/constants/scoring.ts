@@ -36,7 +36,7 @@ export const CHECK_MISSING_LIMIT = 8;
 export const START_WITH_CHECKS = 3;
 
 // A language's agent ranking averages its repos; below this many repos one repo's
-// setup moves the ranking, so it would rank noise. /contribute and /compare use
+// setup moves the ranking, so it would rank noise. /contribute uses
 // it too: below it a language's top picks are most of its repos.
 export const LANGUAGE_AGENTS_MIN_REPOS = 15;
 
@@ -47,5 +47,7 @@ export const CONTRIBUTE_LANGUAGE_TOP = 8;
 export const SIZE_GROUP_MIN = 8;
 export const SIZE_LANGUAGE_LIMIT = 6;
 
-export const GAP_LIST_LIMIT = 5;
-export const WEIGHT_GAP_LIMIT = 6;
+// A repo page names a missing AGENTS.md section only when at least this share of
+// board files has one; rarer sections aren't a gap.
+export const CONTENTS_COMMON_SHARE = 0.4;
+export const CONTENTS_MISSING_SHOWN = 3;

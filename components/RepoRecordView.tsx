@@ -1,23 +1,15 @@
 "use client";
 
-import { Fragment, type ReactNode } from "react";
+import { Fragment } from "react";
 
 import type { CensusFacts, FirstSeenFact, PolicyFact, RepoRecord } from "@/lib/repo-record";
 
+import { InfoRow } from "./InfoRow";
 import { IntentLink } from "./IntentLink";
 import { Panel, PanelHeading } from "./Panel";
 import { STANCE_CHIP } from "./stance-chip";
 
 const CODE = "font-mono text-[13px] text-ink";
-
-function Row({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div className="info-row">
-      <dt className="text-[13px] font-medium text-muted">{label}</dt>
-      <dd className="m-0 break-words text-[14.5px] text-ink-dim">{children}</dd>
-    </div>
-  );
-}
 
 function When({ day }: { day: { iso: string; text: string } }) {
   return <time dateTime={day.iso}>{day.text}</time>;
@@ -128,17 +120,17 @@ export function RepoRecordView({ slug, record }: { slug: string; record: RepoRec
       </PanelHeading>
       <dl className="m-0">
         {record.firstSeen.length > 0 && (
-          <Row label="On this board">
+          <InfoRow label="On this board">
             <FirstSeen facts={record.firstSeen} />
-          </Row>
+          </InfoRow>
         )}
         {record.census && (
-          <Row label="More agent files">
+          <InfoRow label="More agent files">
             <Census census={record.census} />
-          </Row>
+          </InfoRow>
         )}
         {record.readers.length > 0 && (
-          <Row label="Which agents read them">
+          <InfoRow label="Which agents read them">
             <ul className="m-0 list-none p-0">
               {record.readers.map((r) => (
                 <li key={r.file}>
@@ -149,12 +141,12 @@ export function RepoRecordView({ slug, record }: { slug: string; record: RepoRec
             <IntentLink href="/agents" className="dim-link text-[13px]">
               From each agent's docs
             </IntentLink>
-          </Row>
+          </InfoRow>
         )}
         {record.policy && (
-          <Row label="AI contribution policy">
+          <InfoRow label="AI contribution policy">
             <Policy policy={record.policy} />
-          </Row>
+          </InfoRow>
         )}
       </dl>
     </Panel>

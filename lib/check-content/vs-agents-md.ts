@@ -67,7 +67,7 @@ export const VS_AGENTS_MD: Record<string, VsAgentsMd> = {
       text: "---\ndescription: Conventions for API route handlers\nglobs: app/api/**/*.ts\nalwaysApply: false\n---\n\n- Return errors as JSON with a status code; never throw to the framework.\n",
     },
     sources: [
-      "https://cursor.com/docs/context/rules",
+      "https://cursor.com/docs/rules",
       "https://cursor.com/help/customization/rules",
       "https://cursor.com/docs/cli/using",
       "https://agents.md/",

@@ -1,9 +1,7 @@
 import type { ExampleLink } from "@/lib/agents-md-example-links";
-import { pairLabels } from "@/lib/compare-copy";
-import { pairsWith } from "@/lib/compare-pairs";
+import { COMPARE_ANCHOR, COMPARE_PAIRS } from "@/lib/compare-pairs";
 import { type ModelPanel, sourceLabel } from "@/lib/leaderboard-model-panel";
 import type { ModelProfile } from "@/lib/scoring/weights";
-import { comparePath } from "@/lib/utils/compare-path";
 import { percent } from "@/lib/utils/format";
 
 import { ModelReadsPanelView } from "./ModelReadsPanelView";
@@ -29,10 +27,7 @@ export function ModelReadsPanel({
         pass: percent(c.counts.full, c.counts.total),
       }))}
       file={file && { id: file.id, present: file.present, total: file.total }}
-      pairs={pairsWith(model.id).map((p) => {
-        const { a, b } = pairLabels(p);
-        return { href: comparePath(p.slug), label: `${a} vs ${b}` };
-      })}
+      compareHref={COMPARE_PAIRS.some((p) => p.a === model.id || p.b === model.id) ? COMPARE_ANCHOR : null}
       sources={sources.map((url) => ({ href: url, label: sourceLabel(url) }))}
       examples={examples}
     />

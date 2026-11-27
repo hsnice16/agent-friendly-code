@@ -3,6 +3,9 @@ node_modules/
 data/*.db-journal
 data/*.db-wal
 data/*.db-shm
+# A RANK_DB_PATH copy would publish whatever it holds; CI's leak scan reads only data/rank.db.
+*.db
+!data/rank.db
 .env*
 !.env.example
 .vercel/

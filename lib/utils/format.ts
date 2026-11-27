@@ -34,6 +34,8 @@ export function relativeTime(epochSec: number): string {
   return `${Math.floor(diff / 86400)}d ago`;
 }
 
+export const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
+
 export function hostLabel(host: string): string {
   return HOST_LABELS[host] ?? host;
 }

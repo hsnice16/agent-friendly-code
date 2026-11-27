@@ -9,7 +9,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
     "Windsurf became Devin Desktop on June 2, 2026. Where rules go now, what still reads .windsurfrules, the trigger frontmatter, and when AGENTS.md is enough.",
   lead: "Windsurf became Devin Desktop on June 2, 2026. Project rules now go in `.devin/rules/*.md`; `.windsurf/rules/` and a root `.windsurfrules` are still read as fallbacks, so nothing you have breaks. For rules your team shares across agents, an AGENTS.md does the same job, and most other agents read it too.",
   published: "2026-11-16",
-  updated: "2026-11-25",
+  updated: "2026-11-27",
   about: ["Windsurf", "Devin Desktop", "Cascade", "AGENTS.md", "AI coding agents"],
   sections: [
     {
@@ -38,27 +38,27 @@ export const DEVIN_DESKTOP_RULES: Guide = {
             [
               "`.devin/rules/*.md`",
               "Project, one rule per file",
-              "Preferred; takes precedence over `.windsurf/rules/` ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules))",
+              "Preferred ([docs](https://docs.devin.ai/desktop/devin-desktop-faq#are-my-windsurf-rules-still-supported-what-about-devin-rules)); `.windsurf/rules/` files load beside it ([docs](https://docs.devin.ai/desktop/devin-local/customizations#rule-files))",
             ],
             [
               "`.devin/global_rules.md`",
               "Project, one always-on file",
-              "Current ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+              "Current; wins over `.windsurf/global_rules.md` ([docs](https://docs.devin.ai/desktop/devin-local/customizations#rule-files))",
             ],
             [
               "`~/.devin/rules/*.md`, `~/.devin/global_rules.md`",
               "You, in every project",
-              "Current ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+              "Current ([docs](https://docs.devin.ai/desktop/devin-local/customizations#rule-files))",
             ],
             [
               "`AGENTS.md`, `AGENT.md`, `AGENTS.local.md`",
               "Always-on rules, per directory",
-              "Current; read from the workspace root down to the working directory ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md))",
+              "Current; read from the workspace root down to the working directory ([docs](https://docs.devin.ai/desktop/devin-local/customizations#agents-md))",
             ],
             [
               "`.windsurf/rules/*.md`, `.windsurf/global_rules.md`",
               "Project",
-              "Legacy; imported by default ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files))",
+              "Legacy; imported by default ([docs](https://docs.devin.ai/desktop/devin-local/customizations#rule-files))",
             ],
             [
               "`.windsurfrules`",
@@ -79,7 +79,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "Each rule is a Markdown file whose `trigger:` frontmatter decides when it applies ([docs](https://docs.devin.ai/desktop/cascade/memories#rule-files)):",
+          text: "Each rule is a Markdown file whose `trigger:` frontmatter decides when it applies ([docs](https://docs.devin.ai/desktop/devin-local/customizations#rule-files)):",
         },
         {
           kind: "table",
@@ -110,7 +110,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
         {
           kind: "snippet",
           caption: "A rules directory that leaves shared rules in AGENTS.md",
-          text: 'AGENTS.md                     # commands, layout, conventions: read by most agents\n.devin/\n  rules/\n    migrations.md               # trigger: glob, globs: "db/migrations/**"\n    release.md                  # trigger: manual\n  workflows/\n    deploy-preview.md           # run as /deploy-preview\n',
+          text: 'AGENTS.md                     # commands, layout, conventions: read by most agents\n.devin/\n  rules/\n    migrations.md               # trigger: glob, globs: "db/migrations/**"\n    release.md                  # trigger: manual\n.agents/\n  skills/\n    deploy-preview/SKILL.md     # a former workflow\n',
         },
         {
           kind: "p",
@@ -129,7 +129,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
         },
         {
           kind: "p",
-          text: "AGENTS.local.md is read too, for personal rules kept out of version control ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md)).",
+          text: "AGENTS.local.md is read too, for personal rules kept out of version control ([docs](https://docs.devin.ai/desktop/devin-local/customizations#agents-md)).",
         },
       ],
     },
@@ -139,7 +139,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
       blocks: [
         {
           kind: "p",
-          text: "In `.devin/workflows/` (or the legacy `.windsurf/workflows/`), one Markdown file each, capped at 12,000 characters ([docs](https://docs.devin.ai/desktop/cascade/workflows#workflow-storage-locations)). Run one in Cascade with `/name-of-workflow`. Personal global workflows stay in `~/.codeium/windsurf/global_workflows/`.",
+          text: "Into skills. Workflows were a Cascade feature, and Devin Desktop no longer starts Cascade conversations; Devin Local, which replaced it, doesn't run them ([docs](https://docs.devin.ai/desktop/cascade)). Turn each into a skill, for example in `.agents/skills/`.",
         },
       ],
     },
@@ -191,7 +191,7 @@ export const DEVIN_DESKTOP_RULES: Guide = {
     },
     {
       q: "Do I need to rename .windsurf to .devin?",
-      a: "No. Devin Desktop falls back to `.windsurf/`. If both exist, `.devin/rules/` takes precedence.",
+      a: "No. Rule files in `.devin/rules/` and `.windsurf/rules/` both load; of two `global_rules.md` files, only `.devin/global_rules.md` does.",
     },
     {
       q: "Does Devin Desktop read AGENTS.md?",
@@ -199,13 +199,13 @@ export const DEVIN_DESKTOP_RULES: Guide = {
     },
     {
       q: "Is there a character limit on Windsurf rules?",
-      a: "Devin Desktop's current docs state none for rules. Workflows are capped at 12,000 characters each.",
+      a: "Devin Desktop's current docs state none.",
     },
   ],
   sources: [
     "https://docs.devin.ai/desktop/devin-desktop-faq",
-    "https://docs.devin.ai/desktop/cascade/memories",
-    "https://docs.devin.ai/desktop/cascade/workflows",
+    "https://docs.devin.ai/desktop/devin-local/customizations",
+    "https://docs.devin.ai/desktop/cascade",
     "https://docs.devin.ai/onboard-devin/knowledge-onboarding",
     "https://docs.devin.ai/onboard-devin/agents-md",
   ],

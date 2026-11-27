@@ -29,8 +29,7 @@ export default function PrivacyPage() {
       >
         <p className="mt-2 text-[13px] text-muted">Last updated: {LAST_UPDATED}.</p>
         <p className="mt-1 text-[13px] text-muted">
-          Changed on {LAST_UPDATED}: Microsoft Clarity heatmaps and session recordings, and leaderboard search terms in
-          analytics.
+          Changed on {LAST_UPDATED}: how we tell which visitors to ask before Microsoft Clarity loads.
         </p>
       </PageHeader>
 
@@ -106,8 +105,9 @@ export default function PrivacyPage() {
           <p className="mt-3 text-[14.5px] leading-relaxed text-ink-dim">
             For visitors from the European Economic Area, the United Kingdom, and Switzerland, Google Analytics sets no
             cookies until they accept, and sends only cookieless pings that carry no identifier. Microsoft Clarity sets
-            no cookies for them until they accept. They can change their answer below; declining removes Clarity&apos;s
-            cookies at once and stops it from loading on later pages.
+            no cookies for them until they accept. We find these visitors by their device&apos;s time zone;
+            Clarity&apos;s own location check covers those whose time zone points elsewhere. They can change their
+            answer below; declining removes Clarity&apos;s cookies at once and stops it from loading on later pages.
           </p>
           {ANALYTICS_ON && <ConsentSettingsButton className="mt-3 btn-secondary btn-sm" />}
         </Panel>

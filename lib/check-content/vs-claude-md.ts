@@ -20,7 +20,7 @@ export const SETUPS: { id: InstructionSetup; name: string; note: string; caption
   {
     id: "separate",
     name: "Two separate files",
-    note: "Claude Code reads only CLAUDE.md, the other agents only AGENTS.md, and the two drift apart. Only worth it when the content really differs.",
+    note: "Claude Code reads only CLAUDE.md, most other agents only AGENTS.md, and the two drift apart. Only worth it when the content really differs.",
   },
 ];
 
@@ -50,7 +50,7 @@ export const VS_CLAUDE_MD_SOURCES = [
   "https://code.claude.com/docs/en/memory#agents-md",
   "https://agents.md/",
   "https://learn.chatgpt.com/docs/agent-configuration/agents-md",
-  "https://cursor.com/docs/context/rules",
+  "https://cursor.com/docs/rules",
   "https://docs.github.com/en/copilot/reference/custom-instructions-support",
   "https://geminicli.com/docs/cli/gemini-md/",
   "https://docs.devin.ai/onboard-devin/agents-md",

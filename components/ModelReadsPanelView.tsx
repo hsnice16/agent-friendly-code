@@ -17,12 +17,13 @@ export type Props = {
   checks: { id: string; weight: string; pass: string }[];
   /** `id` is a signal id, or "claude_md" for CLAUDE.md, which shares the AGENTS.md check. */
   file: { id: string; present: number; total: number } | null;
-  pairs: Href[];
+  /** The pair averages on /agents, when this agent is in a pair. */
+  compareHref: string | null;
   sources: Href[];
   examples: Href[];
 };
 
-export function ModelReadsPanelView({ modelId, modelLabel, checks, file: f, pairs, sources, examples }: Props) {
+export function ModelReadsPanelView({ modelId, modelLabel, checks, file: f, compareHref, sources, examples }: Props) {
   const claudeMd = f?.id === "claude_md";
   const file = f && {
     ...f,
@@ -80,14 +81,11 @@ export function ModelReadsPanelView({ modelId, modelLabel, checks, file: f, pair
           </p>
         )}
 
-        {pairs.length > 0 && (
-          <p className="mt-3 mb-0 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[13px] text-muted">
-            <span>Compare:</span>
-            {pairs.map((p) => (
-              <IntentLink key={p.href} href={p.href} className="prose-link">
-                {p.label}
-              </IntentLink>
-            ))}
+        {compareHref && (
+          <p className="mt-3 mb-0 text-[13px] text-muted">
+            <IntentLink href={compareHref} className="arrow-link">
+              Compare with other agents →
+            </IntentLink>
           </p>
         )}
 

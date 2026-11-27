@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isRegistry } from "@/lib/clients/registries";
+import { isRegistry, REGISTRIES } from "@/lib/clients/registries";
 import { LIVE_CACHE_CONTROL } from "@/lib/constants/cache";
 import { lookupPackage } from "@/lib/package-lookup";
 import { APP_URL } from "@/lib/version";
@@ -12,7 +12,7 @@ export async function GET(_req: Request, ctx: { params: Promise<{ registry: stri
   const { registry, name } = await ctx.params;
 
   if (!isRegistry(registry)) {
-    return NextResponse.json({ error: "unsupported registry", supported: ["npm", "pypi", "cargo"] }, { status: 400 });
+    return NextResponse.json({ error: "unsupported registry", supported: REGISTRIES }, { status: 400 });
   }
 
   const result = await lookupPackage(registry, name);

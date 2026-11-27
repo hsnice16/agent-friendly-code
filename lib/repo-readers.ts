@@ -72,8 +72,8 @@ export function fileReaders(signals: SignalResult[], root: RootFiles): FileReade
 
   const main = byId.get("agents_md");
   if (main?.matchedPath && hasAgentFile(main)) {
-    const file = main.matchedPath.toLowerCase() === "agents.md" ? "AGENTS.md" : main.matchedPath;
-    const known = ["AGENTS.md", "CLAUDE.md", ".claude/CLAUDE.md"].find((f) => f.toLowerCase() === file.toLowerCase());
+    const path = main.matchedPath.toLowerCase();
+    const known = ["AGENTS.md", "CLAUDE.md", ".claude/CLAUDE.md"].find((f) => f.toLowerCase() === path);
     const readers = known ? mainReaders(known, root) : null;
     if (known && readers) out.push({ file: known, readers });
   }

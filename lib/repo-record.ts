@@ -6,7 +6,7 @@ import { CENSUS, type CensusRepo } from "./file-census";
 import { type FileReaders, fileReaders, type RootFiles } from "./repo-readers";
 import type { SignalResult } from "./scoring/signals";
 import { hasAgentFile, OTHER_FILES } from "./utils/agent-instructions";
-import { formatDay } from "./utils/format";
+import { formatDay, plural } from "./utils/format";
 import { repoFileUrl } from "./utils/repo-file-url";
 import { repoKey } from "./utils/repo-path";
 import { AI_POLICY_REPORT_PATH } from "./utils/report-path";
@@ -136,8 +136,6 @@ export function censusFacts(
     relations,
   };
 }
-
-const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? "" : "s"}`;
 
 export function policyFact(repo: RepoRef, data: AiPolicyData = AI_POLICY): PolicyFact | null {
   const key = repoKey(repo);

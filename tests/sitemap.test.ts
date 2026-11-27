@@ -23,13 +23,11 @@ describe("sitemap", async () => {
     }
   });
 
-  it("lists the guides, reports, comparisons and contribute pages", async () => {
+  it("lists the guides, reports and contribute pages, and no retired comparison", async () => {
     const { GUIDES } = await import("../lib/guides");
-    const { COMPARE_PAIRS } = await import("../lib/compare-pairs");
+    assert.ok(!urls.some((u) => u.includes("/compare")), "a /compare URL redirects to /agents");
     const paths = [
       ...GUIDES.map((g) => `/guide/${g.slug}`),
-      ...COMPARE_PAIRS.map((p) => `/compare/${p.slug}`),
-      "/compare",
       "/contribute",
       "/report/agents-md-size",
       "/report/ai-contribution-policy",

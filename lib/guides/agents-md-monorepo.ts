@@ -101,7 +101,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
             ],
             [
               "Devin Desktop (ex-Windsurf)",
-              "AGENTS.md, AGENTS.local.md and AGENT.md as always-on rules, in each directory from the workspace root to the working directory ([docs](https://docs.devin.ai/desktop/cascade/memories#agents-md)).",
+              "AGENTS.md, AGENTS.local.md and AGENT.md as always-on rules, in each directory from the workspace root to the working directory ([docs](https://docs.devin.ai/desktop/devin-local/customizations#agents-md)).",
               "Not documented beyond that path.",
             ],
             [
@@ -266,7 +266,7 @@ export const AGENTS_MD_MONOREPO: Guide = {
     "https://geminicli.com/docs/cli/gemini-md/",
     "https://opencode.ai/docs/rules/",
     "https://docs.devin.ai/onboard-devin/agents-md",
-    "https://docs.devin.ai/desktop/cascade/memories",
+    "https://docs.devin.ai/desktop/devin-local/customizations",
     "https://antigravity.google/docs/rules",
     "https://aider.chat/docs/usage/conventions.html",
   ],

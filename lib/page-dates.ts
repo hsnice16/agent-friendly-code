@@ -1,5 +1,3 @@
-import { comparePair } from "./agent-scores";
-import { getScoredRepos } from "./agent-scores-data";
 import { getAgentSkillsReport } from "./agent-skills-data";
 import { AGENT_DOCS_CHECKED } from "./agents-faq";
 import { AI_POLICY } from "./ai-policy";
@@ -7,8 +5,6 @@ import { pageSlice } from "./board";
 import { CHECK_CONTENT } from "./check-content";
 import { VS_AGENTS_MD } from "./check-content/vs-agents-md";
 import { getCheckStats } from "./check-stats";
-import type { ComparePair } from "./compare-pairs";
-import { LANGUAGE_AGENTS_MIN_REPOS } from "./constants/scoring";
 import { getContributeList } from "./contribute-data";
 import { listLeaderboard } from "./db";
 import { CENSUS_SUMMARY } from "./file-census";
@@ -41,10 +37,9 @@ const COPY = {
   frameworkGuides: "2026-11-16",
   languageGuides: "2026-11-16",
   examples: "2026-11-22",
-  vsClaudeMd: "2026-11-22",
+  vsClaudeMd: "2026-11-27",
   vsAgentsMd: "2026-11-22",
-  compare: "2026-11-16",
-  compareHub: "2026-11-16",
+  agents: "2026-11-27",
   sizeReport: "2026-11-22",
   contribute: "2026-11-16",
   languageHub: "2026-11-25",
@@ -79,16 +74,6 @@ export function vsAgentsMdModified(id: string): string {
   return pageModified(COPY.vsAgentsMd, [], VS_AGENTS_MD[id].file === "GEMINI.md" ? CENSUS_SUMMARY.date : null);
 }
 
-export function compareModified(pair: ComparePair): string {
-  const s = comparePair(getScoredRepos(), pair.a, pair.b, LANGUAGE_AGENTS_MIN_REPOS);
-  return pageModified(
-    COPY.compare,
-    [...s.aAhead, ...s.bAhead].map((g) => g.repo),
-  );
-}
-
-export const compareHubModified = () => pageModified(COPY.compareHub);
-
 export function contributeModified(list = getContributeList()): string {
   return pageModified(COPY.contribute, [...list.top, ...list.languages.flatMap((l) => l.rows)]);
 }
@@ -96,7 +81,7 @@ export function contributeModified(list = getContributeList()): string {
 // Its agents section shows the same rows as its board, so they date both.
 export const hubModified = (g: { rows: Dated[] }) => pageModified(COPY.languageHub, g.rows);
 
-export const agentsModified = () => pageModified(AGENT_DOCS_CHECKED);
+export const agentsModified = () => pageModified(COPY.agents, [], AGENT_DOCS_CHECKED);
 
 export const guideHubModified = () => pageModified(COPY.guideHub);
 

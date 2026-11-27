@@ -19,5 +19,7 @@ describe("csvField", () => {
   it("defuses formula-leading text", () => {
     for (const lead of ["=", "+", "-", "@"]) assert.equal(csvField(`${lead}1+1`), `'${lead}1+1`);
     assert.equal(csvField('=HYPERLINK("x",1)'), '"\'=HYPERLINK(""x"",1)"');
+    assert.equal(csvField("  =1+1"), "'  =1+1");
+    assert.equal(csvField("a = b"), "a = b");
   });
 });

@@ -33,6 +33,7 @@ const DEVIN_CLI = "https://docs.devin.ai/cli/extensibility/rules";
 const DEVIN_BLUEPRINT = "https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints";
 const KIMI = "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/customization/agents.md";
 const KIMI_COMMANDS = "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/reference/slash-commands.md";
+const KIMI_CONFIG = "https://github.com/MoonshotAI/kimi-code/blob/main/docs/en/configuration/config-files.md";
 const GEMINI = "https://geminicli.com/docs/cli/gemini-md/";
 const ANTIGRAVITY_CLI = "https://antigravity.google/docs/cli/gcli-migration";
 const AIDER = "https://aider.chat/docs/usage/conventions.html";
@@ -41,9 +42,10 @@ const AIDER_TEST = "https://aider.chat/docs/usage/lint-test.html";
 const OPENHANDS = "https://docs.openhands.dev/overview/skills";
 const OPENHANDS_SETUP = "https://docs.openhands.dev/openhands/usage/customization/repository";
 const PI = "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/configuration.md";
-// Pi's docs don't give the per-directory order or the off switch; its loader and CLI do.
+// Pi's docs don't give the per-directory order; its loader does.
 const PI_LOADER = "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/core/resource-loader.ts";
-const PI_ARGS = "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/src/cli/args.ts";
+const PI_CLI = "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/cli.md";
+const PI_USAGE = "https://github.com/earendil-works/pi/blob/main/packages/coding-agent/docs/usage.md";
 
 const NOT_DOCUMENTED = "Not documented.";
 
@@ -83,7 +85,7 @@ export const AGENT_SETUP: Record<ModelId, AgentSetup> = {
     reads: `AGENTS.md at the project root and in subdirectories, combined, the more specific winning ([docs](${CURSOR})). CLAUDE.md the same way, always applied ([help](${CURSOR_HELP})). Rules are \`.mdc\` files in \`.cursor/rules/\`. The CLI reads a root AGENTS.md and CLAUDE.md ([CLI docs](${CURSOR_CLI})).`,
     needs: `Not for AGENTS.md. A plain \`.md\` in \`.cursor/rules/\` is ignored; an Apply Intelligently rule needs a \`description\`, and Apply to Specific Files needs \`globs\` that match ([docs](${CURSOR})).`,
     limit: `None documented. Guidance: keep each rule under 500 lines ([docs](${CURSOR})).`,
-    confirm: `Customize lists every rule and its status; the docs describe no per-chat view of what applied. Rules apply to Agent (Chat), not Tab or Bugbot ([help](${CURSOR_HELP})).`,
+    confirm: `Customize lists every rule and its status; the docs describe no per-chat view of what applied ([docs](${CURSOR})). Rules apply to Agent (Chat), not Tab or Bugbot ([help](${CURSOR_HELP})).`,
     reload: NOT_DOCUMENTED,
     setup: [
       "Add a root AGENTS.md; Cursor picks it up with no setting.",
@@ -113,10 +115,10 @@ export const AGENT_SETUP: Record<ModelId, AgentSetup> = {
     needs: `No ([docs](${KIMI})).`,
     limit: NOT_DOCUMENTED,
     confirm: `Not documented. \`/init\` writes an AGENTS.md from the codebase ([commands](${KIMI_COMMANDS})).`,
-    reload: `\`/reload\` reloads the session and tells the agent about external AGENTS.md changes ([commands](${KIMI_COMMANDS})).`,
-    setup: ["Add a root AGENTS.md, or run `/init` to draft one.", "After editing it mid-session, run `/reload`."],
+    reload: `File watchers reload AGENTS.md by default ([config](${KIMI_CONFIG})); \`/reload\` forces it ([commands](${KIMI_COMMANDS})).`,
+    setup: ["Add a root AGENTS.md, or run `/init` to draft one."],
     checks: ["agents_md", "agent_skills"],
-    sources: [KIMI, KIMI_COMMANDS],
+    sources: [KIMI, KIMI_COMMANDS, KIMI_CONFIG],
   },
   "gemini-cli": {
     reads: `\`~/.gemini/GEMINI.md\`, then GEMINI.md in the workspace directories and their parents. When a tool touches a file, that directory and its ancestors up to a trusted root ([docs](${GEMINI})). For unpaid and Google One users, Antigravity CLI replaced it on June 18, 2026 ([docs](${GEMINI})); that reads GEMINI.md and AGENTS.md in the active directory ([migration](${ANTIGRAVITY_CLI})).`,
@@ -161,9 +163,9 @@ export const AGENT_SETUP: Record<ModelId, AgentSetup> = {
   },
   pi: {
     reads: `The agent directory (\`~/.pi/agent\`), the working directory and each directory above it ([docs](${PI})). In each, the first of AGENTS.override.md, AGENTS.md, AGENTS.MD, CLAUDE.md and CLAUDE.MD, so an empty AGENTS.md still hides a CLAUDE.md beside it ([loader](${PI_LOADER})). Nothing below the working directory.`,
-    needs: `No, and no project trust ([docs](${PI})). \`--no-context-files\` (\`-nc\`) turns them off ([CLI](${PI_ARGS})).`,
+    needs: `No, and no project trust ([docs](${PI})). \`--no-context-files\` (\`-nc\`) turns them off ([CLI](${PI_CLI}#resources)).`,
     limit: NOT_DOCUMENTED,
-    confirm: NOT_DOCUMENTED,
+    confirm: `The startup header lists the instructions it loaded ([docs](${PI_USAGE}#follow-pis-work)).`,
     reload: `\`/reload\` after changing instructions ([docs](${PI})).`,
     setup: [
       "Add a root AGENTS.md; Pi reads it from any directory below.",
@@ -171,7 +173,7 @@ export const AGENT_SETUP: Record<ModelId, AgentSetup> = {
       "Run `/reload` after editing it mid-session.",
     ],
     checks: ["agents_md", "agent_skills"],
-    sources: [PI, PI_LOADER, PI_ARGS],
+    sources: [PI, PI_LOADER, PI_CLI, PI_USAGE],
   },
 };
 

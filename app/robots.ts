@@ -34,18 +34,19 @@ const BULK_LIMITED = [
   "cohere-training-data-crawler",
 ];
 
-// /score/* is unbounded — one URL per repo that exists anywhere. Re-cut board
-// URLs aren't disallowed: a blocked URL's canonical is never read.
+// /score/* is unbounded — one URL per repo that exists anywhere — and its card
+// at /og/score/* can start a live score. Re-cut board URLs aren't disallowed: a
+// blocked URL's canonical is never read.
 //
 // `_rsc` is the payload Next.js fetches when it prefetches a link. Googlebot
 // follows those too: they were 94% of its requests here, against 5% for HTML.
-const DISALLOW = ["/api/", "/score/", "/*?_rsc=", "/*&_rsc="];
+const DISALLOW = ["/api/", "/score/", "/og/score/", "/*?_rsc=", "/*&_rsc="];
 
 // A shared Live Score link is only worth sharing with its card, and these
 // unfurlers obey robots.txt: a Disallow leaves the post with a bare URL. They
 // fetch only what someone pasted, so /score/ costs nothing to open to them.
 const LINK_PREVIEW = ["Twitterbot", "LinkedInBot", "facebookexternalhit", "Discordbot", "TelegramBot", "WhatsApp"];
-const PREVIEW_DISALLOW = DISALLOW.filter((path) => path !== "/score/");
+const PREVIEW_DISALLOW = DISALLOW.filter((path) => path !== "/score/" && path !== "/og/score/");
 
 // The home Dataset's `distribution.contentUrl`; the longer rule beats `/api/`.
 const ALLOW = ["/", "/api/repos"];

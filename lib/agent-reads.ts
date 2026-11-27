@@ -44,11 +44,7 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     agentsMd: "always",
     claudeMd: true,
     note: "Project rules are `.mdc` files in `.cursor/rules/`, subfolders included; a plain `.md` there is ignored. AGENTS.md is read at the root and in subdirectories, combined, the more specific winning. CLAUDE.md is read the same way; the docs describe one at the root. A root `.cursorrules` is legacy and will be deprecated.",
-    sources: [
-      "https://cursor.com/docs/context/rules",
-      "https://cursor.com/help/customization/rules",
-      "https://cursor.com/docs/cli/using",
-    ],
+    sources: ["https://cursor.com/help/customization/rules", "https://cursor.com/docs/cli/using"],
   },
   devin: {
     files: [
@@ -62,10 +58,7 @@ export const AGENT_READS: Record<ModelId, AgentReads> = {
     agentsMd: "always",
     claudeMd: true,
     note: "Looks for AGENTS.md before it starts coding and includes its first 16 KiB. Pulls CLAUDE.md and Cursor rule files into its Knowledge, which its docs mark deprecated in favour of Skills. Setup comes from its environment snapshot, which `.devin/blueprint.yaml` can define.",
-    sources: [
-      "https://docs.devin.ai/onboard-devin/agents-md",
-      "https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints",
-    ],
+    sources: ["https://docs.devin.ai/onboard-devin/environment/git-backed-blueprints"],
   },
   "kimi-cli": {
     files: ["AGENTS.md", ".kimi-code/AGENTS.md", ".agents/skills/"],
@@ -137,12 +130,13 @@ export const OTHER_TOOLS: OtherTool[] = [
     ],
     agentsMd: "Cloud agent, code review, CLI and VS Code",
     answer:
-      "On some surfaces. Copilot cloud agent, code review and CLI read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. In VS Code, the Copilot harness combines every AGENTS.md on its path; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones only with the experimental `chat.useNestedAgentsMdFiles` on as well. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat in Visual Studio, JetBrains, Eclipse or Xcode.",
+      "On some surfaces. Copilot cloud agent and code review read AGENTS.md files anywhere in the repo, the nearest one taking precedence, or a single root CLAUDE.md or GEMINI.md instead. Copilot CLI combines every AGENTS.md, CLAUDE.md and GEMINI.md from the repo root to the working directory and on the path to each file it works on. In VS Code, the Copilot harness combines every AGENTS.md on its path; the Local harness reads a root one only with `chat.useAgentsMdFile` on, and nested ones only with the experimental `chat.useNestedAgentsMdFiles` on as well. Copilot's own file, its CLAUDE.md equivalent, is `.github/copilot-instructions.md`, which every surface but Eclipse code review reads; the support matrix lists no AGENTS.md for chat on github.com or in Visual Studio, JetBrains, Eclipse or Xcode.",
     sources: [
       "https://docs.github.com/en/copilot/how-tos/copilot-on-github/customize-copilot/add-custom-instructions/add-repository-instructions",
       "https://docs.github.com/en/copilot/reference/custom-instructions-support",
+      "https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-custom-instructions",
       "https://code.visualstudio.com/docs/agents/reference/custom-instructions-reference",
-      "https://docs.github.com/en/copilot/concepts/agents/about-agent-skills",
+      "https://docs.github.com/en/copilot/concepts/customizations/agent-skills",
     ],
   },
   {
@@ -167,7 +161,10 @@ export const OTHER_TOOLS: OtherTool[] = [
     agentsMd: "Yes, always on",
     answer:
       "Yes. Windsurf became Devin Desktop on June 2, 2026, and treats AGENTS.md as an always-on rule, read in each directory from the workspace root down to the working directory. Its own rules go in `.devin/rules/*.md`; the legacy `.windsurf/rules/` and `.windsurfrules` are still read.",
-    sources: ["https://docs.devin.ai/desktop/devin-desktop-faq", "https://docs.devin.ai/desktop/cascade/memories"],
+    sources: [
+      "https://docs.devin.ai/desktop/devin-desktop-faq",
+      "https://docs.devin.ai/desktop/devin-local/customizations",
+    ],
   },
   {
     name: "Kiro",

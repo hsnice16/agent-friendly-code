@@ -48,8 +48,10 @@ describe("robots", () => {
 
   it("lets link unfurlers read Live Score pages that search crawlers can't", () => {
     assert.ok([ruleFor("*")?.disallow].flat().includes("/score/"));
+    assert.ok([ruleFor("*")?.disallow].flat().includes("/og/score/"));
     const preview = [ruleFor("Twitterbot")?.disallow].flat();
     assert.ok(!preview.includes("/score/"));
+    assert.ok(!preview.includes("/og/score/"));
     assert.ok(preview.includes("/api/"));
   });
 });

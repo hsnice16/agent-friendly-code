@@ -52,12 +52,12 @@ export const AGENT_FILE_CHECKS: Record<string, CheckContent> = {
   },
   openhands_setup: {
     published: "2026-10-12",
-    updated: "2026-11-16",
+    updated: "2026-11-27",
     title: ".openhands/setup.sh: the setup script OpenHands runs",
     description:
       "What .openhands/setup.sh does, when OpenHands runs it, how we score it, and how many popular open source repos have one.",
     what: "`.openhands/setup.sh` is a shell script OpenHands runs on starting work in a repo, to install dependencies and prepare what the tests need.",
-    why: "Per its repo-customization docs, OpenHands runs this script every time it begins work in a repo, in a container or on the host, so the agent starts with a working environment instead of figuring out the install. Only OpenHands reads it, so this check only affects its score.",
+    why: "Per its repo-customization docs, OpenHands runs this script every time it begins work in a repo, so the agent starts with a working environment instead of figuring out the install. Only OpenHands reads it, so this check only affects its score.",
     scoring: [
       "Full pass: `.openhands/setup.sh` exists and is not empty.",
       "20%: the file exists but is empty.",

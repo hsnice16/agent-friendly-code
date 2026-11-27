@@ -2,13 +2,8 @@
 
 import { MODEL_LABEL } from "@/lib/model-labels";
 import type { ModelId } from "@/lib/scoring/weights";
-import { comparePath } from "@/lib/utils/compare-path";
-
-import { IntentLink } from "./IntentLink";
-import { LINK } from "./link-class";
 
 export type ComparePairRow = {
-  slug: string;
   a: ModelId;
   b: ModelId;
   avgA: number;
@@ -37,11 +32,9 @@ export function ComparePairsView({ pairs }: { pairs: ComparePairRow[] }) {
         </thead>
         <tbody>
           {pairs.map((p) => (
-            <tr key={p.slug}>
+            <tr key={`${p.a}-${p.b}`}>
               <th scope="row" className="font-medium">
-                <IntentLink href={comparePath(p.slug)} className={`${LINK} cover-link`}>
-                  {MODEL_LABEL[p.a]} vs {MODEL_LABEL[p.b]}
-                </IntentLink>
+                {MODEL_LABEL[p.a]} vs {MODEL_LABEL[p.b]}
               </th>
               <td className="text-right tabular-nums">
                 {p.avgA.toFixed(1)} vs {p.avgB.toFixed(1)}
