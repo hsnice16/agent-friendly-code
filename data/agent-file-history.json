@@ -101,7 +101,7 @@
     "https://github.com/hsnice16/agent-friendly-code": {"agentsMd":["2026-04-23","2026-04-23"]},
     "https://github.com/hsnice16/tula": {"agentsMd":["2026-10-01","2026-10-01"],"geminiMd":["2026-10-01","2026-10-01"],"cursorRules":["2026-10-01","2026-10-01"],"openhandsSetup":["2026-10-01","2026-10-01"],"aiderConf":["2026-10-01","2026-10-01"]},
     "https://github.com/huggingface/diffusers": {"agentsMd":["2026-04-24","2026-06-16","2026-06-15"]},
-    "https://github.com/huggingface/transformers": {"agentsMd":["2026-04-23","2026-04-23"]},
+    "https://github.com/huggingface/transformers": {"agentsMd":["2026-04-23","2026-04-23"],"geminiMd":["2026-04-26","2026-11-27"]},
     "https://github.com/immich-app/immich": {"agentsMd":["2026-05-08","2026-10-30","2026-10-29"]},
     "https://github.com/inngest/inngest": {"agentsMd":["2026-05-08","2026-05-08"]},
     "https://github.com/jdx/mise": {"agentsMd":["2026-11-20","2026-11-20"],"cursorRules":["2026-11-20","2026-11-20"],"agentSkills":["2026-11-20","2026-11-20"]},
