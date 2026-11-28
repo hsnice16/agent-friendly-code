@@ -216,7 +216,7 @@
     "https://github.com/solidjs/solid": {"agentsMd":["2026-06-01","2026-11-18","2026-11-17"],"cursorRules":["2026-06-01","2026-11-17","2026-11-16"]},
     "https://github.com/sonarr/sonarr": {"agentsMd":["2026-11-17","2026-11-17"]},
     "https://github.com/spring-projects/spring-framework": {"agentsMd":["2026-04-24","2026-10-02","2026-10-01"]},
-    "https://github.com/sqlfluff/sqlfluff": {"agentsMd":["2026-05-20","2026-05-20"]},
+    "https://github.com/sqlfluff/sqlfluff": {"agentsMd":["2026-05-20","2026-05-20"],"agentSkills":["2026-10-24","2026-11-28","2026-11-27"]},
     "https://github.com/square/leakcanary": {"agentsMd":["2026-10-15","2026-10-15"]},
     "https://github.com/starrocks/starrocks": {"agentsMd":["2026-06-17","2026-06-17"]},
     "https://github.com/statelyai/xstate": {"agentsMd":["2026-07-15","2026-07-15"]},
